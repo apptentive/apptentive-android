@@ -4,6 +4,7 @@ import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.EventPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PersonPayload;
 import com.apptentive.android.sdk.model.SdkAndAppReleasePayload;
 import com.apptentive.android.sdk.model.SdkPayload;
@@ -12,16 +13,20 @@ import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static android.text.TextUtils.isEmpty;
 
 /**
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
-public class ApptentiveHttpClient {
+public class ApptentiveHttpClient implements PayloadRequestSender {
 	public static final String API_VERSION = "7";
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
@@ -41,6 +46,8 @@ public class ApptentiveHttpClient {
 	private final String userAgentString;
 	private final HttpRequestManager httpRequestManager;
 
+	private final Map<Class<? extends Payload>, PayloadRequestFactory> payloadRequestFactoryLookup;
+
 	public ApptentiveHttpClient(String oauthToken, String serverURL) {
 		if (isEmpty(oauthToken)) {
 			throw new IllegalArgumentException("Illegal OAuth Token: '" + oauthToken + "'");
@@ -54,6 +61,7 @@ public class ApptentiveHttpClient {
 		this.oauthToken = oauthToken;
 		this.serverURL = serverURL;
 		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
+		this.payloadRequestFactoryLookup = createPayloadRequestFactoryLookup();
 	}
 
 	//region API Requests
@@ -62,33 +70,92 @@ public class ApptentiveHttpClient {
 		return startJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST, listener);
 	}
 
-	public HttpJsonRequest sendEvent(EventPayload event, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_EVENTS, event, HttpRequestMethod.POST, listener);
+	//endregion
+
+	//region PayloadRequestSender
+
+	@Override
+	public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (payload == null) {
+			throw new IllegalArgumentException("Payload is null");
+		}
+
+		final PayloadRequestFactory requestFactory = payloadRequestFactoryLookup.get(payload.getClass());
+		if (requestFactory == null) {
+			throw new IllegalArgumentException("Unexpected payload type: " + payload.getClass());
+		}
+
+		HttpRequest request = requestFactory.createRequest(payload);
+		request.setListener(listener);
+		httpRequestManager.startRequest(request);
+		return request;
 	}
 
-	public HttpJsonRequest sendDevice(DevicePayload device, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_DEVICES, device, HttpRequestMethod.PUT, listener);
-	}
+	//endregion
 
-	public HttpJsonRequest sendSdk(SdkPayload sdk, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_CONVERSATION, sdk, HttpRequestMethod.PUT, listener);
-	}
+	//region Payload Request Factory
 
-	public HttpJsonRequest sendAppRelease(AppReleasePayload appRelease, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_CONVERSATION, appRelease, HttpRequestMethod.PUT, listener);
-	}
+	private Map<Class<? extends Payload>, PayloadRequestFactory> createPayloadRequestFactoryLookup() {
+		Map<Class<? extends Payload>, PayloadRequestFactory> lookup = new HashMap<>();
 
-	public HttpJsonRequest sendSdkAndAppRelease(SdkAndAppReleasePayload payload, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT, listener);
-	}
+		// Event Payload
+		lookup.put(EventPayload.class, new PayloadRequestFactory<EventPayload>() {
+			@Override
+			public HttpRequest createRequest(EventPayload payload) {
+				return createJsonRequest(ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
+			}
+		});
 
-	public HttpJsonRequest sendPerson(PersonPayload person, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_PEOPLE, person, HttpRequestMethod.PUT, listener);
-	}
+		// Device Payload
+		lookup.put(DevicePayload.class, new PayloadRequestFactory<DevicePayload>() {
+			@Override
+			public HttpRequest createRequest(DevicePayload payload) {
+				return createJsonRequest(ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
+			}
+		});
 
-	public HttpJsonRequest sendSurvey(SurveyResponsePayload survey, HttpRequest.Listener<HttpJsonRequest> listener) {
-		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return startJsonRequest(endpoint, survey, HttpRequestMethod.POST, listener);
+		// SDK Payload
+		lookup.put(SdkPayload.class, new PayloadRequestFactory<SdkPayload>() {
+			@Override
+			public HttpRequest createRequest(SdkPayload payload) {
+				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+			}
+		});
+
+		// App Release Payload
+		lookup.put(AppReleasePayload.class, new PayloadRequestFactory<AppReleasePayload>() {
+			@Override
+			public HttpRequest createRequest(AppReleasePayload payload) {
+				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+			}
+		});
+
+		// SDK and App Release Payload
+		lookup.put(SdkAndAppReleasePayload.class, new PayloadRequestFactory<SdkAndAppReleasePayload>() {
+			@Override
+			public HttpRequest createRequest(SdkAndAppReleasePayload payload) {
+				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+			}
+		});
+
+		// Person Payload
+		lookup.put(PersonPayload.class, new PayloadRequestFactory<PersonPayload>() {
+			@Override
+			public HttpRequest createRequest(PersonPayload payload) {
+				return createJsonRequest(ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
+			}
+		});
+
+		// Survey Payload
+		lookup.put(SurveyResponsePayload.class, new PayloadRequestFactory<SurveyResponsePayload>() {
+			@Override
+			public HttpRequest createRequest(SurveyResponsePayload survey) {
+				String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
+				return createJsonRequest(endpoint, survey, HttpRequestMethod.POST);
+			}
+		});
+
+		return lookup;
 	}
 
 	//endregion
@@ -96,13 +163,18 @@ public class ApptentiveHttpClient {
 	//region Helpers
 
 	private HttpJsonRequest startJsonRequest(String endpoint, JSONObject jsonObject, HttpRequestMethod method, HttpRequest.Listener<HttpJsonRequest> listener) {
+		HttpJsonRequest request = createJsonRequest(endpoint, jsonObject, method);
+		request.setListener(listener);
+		httpRequestManager.startRequest(request);
+		return request;
+	}
+
+	private HttpJsonRequest createJsonRequest(String endpoint, JSONObject jsonObject, HttpRequestMethod method) {
 		String url = createEndpointURL(endpoint);
 		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
 		setupRequestDefaults(request);
 		request.setMethod(method);
 		request.setRequestProperty("Content-Type", "application/json");
-		request.setListener(listener);
-		httpRequestManager.startRequest(request);
 		return request;
 	}
 

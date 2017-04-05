@@ -8,23 +8,11 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
-import com.apptentive.android.sdk.model.AppReleasePayload;
-import com.apptentive.android.sdk.model.DevicePayload;
-import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.model.PersonPayload;
-import com.apptentive.android.sdk.model.SdkAndAppReleasePayload;
-import com.apptentive.android.sdk.model.SdkPayload;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.model.SurveyResponsePayload;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
@@ -37,21 +25,13 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
-import static com.apptentive.android.sdk.model.Payload.BaseType.app_release;
-import static com.apptentive.android.sdk.model.Payload.BaseType.device;
-import static com.apptentive.android.sdk.model.Payload.BaseType.event;
-import static com.apptentive.android.sdk.model.Payload.BaseType.message;
-import static com.apptentive.android.sdk.model.Payload.BaseType.person;
-import static com.apptentive.android.sdk.model.Payload.BaseType.sdk;
-import static com.apptentive.android.sdk.model.Payload.BaseType.sdk_and_app_release;
-import static com.apptentive.android.sdk.model.Payload.BaseType.survey;
 
 public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver, PayloadSender.Listener {
 
@@ -66,7 +46,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
 	 */
-	public ApptentiveTaskManager(Context context) {
+	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient) {
 		dbHelper = new ApptentiveDatabaseHelper(context);
 		/* When a new database task is submitted, the executor has the following behaviors:
 		 * 1. If the thread pool has no thread yet, it creates a single worker thread.
@@ -82,9 +62,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
 
-		payloadSender = new PayloadSender();
+		payloadSender = new PayloadSender(apptentiveHttpClient);
 		payloadSender.setListener(this);
-		registerPayloadTypeSenders(payloadSender);
 
 		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
 	}
@@ -169,14 +148,17 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	//region PayloadSender.Listener
 
-	@Override
-	public void onFinishSending(PayloadSender sender, Payload payload) {
-		deletePayload(payload);
-	}
 
 	@Override
-	public void onFailSending(PayloadSender sender, Payload payload, String errorMessage) {
-		ApptentiveLog.e(PAYLOADS, "Unable to send payload: %s", errorMessage);
+	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+		if (cancelled) {
+			ApptentiveLog.v(PAYLOADS, "Payload sending was cancelled: %s", payload);
+		} else if (errorMessage != null) {
+			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s", payload);
+		} else {
+			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
+		}
+
 		deletePayload(payload);
 	}
 
@@ -209,90 +191,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		}
 
 		payloadSender.sendPayload(payload);
-	}
-
-	private void registerPayloadTypeSenders(PayloadSender sender) {
-		/*
-		 * Each payload type requires its own way of being sent to the server.
-	 	 * Instead of baking all the types into the {@link PayloadSender} we provide a
-	 	 * lookup table.
-	   */
-
-		// message
-		sender.registerTypeSender(message, new PayloadTypeSender<ApptentiveMessage>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(ApptentiveMessage payload) {
-				// TODO: figure out a better solution (probably using notifications)
-				MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-				if (mgr != null) {
-					mgr.resumeSending();
-				}
-				final ApptentiveHttpResponse response = ApptentiveClient.postMessage(payload);
-				if (mgr != null) {
-					// if message is rejected temporarily, onSentMessage() will pause sending
-					mgr.onSentMessage(payload, response);
-				}
-				return response;
-			}
-		});
-
-		//event
-		sender.registerTypeSender(event, new PayloadTypeSender<EventPayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(EventPayload event) {
-				return ApptentiveClient.postEvent(event);
-			}
-		});
-
-		// device
-		sender.registerTypeSender(device, new PayloadTypeSender<DevicePayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(DevicePayload payload) {
-				final ApptentiveHttpResponse response = ApptentiveClient.putDevice(payload);
-				DeviceManager.onSentDeviceInfo(); // TODO: find a better solution
-				return response;
-			}
-		});
-
-		// sdk
-		sender.registerTypeSender(sdk, new PayloadTypeSender<SdkPayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(SdkPayload payload) {
-				return ApptentiveClient.putSdk(payload);
-			}
-		});
-
-		// app_release
-		sender.registerTypeSender(app_release, new PayloadTypeSender<AppReleasePayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(AppReleasePayload payload) {
-				return ApptentiveClient.putAppRelease(payload);
-			}
-		});
-
-		// sdk_and_app_release
-		sender.registerTypeSender(sdk_and_app_release, new PayloadTypeSender<SdkAndAppReleasePayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(SdkAndAppReleasePayload payload) {
-				return ApptentiveClient.putSdkAndAppRelease(payload);
-			}
-		});
-
-		// person
-		sender.registerTypeSender(person, new PayloadTypeSender<PersonPayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(PersonPayload payload) {
-				return ApptentiveClient.putPerson(payload);
-			}
-		});
-
-		// survey
-		sender.registerTypeSender(survey, new PayloadTypeSender<SurveyResponsePayload>() {
-			@Override
-			public ApptentiveHttpResponse sendPayload(SurveyResponsePayload payload) {
-				return ApptentiveClient.postSurvey(payload);
-			}
-		});
 	}
 
 	//endregion

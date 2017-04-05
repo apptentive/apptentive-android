@@ -168,7 +168,7 @@ public class ApptentiveInternal {
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		payloadWorker = new PayloadSendWorker();
-		taskManager = new ApptentiveTaskManager(appContext);
+		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
 		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
