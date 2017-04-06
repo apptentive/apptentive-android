@@ -32,10 +32,16 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_SEND;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
 public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver, PayloadSender.Listener {
 
@@ -164,9 +170,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	//region PayloadSender.Listener
 
-
 	@Override
 	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_PAYLOAD_DID_SEND,
+				NOTIFICATION_KEY_PAYLOAD, payload,
+				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null && !cancelled ? TRUE : FALSE);
+
 		if (cancelled) {
 			ApptentiveLog.v(PAYLOADS, "Payload sending was cancelled: %s", payload);
 			return; // don't remove cancelled payloads from the queue
@@ -209,7 +219,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		payloadSender.sendPayload(payload);
+		boolean scheduled = payloadSender.sendPayload(payload);
+		if (scheduled) {
+			ApptentiveNotificationCenter.defaultCenter()
+				.postNotification(NOTIFICATION_PAYLOAD_WILL_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+		}
 	}
 
 	//endregion

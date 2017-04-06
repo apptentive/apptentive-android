@@ -11,20 +11,10 @@ import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
-import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_SEND;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 
 class PayloadSender {
-	private static final long RETRY_TIMEOUT = 5000;
-	private static final int RETRY_MAX_COUNT = 5;
-
 	private final PayloadRequestSender requestSender;
 	private final HttpRequestRetryPolicy requestRetryPolicy;
 
@@ -70,9 +60,6 @@ class PayloadSender {
 	private synchronized void sendPayloadRequest(final Payload payload) {
 		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
 
-		ApptentiveNotificationCenter.defaultCenter()
-			.postNotification(NOTIFICATION_PAYLOAD_WILL_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
-
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
@@ -98,11 +85,6 @@ class PayloadSender {
 
 	private synchronized void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
 		sendingFlag = false;
-
-		ApptentiveNotificationCenter.defaultCenter()
-			.postNotification(NOTIFICATION_PAYLOAD_DID_SEND,
-				NOTIFICATION_KEY_PAYLOAD, payload,
-				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null ? TRUE : FALSE);
 
 		try {
 			if (listener != null) {
