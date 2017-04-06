@@ -14,11 +14,25 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
+/**
+ * Class responsible for a serial payload sending (one at a time)
+ */
 class PayloadSender {
+	/**
+	 * Object which creates and send Http-request for payloads
+	 */
 	private final PayloadRequestSender requestSender;
+
+	/**
+	 * Payload Http-request retry policy
+	 */
 	private final HttpRequestRetryPolicy requestRetryPolicy;
 
 	private Listener listener;
+
+	/**
+	 * Indicates whenever the sender is busy sending a payload
+	 */
 	private boolean sendingFlag; // this variable is only accessed in a synchronized context
 
 	PayloadSender(PayloadRequestSender requestSender, HttpRequestRetryPolicy retryPolicy) {
@@ -36,6 +50,12 @@ class PayloadSender {
 
 	//region Payloads
 
+	/**
+	 * Sends payload asynchronously. Returns boolean flag immediately indicating if payload send was
+	 * scheduled
+	 *
+	 * @throws IllegalArgumentException is payload is null
+	 */
 	synchronized boolean sendPayload(final Payload payload) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
@@ -46,6 +66,7 @@ class PayloadSender {
 			return false;
 		}
 
+		// we mark the sender as "busy" so no other payloads would be sent until we're done
 		sendingFlag = true;
 
 		try {
@@ -53,20 +74,27 @@ class PayloadSender {
 		} catch (Exception e) {
 			ApptentiveLog.e(PAYLOADS, "Exception while sending payload: %s", payload);
 
+			// for NullPointerException, the message object would be null, we should handle it separately
+			// TODO: add a helper class for handling that
 			String message = e.getMessage();
 			if (message == null) {
 				message = StringUtils.format("%s is thrown", e.getClass().getSimpleName());
 			}
 
+			// if an exception was thrown - mark payload as failed
 			handleFinishSendingPayload(payload, false, message);
 		}
 
 		return true;
 	}
 
+	/**
+	 * Creates and sends payload Http-request asynchronously (returns immediately)
+	 */
 	private synchronized void sendPayloadRequest(final Payload payload) {
 		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
 
+		// create request object
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
 			@Override
 			public void onFinish(HttpRequest request) {
@@ -83,6 +111,8 @@ class PayloadSender {
 				handleFinishSendingPayload(payload, false, reason);
 			}
 		});
+
+		// set 'retry' policy
 		payloadRequest.setRetryPolicy(requestRetryPolicy);
 	}
 
@@ -90,8 +120,15 @@ class PayloadSender {
 
 	//region Listener notification
 
+	/**
+	 * Executed when we're done with the current payload
+	 *
+	 * @param payload      - current payload
+	 * @param cancelled    - flag indicating if payload Http-request was cancelled
+	 * @param errorMessage - if not <code>null</code> - payload request failed
+	 */
 	private synchronized void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
-		sendingFlag = false;
+		sendingFlag = false; // mark sender as 'not busy'
 
 		try {
 			if (listener != null) {
@@ -106,6 +143,9 @@ class PayloadSender {
 
 	//region Getters/Setters
 
+	/**
+	 * Returns <code>true</code> if sender is currently busy with a payload
+	 */
 	synchronized boolean isSendingPayload() {
 		return sendingFlag;
 	}

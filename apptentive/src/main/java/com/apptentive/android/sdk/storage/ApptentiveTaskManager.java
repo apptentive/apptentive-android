@@ -74,6 +74,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
 
+		// Create payload sender object with a custom 'retry' policy
 		payloadSender = new PayloadSender(apptentiveHttpClient, new HttpRequestRetryPolicyDefault() {
 			@Override
 			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
@@ -242,6 +243,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		}
 
 		boolean scheduled = payloadSender.sendPayload(payload);
+
+		// if payload sending was scheduled - notify the rest of the SDK
 		if (scheduled) {
 			ApptentiveNotificationCenter.defaultCenter()
 				.postNotification(NOTIFICATION_PAYLOAD_WILL_START_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
@@ -277,7 +280,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			}
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
 			appInBackground = false;
-			sendNextPayload();
+			sendNextPayload(); // when the app comes back from the background - we need to resume sending payloads
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
 			appInBackground = true;
 		}
