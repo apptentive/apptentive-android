@@ -158,6 +158,8 @@ public class HttpRequestManagerTest extends TestCaseBase {
 			}
 		});
 
+
+
 		// start requests and let them finish
 		requestManager.startRequest(new MockHttpRequest("1"));
 		requestManager.startRequest(new MockHttpRequest("2").setMockResponseCode(500));
@@ -208,7 +210,12 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Test
 	public void testFailedRetry() {
-		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault();
+		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault() {
+			@Override
+			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
+				return responseCode != -1 && super.shouldRetryRequest(responseCode, retryAttempt); // don't retry on an exception
+			}
+		};
 		retryPolicy.setMaxRetryCount(2);
 		retryPolicy.setRetryTimeoutMillis(0);
 
@@ -232,7 +239,12 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Test
 	public void testSuccessfulRetry() {
-		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault();
+		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault() {
+			@Override
+			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
+				return responseCode != -1 && super.shouldRetryRequest(responseCode, retryAttempt); // don't retry on an exception
+			}
+		};
 		retryPolicy.setMaxRetryCount(3);
 		retryPolicy.setRetryTimeoutMillis(0);
 
@@ -282,6 +294,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 				addResult("failed: " + request + " " + reason);
 			}
 		});
+
 		requestManager.startRequest(request);
 	}
 
