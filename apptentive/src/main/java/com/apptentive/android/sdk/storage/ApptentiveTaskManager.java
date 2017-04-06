@@ -18,6 +18,8 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -101,7 +103,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			@Override
 			public void run() {
 				dbHelper.addPayload(payloads);
-				sendNextPayload();
+				sendNextPayloadSync();
 			}
 		});
 	}
@@ -112,7 +114,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				@Override
 				public void run() {
 					dbHelper.deletePayload(payload);
-					sendNextPayload();
+					sendNextPayloadSync();
 				}
 			});
 		}
@@ -131,9 +133,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		return singleThreadExecutor.submit(new Callable<Payload>() {
 			@Override
 			public Payload call() throws Exception {
-				return dbHelper.getOldestUnsentPayload();
+				return getOldestUnsentPayloadSync();
 			}
 		});
+	}
+
+	private Payload getOldestUnsentPayloadSync() {
+		return dbHelper.getOldestUnsentPayload();
 	}
 
 	public void deleteAssociatedFiles(final String messageNonce) {
@@ -197,16 +203,29 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	//endregion
 
 	//region Payload Sending
-
 	private void sendNextPayload() {
+		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
+			@Override
+			protected void execute() {
+				sendNextPayloadSync();
+			}
+		});
+	}
+
+	private void sendNextPayloadSync() {
 		if (appInBackground) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: the app is in the background");
 			return;
 		}
 
+		if (payloadSender.isSendingPayload()) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: payload sender is busy");
+			return;
+		}
+
 		final Payload payload;
 		try {
-			payload = getOldestUnsentPayload().get();
+			payload = getOldestUnsentPayloadSync();
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while peeking the next payload for sending");
 			return;
@@ -219,11 +238,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		if (StringUtils.isNullOrEmpty(payload.getConversationId())) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no conversation id");
-			return;
-		}
-
-		if (payloadSender.isSendingPayload()) {
-			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: payload sender is busy");
 			return;
 		}
 
@@ -253,6 +267,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 						@Override
 						public void run() {
 							dbHelper.updateMissingConversationIds(currentConversationId);
+							sendNextPayloadSync(); // after we've updated payloads - we need to send them
 						}
 					});
 				}
@@ -262,6 +277,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			}
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
 			appInBackground = false;
+			sendNextPayload();
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
 			appInBackground = true;
 		}
