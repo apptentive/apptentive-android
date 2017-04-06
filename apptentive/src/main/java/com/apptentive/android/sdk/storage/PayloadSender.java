@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
 import com.apptentive.android.sdk.util.StringUtils;

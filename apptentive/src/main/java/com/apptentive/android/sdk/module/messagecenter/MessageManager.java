@@ -48,8 +48,8 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 
 public class MessageManager implements Destroyable, ApptentiveNotificationObserver {
 
@@ -334,8 +334,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			.addObserver(NOTIFICATION_ACTIVITY_RESUMED, this)
 			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this)
 			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
-			.addObserver(NOTIFICATION_PAYLOAD_WILL_SEND, this)
-			.addObserver(NOTIFICATION_PAYLOAD_DID_SEND, this);
+			.addObserver(NOTIFICATION_PAYLOAD_WILL_START_SEND, this)
+			.addObserver(NOTIFICATION_PAYLOAD_DID_FINISH_SEND, this);
 	}
 
 	//endregion
@@ -353,12 +353,12 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
 			setCurrentForegroundActivity(null);
 			appWentToBackground();
-		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_SEND)) {
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {
 			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
 			if (payload instanceof ApptentiveMessage) {
 				resumeSending();
 			}
-		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_SEND)) {
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
 			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
 			if (payload instanceof ApptentiveMessage) {
 				// onSentMessage((ApptentiveMessage) payload, ???);

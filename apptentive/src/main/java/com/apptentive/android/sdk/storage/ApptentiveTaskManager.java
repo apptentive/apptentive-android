@@ -13,7 +13,6 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
@@ -34,8 +33,8 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CO
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
@@ -173,7 +172,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	@Override
 	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
 		ApptentiveNotificationCenter.defaultCenter()
-			.postNotification(NOTIFICATION_PAYLOAD_DID_SEND,
+			.postNotification(NOTIFICATION_PAYLOAD_DID_FINISH_SEND,
 				NOTIFICATION_KEY_PAYLOAD, payload,
 				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null && !cancelled ? TRUE : FALSE);
 
@@ -222,7 +221,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		boolean scheduled = payloadSender.sendPayload(payload);
 		if (scheduled) {
 			ApptentiveNotificationCenter.defaultCenter()
-				.postNotification(NOTIFICATION_PAYLOAD_WILL_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+				.postNotification(NOTIFICATION_PAYLOAD_WILL_START_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
 		}
 	}
 

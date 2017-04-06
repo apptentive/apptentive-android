@@ -36,12 +36,12 @@ public class ApptentiveNotifications {
 	/**
 	 * Sent before payload request is sent to the server
 	 */
-	public static final String NOTIFICATION_PAYLOAD_WILL_SEND = "NOTIFICATION_PAYLOAD_WILL_SEND"; // { payload: Payload }
+	public static final String NOTIFICATION_PAYLOAD_WILL_START_SEND = "NOTIFICATION_PAYLOAD_WILL_START_SEND"; // { payload: Payload }
 
 	/**
 	 * Sent after payload sending if finished (might be successful or not)
 	 */
-	public static final String NOTIFICATION_PAYLOAD_DID_SEND = "NOTIFICATION_PAYLOAD_DID_SEND";  // { successful : boolean, payload: Payload }
+	public static final String NOTIFICATION_PAYLOAD_DID_FINISH_SEND = "NOTIFICATION_PAYLOAD_DID_FINISH_SEND";  // { successful : boolean, payload: Payload }
 
 	/**
 	 * Sent if user requested to close all interactions.
