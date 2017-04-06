@@ -1,7 +1,7 @@
 package com.apptentive.android.sdk.network;
 
 import com.apptentive.android.sdk.TestCaseBase;
-import com.apptentive.android.sdk.network.MockHttpURLConnection.AbstractResponseHandler;
+import com.apptentive.android.sdk.network.MockHttpURLConnection.DefaultResponseHandler;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
 import junit.framework.Assert;
@@ -159,7 +159,6 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		});
 
 
-
 		// start requests and let them finish
 		requestManager.startRequest(new MockHttpRequest("1"));
 		requestManager.startRequest(new MockHttpRequest("2").setMockResponseCode(500));
@@ -249,7 +248,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		retryPolicy.setRetryTimeoutMillis(0);
 
 		// fail this request twice and then finish successfully
-		startRequest(new MockHttpRequest("1").setMockResponseHandler(new AbstractResponseHandler() {
+		startRequest(new MockHttpRequest("1").setMockResponseHandler(new DefaultResponseHandler() {
 			int requestAttempts = 0;
 
 			@Override

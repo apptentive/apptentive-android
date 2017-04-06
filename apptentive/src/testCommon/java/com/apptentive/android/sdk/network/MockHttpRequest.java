@@ -12,11 +12,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class MockHttpRequest extends HttpRequest {
+public class MockHttpRequest extends HttpRequest {
 
 	private final MockHttpURLConnection connection;
 
-	MockHttpRequest(String name) {
+	public MockHttpRequest(String name) {
 		super("https://abc.com");
 		connection = new MockHttpURLConnection();
 		connection.setMockResponseCode(200);

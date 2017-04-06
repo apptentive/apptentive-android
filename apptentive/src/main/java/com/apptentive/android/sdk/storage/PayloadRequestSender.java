@@ -11,5 +11,5 @@ import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 
 public interface PayloadRequestSender {
-	HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpJsonRequest> listener);
+	HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener);
 }

@@ -11,6 +11,7 @@ import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
@@ -51,7 +52,14 @@ class PayloadSender {
 		try {
 			sendPayloadRequest(payload);
 		} catch (Exception e) {
-			handleFinishSendingPayload(payload, false, e.getMessage());
+			ApptentiveLog.e(PAYLOADS, "Exception while sending payload: %s", payload);
+
+			String message = e.getMessage();
+			if (message == null) {
+				message = StringUtils.format("%s is thrown", e.getClass().getSimpleName());
+			}
+
+			handleFinishSendingPayload(payload, false, message);
 		}
 
 		return true;
@@ -60,19 +68,19 @@ class PayloadSender {
 	private synchronized void sendPayloadRequest(final Payload payload) {
 		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
 
-		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpJsonRequest>() {
+		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
 			@Override
-			public void onFinish(HttpJsonRequest request) {
+			public void onFinish(HttpRequest request) {
 				handleFinishSendingPayload(payload, false, null);
 			}
 
 			@Override
-			public void onCancel(HttpJsonRequest request) {
+			public void onCancel(HttpRequest request) {
 				handleFinishSendingPayload(payload, true, null);
 			}
 
 			@Override
-			public void onFail(HttpJsonRequest request, String reason) {
+			public void onFail(HttpRequest request, String reason) {
 				handleFinishSendingPayload(payload, false, reason);
 			}
 		});

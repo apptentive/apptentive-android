@@ -14,7 +14,7 @@ import org.json.JSONObject;
 public abstract class Payload extends JSONObject {
 
 	// These three are not stored in the JSON, only the DB.
-	private Long databaseId;
+	private Long databaseId; // FIXME: use 'long' instead
 	private BaseType baseType;
 	private String conversationId;
 

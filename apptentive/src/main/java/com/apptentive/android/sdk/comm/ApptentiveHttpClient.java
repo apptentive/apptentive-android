@@ -75,7 +75,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region PayloadRequestSender
 
 	@Override
-	public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpJsonRequest> listener) {
+	public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
