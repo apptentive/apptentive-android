@@ -208,12 +208,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Test
 	public void testFailedRetry() {
-		HttpRequestRetryPolicy retryPolicy = new HttpRequestRetryPolicy() {
-			@Override
-			protected boolean shouldRetryRequest(int responseCode) {
-				return responseCode == 500;
-			}
-		};
+		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault();
 		retryPolicy.setMaxRetryCount(2);
 		retryPolicy.setRetryTimeoutMillis(0);
 
@@ -237,12 +232,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 
 	@Test
 	public void testSuccessfulRetry() {
-		HttpRequestRetryPolicy retryPolicy = new HttpRequestRetryPolicy() {
-			@Override
-			protected boolean shouldRetryRequest(int responseCode) {
-				return responseCode == 500;
-			}
-		};
+		HttpRequestRetryPolicyDefault retryPolicy = new HttpRequestRetryPolicyDefault();
 		retryPolicy.setMaxRetryCount(3);
 		retryPolicy.setRetryTimeoutMillis(0);
 

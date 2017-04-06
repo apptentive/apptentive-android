@@ -39,7 +39,7 @@ public class HttpRequest {
 	/**
 	 * Default retry policy (used if a custom one is not specified)
 	 */
-	private static final HttpRequestRetryPolicy DEFAULT_RETRY_POLICY = new HttpRequestRetryPolicy();
+	private static final HttpRequestRetryPolicy DEFAULT_RETRY_POLICY = new HttpRequestRetryPolicyDefault();
 
 	/**
 	 * Id-number of the next request
@@ -124,7 +124,7 @@ public class HttpRequest {
 	/**
 	 * How many times request was retried already
 	 */
-	private int retryAttemptCount;
+	private int retryAttempt;
 
 	/**
 	 * Flag indicating if the request is currently scheduled for a retry
@@ -303,21 +303,15 @@ public class HttpRequest {
 	private boolean retryRequest(DispatchQueue networkQueue, int responseCode) {
 		assertFalse(retryDispatchTask.isScheduled());
 
-		final int maxRetryCount = retryPolicy.getMaxRetryCount();
-		if (maxRetryCount != HttpRequestRetryPolicy.RETRY_INDEFINITELY && retryAttemptCount >= maxRetryCount) {
-			ApptentiveLog.v(NETWORK, "Request maximum retry limit reached (%d)", maxRetryCount);
-			return false;
-		}
+		++retryAttempt;
 
-		if (!retryPolicy.shouldRetryRequest(responseCode)) {
+		if (!retryPolicy.shouldRetryRequest(responseCode, retryAttempt)) {
 			ApptentiveLog.v(NETWORK, "Retry policy declined request retry");
 			return false;
 		}
 
-		++retryAttemptCount;
-
 		retrying = true;
-		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryAttemptCount));
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryAttempt));
 
 		return true;
 	}

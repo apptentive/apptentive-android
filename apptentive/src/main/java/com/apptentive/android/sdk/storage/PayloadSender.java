@@ -11,14 +11,9 @@ import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
-import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
-import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
-import com.apptentive.android.sdk.util.Destroyable;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_SEND;
@@ -26,7 +21,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PA
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
+class PayloadSender {
 	private static final long RETRY_TIMEOUT = 5000;
 	private static final int RETRY_MAX_COUNT = 5;
 
@@ -34,28 +29,19 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 	private final HttpRequestRetryPolicy requestRetryPolicy;
 
 	private Listener listener;
-	private boolean appInBackground;
 	private boolean sendingFlag; // this variable is only accessed in a synchronized context
 
-	PayloadSender(PayloadRequestSender requestSender) {
+	PayloadSender(PayloadRequestSender requestSender, HttpRequestRetryPolicy retryPolicy) {
 		if (requestSender == null) {
 			throw new IllegalArgumentException("Payload request sender is null");
 		}
 
+		if (retryPolicy == null) {
+			throw new IllegalArgumentException("Retry policy is null");
+		}
+
 		this.requestSender = requestSender;
-
-		requestRetryPolicy = new HttpRequestRetryPolicy() {
-			@Override
-			protected boolean shouldRetryRequest(int responseCode) {
-				return !(appInBackground || responseCode >= 400 && responseCode < 500);
-			}
-		};
-		requestRetryPolicy.setRetryTimeoutMillis(RETRY_TIMEOUT);
-		requestRetryPolicy.setMaxRetryCount(RETRY_MAX_COUNT);
-
-		ApptentiveNotificationCenter.defaultCenter()
-			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
-			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
+		this.requestRetryPolicy = retryPolicy;
 	}
 
 	//region Payloads
@@ -124,40 +110,6 @@ class PayloadSender implements ApptentiveNotificationObserver, Destroyable {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while notifying payload listener");
-		}
-	}
-
-	//endregion
-
-	//region Background/Foreground
-
-	private void onAppEnterBackground() {
-		appInBackground = true;
-	}
-
-	private void onAppEnterForeground() {
-		appInBackground = false;
-	}
-
-	//endregion
-
-	//region Destroyable
-
-	@Override
-	public void destroy() {
-		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
-	}
-
-	//endregion
-
-	//region ApptentiveNotificationObserver
-
-	@Override
-	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
-			onAppEnterBackground();
-		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
-			onAppEnterForeground();
 		}
 	}
 

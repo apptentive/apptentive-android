@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
+import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
@@ -26,6 +28,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
@@ -42,6 +46,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	private String currentConversationId;
 
 	private final PayloadSender payloadSender;
+	private boolean appInBackground;
 
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
@@ -62,10 +67,21 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
 
-		payloadSender = new PayloadSender(apptentiveHttpClient);
+		payloadSender = new PayloadSender(apptentiveHttpClient, new HttpRequestRetryPolicyDefault() {
+			@Override
+			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
+				if (appInBackground) {
+					return false; // don't retry if the app went background
+				}
+				return super.shouldRetryRequest(responseCode, retryAttempt);
+			}
+		});
 		payloadSender.setListener(this);
 
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
+			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
 	}
 
 	/**
@@ -222,6 +238,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			} else {
 				currentConversationId = null;
 			}
+		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
+			appInBackground = false;
+		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
+			appInBackground = true;
 		}
 	}
 }
