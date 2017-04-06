@@ -183,6 +183,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		if (errorMessage != null) {
 			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
+			if (appInBackground) {
+				ApptentiveLog.v(PAYLOADS, "The app went to the background so we won't remove the payload from the queue");
+				return;
+			}
 		} else {
 			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
 		}
@@ -195,6 +199,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	//region Payload Sending
 
 	private void sendNextPayload() {
+		if (appInBackground) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: the app is in the background");
+			return;
+		}
+
 		final Payload payload;
 		try {
 			payload = getOldestUnsentPayload().get();
