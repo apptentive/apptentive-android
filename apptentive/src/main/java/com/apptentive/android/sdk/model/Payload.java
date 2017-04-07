@@ -17,6 +17,7 @@ public abstract class Payload extends JSONObject {
 	private Long databaseId; // FIXME: use 'long' instead
 	private BaseType baseType;
 	private String conversationId;
+	private String conversationToken;
 
 	public Payload() {
 		initBaseType();
@@ -75,6 +76,14 @@ public abstract class Payload extends JSONObject {
 
 	public void setConversationId(String conversationId) {
 		this.conversationId = conversationId;
+	}
+
+	public void setConversationToken(String conversationToken) {
+		this.conversationToken = conversationToken;
+	}
+
+	public String getConversationToken() {
+		return conversationToken;
 	}
 
 	public enum BaseType {

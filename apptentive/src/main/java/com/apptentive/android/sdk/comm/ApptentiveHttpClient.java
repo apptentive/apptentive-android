@@ -1,5 +1,6 @@
 package com.apptentive.android.sdk.comm;
 
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.DevicePayload;
@@ -41,16 +42,16 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private static final String ENDPOINT_PEOPLE = "/people";
 	private static final String ENDPOINT_SURVEYS_POST = "/surveys/%s/respond";
 
-	private final String oauthToken;
+	private final String apiKey;
 	private final String serverURL;
 	private final String userAgentString;
 	private final HttpRequestManager httpRequestManager;
 
 	private final Map<Class<? extends Payload>, PayloadRequestFactory> payloadRequestFactoryLookup;
 
-	public ApptentiveHttpClient(String oauthToken, String serverURL) {
-		if (isEmpty(oauthToken)) {
-			throw new IllegalArgumentException("Illegal OAuth Token: '" + oauthToken + "'");
+	public ApptentiveHttpClient(String apiKey, String serverURL) {
+		if (isEmpty(apiKey)) {
+			throw new IllegalArgumentException("Illegal API key: '" + apiKey + "'");
 		}
 
 		if (isEmpty(serverURL)) {
@@ -58,7 +59,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 
 		this.httpRequestManager = new HttpRequestManager();
-		this.oauthToken = oauthToken;
+		this.apiKey = apiKey;
 		this.serverURL = serverURL;
 		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 		this.payloadRequestFactoryLookup = createPayloadRequestFactoryLookup();
@@ -67,7 +68,10 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region API Requests
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		return startJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST, listener);
+		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
+		request.setListener(listener);
+		httpRequestManager.startRequest(request);
+		return request;
 	}
 
 	//endregion
@@ -102,7 +106,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(EventPayload.class, new PayloadRequestFactory<EventPayload>() {
 			@Override
 			public HttpRequest createRequest(EventPayload payload) {
-				return createJsonRequest(ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
 			}
 		});
 
@@ -110,7 +114,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(DevicePayload.class, new PayloadRequestFactory<DevicePayload>() {
 			@Override
 			public HttpRequest createRequest(DevicePayload payload) {
-				return createJsonRequest(ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -118,7 +122,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(SdkPayload.class, new PayloadRequestFactory<SdkPayload>() {
 			@Override
 			public HttpRequest createRequest(SdkPayload payload) {
-				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -126,7 +130,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(AppReleasePayload.class, new PayloadRequestFactory<AppReleasePayload>() {
 			@Override
 			public HttpRequest createRequest(AppReleasePayload payload) {
-				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -134,7 +138,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(SdkAndAppReleasePayload.class, new PayloadRequestFactory<SdkAndAppReleasePayload>() {
 			@Override
 			public HttpRequest createRequest(SdkAndAppReleasePayload payload) {
-				return createJsonRequest(ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -142,7 +146,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(PersonPayload.class, new PayloadRequestFactory<PersonPayload>() {
 			@Override
 			public HttpRequest createRequest(PersonPayload payload) {
-				return createJsonRequest(ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getConversationToken(), ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -151,7 +155,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			@Override
 			public HttpRequest createRequest(SurveyResponsePayload survey) {
 				String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-				return createJsonRequest(endpoint, survey, HttpRequestMethod.POST);
+				return createJsonRequest(survey.getConversationToken(), endpoint, survey, HttpRequestMethod.POST);
 			}
 		});
 
@@ -162,23 +166,19 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	//region Helpers
 
-	private HttpJsonRequest startJsonRequest(String endpoint, JSONObject jsonObject, HttpRequestMethod method, HttpRequest.Listener<HttpJsonRequest> listener) {
-		HttpJsonRequest request = createJsonRequest(endpoint, jsonObject, method);
-		request.setListener(listener);
-		httpRequestManager.startRequest(request);
-		return request;
-	}
+	private HttpJsonRequest createJsonRequest(String oauthToken, String endpoint, JSONObject jsonObject, HttpRequestMethod method) {
+		Assert.assertNotNull(oauthToken);
+		Assert.assertNotNull(endpoint);
 
-	private HttpJsonRequest createJsonRequest(String endpoint, JSONObject jsonObject, HttpRequestMethod method) {
 		String url = createEndpointURL(endpoint);
 		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
-		setupRequestDefaults(request);
+		setupRequestDefaults(request, oauthToken);
 		request.setMethod(method);
 		request.setRequestProperty("Content-Type", "application/json");
 		return request;
 	}
 
-	private void setupRequestDefaults(HttpRequest request) {
+	private void setupRequestDefaults(HttpRequest request, String oauthToken) {
 		request.setRequestProperty("User-Agent", userAgentString);
 		request.setRequestProperty("Connection", "Keep-Alive");
 		request.setRequestProperty("Authorization", "OAuth " + oauthToken);

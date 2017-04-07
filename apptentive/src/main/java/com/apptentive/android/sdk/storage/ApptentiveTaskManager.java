@@ -11,6 +11,7 @@ import android.content.Context;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
@@ -51,6 +52,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	// Set when receiving an ApptentiveNotification
 	private String currentConversationId;
+	private String currentConversationToken;
 
 	private final PayloadSender payloadSender;
 	private boolean appInBackground;
@@ -99,6 +101,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void addPayload(final Payload... payloads) {
 		for (Payload payload : payloads) {
 			payload.setConversationId(currentConversationId);
+			payload.setConversationToken(currentConversationToken);
+
 		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
@@ -242,6 +246,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
+		// FIXME: store conversation data in the database
+		payload.setConversationId(currentConversationId);
+		payload.setConversationToken(currentConversationToken);
+
 		boolean scheduled = payloadSender.sendPayload(payload);
 
 		// if payload sending was scheduled - notify the rest of the SDK
@@ -261,6 +269,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			if (conversation.hasActiveState()) {
 				assertNotNull(conversation.getConversationId());
 				currentConversationId = conversation.getConversationId();
+				Assert.assertNotNull(currentConversationId);
+
+				currentConversationToken = conversation.getConversationToken();
+				Assert.assertNotNull(currentConversationToken);
 
 				// when the Conversation ID comes back from the server, we need to update
 				// the payloads that may have already been enqueued so
@@ -269,7 +281,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					singleThreadExecutor.execute(new Runnable() {
 						@Override
 						public void run() {
-							dbHelper.updateMissingConversationIds(currentConversationId);
+							dbHelper.updateMissingConversationIds(currentConversationId); // TODO: update missing conversation token
 							sendNextPayloadSync(); // after we've updated payloads - we need to send them
 						}
 					});
