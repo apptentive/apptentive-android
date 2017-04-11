@@ -259,6 +259,7 @@ public class HttpRequest {
 
 			// send request
 			responseCode = connection.getResponseCode();
+			ApptentiveLog.d(NETWORK, "Response: %d %s", responseCode, connection.getResponseMessage());
 
 			if (isCancelled()) {
 				return;
@@ -271,11 +272,11 @@ public class HttpRequest {
 			boolean gzipped = isGzipContentEncoding(responseHeaders);
 			if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE) {
 				responseData = readResponse(connection.getInputStream(), gzipped);
-				ApptentiveLog.v(NETWORK, "Response: %s", responseData);
+				ApptentiveLog.v(NETWORK, "Response data: %s", responseData);
 			} else {
 				errorMessage = StringUtils.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseData = readResponse(connection.getErrorStream(), gzipped);
-				ApptentiveLog.w(NETWORK, "Response: %s", responseData);
+				ApptentiveLog.w(NETWORK, "Response data: %s", responseData);
 			}
 
 			if (isCancelled()) {
