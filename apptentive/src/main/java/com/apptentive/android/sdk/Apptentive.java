@@ -46,7 +46,6 @@ import java.util.Map;
  */
 public class Apptentive {
 
-
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
 	 *
@@ -65,9 +64,7 @@ public class Apptentive {
 		ApptentiveInternal.createInstance(application, apptentiveApiKey, serverUrl);
 	}
 
-	// ****************************************************************************************
-	// GLOBAL DATA METHODS
-	// ****************************************************************************************
+	//region Global Data Methods
 
 	/**
 	 * Sets the user's email address. This email address will be sent to the Apptentive server to allow out of app
@@ -311,10 +308,9 @@ public class Apptentive {
 		}
 	}
 
+	//endregion
 
-	// ****************************************************************************************
-	// THIRD PARTY INTEGRATIONS
-	// ****************************************************************************************
+	//region Third Party Integrations
 
 	private static final String INTEGRATION_PUSH_TOKEN = "token";
 
@@ -403,9 +399,9 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// PUSH NOTIFICATIONS
-	// ****************************************************************************************
+	//endregion
+
+	//region Push Notifications
 
 	/**
 	 * Determines whether this Intent is a push notification sent from Apptentive.
@@ -674,9 +670,9 @@ public class Apptentive {
 		return data.get(ApptentiveInternal.BODY_DEFAULT);
 	}
 
-	// ****************************************************************************************
-	// RATINGS
-	// ****************************************************************************************
+	//endregion
+
+	//region Rating
 
 	/**
 	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
@@ -704,10 +700,9 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// MESSAGE CENTER
-	// ****************************************************************************************
+	//endregion
 
+	//region Message Center
 
 	/**
 	 * Opens the Apptentive Message Center UI Activity
@@ -953,6 +948,8 @@ public class Apptentive {
 			MetricModule.sendError(e, null, null);
 		}
 	}
+
+	//endregion
 
 	/**
 	 * This method takes a unique event string, stores a record of that event having been visited, determines
