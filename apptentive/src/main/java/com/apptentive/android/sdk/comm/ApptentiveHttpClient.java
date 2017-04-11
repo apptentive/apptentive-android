@@ -69,7 +69,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
-		request.setListener(listener);
+		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
 	}
@@ -90,7 +90,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 
 		HttpRequest request = requestFactory.createRequest(payload);
-		request.setListener(listener);
+		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
 	}

@@ -58,7 +58,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		final AtomicBoolean finished = new AtomicBoolean(false);
 
 		HttpRequest request = new MockHttpRequest("request").setResponseData(expected);
-		request.setListener(new HttpRequest.Adapter<HttpRequest>() {
+		request.addListener(new HttpRequest.Adapter<HttpRequest>() {
 			@Override
 			public void onFinish(HttpRequest request) {
 				Assert.assertEquals(expected, request.getResponseData());
@@ -91,7 +91,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		final AtomicBoolean finished = new AtomicBoolean(false);
 
 		HttpJsonRequest request = new MockHttpJsonRequest("request", requestObject).setMockResponseData(expected);
-		request.setListener(new HttpRequest.Adapter<HttpJsonRequest>() {
+		request.addListener(new HttpRequest.Adapter<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
 				Assert.assertEquals(expected.toString(), request.getResponseObject().toString());
@@ -121,7 +121,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 		final AtomicBoolean finished = new AtomicBoolean(false);
 
 		HttpJsonRequest request = new MockHttpJsonRequest("request", requestObject).setMockResponseData(invalidJson);
-		request.setListener(new HttpRequest.Adapter<HttpJsonRequest>() {
+		request.addListener(new HttpRequest.Adapter<HttpJsonRequest>() {
 			@Override
 			public void onFail(HttpJsonRequest request, String reason) {
 				finished.set(true);
@@ -277,7 +277,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 	//region Helpers
 
 	private void startRequest(HttpRequest request) {
-		request.setListener(new HttpRequest.Listener<MockHttpRequest>() {
+		request.addListener(new HttpRequest.Listener<MockHttpRequest>() {
 			@Override
 			public void onFinish(MockHttpRequest request) {
 				addResult("finished: " + request);
