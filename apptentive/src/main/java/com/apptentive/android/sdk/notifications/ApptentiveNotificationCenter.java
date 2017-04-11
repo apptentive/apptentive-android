@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.notifications;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -52,8 +53,9 @@ public class ApptentiveNotificationCenter {
 	/**
 	 * Adds an entry to the receiver’s dispatch table with an observer using strong reference.
 	 */
-	public synchronized void addObserver(String notification, ApptentiveNotificationObserver observer) {
+	public synchronized ApptentiveNotificationCenter addObserver(String notification, ApptentiveNotificationObserver observer) {
 		addObserver(notification, observer, false);
+		return this;
 	}
 
 	/**
@@ -94,6 +96,13 @@ public class ApptentiveNotificationCenter {
 	 */
 	public synchronized void postNotification(String name) {
 		postNotification(name, EMPTY_USER_INFO);
+	}
+
+	/**
+	 * Creates a notification with a given name and user info and posts it to the receiver.
+	 */
+	public synchronized void postNotification(final String name, Object... args) {
+		postNotification(name, ObjectUtils.toMap(args));
 	}
 
 	/**

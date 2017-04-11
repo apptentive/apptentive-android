@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
@@ -46,6 +47,9 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AC
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 
 public class MessageManager implements Destroyable, ApptentiveNotificationObserver {
 
@@ -94,6 +98,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		this.messageStore = messageStore;
 		this.pollingWorker = new MessagePollingWorker(this);
 		// conversation.setMessageCenterFeatureUsed(true); FIXME: figure out what to do with this call
+
+		registerNotifications();
 	}
 
 	/*
@@ -320,13 +326,26 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		return msgCount;
 	}
 
+	//region Notifications
+
+	private void registerNotifications() {
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_ACTIVITY_STARTED, this)
+			.addObserver(NOTIFICATION_ACTIVITY_RESUMED, this)
+			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
+			.addObserver(NOTIFICATION_PAYLOAD_WILL_START_SEND, this)
+			.addObserver(NOTIFICATION_PAYLOAD_DID_FINISH_SEND, this);
+	}
+
+	//endregion
+
 	//region Notification Observer
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_ACTIVITY_STARTED) ||
-				notification.hasName(NOTIFICATION_ACTIVITY_RESUMED)) {
-
+			notification.hasName(NOTIFICATION_ACTIVITY_RESUMED)) {
 			final Activity activity = notification.getRequiredUserInfo(NOTIFICATION_KEY_ACTIVITY, Activity.class);
 			setCurrentForegroundActivity(activity);
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
@@ -334,6 +353,16 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
 			setCurrentForegroundActivity(null);
 			appWentToBackground();
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {
+			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
+			if (payload instanceof ApptentiveMessage) {
+				resumeSending();
+			}
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
+			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
+			if (payload instanceof ApptentiveMessage) {
+				// onSentMessage((ApptentiveMessage) payload, ???);
+			}
 		}
 	}
 

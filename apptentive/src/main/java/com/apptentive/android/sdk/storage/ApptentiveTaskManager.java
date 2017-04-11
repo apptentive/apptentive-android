@@ -8,12 +8,19 @@ package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
+import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.List;
 import java.util.concurrent.Callable;
@@ -22,22 +29,38 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import static com.apptentive.android.sdk.ApptentiveNotifications.*;
-import static com.apptentive.android.sdk.conversation.ConversationState.*;
-import static com.apptentive.android.sdk.debug.Assert.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
+import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
+import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.Assert.assertTrue;
+import static java.lang.Boolean.FALSE;
+import static java.lang.Boolean.TRUE;
 
-public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver {
+public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver, PayloadSender.Listener {
 
 	private ApptentiveDatabaseHelper dbHelper;
-	private ThreadPoolExecutor singleThreadExecutor;
+	private ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
 
 	// Set when receiving an ApptentiveNotification
 	private String currentConversationId;
+	private String currentConversationToken;
+
+	private final PayloadSender payloadSender;
+	private boolean appInBackground;
 
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
 	 */
-	public ApptentiveTaskManager(Context context) {
+	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient) {
 		dbHelper = new ApptentiveDatabaseHelper(context);
 		/* When a new database task is submitted, the executor has the following behaviors:
 		 * 1. If the thread pool has no thread yet, it creates a single worker thread.
@@ -46,31 +69,29 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		 *
 		 */
 		singleThreadExecutor = new ThreadPoolExecutor(1, 1,
-				30L, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>(),
-				new ThreadPoolExecutor.CallerRunsPolicy());
+			30L, TimeUnit.SECONDS,
+			new LinkedBlockingQueue<Runnable>(),
+			new ThreadPoolExecutor.CallerRunsPolicy());
 
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
 
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
-	}
+		// Create payload sender object with a custom 'retry' policy
+		payloadSender = new PayloadSender(apptentiveHttpClient, new HttpRequestRetryPolicyDefault() {
+			@Override
+			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
+				if (appInBackground) {
+					return false; // don't retry if the app went background
+				}
+				return super.shouldRetryRequest(responseCode, retryAttempt);
+			}
+		});
+		payloadSender.setListener(this);
 
-
-	/* Wrapper class that can be used to return worker thread result to caller through message
-	*  Usage: Message message = callerThreadHandler.obtainMessage(MESSAGE_FINISH,
-	*				     new AsyncTaskExResult<List<ApptentiveMessage>>(ApptentiveTaskManager.this, result));
-	*			    message.sendToTarget();
-	*/
-	@SuppressWarnings({"RawUseOfParameterizedType"})
-	private static class ApptentiveTaskResult<Data> {
-		final ApptentiveTaskManager mTask;
-		final Data[] mData;
-
-		ApptentiveTaskResult(ApptentiveTaskManager task, Data... data) {
-			mTask = task;
-			mData = data;
-		}
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
+			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
 	}
 
 	/**
@@ -80,21 +101,24 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void addPayload(final Payload... payloads) {
 		for (Payload payload : payloads) {
 			payload.setConversationId(currentConversationId);
+			payload.setToken(currentConversationToken);
 		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
 				dbHelper.addPayload(payloads);
+				sendNextPayloadSync();
 			}
 		});
 	}
 
-	public void deletePayload(final Payload payload){
+	public void deletePayload(final Payload payload) {
 		if (payload != null) {
 			singleThreadExecutor.execute(new Runnable() {
 				@Override
 				public void run() {
 					dbHelper.deletePayload(payload);
+					sendNextPayloadSync();
 				}
 			});
 		}
@@ -113,9 +137,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		return singleThreadExecutor.submit(new Callable<Payload>() {
 			@Override
 			public Payload call() throws Exception {
-				return dbHelper.getOldestUnsentPayload();
+				return getOldestUnsentPayloadSync();
 			}
 		});
+	}
+
+	private Payload getOldestUnsentPayloadSync() {
+		return dbHelper.getOldestUnsentPayload();
 	}
 
 	public void deleteAssociatedFiles(final String messageNonce) {
@@ -136,7 +164,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		});
 	}
 
-	public Future<Boolean> addCompoundMessageFiles(final List<StoredFile> associatedFiles) throws Exception{
+	public Future<Boolean> addCompoundMessageFiles(final List<StoredFile> associatedFiles) throws Exception {
 		return singleThreadExecutor.submit(new Callable<Boolean>() {
 			@Override
 			public Boolean call() throws Exception {
@@ -149,6 +177,85 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		dbHelper.reset(context);
 	}
 
+	//region PayloadSender.Listener
+
+	@Override
+	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_PAYLOAD_DID_FINISH_SEND,
+				NOTIFICATION_KEY_PAYLOAD, payload,
+				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null && !cancelled ? TRUE : FALSE);
+
+		if (cancelled) {
+			ApptentiveLog.v(PAYLOADS, "Payload sending was cancelled: %s", payload);
+			return; // don't remove cancelled payloads from the queue
+		}
+
+		if (errorMessage != null) {
+			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
+			if (appInBackground) {
+				ApptentiveLog.v(PAYLOADS, "The app went to the background so we won't remove the payload from the queue");
+				return;
+			}
+		} else {
+			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
+		}
+
+		deletePayload(payload);
+	}
+
+	//endregion
+
+	//region Payload Sending
+	private void sendNextPayload() {
+		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
+			@Override
+			protected void execute() {
+				sendNextPayloadSync();
+			}
+		});
+	}
+
+	private void sendNextPayloadSync() {
+		if (appInBackground) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: the app is in the background");
+			return;
+		}
+
+		if (payloadSender.isSendingPayload()) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: payload sender is busy");
+			return;
+		}
+
+		final Payload payload;
+		try {
+			payload = getOldestUnsentPayloadSync();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while peeking the next payload for sending");
+			return;
+		}
+
+		if (payload == null) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no unsent payloads found");
+			return;
+		}
+
+		if (StringUtils.isNullOrEmpty(payload.getConversationId()) || StringUtils.isNullOrEmpty(payload.getToken())) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no conversation id");
+			return;
+		}
+
+		boolean scheduled = payloadSender.sendPayload(payload);
+
+		// if payload sending was scheduled - notify the rest of the SDK
+		if (scheduled) {
+			ApptentiveNotificationCenter.defaultCenter()
+				.postNotification(NOTIFICATION_PAYLOAD_WILL_START_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+		}
+	}
+
+	//endregion
+
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
@@ -157,6 +264,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			if (conversation.hasActiveState()) {
 				assertNotNull(conversation.getConversationId());
 				currentConversationId = conversation.getConversationId();
+				Assert.assertNotNull(currentConversationId);
+
+				currentConversationToken = conversation.getConversationToken();
+				Assert.assertNotNull(currentConversationToken);
 
 				// when the Conversation ID comes back from the server, we need to update
 				// the payloads that may have already been enqueued so
@@ -165,7 +276,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					singleThreadExecutor.execute(new Runnable() {
 						@Override
 						public void run() {
-							dbHelper.updateMissingConversationIds(currentConversationId);
+							dbHelper.updateIncompletePayloads(currentConversationId, currentConversationToken);
+							sendNextPayloadSync(); // after we've updated payloads - we need to send them
 						}
 					});
 				}
@@ -173,6 +285,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			} else {
 				currentConversationId = null;
 			}
+		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
+			appInBackground = false;
+			sendNextPayload(); // when the app comes back from the background - we need to resume sending payloads
+		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
+			appInBackground = true;
 		}
 	}
 }

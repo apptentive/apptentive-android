@@ -30,7 +30,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.SurveyResponse;
+import com.apptentive.android.sdk.model.SurveyResponsePayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
@@ -122,7 +122,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
 
-					ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(new SurveyResponse(interaction, answers));
+					ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(new SurveyResponsePayload(interaction, answers));
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {

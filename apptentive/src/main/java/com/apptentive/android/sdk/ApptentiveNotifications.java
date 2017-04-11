@@ -34,11 +34,23 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_APP_ENTER_BACKGROUND = "NOTIFICATION_APP_ENTER_BACKGROUND";
 
 	/**
+	 * Sent before payload request is sent to the server
+	 */
+	public static final String NOTIFICATION_PAYLOAD_WILL_START_SEND = "NOTIFICATION_PAYLOAD_WILL_START_SEND"; // { payload: Payload }
+
+	/**
+	 * Sent after payload sending if finished (might be successful or not)
+	 */
+	public static final String NOTIFICATION_PAYLOAD_DID_FINISH_SEND = "NOTIFICATION_PAYLOAD_DID_FINISH_SEND";  // { successful : boolean, payload: Payload }
+
+	/**
 	 * Sent if user requested to close all interactions.
 	 */
 	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
 	// keys
+	public static final String NOTIFICATION_KEY_SUCCESSFUL = "successful";
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
 	public static final String NOTIFICATION_KEY_CONVERSATION = "conversation";
+	public static final String NOTIFICATION_KEY_PAYLOAD = "payload";
 }

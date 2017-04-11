@@ -14,9 +14,10 @@ import org.json.JSONObject;
 public abstract class Payload extends JSONObject {
 
 	// These three are not stored in the JSON, only the DB.
-	private Long databaseId;
+	private Long databaseId; // FIXME: use 'long' instead
 	private BaseType baseType;
 	private String conversationId;
+	private String token;
 
 	public Payload() {
 		initBaseType();
@@ -27,9 +28,10 @@ public abstract class Payload extends JSONObject {
 		initBaseType();
 	}
 
-	public Payload(String json, String conversationId) throws JSONException {
+	public Payload(String json, String conversationId, String token) throws JSONException {
 		this(json);
 		this.conversationId = conversationId;
+		this.token = token;
 	}
 
 	/**
@@ -75,6 +77,14 @@ public abstract class Payload extends JSONObject {
 
 	public void setConversationId(String conversationId) {
 		this.conversationId = conversationId;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public String getToken() {
+		return token;
 	}
 
 	public enum BaseType {

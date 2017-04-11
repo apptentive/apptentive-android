@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.network;
 
 import org.json.JSONObject;
@@ -6,11 +12,11 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-class MockHttpJsonRequest extends HttpJsonRequest {
+public class MockHttpJsonRequest extends HttpJsonRequest {
 
 	private final MockHttpURLConnection connection;
 
-	MockHttpJsonRequest(String name, JSONObject requestObject) {
+	public MockHttpJsonRequest(String name, JSONObject requestObject) {
 		super("https://abc.com", requestObject);
 		connection = new MockHttpURLConnection();
 		connection.setMockResponseCode(200);

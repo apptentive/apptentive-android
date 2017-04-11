@@ -13,9 +13,9 @@ import org.json.JSONException;
  * @author Sky Kelsey
  */
 public class SdkFactory {
-	public static Sdk fromJson(String json) {
+	public static SdkPayload fromJson(String json) {
 		try {
-			return new Sdk(json);
+			return new SdkPayload(json);
 		} catch (JSONException e) {
 			ApptentiveLog.v("Error parsing json as Sdk: %s", e, json);
 		} catch (IllegalArgumentException e) {

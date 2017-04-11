@@ -32,8 +32,9 @@ public abstract class ApptentiveBaseActivity extends AppCompatActivity implement
 	//region Notifications
 
 	protected void registerNotifications() {
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS, this);
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS, this)
+			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this);
 	}
 
 	protected void unregisterNotification() {

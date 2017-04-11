@@ -17,7 +17,7 @@ import java.util.Map;
 /**
  * @author Sky Kelsey
  */
-public class Event extends ConversationItem {
+public class EventPayload extends ConversationItem {
 
 	private static final String KEY_LABEL = "label";
 	private static final String KEY_INTERACTION_ID = "interaction_id";
@@ -25,11 +25,11 @@ public class Event extends ConversationItem {
 	private static final String KEY_TRIGGER = "trigger";
 	private static final String KEY_CUSTOM_DATA = "custom_data";
 
-	public Event(String json) throws JSONException {
+	public EventPayload(String json) throws JSONException {
 		super(json);
 	}
 
-	public Event(String label, JSONObject data) {
+	public EventPayload(String label, JSONObject data) {
 		super();
 		try {
 			put(KEY_LABEL, label);
@@ -41,7 +41,7 @@ public class Event extends ConversationItem {
 		}
 	}
 
-	public Event(String label, Map<String, String> data) {
+	public EventPayload(String label, Map<String, String> data) {
 		super();
 		try {
 			put(KEY_LABEL, label);
@@ -57,7 +57,7 @@ public class Event extends ConversationItem {
 		}
 	}
 
-	public Event(String label, String interactionId, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+	public EventPayload(String label, String interactionId, String data, Map<String, Object> customData, ExtendedData... extendedData) {
 		super();
 		try {
 			put(KEY_LABEL, label);
@@ -104,7 +104,7 @@ public class Event extends ConversationItem {
 		return ret;
 	}
 
-	public Event(String label, String trigger) {
+	public EventPayload(String label, String trigger) {
 		this(label, (Map<String, String>) null);
 		Map<String, String> data = new HashMap<String, String>();
 		data.put(KEY_TRIGGER, trigger);

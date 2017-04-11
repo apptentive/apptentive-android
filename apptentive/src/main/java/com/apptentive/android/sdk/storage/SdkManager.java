@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.model.SdkPayload;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -31,8 +32,8 @@ public class SdkManager {
 		return sdk;
 	}
 
-	public static com.apptentive.android.sdk.model.Sdk getPayload(Sdk sdk) {
-		com.apptentive.android.sdk.model.Sdk ret = new com.apptentive.android.sdk.model.Sdk();
+	public static SdkPayload getPayload(Sdk sdk) {
+		SdkPayload ret = new SdkPayload();
 		if (sdk == null) {
 			return ret;
 		}

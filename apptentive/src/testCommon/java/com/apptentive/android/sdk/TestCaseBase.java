@@ -46,6 +46,10 @@ public class TestCaseBase {
 		result.add(str);
 	}
 
+	protected void addResult(String format, Object... params) {
+		result.add(StringUtils.format(format, params));
+	}
+
 	protected void assertResult(String... expected) {
 		// Make sure the expected and result sets contain the same number of items
 		if (expected.length != result.size()) {

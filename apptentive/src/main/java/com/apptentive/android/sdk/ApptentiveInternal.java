@@ -31,7 +31,7 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -44,12 +44,10 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
-import com.apptentive.android.sdk.storage.PayloadSendWorker;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
@@ -78,7 +76,6 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KE
  */
 public class ApptentiveInternal {
 
-	private final PayloadSendWorker payloadWorker;
 	private final ApptentiveTaskManager taskManager;
 
 	private final ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
@@ -144,7 +141,6 @@ public class ApptentiveInternal {
 
 	// for unit testing
 	protected ApptentiveInternal() {
-		payloadWorker = null;
 		taskManager = null;
 		globalSharedPrefs = null;
 		apiKey = null;
@@ -167,8 +163,7 @@ public class ApptentiveInternal {
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
-		payloadWorker = new PayloadSendWorker();
-		taskManager = new ApptentiveTaskManager(appContext);
+		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
 		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
@@ -341,10 +336,6 @@ public class ApptentiveInternal {
 		return conversation != null ? conversation.getMessageManager() : null;
 	}
 
-	public PayloadSendWorker getPayloadWorker() {
-		return payloadWorker;
-	}
-
 	public ApptentiveTaskManager getApptentiveTaskManager() {
 		return taskManager;
 	}
@@ -406,11 +397,11 @@ public class ApptentiveInternal {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		EngagementModule.engageInternal(appContext, Event.EventLabel.app__launch.getLabelName());
+		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 	}
 
 	public void onAppExit(final Context appContext) {
-		EngagementModule.engageInternal(appContext, Event.EventLabel.app__exit.getLabelName());
+		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onActivityStarted(Activity activity) {
@@ -420,7 +411,7 @@ public class ApptentiveInternal {
 
 			// Post a notification
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STARTED,
-				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
+				NOTIFICATION_KEY_ACTIVITY, activity);
 		}
 	}
 
@@ -431,13 +422,12 @@ public class ApptentiveInternal {
 
 			// Post a notification
 			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_RESUMED,
-				ObjectUtils.toMap(NOTIFICATION_KEY_ACTIVITY, activity));
+				NOTIFICATION_KEY_ACTIVITY, activity);
 		}
 	}
 
 	public void onAppEnterForeground() {
 		appIsInForeground = true;
-		payloadWorker.appWentToForeground();
 
 		// Post a notification
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_FOREGROUND);
@@ -446,7 +436,6 @@ public class ApptentiveInternal {
 	public void onAppEnterBackground() {
 		appIsInForeground = false;
 		currentTaskStackTopActivity = null;
-		payloadWorker.appWentToBackground();
 
 		// Post a notification
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_BACKGROUND);
@@ -677,7 +666,7 @@ public class ApptentiveInternal {
 	/**
 	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
 	 */
-	private void fetchAppConfiguration() {
+	private void fetchAppConfiguration() { // FIXME: remove unused method
 		ApptentiveLog.i("Fetching new Configuration task started.");
 		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
 		try {

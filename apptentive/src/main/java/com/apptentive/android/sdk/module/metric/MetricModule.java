@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.module.metric;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.Event;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.util.Util;
 import org.json.JSONObject;
@@ -22,19 +22,19 @@ public class MetricModule {
 
 	private static final String KEY_EXCEPTION = "exception";
 
-	public static void sendMetric(Event.EventLabel type) {
+	public static void sendMetric(EventPayload.EventLabel type) {
 		sendMetric(type, null);
 	}
 
-	public static void sendMetric(Event.EventLabel type, String trigger) {
+	public static void sendMetric(EventPayload.EventLabel type, String trigger) {
 		sendMetric(type, trigger, null);
 	}
 
-	public static void sendMetric(Event.EventLabel type, String trigger, Map<String, String> data) {
+	public static void sendMetric(EventPayload.EventLabel type, String trigger, Map<String, String> data) {
 		Configuration config = Configuration.load();
 		if (config.isMetricsEnabled()) {
 			ApptentiveLog.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
-			Event event = new Event(type.getLabelName(), trigger);
+			EventPayload event = new EventPayload(type.getLabelName(), trigger);
 			event.putData(data);
 			EventManager.sendEvent(event);
 		}
@@ -48,7 +48,7 @@ public class MetricModule {
 	 * @param extraData   Any extra data that may have contributed to the Throwable being thrown.
 	 */
 	public static void sendError(Throwable throwable, String description, String extraData) {
-		Event.EventLabel type = Event.EventLabel.error;
+		EventPayload.EventLabel type = EventPayload.EventLabel.error;
 		try {
 			JSONObject data = new JSONObject();
 			data.put("thread", Thread.currentThread().getName());
@@ -67,7 +67,7 @@ public class MetricModule {
 			Configuration config = Configuration.load();
 			if (config.isMetricsEnabled()) {
 				ApptentiveLog.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
-				Event event = new Event(type.getLabelName(), data);
+				EventPayload event = new EventPayload(type.getLabelName(), data);
 				EventManager.sendEvent(event);
 			}
 		} catch (Exception e) {

@@ -34,7 +34,7 @@ public class PayloadFactory {
 				return PersonFactory.fromJson(json);
 			case survey:
 				try {
-					return new SurveyResponse(json);
+					return new SurveyResponsePayload(json);
 				} catch (JSONException e) {
 					// Ignore
 				}

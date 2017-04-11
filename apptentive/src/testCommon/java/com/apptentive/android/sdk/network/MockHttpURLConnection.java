@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.network;
 
 import java.io.ByteArrayInputStream;
@@ -11,7 +17,7 @@ import java.net.ProtocolException;
 import java.util.HashMap;
 import java.util.Map;
 
-class MockHttpURLConnection extends HttpURLConnection {
+public class MockHttpURLConnection extends HttpURLConnection {
 	private static final Map<Integer, String> statusLookup;
 
 	static {
@@ -105,27 +111,14 @@ class MockHttpURLConnection extends HttpURLConnection {
 		String getErrorData();
 	}
 
-	public static class AbstractResponseHandler implements ResponseHandler {
-		@Override
-		public int getResponseCode() {
-			return 200;
-		}
-
-		@Override
-		public String getResponseData() {
-			return "";
-		}
-
-		@Override
-		public String getErrorData() {
-			return "";
-		}
-	}
-
-	private static class DefaultResponseHandler implements ResponseHandler {
+	public static class DefaultResponseHandler implements ResponseHandler {
 		private int responseCode;
 		private String responseData;
 		private String errorData;
+
+		public DefaultResponseHandler() {
+			this(200, "", "");
+		}
 
 		public DefaultResponseHandler(int responseCode, String responseData, String errorData) {
 			this.responseCode = responseCode;

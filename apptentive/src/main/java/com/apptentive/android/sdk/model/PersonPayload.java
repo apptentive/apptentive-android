@@ -13,7 +13,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class Person extends Payload {
+public class PersonPayload extends Payload {
 
 	public static final String KEY = "person";
 
@@ -29,11 +29,11 @@ public class Person extends Payload {
 	private static final String KEY_BIRTHDAY = "birthday";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 
-	public Person() {
+	public PersonPayload() {
 		super();
 	}
 
-	public Person(String json) throws JSONException {
+	public PersonPayload(String json) throws JSONException {
 		super(json);
 	}
 

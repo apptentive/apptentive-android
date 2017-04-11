@@ -13,9 +13,9 @@ import org.json.JSONException;
  * @author Sky Kelsey
  */
 public class DeviceFactory {
-	public static Device fromJson(String json) {
+	public static DevicePayload fromJson(String json) {
 		try {
-			return new Device(json);
+			return new DevicePayload(json);
 		} catch (JSONException e) {
 			ApptentiveLog.v("Error parsing json as Device: %s", e, json);
 		} catch (IllegalArgumentException e) {

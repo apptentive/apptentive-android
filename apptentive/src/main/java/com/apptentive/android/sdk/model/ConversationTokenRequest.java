@@ -17,31 +17,31 @@ public class ConversationTokenRequest extends JSONObject {
 	public ConversationTokenRequest() {
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(DevicePayload device) {
 		try {
-			put(Device.KEY, device);
+			put(DevicePayload.KEY, device);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Device.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
 		}
 	}
 
-	public void setSdk(Sdk sdk) {
+	public void setSdk(SdkPayload sdk) {
 		try {
-			put(Sdk.KEY, sdk);
+			put(SdkPayload.KEY, sdk);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
 		}
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(PersonPayload person) {
 		try {
-			put(Person.KEY, person);
+			put(PersonPayload.KEY, person);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Person.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
 		}
 	}
 
-	public void setAppRelease(AppRelease appRelease) {
+	public void setAppRelease(AppReleasePayload appRelease) {
 		try {
 			put(appRelease.getBaseType().name(), appRelease);
 		} catch (JSONException e) {

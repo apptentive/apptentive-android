@@ -6,6 +6,7 @@ public enum ApptentiveLogTag {
 	NOTIFICATIONS(true),
 	MESSAGES(true),
 	DATABASE(true),
+	PAYLOADS(true),
 	TESTER_COMMANDS(true);
 
 	ApptentiveLogTag(boolean enabled) {

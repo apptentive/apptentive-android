@@ -14,9 +14,9 @@ import org.json.JSONException;
  * @author Sky Kelsey
  */
 public class EventFactory {
-	public static Event fromJson(String json) {
+	public static EventPayload fromJson(String json) {
 		try {
-			return new Event(json);
+			return new EventPayload(json);
 		} catch (JSONException e) {
 			ApptentiveLog.v("Error parsing json as Event: %s", e, json);
 		} catch (IllegalArgumentException e) {
