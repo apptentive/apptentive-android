@@ -74,6 +74,13 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
+	/**
+	 * Returns the first request with a given tag or <code>null</code> is not found
+	 */
+	public HttpRequest findRequest(String tag) {
+		return httpRequestManager.findRequest(tag);
+	}
+
 	//endregion
 
 	//region PayloadRequestSender

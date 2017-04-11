@@ -24,6 +24,7 @@ import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
@@ -390,10 +391,6 @@ public class ApptentiveInternal {
 
 	public ApptentiveHttpClient getApptentiveHttpClient() {
 		return apptentiveHttpClient;
-	}
-
-	public void runOnWorkerThread(Runnable r) {
-		cachedExecutor.execute(r);
 	}
 
 	public void onAppLaunch(final Context appContext) {
@@ -960,6 +957,14 @@ public class ApptentiveInternal {
 			prefs.edit().putString(Constants.PREF_KEY_SERVER_URL, url).apply();
 		}
 		return url;
+	}
+
+	//endregion
+
+	//region Login/Logout
+
+	void login(String token, LoginCallback callback) {
+		conversationManager.login(token, callback);
 	}
 
 	//endregion

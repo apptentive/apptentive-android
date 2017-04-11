@@ -1060,6 +1060,47 @@ public class Apptentive {
 		}
 	}
 
+	//region Login/Logout
+
+	/**
+	 * Starts login process asynchronously. This call returns immediately.
+	 * @throws IllegalArgumentException if token is null.
+	 */
+	public void login(String token, LoginCallback callback) {
+		if (token == null) {
+			throw new IllegalArgumentException("Token is null");
+		}
+
+		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+		if (instance == null) {
+			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+			if (callback != null) {
+				callback.onLoginFail("Apptentive instance is not properly initialized");
+			}
+		} else {
+			instance.login(token, callback);
+		}
+	}
+
+	/**
+	 * Callback interface for an async login process.
+	 */
+	public interface LoginCallback {
+		/**
+		 * Called when a login attempt has completed successfully.
+		 */
+		void onLoginFinish();
+
+		/**
+		 * Called when a login attempt has failed.
+		 *
+		 * @param errorMessage failure cause message
+		 */
+		void onLoginFail(String errorMessage);
+	}
+
+	//endregion
+
 	/**
 	 * <p>This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
 	 * with a string or a long, and there is no limit to the number of parts your semantic version can
