@@ -14,7 +14,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadFactory;
@@ -50,6 +49,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
 	public static final String PAYLOAD_KEY_JSON = "json";           // 2
 	private static final String PAYLOAD_KEY_CONVERSATION_ID = "conversation_id"; // 3
+	private static final String PAYLOAD_KEY_TOKEN = "token"; // 4
 
 	private static final String TABLE_CREATE_PAYLOAD =
 		"CREATE TABLE " + TABLE_PAYLOAD +
@@ -57,14 +57,16 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
 			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
 			PAYLOAD_KEY_JSON + " TEXT," +
-			PAYLOAD_KEY_CONVERSATION_ID + " TEXT" +
+			PAYLOAD_KEY_CONVERSATION_ID + " TEXT," +
+			PAYLOAD_KEY_TOKEN + " TEXT" +
 			");";
 
 	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
-	public static final String QUERY_UPDATE_MISSING_CONVERSATION_IDS = StringUtils.format("UPDATE %s SET %s = ? WHERE %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_CONVERSATION_ID);
+	private static final String QUERY_UPDATE_INCOMPLETE_PAYLOADS = StringUtils.format("UPDATE %s SET %s = ?, %s = ? WHERE %s IS NULL OR %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN);
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
-	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_TOKEN + " TEXT";
 
 	//endregion
 
@@ -322,7 +324,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	private void upgradeVersion2to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
-		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD);
+		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID);
+		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN);
 	}
 
 	//endregion
@@ -343,6 +346,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
 				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
+				values.put(PAYLOAD_KEY_TOKEN, payload.getToken());
 				db.insert(TABLE_PAYLOAD, null, values);
 			}
 			db.setTransactionSuccessful();
@@ -387,10 +391,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
+				String token = cursor.getString(4);
 				payload = PayloadFactory.fromJson(json, baseType);
 				if (payload != null) {
 					payload.setDatabaseId(databaseId);
 					payload.setConversationId(conversationId);
+					payload.setToken(token);
 				}
 			}
 			return payload;
@@ -402,15 +408,17 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void updateMissingConversationIds(String conversationId) {
+	public void updateIncompletePayloads(String conversationId, String token) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
-
+		if (StringUtils.isNullOrEmpty(token)) {
+			throw new IllegalArgumentException("Token is null or empty");
+		}
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(QUERY_UPDATE_MISSING_CONVERSATION_IDS, new String[] { conversationId });
+			cursor = db.rawQuery(QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] { conversationId , token});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
 		} catch (SQLException e) {
