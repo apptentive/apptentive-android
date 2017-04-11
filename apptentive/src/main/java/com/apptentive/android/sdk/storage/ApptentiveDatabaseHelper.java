@@ -166,7 +166,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		ApptentiveLog.d("ApptentiveDatabase.onCreate(db)");
+		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onCreate(db)");
 		db.execSQL(TABLE_CREATE_PAYLOAD);
 		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
@@ -179,7 +179,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
 				upgradeVersion1to2(db);
@@ -220,7 +220,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -262,12 +262,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
 					}
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -311,12 +311,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
 					}
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -352,7 +352,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("addPayload EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "addPayload EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -363,7 +363,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				db = getWritableDatabase();
 				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
 			} catch (SQLException sqe) {
-				ApptentiveLog.e("deletePayload EXCEPTION: " + sqe.getMessage());
+				ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
 			}
 		}
 	}
@@ -374,7 +374,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.delete(TABLE_PAYLOAD, "", null);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAllPayloads EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAllPayloads EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -401,7 +401,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 			return payload;
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
 			return null;
 		} finally {
 			ensureClosed(cursor);
@@ -440,7 +440,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
 			return cursor.getCount();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
 			return 0;
 		} finally {
 			ensureClosed(cursor);
@@ -453,7 +453,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.delete(TABLE_MESSAGE, "", null);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAllMessages EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAllMessages EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -462,9 +462,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		try {
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_MESSAGE, MESSAGE_KEY_NONCE + " = ?", new String[]{nonce});
-			ApptentiveLog.d("Deleted %d messages.", deleted);
+			ApptentiveLog.d(DATABASE, "Deleted %d messages.", deleted);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteMessage EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -477,9 +477,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		try {
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
-			ApptentiveLog.d("Deleted %d stored files.", deleted);
+			ApptentiveLog.d(DATABASE, "Deleted %d stored files.", deleted);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -504,7 +504,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -541,7 +541,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			return ret != -1;
 		}
@@ -557,7 +557,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				cursor.close();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error closing SQLite cursor.", e);
+			ApptentiveLog.w(DATABASE, "Error closing SQLite cursor.", e);
 		}
 	}
 
