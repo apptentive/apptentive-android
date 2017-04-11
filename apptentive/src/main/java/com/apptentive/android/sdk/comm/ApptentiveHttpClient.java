@@ -106,7 +106,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(EventPayload.class, new PayloadRequestFactory<EventPayload>() {
 			@Override
 			public HttpRequest createRequest(EventPayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
+				return createJsonRequest(payload.getToken(), ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
 			}
 		});
 
@@ -114,7 +114,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(DevicePayload.class, new PayloadRequestFactory<DevicePayload>() {
 			@Override
 			public HttpRequest createRequest(DevicePayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getToken(), ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -122,7 +122,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(SdkPayload.class, new PayloadRequestFactory<SdkPayload>() {
 			@Override
 			public HttpRequest createRequest(SdkPayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -130,7 +130,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(AppReleasePayload.class, new PayloadRequestFactory<AppReleasePayload>() {
 			@Override
 			public HttpRequest createRequest(AppReleasePayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -138,7 +138,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(SdkAndAppReleasePayload.class, new PayloadRequestFactory<SdkAndAppReleasePayload>() {
 			@Override
 			public HttpRequest createRequest(SdkAndAppReleasePayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -146,7 +146,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		lookup.put(PersonPayload.class, new PayloadRequestFactory<PersonPayload>() {
 			@Override
 			public HttpRequest createRequest(PersonPayload payload) {
-				return createJsonRequest(payload.getConversationToken(), ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
+				return createJsonRequest(payload.getToken(), ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
 			}
 		});
 
@@ -155,7 +155,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			@Override
 			public HttpRequest createRequest(SurveyResponsePayload survey) {
 				String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-				return createJsonRequest(survey.getConversationToken(), endpoint, survey, HttpRequestMethod.POST);
+				return createJsonRequest(survey.getToken(), endpoint, survey, HttpRequestMethod.POST);
 			}
 		});
 

@@ -14,7 +14,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadFactory;
@@ -50,6 +49,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
 	public static final String PAYLOAD_KEY_JSON = "json";           // 2
 	private static final String PAYLOAD_KEY_CONVERSATION_ID = "conversation_id"; // 3
+	private static final String PAYLOAD_KEY_TOKEN = "token"; // 4
 
 	private static final String TABLE_CREATE_PAYLOAD =
 		"CREATE TABLE " + TABLE_PAYLOAD +
@@ -57,14 +57,16 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
 			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
 			PAYLOAD_KEY_JSON + " TEXT," +
-			PAYLOAD_KEY_CONVERSATION_ID + " TEXT" +
+			PAYLOAD_KEY_CONVERSATION_ID + " TEXT," +
+			PAYLOAD_KEY_TOKEN + " TEXT" +
 			");";
 
 	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
-	public static final String QUERY_UPDATE_MISSING_CONVERSATION_IDS = StringUtils.format("UPDATE %s SET %s = ? WHERE %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_CONVERSATION_ID);
+	private static final String QUERY_UPDATE_INCOMPLETE_PAYLOADS = StringUtils.format("UPDATE %s SET %s = ?, %s = ? WHERE %s IS NULL OR %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN);
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
-	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_TOKEN + " TEXT";
 
 	//endregion
 
@@ -164,7 +166,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onCreate(SQLiteDatabase db) {
-		ApptentiveLog.d("ApptentiveDatabase.onCreate(db)");
+		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onCreate(db)");
 		db.execSQL(TABLE_CREATE_PAYLOAD);
 		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
@@ -177,7 +179,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ApptentiveLog.d("ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
 				upgradeVersion1to2(db);
@@ -218,7 +220,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -260,12 +262,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
 					}
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -309,12 +311,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
-						ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
 					}
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -322,7 +324,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	private void upgradeVersion2to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
-		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD);
+		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID);
+		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN);
 	}
 
 	//endregion
@@ -343,12 +346,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
 				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
+				values.put(PAYLOAD_KEY_TOKEN, payload.getToken());
 				db.insert(TABLE_PAYLOAD, null, values);
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("addPayload EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "addPayload EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -359,7 +363,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				db = getWritableDatabase();
 				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
 			} catch (SQLException sqe) {
-				ApptentiveLog.e("deletePayload EXCEPTION: " + sqe.getMessage());
+				ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
 			}
 		}
 	}
@@ -370,7 +374,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.delete(TABLE_PAYLOAD, "", null);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAllPayloads EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAllPayloads EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -387,30 +391,34 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
+				String token = cursor.getString(4);
 				payload = PayloadFactory.fromJson(json, baseType);
 				if (payload != null) {
 					payload.setDatabaseId(databaseId);
 					payload.setConversationId(conversationId);
+					payload.setToken(token);
 				}
 			}
 			return payload;
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
 			return null;
 		} finally {
 			ensureClosed(cursor);
 		}
 	}
 
-	public void updateMissingConversationIds(String conversationId) {
+	public void updateIncompletePayloads(String conversationId, String token) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
-
+		if (StringUtils.isNullOrEmpty(token)) {
+			throw new IllegalArgumentException("Token is null or empty");
+		}
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(QUERY_UPDATE_MISSING_CONVERSATION_IDS, new String[] { conversationId });
+			cursor = db.rawQuery(QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] { conversationId , token});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
 		} catch (SQLException e) {
@@ -432,7 +440,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
 			return cursor.getCount();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
 			return 0;
 		} finally {
 			ensureClosed(cursor);
@@ -445,7 +453,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.delete(TABLE_MESSAGE, "", null);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAllMessages EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAllMessages EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -454,9 +462,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		try {
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_MESSAGE, MESSAGE_KEY_NONCE + " = ?", new String[]{nonce});
-			ApptentiveLog.d("Deleted %d messages.", deleted);
+			ApptentiveLog.d(DATABASE, "Deleted %d messages.", deleted);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteMessage EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteMessage EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -469,9 +477,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		try {
 			db = getWritableDatabase();
 			int deleted = db.delete(TABLE_COMPOUND_MESSAGE_FILESTORE, COMPOUND_FILESTORE_KEY_MESSAGE_NONCE + " = ?", new String[]{messageNonce});
-			ApptentiveLog.d("Deleted %d stored files.", deleted);
+			ApptentiveLog.d(DATABASE, "Deleted %d stored files.", deleted);
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -496,7 +504,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				} while (cursor.moveToNext());
 			}
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("getAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "getAssociatedFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -533,7 +541,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.setTransactionSuccessful();
 			db.endTransaction();
 		} catch (SQLException sqe) {
-			ApptentiveLog.e("addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
+			ApptentiveLog.e(DATABASE, "addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
 		} finally {
 			return ret != -1;
 		}
@@ -549,7 +557,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				cursor.close();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error closing SQLite cursor.", e);
+			ApptentiveLog.w(DATABASE, "Error closing SQLite cursor.", e);
 		}
 	}
 

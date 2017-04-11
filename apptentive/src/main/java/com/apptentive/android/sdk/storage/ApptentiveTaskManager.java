@@ -101,8 +101,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void addPayload(final Payload... payloads) {
 		for (Payload payload : payloads) {
 			payload.setConversationId(currentConversationId);
-			payload.setConversationToken(currentConversationToken);
-
+			payload.setToken(currentConversationToken);
 		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
@@ -241,14 +240,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		if (StringUtils.isNullOrEmpty(payload.getConversationId())) {
+		if (StringUtils.isNullOrEmpty(payload.getConversationId()) || StringUtils.isNullOrEmpty(payload.getToken())) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no conversation id");
 			return;
 		}
-
-		// FIXME: store conversation data in the database
-		payload.setConversationId(currentConversationId);
-		payload.setConversationToken(currentConversationToken);
 
 		boolean scheduled = payloadSender.sendPayload(payload);
 
@@ -281,7 +276,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					singleThreadExecutor.execute(new Runnable() {
 						@Override
 						public void run() {
-							dbHelper.updateMissingConversationIds(currentConversationId); // TODO: update missing conversation token
+							dbHelper.updateIncompletePayloads(currentConversationId, currentConversationToken);
 							sendNextPayloadSync(); // after we've updated payloads - we need to send them
 						}
 					});

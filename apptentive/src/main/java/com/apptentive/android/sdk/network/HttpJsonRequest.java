@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.network;
 
+import com.apptentive.android.sdk.util.StringUtils;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,7 +32,9 @@ public class HttpJsonRequest extends HttpRequest {
 	@Override
 	protected void handleResponse(String response) throws IOException {
 		try {
-			responseObject = new JSONObject(response);
+			if (!StringUtils.isNullOrEmpty(response)) {
+				responseObject = new JSONObject(response);
+			}
 		} catch (JSONException e) {
 			throw new IOException(e);
 		}
