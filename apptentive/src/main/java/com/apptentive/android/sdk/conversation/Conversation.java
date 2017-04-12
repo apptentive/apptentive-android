@@ -111,6 +111,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.conversationMessagesFile = conversationMessagesFile;
 
 		conversationData = new ConversationData();
+		conversationData.setDataChangedListener(this);
+
 		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
@@ -213,14 +215,17 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
+		long start = System.currentTimeMillis();
 		FileSerializer serializer = new FileSerializer(conversationDataFile);
 		serializer.serialize(conversationData);
+		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
 		ApptentiveLog.d(CONVERSATION, "Loading conversation data");
 		FileSerializer serializer = new FileSerializer(conversationDataFile);
 		conversationData = (ConversationData) serializer.deserialize();
+		conversationData.setDataChangedListener(this);
 	}
 
 	//endregion

@@ -1,5 +1,6 @@
 package com.apptentive.android.sdk.network;
 
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -35,7 +36,7 @@ public class HttpRequestManager {
 	/**
 	 * Creates a request manager with custom network dispatch queue
 	 *
-	 * @param networkQueue  - dispatch queue for blocking network operations
+	 * @param networkQueue - dispatch queue for blocking network operations
 	 * @throws IllegalArgumentException if queue is null
 	 */
 	public HttpRequestManager(DispatchQueue networkQueue) {
@@ -63,18 +64,14 @@ public class HttpRequestManager {
 		return request;
 	}
 
-	/** Handles request synchronously */
+	/**
+	 * Handles request synchronously
+	 */
 	void dispatchRequest(final HttpRequest request) {
 		networkQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
-				try {
-					request.dispatchSync(networkQueue);
-				} finally {
-					if (!request.retrying) {
-						unregisterRequest(request);
-					}
-				}
+				request.dispatchSync(networkQueue);
 			}
 		});
 	}
@@ -114,26 +111,38 @@ public class HttpRequestManager {
 		}
 	}
 
+	/**
+	 * Returns a request with a specified tag or <code>null</code> is not found
+	 */
+	public synchronized HttpRequest findRequest(String tag) {
+		for (HttpRequest request : activeRequests) {
+			if (StringUtils.equal(request.getTag(), tag)) {
+				return request;
+			}
+		}
+		return null;
+	}
+
 	//endregion
 
 	//region Listener callbacks
 
 	private void notifyRequestStarted(final HttpRequest request) {
-			if (listener != null) {
-				listener.onRequestStart(HttpRequestManager.this, request);
-			}
+		if (listener != null) {
+			listener.onRequestStart(HttpRequestManager.this, request);
+		}
 	}
 
 	private void notifyRequestFinished(final HttpRequest request) {
-			if (listener != null) {
-				listener.onRequestFinish(HttpRequestManager.this, request);
-			}
+		if (listener != null) {
+			listener.onRequestFinish(HttpRequestManager.this, request);
+		}
 	}
 
 	private void notifyCancelledAllRequests() {
-			if (listener != null) {
-				listener.onRequestsCancel(HttpRequestManager.this);
-			}
+		if (listener != null) {
+			listener.onRequestsCancel(HttpRequestManager.this);
+		}
 	}
 
 	//endregion

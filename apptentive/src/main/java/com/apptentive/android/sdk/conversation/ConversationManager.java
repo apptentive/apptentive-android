@@ -2,10 +2,11 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 
+import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
-import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -23,6 +24,8 @@ import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONObject;
 
@@ -30,11 +33,11 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
-
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
+import static com.apptentive.android.sdk.debug.Assert.*;
+import static com.apptentive.android.sdk.debug.Tester.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
 /**
@@ -48,6 +51,7 @@ import static com.apptentive.android.sdk.debug.TesterEvent.*;
 public class ConversationManager {
 
 	protected static final String CONVERSATION_METADATA_PATH = "conversation-v1.meta";
+	private static final String TAG_FETCH_CONVERSATION_TOKEN_REQUEST = "fetch_conversation_token";
 
 	private final WeakReference<Context> contextRef;
 
@@ -191,32 +195,48 @@ public class ConversationManager {
 
 	//region Conversation Token Fetching
 
-	private void fetchConversationToken(final Conversation conversation) {
-		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
-		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
-
+	/**
+	 * Starts fetching conversation token. Returns immediately if conversation is already fetching.
+	 *
+	 * @return a new http-request object if conversation is not currently fetched or an instance of
+	 * the existing request
+	 */
+	private HttpRequest fetchConversationToken(final Conversation conversation) {
+		// check if context is lost
 		final Context context = getContext();
 		if (context == null) {
 			ApptentiveLog.w(CONVERSATION, "Unable to fetch conversation token: context reference is lost");
-			return;
+			return null;
 		}
 
+		// check for an existing request
+		HttpRequest existingRequest = getHttpClient().findRequest(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		if (existingRequest != null) {
+			ApptentiveLog.d(CONVERSATION, "Conversation already fetching");
+			return existingRequest;
+		}
+
+		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
+
 		// Try to fetch a new one from the server.
-		ConversationTokenRequest request = new ConversationTokenRequest();
+		ConversationTokenRequest conversationTokenRequest = new ConversationTokenRequest();
 
 		// Send the Device and Sdk now, so they are available on the server from the start.
 		final Device device = DeviceManager.generateNewDevice(context);
 		final Sdk sdk = SdkManager.generateCurrentSdk();
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 
-		request.setDevice(DeviceManager.getDiffPayload(null, device));
-		request.setSdk(SdkManager.getPayload(sdk));
-		request.setAppRelease(AppReleaseManager.getPayload(appRelease));
+		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
+		conversationTokenRequest.setSdk(SdkManager.getPayload(sdk));
+		conversationTokenRequest.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
-		ApptentiveInternal.getInstance().getApptentiveHttpClient()
-			.getConversationToken(request, new HttpRequest.Listener<HttpJsonRequest>() {
+		HttpRequest request = getHttpClient()
+			.getConversationToken(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
+					assertMainThread();
+
 					try {
 						JSONObject root = request.getResponseObject();
 						String conversationToken = root.getString("token");
@@ -248,9 +268,6 @@ public class ConversationManager {
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
 
-						// write conversation to the disk (sync operation)
-						conversation.saveConversationData();
-
 						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 
 						handleConversationStateChange(conversation);
@@ -271,6 +288,10 @@ public class ConversationManager {
 					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 			});
+
+		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
+		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		return request;
 	}
 
 	//endregion
@@ -278,23 +299,24 @@ public class ConversationManager {
 	//region Conversation fetching
 
 	private void handleConversationStateChange(Conversation conversation) {
-		Assert.assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+		assertMainThread();
+		assertTrue(conversation != null && !conversation.hasState(UNDEFINED));
 
-		if (conversation != null) {
+		if (conversation != null && !conversation.hasState(UNDEFINED)) {
 			dispatchDebugEvent(EVT_CONVERSATION_STATE_CHANGE,
 				"conversation_state", conversation.getState().toString(),
 				"conversation_identifier", conversation.getConversationId());
+
+			ApptentiveNotificationCenter.defaultCenter()
+				.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
+
+			if (conversation.hasActiveState()) {
+				conversation.fetchInteractions(getContext());
+			}
+
+			updateMetadataItems(conversation);
 		}
-
-		ApptentiveNotificationCenter.defaultCenter()
-			.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
-				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
-
-		if (conversation != null && conversation.hasActiveState()) {
-			conversation.fetchInteractions(getContext());
-		}
-
-		updateMetadataItems(conversation);
 	}
 
 	/* For testing purposes */
@@ -385,6 +407,95 @@ public class ConversationManager {
 
 	//endregion
 
+	//region Login/Logout
+
+	private static final LoginCallback NULL_LOGIN_CALLBACK = new LoginCallback() {
+		@Override
+		public void onLoginFinish() {
+		}
+
+		@Override
+		public void onLoginFail(String errorMessage) {
+		}
+	};
+
+	public void login(final String token, final LoginCallback callback) {
+		// we only deal with an active conversation on the main thread
+		DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+			@Override
+			protected void execute() {
+				requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
+			}
+		});
+	}
+
+	private void requestLoggedInConversation(final String token, final LoginCallback callback) {
+		assertMainThread();
+
+		if (callback == null) {
+			throw new IllegalArgumentException("Callback is null");
+		}
+
+		// check if active conversation exists
+		if (activeConversation == null) {
+			ApptentiveLog.e(CONVERSATION, "Unable to login: no active conversation");
+			callback.onLoginFail("No active conversation");
+			return;
+		}
+
+		switch (activeConversation.getState()) {
+			case ANONYMOUS_PENDING:
+				// start fetching conversation token (if not yet fetched)
+				final HttpRequest fetchRequest = fetchConversationToken(activeConversation);
+				if (fetchRequest == null) {
+					ApptentiveLog.e(CONVERSATION, "Unable to login: fetch request failed to send");
+					callback.onLoginFail("fetch request failed to send");
+					return;
+				}
+
+				// attach a listener to an active request
+				fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
+					@Override
+					public void onFinish(HttpRequest request) {
+						assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
+
+						if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
+							ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
+							sendLoginRequest(token, callback);
+						} else {
+							callback.onLoginFail("Conversation fetching completed abnormally");
+						}
+					}
+
+					@Override
+					public void onCancel(HttpRequest request) {
+						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching cancelled.");
+						callback.onLoginFail("Conversation fetching was cancelled");
+					}
+
+					@Override
+					public void onFail(HttpRequest request, String reason) {
+						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching failed.");
+						callback.onLoginFail("Conversation fetching failed: " + reason);
+					}
+				});
+				break;
+			case ANONYMOUS:
+			case LOGGED_OUT:
+				sendLoginRequest(token, callback);
+				break;
+			case LOGGED_IN:
+				callback.onLoginFail("already logged in"); // TODO: force logout?
+				break;
+		}
+	}
+
+	private void sendLoginRequest(String token, LoginCallback callback) {
+		callback.onLoginFail("login not yet implemented"); // FIXME: kick off login request
+	}
+
+	//endregion
+
 	//region Getters/Setters
 
 	public Conversation getActiveConversation() {
@@ -393,6 +504,10 @@ public class ConversationManager {
 
 	public ConversationMetadata getConversationMetadata() {
 		return conversationMetadata;
+	}
+
+	private ApptentiveHttpClient getHttpClient() {
+		return ApptentiveInternal.getInstance().getApptentiveHttpClient(); // TODO: remove coupling
 	}
 
 	private Context getContext() {

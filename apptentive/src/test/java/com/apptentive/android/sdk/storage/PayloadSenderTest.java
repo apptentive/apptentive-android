@@ -135,7 +135,7 @@ public class PayloadSenderTest extends TestCaseBase {
 
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());
-			request.setListener(listener);
+			request.addListener(listener);
 			requestManager.startRequest(request);
 			return request;
 		}

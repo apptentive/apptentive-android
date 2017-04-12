@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.debug;
 
+import android.os.Looper;
+
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -137,6 +139,28 @@ public class Assert {
 	public static void assertEquals(Object expected, Object actual) {
 		if (imp != null && !ObjectUtils.equal(expected, actual)) {
 			imp.assertFailed(StringUtils.format("Expected '%s' but was '%s'", expected, actual));
+		}
+	}
+
+	//endregion
+
+	//region Threading
+
+	/**
+	 * Asserts that code executes on the main thread.
+	 */
+	public static void assertMainThread() {
+		if (imp != null && Looper.myLooper() != Looper.getMainLooper()) {
+			imp.assertFailed(StringUtils.format("Expected 'main' thread but was '%s'", Thread.currentThread().getName()));
+		}
+	}
+
+	/**
+	 * Asserts that code executes on the main thread.
+	 */
+	public static void assertBackgroundThread() {
+		if (imp != null && Looper.myLooper() == Looper.getMainLooper()) {
+			imp.assertFailed("Expected background thread but was 'main'");
 		}
 	}
 

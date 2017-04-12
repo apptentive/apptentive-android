@@ -69,9 +69,16 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
-		request.setListener(listener);
+		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
+	}
+
+	/**
+	 * Returns the first request with a given tag or <code>null</code> is not found
+	 */
+	public HttpRequest findRequest(String tag) {
+		return httpRequestManager.findRequest(tag);
 	}
 
 	//endregion
@@ -90,7 +97,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 
 		HttpRequest request = requestFactory.createRequest(payload);
-		request.setListener(listener);
+		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
 	}

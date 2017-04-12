@@ -46,7 +46,6 @@ import java.util.Map;
  */
 public class Apptentive {
 
-
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
 	 *
@@ -65,9 +64,7 @@ public class Apptentive {
 		ApptentiveInternal.createInstance(application, apptentiveApiKey, serverUrl);
 	}
 
-	// ****************************************************************************************
-	// GLOBAL DATA METHODS
-	// ****************************************************************************************
+	//region Global Data Methods
 
 	/**
 	 * Sets the user's email address. This email address will be sent to the Apptentive server to allow out of app
@@ -311,10 +308,9 @@ public class Apptentive {
 		}
 	}
 
+	//endregion
 
-	// ****************************************************************************************
-	// THIRD PARTY INTEGRATIONS
-	// ****************************************************************************************
+	//region Third Party Integrations
 
 	private static final String INTEGRATION_PUSH_TOKEN = "token";
 
@@ -403,9 +399,9 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// PUSH NOTIFICATIONS
-	// ****************************************************************************************
+	//endregion
+
+	//region Push Notifications
 
 	/**
 	 * Determines whether this Intent is a push notification sent from Apptentive.
@@ -674,9 +670,9 @@ public class Apptentive {
 		return data.get(ApptentiveInternal.BODY_DEFAULT);
 	}
 
-	// ****************************************************************************************
-	// RATINGS
-	// ****************************************************************************************
+	//endregion
+
+	//region Rating
 
 	/**
 	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
@@ -704,10 +700,9 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// MESSAGE CENTER
-	// ****************************************************************************************
+	//endregion
 
+	//region Message Center
 
 	/**
 	 * Opens the Apptentive Message Center UI Activity
@@ -954,6 +949,8 @@ public class Apptentive {
 		}
 	}
 
+	//endregion
+
 	/**
 	 * This method takes a unique event string, stores a record of that event having been visited, determines
 	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
@@ -1062,6 +1059,50 @@ public class Apptentive {
 			internal.setOnSurveyFinishedListener(listener);
 		}
 	}
+
+	//region Login/Logout
+
+	/**
+	 * Starts login process asynchronously. This call returns immediately.
+	 */
+	public void login(String token, LoginCallback callback) {
+		if (token == null) {
+			if (callback != null) {
+				callback.onLoginFail("token is null");
+			}
+
+			return;
+		}
+
+		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+		if (instance == null) {
+			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+			if (callback != null) {
+				callback.onLoginFail("Apptentive instance is not properly initialized");
+			}
+		} else {
+			instance.login(token, callback);
+		}
+	}
+
+	/**
+	 * Callback interface for an async login process.
+	 */
+	public interface LoginCallback {
+		/**
+		 * Called when a login attempt has completed successfully.
+		 */
+		void onLoginFinish();
+
+		/**
+		 * Called when a login attempt has failed.
+		 *
+		 * @param errorMessage failure cause message
+		 */
+		void onLoginFail(String errorMessage);
+	}
+
+	//endregion
 
 	/**
 	 * <p>This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized

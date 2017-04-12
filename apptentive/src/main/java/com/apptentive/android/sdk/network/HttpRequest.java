@@ -11,6 +11,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +56,11 @@ public class HttpRequest {
 	 * Url-connection for network communications
 	 */
 	private HttpURLConnection connection;
+
+	/**
+	 * Optional request tag (for an easy request identification)
+	 */
+	private String tag;
 
 	/**
 	 * Optional name of the request (for logging purposes)
@@ -132,7 +138,7 @@ public class HttpRequest {
 	boolean retrying;
 
 	@SuppressWarnings("rawtypes")
-	private Listener listener;
+	private List<Listener> listeners;
 
 	/**
 	 * Optional dispatch queue for listener callbacks
@@ -144,6 +150,7 @@ public class HttpRequest {
 			throw new IllegalArgumentException("Invalid URL string '" + urlString + "'");
 		}
 
+		this.listeners = new ArrayList<>(1);
 		this.id = nextRequestId++;
 		this.urlString = urlString;
 	}
@@ -154,17 +161,33 @@ public class HttpRequest {
 	@SuppressWarnings("unchecked")
 	private void finishRequest() {
 		try {
-			if (listener != null) {
-				if (isSuccessful()) {
-					listener.onFinish(this);
-				} else if (isCancelled()) {
-					listener.onCancel(this);
-				} else {
-					listener.onFail(this, errorMessage);
+			if (isSuccessful()) {
+				for (Listener listener : listeners) {
+					try {
+						listener.onFinish(this);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
+				}
+			} else if (isCancelled()) {
+				for (Listener listener : listeners) {
+					try {
+						listener.onCancel(this);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
+				}
+			} else {
+				for (Listener listener : listeners) {
+					try {
+						listener.onFail(this, errorMessage);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
 				}
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception in request finish listener");
+		} finally {
+			requestManager.unregisterRequest(HttpRequest.this);
 		}
 	}
 
@@ -220,7 +243,7 @@ public class HttpRequest {
 		}
 	}
 
-	protected void sendRequestSync() throws IOException {
+	private void sendRequestSync() throws IOException {
 		try {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
@@ -384,7 +407,7 @@ public class HttpRequest {
 	/**
 	 * Returns <code>true</code> if request is cancelled
 	 */
-	public synchronized boolean isCancelled() {
+	synchronized boolean isCancelled() {
 		return cancelled;
 	}
 
@@ -481,15 +504,31 @@ public class HttpRequest {
 		return name;
 	}
 
-	public void setListener(Listener<?> listener) {
-		this.listener = listener;
+	public String getTag() {
+		return tag;
+	}
+
+	public void setTag(String tag) {
+		this.tag = tag;
+	}
+
+	public void addListener(Listener<?> listener) {
+		if (listener == null) {
+			throw new IllegalArgumentException("Listener is null");
+		}
+
+		boolean contains = listeners.contains(listener);
+		assertFalse(contains, "Already contains listener: %s", listener);
+		if (!contains) {
+			listeners.add(listener);
+		}
 	}
 
 	public void setCallbackQueue(DispatchQueue callbackQueue) {
 		this.callbackQueue = callbackQueue;
 	}
 
-	public String getResponseData() {
+	String getResponseData() {
 		return responseData;
 	}
 
@@ -510,7 +549,7 @@ public class HttpRequest {
 
 	//region Listener
 
-	public interface Listener<T> {
+	public interface Listener<T extends HttpRequest> {
 		void onFinish(T request);
 
 		void onCancel(T request);
@@ -518,7 +557,7 @@ public class HttpRequest {
 		void onFail(T request, String reason);
 	}
 
-	public static class Adapter<T> implements Listener<T> {
+	public static class Adapter<T extends HttpRequest> implements Listener<T> {
 
 		@Override
 		public void onFinish(T request) {
