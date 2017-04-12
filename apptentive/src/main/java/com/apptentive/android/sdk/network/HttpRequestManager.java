@@ -71,13 +71,7 @@ public class HttpRequestManager {
 		networkQueue.dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
-				try {
-					request.dispatchSync(networkQueue);
-				} finally {
-					if (!request.retrying) {
-						unregisterRequest(request);
-					}
-				}
+				request.dispatchSync(networkQueue);
 			}
 		});
 	}

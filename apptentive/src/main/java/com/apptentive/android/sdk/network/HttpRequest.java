@@ -160,30 +160,34 @@ public class HttpRequest {
 
 	@SuppressWarnings("unchecked")
 	private void finishRequest() {
-		if (isSuccessful()) {
-			for (Listener listener : listeners) {
-				try {
-					listener.onFinish(this);
-				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception in request finish listener");
+		try {
+			if (isSuccessful()) {
+				for (Listener listener : listeners) {
+					try {
+						listener.onFinish(this);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
+				}
+			} else if (isCancelled()) {
+				for (Listener listener : listeners) {
+					try {
+						listener.onCancel(this);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
+				}
+			} else {
+				for (Listener listener : listeners) {
+					try {
+						listener.onFail(this, errorMessage);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception in request finish listener");
+					}
 				}
 			}
-		} else if (isCancelled()) {
-			for (Listener listener : listeners) {
-				try {
-					listener.onCancel(this);
-				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception in request finish listener");
-				}
-			}
-		} else {
-			for (Listener listener : listeners) {
-				try {
-					listener.onFail(this, errorMessage);
-				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception in request finish listener");
-				}
-			}
+		} finally {
+			requestManager.unregisterRequest(HttpRequest.this);
 		}
 	}
 
@@ -239,7 +243,7 @@ public class HttpRequest {
 		}
 	}
 
-	protected void sendRequestSync() throws IOException {
+	private void sendRequestSync() throws IOException {
 		try {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
@@ -403,7 +407,7 @@ public class HttpRequest {
 	/**
 	 * Returns <code>true</code> if request is cancelled
 	 */
-	public synchronized boolean isCancelled() {
+	synchronized boolean isCancelled() {
 		return cancelled;
 	}
 
@@ -524,7 +528,7 @@ public class HttpRequest {
 		this.callbackQueue = callbackQueue;
 	}
 
-	public String getResponseData() {
+	String getResponseData() {
 		return responseData;
 	}
 
