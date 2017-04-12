@@ -1064,11 +1064,14 @@ public class Apptentive {
 
 	/**
 	 * Starts login process asynchronously. This call returns immediately.
-	 * @throws IllegalArgumentException if token is null.
 	 */
 	public void login(String token, LoginCallback callback) {
 		if (token == null) {
-			throw new IllegalArgumentException("Token is null");
+			if (callback != null) {
+				callback.onLoginFail("token is null");
+			}
+
+			return;
 		}
 
 		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
