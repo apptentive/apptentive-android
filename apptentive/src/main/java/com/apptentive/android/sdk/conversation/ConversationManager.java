@@ -266,9 +266,6 @@ public class ConversationManager {
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
 						conversation.setPersonId(personId);
 
-						// write conversation to the disk (sync operation)
-						conversation.saveConversationData();
-
 						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 
 						handleConversationStateChange(conversation);
@@ -290,6 +287,7 @@ public class ConversationManager {
 				}
 			});
 
+		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
 		return request;
 	}
