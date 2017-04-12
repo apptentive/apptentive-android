@@ -235,6 +235,8 @@ public class ConversationManager {
 			.getConversationToken(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
+					assertMainThread();
+
 					try {
 						JSONObject root = request.getResponseObject();
 						String conversationToken = root.getString("token");
@@ -297,7 +299,9 @@ public class ConversationManager {
 	//region Conversation fetching
 
 	private void handleConversationStateChange(Conversation conversation) {
+		assertMainThread();
 		assertTrue(conversation != null && !conversation.hasState(UNDEFINED));
+
 		if (conversation != null && !conversation.hasState(UNDEFINED)) {
 			dispatchDebugEvent(EVT_CONVERSATION_STATE_CHANGE,
 				"conversation_state", conversation.getState().toString(),
@@ -426,6 +430,8 @@ public class ConversationManager {
 	}
 
 	private void requestLoggedInConversation(final String token, final LoginCallback callback) {
+		assertMainThread();
+
 		if (callback == null) {
 			throw new IllegalArgumentException("Callback is null");
 		}
