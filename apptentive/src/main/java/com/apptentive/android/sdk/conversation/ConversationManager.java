@@ -220,19 +220,19 @@ public class ConversationManager {
 		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
 
 		// Try to fetch a new one from the server.
-		ConversationTokenRequest payload = new ConversationTokenRequest();
+		ConversationTokenRequest conversationTokenRequest = new ConversationTokenRequest();
 
 		// Send the Device and Sdk now, so they are available on the server from the start.
 		final Device device = DeviceManager.generateNewDevice(context);
 		final Sdk sdk = SdkManager.generateCurrentSdk();
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 
-		payload.setDevice(DeviceManager.getDiffPayload(null, device));
-		payload.setSdk(SdkManager.getPayload(sdk));
-		payload.setAppRelease(AppReleaseManager.getPayload(appRelease));
+		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
+		conversationTokenRequest.setSdk(SdkManager.getPayload(sdk));
+		conversationTokenRequest.setAppRelease(AppReleaseManager.getPayload(appRelease));
 
 		HttpRequest request = getHttpClient()
-			.getConversationToken(payload, new HttpRequest.Listener<HttpJsonRequest>() {
+			.getConversationToken(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
 					try {
