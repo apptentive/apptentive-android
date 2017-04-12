@@ -297,23 +297,22 @@ public class ConversationManager {
 	//region Conversation fetching
 
 	private void handleConversationStateChange(Conversation conversation) {
-		assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
-
-		if (conversation != null) {
+		assertTrue(conversation != null && !conversation.hasState(UNDEFINED));
+		if (conversation != null && !conversation.hasState(UNDEFINED)) {
 			dispatchDebugEvent(EVT_CONVERSATION_STATE_CHANGE,
 				"conversation_state", conversation.getState().toString(),
 				"conversation_identifier", conversation.getConversationId());
+
+			ApptentiveNotificationCenter.defaultCenter()
+				.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
+
+			if (conversation.hasActiveState()) {
+				conversation.fetchInteractions(getContext());
+			}
+
+			updateMetadataItems(conversation);
 		}
-
-		ApptentiveNotificationCenter.defaultCenter()
-			.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
-				ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
-
-		if (conversation != null && conversation.hasActiveState()) {
-			conversation.fetchInteractions(getContext());
-		}
-
-		updateMetadataItems(conversation);
 	}
 
 	/* For testing purposes */
