@@ -117,7 +117,7 @@ public class EventPayload extends ConversationItem {
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("conversations/%s/event", getConversationId());
+		return StringUtils.format("/conversations/%s/event", getConversationId());
 	}
 
 	@Override

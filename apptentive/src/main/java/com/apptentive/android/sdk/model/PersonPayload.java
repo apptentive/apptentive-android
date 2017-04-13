@@ -43,7 +43,7 @@ public class PersonPayload extends Payload {
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("converations/%s/people", getConversationId());
+		return StringUtils.format("/converations/%s/people", getConversationId());
 	}
 
 	@Override

@@ -46,7 +46,7 @@ public class SurveyResponsePayload extends ConversationItem {
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("conversations/%s/surveys/%s/respond", getConversationId(), getId());
+		return StringUtils.format("/conversations/%s/surveys/%s/respond", getConversationId(), getId());
 	}
 
 	@Override

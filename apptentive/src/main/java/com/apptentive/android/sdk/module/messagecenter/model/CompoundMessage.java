@@ -67,7 +67,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("conversations/%s/messages", getConversationId());
+		return StringUtils.format("/conversations/%s/messages", getConversationId());
 	}
 
 	@Override

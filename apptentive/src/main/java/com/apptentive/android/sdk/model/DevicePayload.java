@@ -58,7 +58,7 @@ public class DevicePayload extends Payload {
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("conversations/%s/devices", getConversationId());
+		return StringUtils.format("/conversations/%s/devices", getConversationId());
 	}
 
 	@Override

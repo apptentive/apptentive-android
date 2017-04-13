@@ -67,7 +67,7 @@ public class SdkAndAppReleasePayload extends Payload {
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("conversations/%s/sdkapprelease", getConversationId());
+		return StringUtils.format("/conversations/%s/sdkapprelease", getConversationId());
 	}
 
 	@Override
