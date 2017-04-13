@@ -166,6 +166,19 @@ public class Assert {
 
 	//endregion
 
+	//region Failure
+
+	/**
+	 * General failure with a message
+	 */
+	public static void assertFail(String message) {
+		if (imp != null) {
+			imp.assertFailed(message);
+		}
+	}
+
+	//endregion
+
 	public static void setImp(AssertImp imp) {
 		Assert.imp = imp;
 	}

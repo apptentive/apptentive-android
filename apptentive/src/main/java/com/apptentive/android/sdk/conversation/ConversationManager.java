@@ -438,8 +438,8 @@ public class ConversationManager {
 
 		// check if active conversation exists
 		if (activeConversation == null) {
-			ApptentiveLog.e(CONVERSATION, "Unable to login: no active conversation");
-			callback.onLoginFail("No active conversation");
+			ApptentiveLog.d(CONVERSATION, "No active conversation. Performing login...");
+			sendLoginRequest(token, callback);
 			return;
 		}
 
@@ -481,11 +481,14 @@ public class ConversationManager {
 				});
 				break;
 			case ANONYMOUS:
-			case LOGGED_OUT:
 				sendLoginRequest(token, callback);
 				break;
 			case LOGGED_IN:
 				callback.onLoginFail("already logged in"); // TODO: force logout?
+				break;
+			default:
+				assertFail("Unexpected conversation state: " + activeConversation.getState());
+				callback.onLoginFail("internal error");
 				break;
 		}
 	}
