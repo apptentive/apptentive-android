@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
@@ -51,6 +53,25 @@ public class DevicePayload extends Payload {
 	public DevicePayload(String json) throws JSONException {
 		super(json);
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("conversations/%s/devices", getConversationId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.PUT;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "application/json";
+	}
+
+	//endregion
 
 	public void initBaseType() {
 		setBaseType(BaseType.device);

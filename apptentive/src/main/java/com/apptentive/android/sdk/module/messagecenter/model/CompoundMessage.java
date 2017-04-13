@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.image.ImageItem;
 
 import org.json.JSONArray;
@@ -61,6 +63,24 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		isOutgoing = bOutgoing;
 	}
 
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("conversations/%s/messages", getConversationId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.POST;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "multipart/mixed;boundary=xxx";
+	}
+
+	//endregion
 
 	@Override
 	protected void initType() {

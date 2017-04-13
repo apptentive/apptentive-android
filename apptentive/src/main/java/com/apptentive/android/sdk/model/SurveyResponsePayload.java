@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +41,25 @@ public class SurveyResponsePayload extends ConversationItem {
 			ApptentiveLog.e("Unable to construct survey payload.", e);
 		}
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("conversations/%s/surveys/%s/respond", getConversationId(), getId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.POST;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "application/json";
+	}
+
+	//endregion
 
 	public String getId() {
 		return optString(KEY_SURVEY_ID, "");

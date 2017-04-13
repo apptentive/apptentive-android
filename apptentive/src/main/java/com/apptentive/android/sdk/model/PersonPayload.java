@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
@@ -36,6 +38,25 @@ public class PersonPayload extends Payload {
 	public PersonPayload(String json) throws JSONException {
 		super(json);
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("converations/%s/people", getConversationId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.PUT;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "application/json";
+	}
+
+	//endregion
 
 	public void initBaseType() {
 		setBaseType(BaseType.person);
