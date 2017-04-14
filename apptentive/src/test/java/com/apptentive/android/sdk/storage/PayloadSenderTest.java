@@ -10,6 +10,7 @@ import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.network.MockHttpRequest;
 import com.apptentive.android.sdk.network.MockHttpURLConnection;
@@ -115,6 +116,21 @@ public class PayloadSenderTest extends TestCaseBase {
 
 		public ResponseHandler getResponseHandler() {
 			return responseHandler;
+		}
+
+		@Override
+		public String getHttpEndPoint() {
+			return null;
+		}
+
+		@Override
+		public HttpRequestMethod getHttpRequestMethod() {
+			return null;
+		}
+
+		@Override
+		public String getHttpRequestContentType() {
+			return null;
 		}
 
 		@Override

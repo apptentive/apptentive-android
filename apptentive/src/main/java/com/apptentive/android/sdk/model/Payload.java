@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -112,10 +113,29 @@ public abstract class Payload extends JSONObject {
 
 	/**
 	 * @deprecated Do not use this method to check for key existence. Instead us !isNull(KEY_NAME), as this works better
-	 *             with keys with null values.
+	 * with keys with null values.
 	 */
 	@Override
 	public boolean has(String key) {
 		return super.has(key);
 	}
+
+	//region Http-request
+
+	/**
+	 * Http endpoint for sending this payload
+	 */
+	public abstract String getHttpEndPoint();
+
+	/**
+	 * Http request method for sending this payload
+	 */
+	public abstract HttpRequestMethod getHttpRequestMethod();
+
+	/**
+	 * Http content type for sending this payload
+	 */
+	public abstract String getHttpRequestContentType();
+
+	//endregion
 }

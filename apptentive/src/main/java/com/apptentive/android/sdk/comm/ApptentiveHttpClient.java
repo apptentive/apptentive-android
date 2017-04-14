@@ -47,8 +47,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private final String userAgentString;
 	private final HttpRequestManager httpRequestManager;
 
-	private final Map<Class<? extends Payload>, PayloadRequestFactory> payloadRequestFactoryLookup;
-
 	public ApptentiveHttpClient(String apiKey, String serverURL) {
 		if (isEmpty(apiKey)) {
 			throw new IllegalArgumentException("Illegal API key: '" + apiKey + "'");
@@ -62,7 +60,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		this.apiKey = apiKey;
 		this.serverURL = serverURL;
 		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
-		this.payloadRequestFactoryLookup = createPayloadRequestFactoryLookup();
 	}
 
 	//region API Requests
@@ -91,82 +88,24 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			throw new IllegalArgumentException("Payload is null");
 		}
 
-		final PayloadRequestFactory requestFactory = payloadRequestFactoryLookup.get(payload.getClass());
-		if (requestFactory == null) {
-			throw new IllegalArgumentException("Unexpected payload type: " + payload.getClass());
-		}
-
-		HttpRequest request = requestFactory.createRequest(payload);
+		HttpRequest request = createRequest(payload);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
 	}
 
-	//endregion
+	private HttpRequest createRequest(Payload payload) {
+		final String token = payload.getToken();
+		final String endPoint = payload.getHttpEndPoint();
+		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();
 
-	//region Payload Request Factory
-
-	private Map<Class<? extends Payload>, PayloadRequestFactory> createPayloadRequestFactoryLookup() {
-		Map<Class<? extends Payload>, PayloadRequestFactory> lookup = new HashMap<>();
-
-		// Event Payload
-		lookup.put(EventPayload.class, new PayloadRequestFactory<EventPayload>() {
-			@Override
-			public HttpRequest createRequest(EventPayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_EVENTS, payload, HttpRequestMethod.POST);
+		switch (payload.getHttpRequestContentType()) {
+			case "application/json": {
+				return createJsonRequest(token, endPoint, payload, requestMethod);
 			}
-		});
+		}
 
-		// Device Payload
-		lookup.put(DevicePayload.class, new PayloadRequestFactory<DevicePayload>() {
-			@Override
-			public HttpRequest createRequest(DevicePayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_DEVICES, payload, HttpRequestMethod.PUT);
-			}
-		});
-
-		// SDK Payload
-		lookup.put(SdkPayload.class, new PayloadRequestFactory<SdkPayload>() {
-			@Override
-			public HttpRequest createRequest(SdkPayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
-			}
-		});
-
-		// App Release Payload
-		lookup.put(AppReleasePayload.class, new PayloadRequestFactory<AppReleasePayload>() {
-			@Override
-			public HttpRequest createRequest(AppReleasePayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
-			}
-		});
-
-		// SDK and App Release Payload
-		lookup.put(SdkAndAppReleasePayload.class, new PayloadRequestFactory<SdkAndAppReleasePayload>() {
-			@Override
-			public HttpRequest createRequest(SdkAndAppReleasePayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_CONVERSATION, payload, HttpRequestMethod.PUT);
-			}
-		});
-
-		// Person Payload
-		lookup.put(PersonPayload.class, new PayloadRequestFactory<PersonPayload>() {
-			@Override
-			public HttpRequest createRequest(PersonPayload payload) {
-				return createJsonRequest(payload.getToken(), ENDPOINT_PEOPLE, payload, HttpRequestMethod.PUT);
-			}
-		});
-
-		// Survey Payload
-		lookup.put(SurveyResponsePayload.class, new PayloadRequestFactory<SurveyResponsePayload>() {
-			@Override
-			public HttpRequest createRequest(SurveyResponsePayload survey) {
-				String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-				return createJsonRequest(survey.getToken(), endpoint, survey, HttpRequestMethod.POST);
-			}
-		});
-
-		return lookup;
+		throw new IllegalArgumentException("Unexpected content type: " + payload.getHttpRequestContentType());
 	}
 
 	//endregion
