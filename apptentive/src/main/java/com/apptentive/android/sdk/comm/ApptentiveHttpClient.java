@@ -22,19 +22,15 @@ import static android.text.TextUtils.isEmpty;
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
 public class ApptentiveHttpClient implements PayloadRequestSender {
-	public static final String API_VERSION = "7";
+	private static final String API_VERSION = "7";
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
-	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
+	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
+	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
-	private static final String ENDPOINT_EVENTS = "/events";
-	private static final String ENDPOINT_DEVICES = "/devices";
-	private static final String ENDPOINT_PEOPLE = "/people";
-	private static final String ENDPOINT_SURVEYS_POST = "/surveys/%s/respond";
 
 	private final String apiKey;
 	private final String serverURL;
