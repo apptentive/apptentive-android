@@ -7,6 +7,9 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
+
 import org.json.JSONException;
 
 /**
@@ -31,6 +34,25 @@ public class SdkPayload extends Payload {
 	public SdkPayload() {
 		super();
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+	}
+
+	//endregion
 
 	public void initBaseType() {
 		setBaseType(BaseType.sdk);

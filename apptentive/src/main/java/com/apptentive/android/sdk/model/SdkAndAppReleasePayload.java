@@ -14,6 +14,8 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -60,6 +62,25 @@ public class SdkAndAppReleasePayload extends Payload {
 			throw new IllegalStateException(e); // that should not happen but we can't ignore that
 		}
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("/conversations/%s/sdkapprelease", getConversationId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.PUT;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "application/json";
+	}
+
+	//endregion
 
 	//region Inheritance
 	public void initBaseType() {

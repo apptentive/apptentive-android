@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -110,6 +112,25 @@ public class EventPayload extends ConversationItem {
 		data.put(KEY_TRIGGER, trigger);
 		putData(data);
 	}
+
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint() {
+		return StringUtils.format("/conversations/%s/event", getConversationId());
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.POST;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		return "application/json";
+	}
+
+	//endregion
 
 	@Override
 	protected void initBaseType() {
