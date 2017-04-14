@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
+import android.os.Looper;
 
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -495,6 +496,37 @@ public class ConversationManager {
 
 	private void sendLoginRequest(String token, LoginCallback callback) {
 		callback.onLoginFail("login not yet implemented"); // FIXME: kick off login request
+	}
+
+	public void logout() {
+		// we only deal with an active conversation on the main thread
+		if (Looper.myLooper() != Looper.getMainLooper()) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					doLogout();
+				}
+			});
+		} else {
+			doLogout();
+		}
+	}
+
+	private void doLogout() {
+		// 1. Check to make sure we need to log out.
+		if (activeConversation != null) {
+			switch (activeConversation.getState()) {
+				case LOGGED_IN:
+					endActiveConversation();
+					break;
+				default:
+					ApptentiveLog.w(CONVERSATION, "Attempted to logout() from Conversation, but the Active Conversation was not in LOGGED_IN state.");
+					break;
+			}
+		} else {
+			ApptentiveLog.w(CONVERSATION, "Attempted to logout(), but there was no Active Conversation.");
+		}
+		dispatchDebugEvent(EVT_LOGOUT);
 	}
 
 	//endregion

@@ -27,6 +27,13 @@ public class TesterEvent {
 	public static final String EVT_APPTENTIVE_EVENT = "apptentive_event"; // { eventLabel:String }
 	public static final String EVT_APPTENTIVE_EVENT_KEY_EVENT_LABEL = "eventLabel";
 
+	/** The login attempt finished (might be either successful or failed) */
+	public static final String EVT_LOGIN_FINISHED = "login_finished";
+	public static final String EVT_LOGIN_FINISHED_ERROR_MESSAGE = "error_message";
+
+	/** The logout call finished */
+	public static final String EVT_LOGOUT = "logout";
+
 	// Common event keys
 	public static final String EVT_KEY_SUCCESSFUL = "successful";
 }

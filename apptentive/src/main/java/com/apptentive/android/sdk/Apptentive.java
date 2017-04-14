@@ -1065,7 +1065,7 @@ public class Apptentive {
 	/**
 	 * Starts login process asynchronously. This call returns immediately.
 	 */
-	public void login(String token, LoginCallback callback) {
+	public static void login(String token, LoginCallback callback) {
 		if (token == null) {
 			if (callback != null) {
 				callback.onLoginFail("token is null");
@@ -1100,6 +1100,15 @@ public class Apptentive {
 		 * @param errorMessage failure cause message
 		 */
 		void onLoginFail(String errorMessage);
+	}
+
+	public static void logout() {
+		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+		if (instance == null) {
+			ApptentiveLog.e("Unable to logout: Apptentive instance is not properly initialized");
+		} else {
+			instance.logout();
+		}
 	}
 
 	//endregion
