@@ -1103,11 +1103,15 @@ public class Apptentive {
 	}
 
 	public static void logout() {
-		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
-		if (instance == null) {
-			ApptentiveLog.e("Unable to logout: Apptentive instance is not properly initialized");
-		} else {
-			instance.logout();
+		try {
+			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+			if (instance == null) {
+				ApptentiveLog.e("Unable to logout: Apptentive instance is not properly initialized");
+			} else {
+				instance.logout();
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while logging out of conversation.", e);
 		}
 	}
 
