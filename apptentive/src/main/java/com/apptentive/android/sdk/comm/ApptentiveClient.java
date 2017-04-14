@@ -78,35 +78,6 @@ public class ApptentiveClient {
 		return new ApptentiveHttpResponse();
 	}
 
-	public static ApptentiveHttpResponse postEvent(EventPayload event) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_EVENTS, Method.POST, event.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse putDevice(DevicePayload device) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_DEVICES, Method.PUT, device.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse putSdk(SdkPayload sdk) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, sdk.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse putAppRelease(AppReleasePayload appRelease) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, appRelease.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse putSdkAndAppRelease(SdkAndAppReleasePayload payload) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONVERSATION, Method.PUT, payload.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse putPerson(PersonPayload person) {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_PEOPLE, Method.PUT, person.marshallForSending());
-	}
-
-	public static ApptentiveHttpResponse postSurvey(SurveyResponsePayload survey) {
-		String endpoint = String.format(ENDPOINT_SURVEYS_POST, survey.getId());
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), endpoint, Method.POST, survey.marshallForSending());
-	}
-
 	public static ApptentiveHttpResponse getInteractions() {
 		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_INTERACTIONS, Method.GET, null);
 	}
