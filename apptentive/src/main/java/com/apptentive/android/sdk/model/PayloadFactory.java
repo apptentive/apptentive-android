@@ -32,6 +32,8 @@ public class PayloadFactory {
 				return SdkAndAppReleasePayload.fromJson(json);
 			case person:
 				return PersonFactory.fromJson(json);
+			case logout:
+				return LogoutPayloadFactory.fromJson(json);
 			case survey:
 				try {
 					return new SurveyResponsePayload(json);

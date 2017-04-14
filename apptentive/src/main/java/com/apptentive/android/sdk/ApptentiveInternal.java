@@ -967,6 +967,10 @@ public class ApptentiveInternal {
 		conversationManager.login(token, callback);
 	}
 
+	void logout() {
+		conversationManager.logout();
+	}
+
 	//endregion
 
 	/**
