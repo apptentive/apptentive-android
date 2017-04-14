@@ -1,15 +1,10 @@
 package com.apptentive.android.sdk.comm;
 
-import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.DevicePayload;
-import com.apptentive.android.sdk.model.EventPayload;
+import com.apptentive.android.sdk.model.MultipartPayload;
 import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.model.PersonPayload;
-import com.apptentive.android.sdk.model.SdkAndAppReleasePayload;
-import com.apptentive.android.sdk.model.SdkPayload;
-import com.apptentive.android.sdk.model.SurveyResponsePayload;
+import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.network.HttpJsonMultipartRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
@@ -19,8 +14,7 @@ import com.apptentive.android.sdk.util.Constants;
 
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
 
@@ -88,16 +82,22 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			throw new IllegalArgumentException("Payload is null");
 		}
 
-		HttpRequest request = createRequest(payload);
+		HttpRequest request = createPayloadRequest(payload);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
 	}
 
-	private HttpRequest createRequest(Payload payload) {
+	private HttpRequest createPayloadRequest(Payload payload) {
 		final String token = payload.getToken();
 		final String endPoint = payload.getHttpEndPoint();
 		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();
+
+		// TODO: figure out a better solution
+		if (payload instanceof MultipartPayload) {
+			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
+			return createMultipartRequest(token, endPoint, payload, associatedFiles, requestMethod);
+		}
 
 		switch (payload.getHttpRequestContentType()) {
 			case "application/json": {
@@ -112,15 +112,46 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	//region Helpers
 
-	private HttpJsonRequest createJsonRequest(String oauthToken, String endpoint, JSONObject jsonObject, HttpRequestMethod method) {
-		Assert.assertNotNull(oauthToken);
-		Assert.assertNotNull(endpoint);
+	private HttpJsonRequest createJsonRequest(String oauthToken, String endpoint, JSONObject payload, HttpRequestMethod method) {
+		if (oauthToken == null) {
+			throw new IllegalArgumentException("OAuth token is null");
+		}
+		if (endpoint == null) {
+			throw new IllegalArgumentException("Endpoint is null");
+		}
+		if (payload == null) {
+			throw new IllegalArgumentException("Payload is null");
+		}
+		if (method == null) {
+			throw new IllegalArgumentException("Method is null");
+		}
 
 		String url = createEndpointURL(endpoint);
-		HttpJsonRequest request = new HttpJsonRequest(url, jsonObject);
+		HttpJsonRequest request = new HttpJsonRequest(url, payload);
 		setupRequestDefaults(request, oauthToken);
 		request.setMethod(method);
 		request.setRequestProperty("Content-Type", "application/json");
+		return request;
+	}
+
+	private HttpJsonMultipartRequest createMultipartRequest(String oauthToken, String endpoint, JSONObject payload, List<StoredFile> files, HttpRequestMethod method) {
+		if (oauthToken == null) {
+			throw new IllegalArgumentException("OAuth token is null");
+		}
+		if (endpoint == null) {
+			throw new IllegalArgumentException("Endpoint is null");
+		}
+		if (payload == null) {
+			throw new IllegalArgumentException("Payload is null");
+		}
+		if (method == null) {
+			throw new IllegalArgumentException("Method is null");
+		}
+
+		String url = createEndpointURL(endpoint);
+		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, payload, files);
+		setupRequestDefaults(request, oauthToken);
+		request.setMethod(method);
 		return request;
 	}
 

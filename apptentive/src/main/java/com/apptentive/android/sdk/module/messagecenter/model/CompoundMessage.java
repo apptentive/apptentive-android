@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.model.MultipartPayload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -23,7 +24,7 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
+public class CompoundMessage extends ApptentiveMessage implements MultipartPayload, MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 
@@ -203,7 +204,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		}
 	}
 
-
+	@Override
 	public List<StoredFile> getAssociatedFiles() {
 		if (hasNoAttachments) {
 			return null;
