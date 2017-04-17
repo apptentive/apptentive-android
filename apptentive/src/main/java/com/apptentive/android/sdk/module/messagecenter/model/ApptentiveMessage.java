@@ -122,20 +122,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		this.read = read;
 	}
 
-	public String getSenderId() {
-		try {
-			if (!isNull((KEY_SENDER))) {
-				JSONObject sender = getJSONObject(KEY_SENDER);
-				if (!sender.isNull((KEY_SENDER_ID))) {
-					return sender.getString(KEY_SENDER_ID);
-				}
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
-	}
-
 	// For debugging only.
 	public void setSenderId(String senderId) {
 		try {
@@ -226,7 +212,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public boolean isAutomatedMessage() {
 		return getAutomated();
 	}
-
 
 	public enum Type {
 		TextMessage,
