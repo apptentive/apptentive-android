@@ -27,7 +27,7 @@ import org.json.JSONException;
  * and {@link AppReleasePayload} payloads (which still kept for backward compatibility
  * purposes).
  */
-public class SdkAndAppReleasePayload extends Payload {
+public class SdkAndAppReleasePayload extends JsonPayload {
 
 	private final SdkPayload sdk;
 	private final AppReleasePayload appRelease;

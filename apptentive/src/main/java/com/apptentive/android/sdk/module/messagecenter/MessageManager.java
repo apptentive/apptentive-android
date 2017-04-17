@@ -16,7 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
@@ -354,12 +354,12 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			setCurrentForegroundActivity(null);
 			appWentToBackground();
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {
-			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
+			final JsonPayload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, JsonPayload.class);
 			if (payload instanceof ApptentiveMessage) {
 				resumeSending();
 			}
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
-			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
+			final JsonPayload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, JsonPayload.class);
 			if (payload instanceof ApptentiveMessage) {
 				// onSentMessage((ApptentiveMessage) payload, ???);
 			}

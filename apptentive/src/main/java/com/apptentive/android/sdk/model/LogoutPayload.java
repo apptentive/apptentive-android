@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
-public class LogoutPayload extends Payload {
+public class LogoutPayload extends JsonPayload {
 	public LogoutPayload() {
 		super();
 	}

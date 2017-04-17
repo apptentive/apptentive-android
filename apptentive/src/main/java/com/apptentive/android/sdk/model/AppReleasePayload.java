@@ -19,7 +19,7 @@ import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
-public class AppReleasePayload extends Payload {
+public class AppReleasePayload extends JsonPayload {
 
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION_NAME = "version_name";

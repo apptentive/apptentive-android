@@ -7,13 +7,12 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.TestCaseBase;
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.network.MockHttpRequest;
-import com.apptentive.android.sdk.network.MockHttpURLConnection;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.DefaultResponseHandler;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.ResponseHandler;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -25,7 +24,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-public class PayloadSenderTest extends TestCaseBase {
+public class JsonPayloadSenderTest extends TestCaseBase {
 	private MockDispatchQueue networkQueue;
 
 	@Before
@@ -42,7 +41,7 @@ public class PayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+			public void onFinishSending(PayloadSender sender, JsonPayload payload, boolean cancelled, String errorMessage) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {
@@ -89,7 +88,7 @@ public class PayloadSenderTest extends TestCaseBase {
 		);
 	}
 
-	class MockPayload extends Payload {
+	class MockPayload extends JsonPayload {
 		private final String json;
 		private ResponseHandler responseHandler;
 
@@ -147,7 +146,7 @@ public class PayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
+		public HttpRequest sendPayload(JsonPayload payload, HttpRequest.Listener<HttpRequest> listener) {
 
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());

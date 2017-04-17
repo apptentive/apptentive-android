@@ -16,7 +16,7 @@ import org.json.JSONException;
  */
 public class PayloadFactory {
 
-	public static Payload fromJson(String json, Payload.BaseType baseType) {
+	public static JsonPayload fromJson(String json, JsonPayload.BaseType baseType) {
 		switch (baseType) {
 			case message:
 				return MessageFactory.fromJson(json);

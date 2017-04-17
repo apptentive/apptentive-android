@@ -1,8 +1,8 @@
 package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.MultipartPayload;
-import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpJsonMultipartRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -73,7 +73,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region PayloadRequestSender
 
 	@Override
-	public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
+	public HttpRequest sendPayload(JsonPayload payload, HttpRequest.Listener<HttpRequest> listener) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
@@ -84,7 +84,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
-	private HttpRequest createPayloadRequest(Payload payload) {
+	private HttpRequest createPayloadRequest(JsonPayload payload) {
 		final String token = payload.getToken();
 		final String endPoint = payload.getHttpEndPoint();
 		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();

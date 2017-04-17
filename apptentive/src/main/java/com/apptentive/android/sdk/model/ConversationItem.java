@@ -15,7 +15,7 @@ import java.util.UUID;
 /**
  * @author Sky Kelsey
  */
-public abstract class ConversationItem extends Payload {
+public abstract class ConversationItem extends JsonPayload {
 
 	protected static final String KEY_NONCE = "nonce";
 	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";

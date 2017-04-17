@@ -15,7 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.PayloadFactory;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
@@ -275,7 +275,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// Migrate all pending payload messages
 		// Migrate legacy message types to CompoundMessage Type
 		try {
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.BaseType.message.name()});
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{JsonPayload.BaseType.message.name()});
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(2);
@@ -336,12 +336,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public void addPayload(Payload... payloads) {
+	public void addPayload(JsonPayload... payloads) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
-			for (Payload payload : payloads) {
+			for (JsonPayload payload : payloads) {
 				ContentValues values = new ContentValues();
 				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
@@ -356,7 +356,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void deletePayload(Payload payload) {
+	public void deletePayload(JsonPayload payload) {
 		if (payload != null) {
 			SQLiteDatabase db = null;
 			try {
@@ -378,17 +378,17 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public Payload getOldestUnsentPayload() {
+	public JsonPayload getOldestUnsentPayload() {
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
 			cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-			Payload payload = null;
+			JsonPayload payload = null;
 			if (cursor.moveToFirst()) {
 				long databaseId = Long.parseLong(cursor.getString(0));
-				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
+				JsonPayload.BaseType baseType = JsonPayload.BaseType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
 				String token = cursor.getString(4);

@@ -15,7 +15,7 @@ import org.json.JSONException;
 /**
  * @author Sky Kelsey
  */
-public class DevicePayload extends Payload {
+public class DevicePayload extends JsonPayload {
 
 	public static final String KEY = "device";
 
