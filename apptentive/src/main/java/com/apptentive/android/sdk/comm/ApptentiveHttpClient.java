@@ -92,12 +92,12 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		// TODO: figure out a better solution
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			return createMultipartRequest(token, endPoint, payload, associatedFiles, requestMethod);
+			return createMultipartRequest(token, endPoint, payload.getJsonObject(), associatedFiles, requestMethod);
 		}
 
 		switch (payload.getHttpRequestContentType()) {
 			case "application/json": {
-				return createJsonRequest(token, endPoint, payload, requestMethod);
+				return createJsonRequest(token, endPoint, payload.getJsonObject(), requestMethod);
 			}
 		}
 

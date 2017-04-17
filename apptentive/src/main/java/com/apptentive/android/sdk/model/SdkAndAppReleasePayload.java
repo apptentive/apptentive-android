@@ -32,35 +32,14 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	private final SdkPayload sdk;
 	private final AppReleasePayload appRelease;
 
-	public static SdkAndAppReleasePayload fromJson(String json) {
-		try {
-			return new SdkAndAppReleasePayload(json);
-		} catch (JSONException e) {
-			ApptentiveLog.v("Error parsing json as SdkAndAppReleasePayload: %s", e, json);
-		} catch (IllegalArgumentException e) {
-			// Unknown unknown #rumsfeld
-		}
-		return null;
-	}
-
-	private SdkAndAppReleasePayload(String json) throws JSONException {
-		super(json);
-
-		sdk = new SdkPayload(getJSONObject("sdk").toString());
-		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());
-	}
-
 	public SdkAndAppReleasePayload() {
 		super();
 		sdk = new SdkPayload();
 		appRelease = new AppReleasePayload();
 
-		try {
-			put("sdk", sdk);
-			put("app_release", appRelease);
-		} catch (JSONException e) {
-			throw new IllegalStateException(e); // that should not happen but we can't ignore that
-		}
+		// TODO: a better solution
+		put("sdk", sdk.getJsonObject());
+		put("app_release", appRelease.getJsonObject());
 	}
 
 	//region Http-request

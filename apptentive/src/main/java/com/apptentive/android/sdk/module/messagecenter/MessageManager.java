@@ -158,7 +158,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 					apptentiveMessage.setRead(true);
 				} else {
 					if (messageOnToast == null) {
-						if (apptentiveMessage.getType() == ApptentiveMessage.Type.CompoundMessage) {
+						if (apptentiveMessage.getMessageType() == ApptentiveMessage.Type.CompoundMessage) {
 							messageOnToast = (CompoundMessage) apptentiveMessage;
 						}
 					}

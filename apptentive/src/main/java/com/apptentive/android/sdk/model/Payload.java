@@ -50,11 +50,11 @@ public abstract class Payload {
 		this.contentType = contentType;
 	}
 
-	public String getAuthToken() {
+	public String getToken() {
 		return authToken;
-	}
+	} // TODO: rename to getAuthToken
 
-	public void setAuthToken(String authToken) {
+	public void setToken(String authToken) { // TODO: rename to setAuthToken
 		this.authToken = authToken;
 	}
 

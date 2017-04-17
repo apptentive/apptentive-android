@@ -27,19 +27,11 @@ public class EventPayload extends ConversationItem {
 	private static final String KEY_TRIGGER = "trigger";
 	private static final String KEY_CUSTOM_DATA = "custom_data";
 
-	public EventPayload(String json) throws JSONException {
-		super(json);
-	}
-
 	public EventPayload(String label, JSONObject data) {
 		super();
-		try {
-			put(KEY_LABEL, label);
-			if (data != null) {
-				put(KEY_DATA, data);
-			}
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to construct Event.", e);
+		put(KEY_LABEL, label);
+		if (data != null) {
+			put(KEY_DATA, data);
 		}
 	}
 
@@ -88,7 +80,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public String getEventLabel() {
-		return optString(KEY_LABEL, null);
+		return getString(KEY_LABEL);
 	}
 
 	private JSONObject generateCustomDataJson(Map<String, Object> customData) {
@@ -108,7 +100,7 @@ public class EventPayload extends ConversationItem {
 
 	public EventPayload(String label, String trigger) {
 		this(label, (Map<String, String>) null);
-		Map<String, String> data = new HashMap<String, String>();
+		Map<String, String> data = new HashMap<>();
 		data.put(KEY_TRIGGER, trigger);
 		putData(data);
 	}

@@ -6,9 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
-import org.json.JSONException;
 
 import java.util.UUID;
 
@@ -33,55 +31,25 @@ public abstract class ConversationItem extends JsonPayload {
 
 	}
 
-	protected ConversationItem(String json) throws JSONException {
-		super(json);
-	}
-
+	@Override
 	public void setNonce(String nonce) {
-		try {
-			put(KEY_NONCE, nonce);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_NONCE);
-		}
-	}
-
-	public String getNonce() {
-		try {
-			if (!isNull((KEY_NONCE))) {
-				return getString(KEY_NONCE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		super.setNonce(nonce);
+		put(KEY_NONCE, nonce);
 	}
 
 	public Double getClientCreatedAt() {
-		try {
-			return getDouble(KEY_CLIENT_CREATED_AT);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getDouble(KEY_CLIENT_CREATED_AT);
 	}
 
-	public void setClientCreatedAt(Double clientCreatedAt) {
-		try {
-			put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT);
-		}
+	public void setClientCreatedAt(double clientCreatedAt) {
+		put(KEY_CLIENT_CREATED_AT, clientCreatedAt);
 	}
 
 	/**
 	 * This is made public primarily so that unit tests can be made to run successfully no matter what the time zone.
 	 */
 	public void setClientCreatedAtUtcOffset(int clientCreatedAtUtcOffset) {
-		try {
-			put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ConversationItem's %s field.", e, KEY_CLIENT_CREATED_AT_UTC_OFFSET);
-		}
+		put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
 	}
 
 

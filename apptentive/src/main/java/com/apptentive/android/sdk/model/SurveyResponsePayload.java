@@ -22,10 +22,6 @@ public class SurveyResponsePayload extends ConversationItem {
 
 	private static final String KEY_SURVEY_ANSWERS = "answers";
 
-	public SurveyResponsePayload(String json) throws JSONException {
-		super(json);
-	}
-
 	public SurveyResponsePayload(SurveyInteraction definition, Map<String, Object> answers) {
 		super();
 
@@ -62,7 +58,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	//endregion
 
 	public String getId() {
-		return optString(KEY_SURVEY_ID, "");
+		return getString(KEY_SURVEY_ID);
 	}
 
 	@Override

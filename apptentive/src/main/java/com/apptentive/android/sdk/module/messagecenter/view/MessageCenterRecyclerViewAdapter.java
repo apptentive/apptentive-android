@@ -248,7 +248,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			JSONObject data = new JSONObject();
 			try {
 				data.put("message_id", messages[0].getId());
-				data.put("message_type", messages[0].getType().name());
+				data.put("message_type", messages[0].getMessageType().name());
 			} catch (JSONException e) {
 				//
 			}

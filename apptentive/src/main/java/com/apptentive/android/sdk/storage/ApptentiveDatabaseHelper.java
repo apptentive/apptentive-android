@@ -16,7 +16,6 @@ import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.JsonPayload;
-import com.apptentive.android.sdk.model.PayloadFactory;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
@@ -392,12 +391,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
 				String token = cursor.getString(4);
-				payload = PayloadFactory.fromJson(json, baseType);
-				if (payload != null) {
-					payload.setDatabaseId(databaseId);
-					payload.setConversationId(conversationId);
-					payload.setToken(token);
-				}
+//				payload = PayloadFactory.fromJson(json, baseType);
+//				if (payload != null) {
+//					payload.setDatabaseId(databaseId);
+//					payload.setConversationId(conversationId);
+//					payload.setToken(token);
+//				}
+				throw new RuntimeException("Implement me"); // FIXME: implement me
 			}
 			return payload;
 		} catch (SQLException sqe) {

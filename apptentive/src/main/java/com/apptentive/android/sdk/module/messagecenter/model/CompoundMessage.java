@@ -88,11 +88,6 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		setType(Type.CompoundMessage);
 	}
 
-	@Override
-	public String marshallForSending() {
-		return toString();
-	}
-
 	// Get text message body, maybe empty
 	@Override
 	public String getBody() {

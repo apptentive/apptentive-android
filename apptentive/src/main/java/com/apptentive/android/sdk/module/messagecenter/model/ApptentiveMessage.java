@@ -44,10 +44,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		initType();
 	}
 
-	protected ApptentiveMessage(String json) throws JSONException {
-		super(json);
-	}
-
 	protected void initBaseType() {
 		setBaseType(BaseType.message);
 	}
@@ -55,76 +51,38 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	protected abstract void initType();
 
 	public void setId(String id) {
-		try {
-			put(KEY_ID, id);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_ID);
-		}
+		put(KEY_ID, id);
 	}
 
 	public String getId() {
-		try {
-			if (!isNull((KEY_ID))) {
-				return getString(KEY_ID);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_ID);
 	}
 
-	public Double getCreatedAt() {
-		try {
-			return getDouble(KEY_CREATED_AT);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+	public Double getCreatedAt() { // // FIXME: figure out primitive vs Double
+		return getDouble(KEY_CREATED_AT);
 	}
 
 	public void setCreatedAt(Double createdAt) {
-		try {
-			put(KEY_CREATED_AT, createdAt);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CREATED_AT);
-		}
+		put(KEY_CREATED_AT, createdAt);
 	}
 
-	public Type getType() {
-		try {
-			if (isNull((KEY_TYPE))) {
-				return Type.CompoundMessage;
-			}
-			return Type.parse(getString(KEY_TYPE));
-		} catch (JSONException e) {
-			// Ignore
+	public Type getMessageType() {
+		if (isNull(KEY_TYPE)) {
+			return Type.CompoundMessage;
 		}
-		return Type.unknown;
+		return Type.parse(getString(KEY_TYPE));
 	}
 
 	protected void setType(Type type) {
-		try {
-			put(KEY_TYPE, type.name());
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_TYPE);
-		}
+		put(KEY_TYPE, type.name());
 	}
 
 	public boolean isHidden() {
-		try {
-			return getBoolean(KEY_HIDDEN);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return false;
+		return getBoolean(KEY_HIDDEN);
 	}
 
 	public void setHidden(boolean hidden) {
-		try {
-			put(KEY_HIDDEN, hidden);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_HIDDEN);
-		}
+		put(KEY_HIDDEN, hidden);
 	}
 
 	public void setCustomData(Map<String, Object> customData) {
@@ -223,22 +181,11 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	}
 
 	public boolean getAutomated() {
-		try {
-			if (!isNull((KEY_AUTOMATED))) {
-				return getBoolean(KEY_AUTOMATED);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return false;
+		return getBoolean(KEY_AUTOMATED);
 	}
 
 	public void setAutomated(boolean isAutomated) {
-		try {
-			put(KEY_AUTOMATED, isAutomated);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_AUTOMATED);
-		}
+		put(KEY_AUTOMATED, isAutomated);
 	}
 
 	public String getDatestamp() {
