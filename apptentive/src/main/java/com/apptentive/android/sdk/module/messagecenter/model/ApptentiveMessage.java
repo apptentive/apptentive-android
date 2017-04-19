@@ -44,6 +44,12 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		initType();
 	}
 
+	protected ApptentiveMessage(String json) {
+		super(json);
+		state = State.unknown;
+		initType();
+	}
+
 	protected void initBaseType() {
 		setBaseType(BaseType.message);
 	}

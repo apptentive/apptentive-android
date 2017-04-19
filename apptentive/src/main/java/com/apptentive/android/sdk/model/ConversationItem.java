@@ -31,6 +31,10 @@ public abstract class ConversationItem extends JsonPayload {
 
 	}
 
+	protected ConversationItem(String json) {
+		super(json);
+	}
+
 	@Override
 	public void setNonce(String nonce) {
 		super.setNonce(nonce);

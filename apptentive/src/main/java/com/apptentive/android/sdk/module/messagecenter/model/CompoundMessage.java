@@ -91,58 +91,29 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	// Get text message body, maybe empty
 	@Override
 	public String getBody() {
-		try {
-			if (!isNull(KEY_BODY)) {
-				return getString(KEY_BODY);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_BODY);
 	}
 
 	// Set text message body, maybe empty
 	@Override
 	public void setBody(String body) {
-		try {
-			put(KEY_BODY, body);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set message body.");
-		}
+		put(KEY_BODY, body);
 	}
 
 	public String getTitle() {
-		try {
-			return getString(KEY_TITLE);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_TITLE);
 	}
 
 	public void setTitle(String title) {
-		try {
-			put(KEY_TITLE, title);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set title.");
-		}
+		put(KEY_TITLE, title);
 	}
 
 	public boolean getTextOnly() {
-		try {
-			return getBoolean(KEY_TEXT_ONLY);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return true;
+		return getBoolean(KEY_TEXT_ONLY);
 	}
 
 	public void setTextOnly(boolean bVal) {
-		try {
-			put(KEY_TEXT_ONLY, bVal);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set file filePath.");
-		}
+		put(KEY_TEXT_ONLY, bVal);
 	}
 
 

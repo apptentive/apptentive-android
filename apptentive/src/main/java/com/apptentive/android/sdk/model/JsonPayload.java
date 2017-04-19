@@ -7,8 +7,10 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
@@ -23,7 +25,20 @@ public abstract class JsonPayload extends Payload {
 	private String conversationId;
 
 	public JsonPayload() {
+		super();
 		jsonObject = new JSONObject();
+		initBaseType();
+	}
+
+	public JsonPayload(String json) {
+		super();
+		JSONObject temp = null;
+		try {
+			temp = new JSONObject(json);
+		} catch (JSONException e) {
+			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error creating JsonPayload from json string.", e);
+		}
+		jsonObject = (temp == null ? null : temp);
 		initBaseType();
 	}
 
