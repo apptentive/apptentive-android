@@ -17,8 +17,8 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;

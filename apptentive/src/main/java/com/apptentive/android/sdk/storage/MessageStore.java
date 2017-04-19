@@ -7,10 +7,9 @@
 package com.apptentive.android.sdk.storage;
 
 
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 /**
  * @author Sky Kelsey

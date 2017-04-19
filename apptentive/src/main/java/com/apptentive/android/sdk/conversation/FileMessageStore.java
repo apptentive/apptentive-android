@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.storage.MessageStore;
