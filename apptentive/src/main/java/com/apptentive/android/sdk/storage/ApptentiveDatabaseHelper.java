@@ -17,6 +17,7 @@ import android.text.TextUtils;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.OutgoingPayload;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
@@ -275,7 +276,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// Migrate all pending payload messages
 		// Migrate legacy message types to CompoundMessage Type
 		try {
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.PayloadType.message.name()});
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{PayloadType.message.name()});
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(2);
@@ -388,7 +389,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			OutgoingPayload payload = null;
 			if (cursor.moveToFirst()) {
 				long databaseId = Long.parseLong(cursor.getString(0));
-				Payload.PayloadType payloadType = Payload.PayloadType.parse(cursor.getString(1));
+				PayloadType payloadType = PayloadType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
 				String authToken = cursor.getString(4);

@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import java.util.List;
@@ -116,30 +115,6 @@ public abstract class Payload {
 
 	protected void setPayloadType(PayloadType payloadType) {
 		this.payloadType = payloadType;
-	}
-
-	public enum PayloadType {
-		message,
-		event,
-		device,
-		sdk,
-		app_release,
-		sdk_and_app_release,
-		person,
-		logout,
-		unknown,
-		outgoing,
-		// Legacy
-		survey;
-
-		public static PayloadType parse(String type) {
-			try {
-				return PayloadType.valueOf(type);
-			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Payload.PayloadType: " + type);
-			}
-			return unknown;
-		}
 	}
 
 	public abstract byte[] getData();

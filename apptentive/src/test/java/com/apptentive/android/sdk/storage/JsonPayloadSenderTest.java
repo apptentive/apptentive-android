@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.storage;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;

@@ -11,7 +11,6 @@ import java.io.IOException;
 public class RawHttpRequest extends HttpRequest {
 
 	private final byte[] data;
-	String response;
 
 	public RawHttpRequest(String urlString, byte[] data) {
 		super(urlString);
@@ -25,14 +24,5 @@ public class RawHttpRequest extends HttpRequest {
 	@Override
 	protected byte[] createRequestData() throws IOException {
 		return data;
-	}
-
-	@Override
-	protected void handleResponse(String response) throws IOException {
-		this.response = response;
-	}
-
-	public String getResponseObject() {
-		return response;
 	}
 }
