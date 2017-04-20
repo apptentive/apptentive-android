@@ -22,8 +22,6 @@ public abstract class Payload {
 	protected String conversationId;
 	protected List<Object> attachments; // TODO: Figure out attachment handling
 
-	private PayloadType payloadType;
-
 	public String getType() {
 		return type;
 	}
@@ -96,25 +94,12 @@ public abstract class Payload {
 		this.conversationId = conversationId;
 	}
 
-	/**
-	 * Each subclass must set its type in this method.
-	 */
-	protected abstract void initPayloadType();
-
 	public long getDatabaseId() {
 		return databaseId;
 	}
 
 	public void setDatabaseId(long databaseId) {
 		this.databaseId = databaseId;
-	}
-
-	public PayloadType getPayloadType() {
-		return payloadType;
-	}
-
-	protected void setPayloadType(PayloadType payloadType) {
-		this.payloadType = payloadType;
 	}
 
 	public abstract byte[] getData();

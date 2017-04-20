@@ -10,10 +10,6 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
 public class LogoutPayload extends JsonPayload {
-	@Override
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.logout);
-	}
 
 	//region Http-request
 

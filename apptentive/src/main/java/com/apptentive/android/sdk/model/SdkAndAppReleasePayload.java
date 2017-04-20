@@ -59,12 +59,6 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 
 	//endregion
 
-	//region Inheritance
-	public void initPayloadType() {
-		setPayloadType(PayloadType.sdk_and_app_release);
-	}
-	//endregion
-
 	//region Sdk getters/setters
 	public String getVersion() {
 		return sdk.getVersion();

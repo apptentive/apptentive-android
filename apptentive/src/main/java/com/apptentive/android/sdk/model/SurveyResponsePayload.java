@@ -61,8 +61,4 @@ public class SurveyResponsePayload extends ConversationItem {
 		return getString(KEY_SURVEY_ID);
 	}
 
-	@Override
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.survey);
-	}
 }

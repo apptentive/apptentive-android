@@ -40,7 +40,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		super();
 		state = State.sending;
 		read = true; // This message originated here.
-		setPayloadType(PayloadType.message);
 		initType();
 	}
 
@@ -48,10 +47,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		super(json);
 		state = State.unknown;
 		initType();
-	}
-
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.message);
 	}
 
 	protected abstract void initType();

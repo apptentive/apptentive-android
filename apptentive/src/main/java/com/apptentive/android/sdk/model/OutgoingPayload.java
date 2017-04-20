@@ -13,7 +13,6 @@ public class OutgoingPayload extends Payload {
 	private byte[] data;
 
 	public OutgoingPayload(PayloadType payloadType) {
-		setPayloadType(payloadType);
 	}
 
 	@Override
@@ -23,11 +22,6 @@ public class OutgoingPayload extends Payload {
 
 	public void setData(byte[] data) {
 		this.data = data;
-	}
-
-	@Override
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.outgoing);
 	}
 
 	@Override

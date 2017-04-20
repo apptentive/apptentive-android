@@ -39,10 +39,6 @@ public class SdkPayload extends JsonPayload {
 
 	//endregion
 
-	public void initPayloadType() {
-		setPayloadType(PayloadType.sdk);
-	}
-
 	public String getVersion() {
 		if (!isNull(KEY_VERSION)) {
 			return getString(KEY_VERSION);

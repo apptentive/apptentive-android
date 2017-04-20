@@ -92,7 +92,7 @@ class PayloadSender {
 	 * Creates and sends payload Http-request asynchronously (returns immediately)
 	 */
 	private synchronized void sendPayloadRequest(final Payload payload) {
-		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getPayloadType(), payload.getDatabaseId(), payload.getConversationId());
+		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getClass().getName(), payload.getDatabaseId(), payload.getConversationId());
 
 		// create request object
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {

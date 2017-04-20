@@ -23,7 +23,6 @@ public abstract class JsonPayload extends Payload {
 	public JsonPayload() {
 		super();
 		jsonObject = new JSONObject();
-		initPayloadType();
 	}
 
 	public JsonPayload(String json) {
@@ -35,7 +34,6 @@ public abstract class JsonPayload extends Payload {
 			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error creating JsonPayload from json string.", e);
 		}
 		jsonObject = (temp == null ? null : temp);
-		initPayloadType();
 	}
 
 	//region Data

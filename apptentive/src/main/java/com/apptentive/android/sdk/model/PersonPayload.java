@@ -46,10 +46,6 @@ public class PersonPayload extends JsonPayload {
 
 	//endregion
 
-	public void initPayloadType() {
-		setPayloadType(PayloadType.person);
-	}
-
 	public String getId() {
 		if (!isNull(KEY_ID)) {
 			return getString(KEY_ID);

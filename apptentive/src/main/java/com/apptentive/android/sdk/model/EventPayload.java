@@ -124,11 +124,6 @@ public class EventPayload extends ConversationItem {
 
 	//endregion
 
-	@Override
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.event);
-	}
-
 	public void putData(Map<String, String> data) {
 		if (data == null || data.isEmpty()) {
 			return;

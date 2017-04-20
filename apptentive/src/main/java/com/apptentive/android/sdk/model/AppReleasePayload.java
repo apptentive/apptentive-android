@@ -10,6 +10,8 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 public class AppReleasePayload extends JsonPayload {
 
+	public static final String KEY = "app_release";
+
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION_NAME = "version_name";
 	private static final String KEY_VERSION_CODE = "version_code";
@@ -38,10 +40,6 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	//endregion
-
-	public void initPayloadType() {
-		setPayloadType(PayloadType.app_release);
-	}
 
 	public String getType() {
 		return getString(KEY_TYPE);

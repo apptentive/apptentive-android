@@ -344,7 +344,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.beginTransaction();
 			for (Payload payload : payloads) {
 				ContentValues values = new ContentValues();
-				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getPayloadType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
 				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
 				values.put(PAYLOAD_KEY_AUTH_TOKEN, payload.getAuthToken());
