@@ -12,7 +12,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
@@ -98,10 +98,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public void addPayload(final JsonPayload... payloads) {
-		for (JsonPayload payload : payloads) {
+	public void addPayload(final Payload... payloads) {
+		for (Payload payload : payloads) {
 			payload.setConversationId(currentConversationId);
-			payload.setToken(currentConversationToken);
+			payload.setAuthToken(currentConversationToken);
 		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
@@ -112,7 +112,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		});
 	}
 
-	public void deletePayload(final JsonPayload payload) {
+	public void deletePayload(final Payload payload) {
 		if (payload != null) {
 			singleThreadExecutor.execute(new Runnable() {
 				@Override
@@ -133,16 +133,16 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		});
 	}
 
-	public synchronized Future<JsonPayload> getOldestUnsentPayload() throws Exception {
-		return singleThreadExecutor.submit(new Callable<JsonPayload>() {
+	public synchronized Future<Payload> getOldestUnsentPayload() throws Exception {
+		return singleThreadExecutor.submit(new Callable<Payload>() {
 			@Override
-			public JsonPayload call() throws Exception {
+			public Payload call() throws Exception {
 				return getOldestUnsentPayloadSync();
 			}
 		});
 	}
 
-	private JsonPayload getOldestUnsentPayloadSync() {
+	private Payload getOldestUnsentPayloadSync() {
 		return dbHelper.getOldestUnsentPayload();
 	}
 
@@ -180,7 +180,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	//region PayloadSender.Listener
 
 	@Override
-	public void onFinishSending(PayloadSender sender, JsonPayload payload, boolean cancelled, String errorMessage) {
+	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_PAYLOAD_DID_FINISH_SEND,
 				NOTIFICATION_KEY_PAYLOAD, payload,
@@ -227,7 +227,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		final JsonPayload payload;
+		final Payload payload;
 		try {
 			payload = getOldestUnsentPayloadSync();
 		} catch (Exception e) {
@@ -240,7 +240,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		if (StringUtils.isNullOrEmpty(payload.getConversationId()) || StringUtils.isNullOrEmpty(payload.getToken())) {
+		if (StringUtils.isNullOrEmpty(payload.getConversationId()) || StringUtils.isNullOrEmpty(payload.getAuthToken())) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no conversation id");
 			return;
 		}

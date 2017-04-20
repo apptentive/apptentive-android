@@ -6,16 +6,7 @@
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-
-import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
-import com.apptentive.android.sdk.util.Util;
 
 public class AppReleasePayload extends JsonPayload {
 
@@ -48,8 +39,8 @@ public class AppReleasePayload extends JsonPayload {
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.app_release);
+	public void initPayloadType() {
+		setPayloadType(PayloadType.app_release);
 	}
 
 	public String getType() {

@@ -43,9 +43,9 @@ public class ConversationTokenRequest extends JSONObject {
 
 	public void setAppRelease(AppReleasePayload appRelease) {
 		try {
-			put(appRelease.getBaseType().name(), appRelease);
+			put(appRelease.getPayloadType().name(), appRelease);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getBaseType().name());
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getPayloadType().name());
 		}
 	}
 }

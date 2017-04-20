@@ -125,8 +125,8 @@ public class EventPayload extends ConversationItem {
 	//endregion
 
 	@Override
-	protected void initBaseType() {
-		setBaseType(BaseType.event);
+	protected void initPayloadType() {
+		setPayloadType(PayloadType.event);
 	}
 
 	public void putData(Map<String, String> data) {

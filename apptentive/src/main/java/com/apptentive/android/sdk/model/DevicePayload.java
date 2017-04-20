@@ -60,8 +60,8 @@ public class DevicePayload extends JsonPayload {
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.device);
+	public void initPayloadType() {
+		setPayloadType(PayloadType.device);
 	}
 
 	public void setUuid(String uuid) {

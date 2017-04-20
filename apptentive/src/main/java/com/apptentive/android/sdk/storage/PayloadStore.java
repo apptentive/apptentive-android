@@ -1,23 +1,20 @@
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.Payload;
 
 import java.util.concurrent.Future;
 
-/**
- * @author Sky Kelsey
- */
 public interface PayloadStore {
 
-	public void addPayload(JsonPayload... payloads);
+	void addPayload(Payload... payloads);
 
-	public void deletePayload(JsonPayload payload);
+	void deletePayload(Payload payload);
 
-	public void deleteAllPayloads();
+	void deleteAllPayloads();
 
 	/* Asynchronous call to retrieve the oldest unsent payload from the data storage.
 	 * Calling get() method on the returned Future object will block the caller until the Future has completed,
 	 */
-	public Future<JsonPayload> getOldestUnsentPayload() throws Exception;
+	Future<Payload> getOldestUnsentPayload() throws Exception;
 
 }

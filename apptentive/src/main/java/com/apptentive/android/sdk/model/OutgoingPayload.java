@@ -7,30 +7,41 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.network.HttpRequestMethod;
-import com.apptentive.android.sdk.util.StringUtils;
 
-public class LogoutPayload extends JsonPayload {
-	@Override
-	protected void initPayloadType() {
-		setPayloadType(PayloadType.logout);
+public class OutgoingPayload extends Payload {
+
+	private byte[] data;
+
+	public OutgoingPayload(PayloadType payloadType) {
+		setPayloadType(payloadType);
 	}
 
-	//region Http-request
+	@Override
+	public byte[] getData() {
+		return data;
+	}
+
+	public void setData(byte[] data) {
+		this.data = data;
+	}
+
+	@Override
+	protected void initPayloadType() {
+		setPayloadType(PayloadType.outgoing);
+	}
 
 	@Override
 	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/logout", getConversationId());
+		return null;
 	}
 
 	@Override
 	public HttpRequestMethod getHttpRequestMethod() {
-		return HttpRequestMethod.POST;
+		return null;
 	}
 
 	@Override
 	public String getHttpRequestContentType() {
-		return "application/json"; // TODO: application/octet-stream
+		return null;
 	}
-
-	//endregion
 }

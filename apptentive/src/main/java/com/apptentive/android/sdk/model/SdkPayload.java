@@ -39,8 +39,8 @@ public class SdkPayload extends JsonPayload {
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.sdk);
+	public void initPayloadType() {
+		setPayloadType(PayloadType.sdk);
 	}
 
 	public String getVersion() {

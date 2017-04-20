@@ -15,7 +15,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.OutgoingPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
@@ -48,7 +49,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
 	public static final String PAYLOAD_KEY_JSON = "json";           // 2
 	private static final String PAYLOAD_KEY_CONVERSATION_ID = "conversation_id"; // 3
-	private static final String PAYLOAD_KEY_TOKEN = "token"; // 4
+	private static final String PAYLOAD_KEY_AUTH_TOKEN = "auth_token"; // 4
 
 	private static final String TABLE_CREATE_PAYLOAD =
 		"CREATE TABLE " + TABLE_PAYLOAD +
@@ -57,15 +58,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
 			PAYLOAD_KEY_JSON + " TEXT," +
 			PAYLOAD_KEY_CONVERSATION_ID + " TEXT," +
-			PAYLOAD_KEY_TOKEN + " TEXT" +
+			PAYLOAD_KEY_AUTH_TOKEN + " TEXT" +
 			");";
 
 	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
-	private static final String QUERY_UPDATE_INCOMPLETE_PAYLOADS = StringUtils.format("UPDATE %s SET %s = ?, %s = ? WHERE %s IS NULL OR %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN);
+	private static final String QUERY_UPDATE_INCOMPLETE_PAYLOADS = StringUtils.format("UPDATE %s SET %s = ?, %s = ? WHERE %s IS NULL OR %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_AUTH_TOKEN, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_AUTH_TOKEN);
 
 	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
 	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
-	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_TOKEN + " TEXT";
+	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_AUTH_TOKEN + " TEXT";
 
 	//endregion
 
@@ -274,7 +275,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// Migrate all pending payload messages
 		// Migrate legacy message types to CompoundMessage Type
 		try {
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{JsonPayload.BaseType.message.name()});
+			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.PayloadType.message.name()});
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(2);
@@ -335,17 +336,17 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public void addPayload(JsonPayload... payloads) {
+	public void addPayload(Payload... payloads) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
-			for (JsonPayload payload : payloads) {
+			for (Payload payload : payloads) {
 				ContentValues values = new ContentValues();
-				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
+				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getPayloadType().name());
 				values.put(PAYLOAD_KEY_JSON, payload.toString());
 				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
-				values.put(PAYLOAD_KEY_TOKEN, payload.getToken());
+				values.put(PAYLOAD_KEY_AUTH_TOKEN, payload.getAuthToken());
 				db.insert(TABLE_PAYLOAD, null, values);
 			}
 			db.setTransactionSuccessful();
@@ -355,7 +356,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void deletePayload(JsonPayload payload) {
+	public void deletePayload(Payload payload) {
 		if (payload != null) {
 			SQLiteDatabase db = null;
 			try {
@@ -377,27 +378,25 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public JsonPayload getOldestUnsentPayload() {
+	public Payload getOldestUnsentPayload() {
 
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
 			cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-			JsonPayload payload = null;
+			OutgoingPayload payload = null;
 			if (cursor.moveToFirst()) {
 				long databaseId = Long.parseLong(cursor.getString(0));
-				JsonPayload.BaseType baseType = JsonPayload.BaseType.parse(cursor.getString(1));
+				Payload.PayloadType payloadType = Payload.PayloadType.parse(cursor.getString(1));
 				String json = cursor.getString(2);
 				String conversationId = cursor.getString(3);
-				String token = cursor.getString(4);
-//				payload = PayloadFactory.fromJson(json, baseType);
-//				if (payload != null) {
-//					payload.setDatabaseId(databaseId);
-//					payload.setConversationId(conversationId);
-//					payload.setToken(token);
-//				}
-				throw new RuntimeException("Implement me"); // FIXME: implement me
+				String authToken = cursor.getString(4);
+				payload = new OutgoingPayload(payloadType);
+				payload.setDatabaseId(databaseId);
+				payload.setConversationId(conversationId);
+				payload.setAuthToken(authToken);
+				payload.setData(json.getBytes());
 			}
 			return payload;
 		} catch (SQLException sqe) {

@@ -62,7 +62,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	}
 
 	@Override
-	protected void initBaseType() {
-		setBaseType(BaseType.survey);
+	protected void initPayloadType() {
+		setPayloadType(PayloadType.survey);
 	}
 }

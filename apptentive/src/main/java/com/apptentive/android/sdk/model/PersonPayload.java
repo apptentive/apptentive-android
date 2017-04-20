@@ -46,8 +46,8 @@ public class PersonPayload extends JsonPayload {
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.person);
+	public void initPayloadType() {
+		setPayloadType(PayloadType.person);
 	}
 
 	public String getId() {

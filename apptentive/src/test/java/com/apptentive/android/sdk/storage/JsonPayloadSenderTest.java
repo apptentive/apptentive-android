@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
@@ -41,7 +42,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, JsonPayload payload, boolean cancelled, String errorMessage) {
+			public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {
@@ -99,8 +100,8 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		protected void initBaseType() {
-			setBaseType(BaseType.event);
+		protected void initPayloadType() {
+			setPayloadType(PayloadType.event);
 		}
 
 		public MockPayload setResponseCode(int responseCode) {
@@ -146,8 +147,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public HttpRequest sendPayload(JsonPayload payload, HttpRequest.Listener<HttpRequest> listener) {
-
+		public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());
 			request.addListener(listener);

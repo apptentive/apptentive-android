@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -56,7 +56,7 @@ class PayloadSender {
 	 *
 	 * @throws IllegalArgumentException is payload is null
 	 */
-	synchronized boolean sendPayload(final JsonPayload payload) {
+	synchronized boolean sendPayload(final Payload payload) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
@@ -91,8 +91,8 @@ class PayloadSender {
 	/**
 	 * Creates and sends payload Http-request asynchronously (returns immediately)
 	 */
-	private synchronized void sendPayloadRequest(final JsonPayload payload) {
-		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getBaseType(), payload.getDatabaseId(), payload.getConversationId());
+	private synchronized void sendPayloadRequest(final Payload payload) {
+		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getPayloadType(), payload.getDatabaseId(), payload.getConversationId());
 
 		// create request object
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
@@ -127,7 +127,7 @@ class PayloadSender {
 	 * @param cancelled    - flag indicating if payload Http-request was cancelled
 	 * @param errorMessage - if not <code>null</code> - payload request failed
 	 */
-	private synchronized void handleFinishSendingPayload(JsonPayload payload, boolean cancelled, String errorMessage) {
+	private synchronized void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
 		sendingFlag = false; // mark sender as 'not busy'
 
 		try {
@@ -159,7 +159,7 @@ class PayloadSender {
 	//region Listener
 
 	public interface Listener {
-		void onFinishSending(PayloadSender sender, JsonPayload payload, boolean cancelled, String errorMessage);
+		void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage);
 	}
 
 	//endregion

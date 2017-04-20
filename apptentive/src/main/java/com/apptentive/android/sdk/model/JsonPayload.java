@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -20,14 +19,11 @@ public abstract class JsonPayload extends Payload {
 	private final JSONObject jsonObject;
 
 	// These three are not stored in the JSON, only the DB.
-	private long databaseId;
-	private BaseType baseType;
-	private String conversationId;
 
 	public JsonPayload() {
 		super();
 		jsonObject = new JSONObject();
-		initBaseType();
+		initPayloadType();
 	}
 
 	public JsonPayload(String json) {
@@ -39,60 +35,7 @@ public abstract class JsonPayload extends Payload {
 			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error creating JsonPayload from json string.", e);
 		}
 		jsonObject = (temp == null ? null : temp);
-		initBaseType();
-	}
-
-	/**
-	 * Each subclass must set its type in this method.
-	 */
-	protected abstract void initBaseType();
-
-	public long getDatabaseId() {
-		return databaseId;
-	}
-
-	public void setDatabaseId(long databaseId) {
-		this.databaseId = databaseId;
-	}
-
-	public BaseType getBaseType() {
-		return baseType;
-	}
-
-	protected void setBaseType(BaseType baseType) {
-		this.baseType = baseType;
-	}
-
-	public String getConversationId() {
-		return conversationId;
-	}
-
-	public void setConversationId(String conversationId) {
-		this.conversationId = conversationId;
-	}
-
-	public enum BaseType {
-		message,
-		event,
-		device,
-		sdk,
-		app_release,
-		sdk_and_app_release,
-		person,
-		logout,
-		unknown,
-		// Legacy
-		survey;
-
-		public static BaseType parse(String type) {
-			try {
-				return BaseType.valueOf(type);
-			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Payload.BaseType: " + type);
-			}
-			return unknown;
-		}
-
+		initPayloadType();
 	}
 
 	//region Data
@@ -197,25 +140,6 @@ public abstract class JsonPayload extends Payload {
 	public JSONObject getJsonObject() {
 		return jsonObject;
 	}
-
-	//endregion
-
-	//region Http-request
-
-	/**
-	 * Http endpoint for sending this payload
-	 */
-	public abstract String getHttpEndPoint();
-
-	/**
-	 * Http request method for sending this payload
-	 */
-	public abstract HttpRequestMethod getHttpRequestMethod();
-
-	/**
-	 * Http content type for sending this payload
-	 */
-	public abstract String getHttpRequestContentType();
 
 	//endregion
 }

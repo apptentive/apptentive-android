@@ -1,14 +1,15 @@
 package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.MultipartPayload;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpJsonMultipartRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.network.RawHttpRequest;
 import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.util.Constants;
 
@@ -54,8 +55,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	//region API Requests
 
-	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
+	public RawHttpRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
+		RawHttpRequest request = createRawRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest.toString().getBytes(), HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
@@ -73,7 +74,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region PayloadRequestSender
 
 	@Override
-	public HttpRequest sendPayload(JsonPayload payload, HttpRequest.Listener<HttpRequest> listener) {
+	public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
@@ -84,38 +85,32 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
-	private HttpRequest createPayloadRequest(JsonPayload payload) {
-		final String token = payload.getToken();
+	private HttpRequest createPayloadRequest(Payload payload) {
+		final String token = payload.getAuthToken();
 		final String endPoint = payload.getHttpEndPoint();
 		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();
 
 		// TODO: figure out a better solution
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			return createMultipartRequest(token, endPoint, payload.getJsonObject(), associatedFiles, requestMethod);
+			return createMultipartRequest(token, endPoint, payload.getData(), associatedFiles, requestMethod);
 		}
 
-		switch (payload.getHttpRequestContentType()) {
-			case "application/json": {
-				return createJsonRequest(token, endPoint, payload.getJsonObject(), requestMethod);
-			}
-		}
-
-		throw new IllegalArgumentException("Unexpected content type: " + payload.getHttpRequestContentType());
+		return createRawRequest(token, endPoint, payload.getData(), requestMethod);
 	}
 
 	//endregion
 
 	//region Helpers
 
-	private HttpJsonRequest createJsonRequest(String oauthToken, String endpoint, JSONObject payload, HttpRequestMethod method) {
+	private RawHttpRequest createRawRequest(String oauthToken, String endpoint, byte[] data, HttpRequestMethod method) {
 		if (oauthToken == null) {
 			throw new IllegalArgumentException("OAuth token is null");
 		}
 		if (endpoint == null) {
 			throw new IllegalArgumentException("Endpoint is null");
 		}
-		if (payload == null) {
+		if (data == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
 		if (method == null) {
@@ -123,29 +118,29 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 
 		String url = createEndpointURL(endpoint);
-		HttpJsonRequest request = new HttpJsonRequest(url, payload);
+		RawHttpRequest request = new RawHttpRequest(url, data);
 		setupRequestDefaults(request, oauthToken);
 		request.setMethod(method);
 		request.setRequestProperty("Content-Type", "application/json");
 		return request;
 	}
 
-	private HttpJsonMultipartRequest createMultipartRequest(String oauthToken, String endpoint, JSONObject payload, List<StoredFile> files, HttpRequestMethod method) {
+	private HttpJsonMultipartRequest createMultipartRequest(String oauthToken, String endpoint, byte[] data, List<StoredFile> files, HttpRequestMethod method) {
 		if (oauthToken == null) {
 			throw new IllegalArgumentException("OAuth token is null");
 		}
 		if (endpoint == null) {
 			throw new IllegalArgumentException("Endpoint is null");
 		}
-		if (payload == null) {
-			throw new IllegalArgumentException("Payload is null");
+		if (data == null) {
+			throw new IllegalArgumentException("Data is null");
 		}
 		if (method == null) {
 			throw new IllegalArgumentException("Method is null");
 		}
 
 		String url = createEndpointURL(endpoint);
-		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, payload, files);
+		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, data, files);
 		setupRequestDefaults(request, oauthToken);
 		request.setMethod(method);
 		return request;

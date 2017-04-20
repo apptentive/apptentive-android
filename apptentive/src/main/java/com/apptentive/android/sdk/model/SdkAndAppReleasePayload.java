@@ -18,8 +18,6 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
-import org.json.JSONException;
-
 /**
  * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
  *
@@ -62,8 +60,8 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	//endregion
 
 	//region Inheritance
-	public void initBaseType() {
-		setBaseType(BaseType.sdk_and_app_release);
+	public void initPayloadType() {
+		setPayloadType(PayloadType.sdk_and_app_release);
 	}
 	//endregion
 

@@ -6,9 +6,13 @@
 
 package com.apptentive.android.sdk.model;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+
 import java.util.List;
 
 public abstract class Payload {
+	private long databaseId;
 	protected String type;
 	protected String nonce;
 	protected int apiVersion;
@@ -16,7 +20,10 @@ public abstract class Payload {
 	protected String authToken;
 	protected String method;
 	protected String path;
+	protected String conversationId;
 	protected List<Object> attachments; // TODO: Figure out attachment handling
+
+	private PayloadType payloadType;
 
 	public String getType() {
 		return type;
@@ -50,11 +57,11 @@ public abstract class Payload {
 		this.contentType = contentType;
 	}
 
-	public String getToken() {
+	public String getAuthToken() {
 		return authToken;
-	} // TODO: rename to getAuthToken
+	}
 
-	public void setToken(String authToken) { // TODO: rename to setAuthToken
+	public void setAuthToken(String authToken) {
 		this.authToken = authToken;
 	}
 
@@ -82,5 +89,77 @@ public abstract class Payload {
 		this.attachments = attachments;
 	}
 
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
+	}
+
+	/**
+	 * Each subclass must set its type in this method.
+	 */
+	protected abstract void initPayloadType();
+
+	public long getDatabaseId() {
+		return databaseId;
+	}
+
+	public void setDatabaseId(long databaseId) {
+		this.databaseId = databaseId;
+	}
+
+	public PayloadType getPayloadType() {
+		return payloadType;
+	}
+
+	protected void setPayloadType(PayloadType payloadType) {
+		this.payloadType = payloadType;
+	}
+
+	public enum PayloadType {
+		message,
+		event,
+		device,
+		sdk,
+		app_release,
+		sdk_and_app_release,
+		person,
+		logout,
+		unknown,
+		outgoing,
+		// Legacy
+		survey;
+
+		public static PayloadType parse(String type) {
+			try {
+				return PayloadType.valueOf(type);
+			} catch (IllegalArgumentException e) {
+				ApptentiveLog.v("Error parsing unknown Payload.PayloadType: " + type);
+			}
+			return unknown;
+		}
+	}
+
 	public abstract byte[] getData();
+
+	//region Http-request
+
+	/**
+	 * Http endpoint for sending this payload
+	 */
+	public abstract String getHttpEndPoint();
+
+	/**
+	 * Http request method for sending this payload
+	 */
+	public abstract HttpRequestMethod getHttpRequestMethod();
+
+	/**
+	 * Http content type for sending this payload
+	 */
+	public abstract String getHttpRequestContentType();
+
+	//endregion
 }
