@@ -155,7 +155,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 
 	public ApptentiveDatabaseHelper(Context context) {
-		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		this(context, DATABASE_NAME, DATABASE_VERSION);
+	}
+
+	/** Convenience constructor for unit testing */
+	ApptentiveDatabaseHelper(Context context, String databaseName, int databaseVersion) {
+		super(context, databaseName, null, databaseVersion);
 		fileDir = context.getFilesDir();
 	}
 
