@@ -23,8 +23,6 @@ public class SurveyResponsePayload extends ConversationItem {
 	private static final String KEY_SURVEY_ANSWERS = "answers";
 
 	public SurveyResponsePayload(SurveyInteraction definition, Map<String, Object> answers) {
-		super();
-
 		try {
 			put(KEY_SURVEY_ID, definition.getId());
 			JSONObject answersJson = new JSONObject();
@@ -36,6 +34,10 @@ public class SurveyResponsePayload extends ConversationItem {
 		} catch (JSONException e) {
 			ApptentiveLog.e("Unable to construct survey payload.", e);
 		}
+	}
+
+	public SurveyResponsePayload(String json) throws JSONException {
+		super(json);
 	}
 
 	//region Http-request

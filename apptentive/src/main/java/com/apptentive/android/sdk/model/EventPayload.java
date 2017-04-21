@@ -27,6 +27,10 @@ public class EventPayload extends ConversationItem {
 	private static final String KEY_TRIGGER = "trigger";
 	private static final String KEY_CUSTOM_DATA = "custom_data";
 
+	public EventPayload(String json) throws JSONException {
+		super(json);
+	}
+
 	public EventPayload(String label, JSONObject data) {
 		super();
 		put(KEY_LABEL, label);

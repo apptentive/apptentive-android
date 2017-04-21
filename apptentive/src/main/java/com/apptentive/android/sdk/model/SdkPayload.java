@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
+import org.json.JSONException;
+
 public class SdkPayload extends JsonPayload {
 
 	public static final String KEY = "sdk";
@@ -19,6 +21,13 @@ public class SdkPayload extends JsonPayload {
 	private static final String KEY_PLATFORM = "platform";
 	private static final String KEY_DISTRIBUTION = "distribution";
 	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
+
+	public SdkPayload() {
+	}
+
+	public SdkPayload(String json) throws JSONException {
+		super(json);
+	}
 
 	//region Http-request
 

@@ -41,6 +41,13 @@ public class DevicePayload extends JsonPayload {
 	private static final String KEY_UTC_OFFSET = "utc_offset";
 	private static final String KEY_INTEGRATION_CONFIG = "integration_config";
 
+	public DevicePayload() {
+	}
+
+	public DevicePayload(String json) throws JSONException {
+		super(json);
+	}
+
 	//region Http-request
 
 	@Override

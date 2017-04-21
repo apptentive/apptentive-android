@@ -27,6 +27,13 @@ public class PersonPayload extends JsonPayload {
 	private static final String KEY_BIRTHDAY = "birthday";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 
+	public PersonPayload() {
+	}
+
+	public PersonPayload(String json) throws JSONException {
+		super(json);
+	}
+
 	//region Http-request
 
 	@Override

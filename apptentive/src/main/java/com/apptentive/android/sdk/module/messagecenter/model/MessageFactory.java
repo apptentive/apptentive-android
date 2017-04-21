@@ -41,7 +41,7 @@ public class MessageFactory {
 					} catch (JSONException e) {
 						// Ignore, senderId would be null
 					}
-					String personId = ApptentiveInternal.getInstance().getPersonId();
+					String personId = ApptentiveInternal.getInstance() != null ? ApptentiveInternal.getInstance().getPersonId() : null;
 					// If senderId is null or same as the locally stored id, construct message as outgoing
 					return new CompoundMessage(json, (senderId == null || (personId != null && senderId.equals(personId))));
 				case unknown:

@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.util.Util;
 
+import org.json.JSONException;
+
 import java.util.UUID;
 
 /**
@@ -31,7 +33,7 @@ public abstract class ConversationItem extends JsonPayload {
 
 	}
 
-	protected ConversationItem(String json) {
+	protected ConversationItem(String json) throws JSONException {
 		super(json);
 	}
 

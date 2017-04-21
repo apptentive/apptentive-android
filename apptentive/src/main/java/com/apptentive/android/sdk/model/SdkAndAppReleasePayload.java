@@ -18,6 +18,8 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
+import org.json.JSONException;
+
 /**
  * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
  *
@@ -31,13 +33,19 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	private final AppReleasePayload appRelease;
 
 	public SdkAndAppReleasePayload() {
-		super();
 		sdk = new SdkPayload();
 		appRelease = new AppReleasePayload();
 
 		// TODO: a better solution
 		put("sdk", sdk.getJsonObject());
 		put("app_release", appRelease.getJsonObject());
+	}
+
+	public SdkAndAppReleasePayload(String json) throws JSONException {
+		super(json);
+
+		sdk = new SdkPayload(getJSONObject("sdk").toString());
+		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());
 	}
 
 	//region Http-request

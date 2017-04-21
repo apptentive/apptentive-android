@@ -25,15 +25,8 @@ public abstract class JsonPayload extends Payload {
 		jsonObject = new JSONObject();
 	}
 
-	public JsonPayload(String json) {
-		super();
-		JSONObject temp = null;
-		try {
-			temp = new JSONObject(json);
-		} catch (JSONException e) {
-			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error creating JsonPayload from json string.", e);
-		}
-		jsonObject = (temp == null ? null : temp);
+	public JsonPayload(String json) throws JSONException {
+		jsonObject = new JSONObject(json);
 	}
 
 	//region Data
@@ -130,6 +123,16 @@ public abstract class JsonPayload extends Payload {
 	protected boolean isNull(String key) { // TODO: rename to containsKey
 		return jsonObject.isNull(key);
 	}
+
+	//endregion
+
+	//region String Representation
+
+	@Override
+	public String toString() {
+		return jsonObject.toString();
+	}
+
 
 	//endregion
 

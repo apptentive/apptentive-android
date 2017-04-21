@@ -43,7 +43,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		initType();
 	}
 
-	protected ApptentiveMessage(String json) {
+	protected ApptentiveMessage(String json) throws JSONException {
 		super(json);
 		state = State.unknown;
 		initType();

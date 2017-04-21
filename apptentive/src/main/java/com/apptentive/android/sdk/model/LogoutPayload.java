@@ -9,7 +9,15 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import org.json.JSONException;
+
 public class LogoutPayload extends JsonPayload {
+	public LogoutPayload() {
+	}
+
+	public LogoutPayload(String json) throws JSONException {
+		super(json);
+	}
 
 	//region Http-request
 

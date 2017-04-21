@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
+import org.json.JSONException;
+
 public class AppReleasePayload extends JsonPayload {
 
 	public static final String KEY = "app_release";
@@ -21,6 +23,13 @@ public class AppReleasePayload extends JsonPayload {
 	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 	private static final String KEY_DEBUG = "debug";
+
+	public AppReleasePayload() {
+	}
+
+	public AppReleasePayload(String json) throws JSONException {
+		super(json);
+	}
 
 	//region Http-request
 
