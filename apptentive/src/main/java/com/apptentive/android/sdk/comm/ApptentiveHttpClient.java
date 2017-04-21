@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.network.RawHttpRequest;
 import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.util.Constants;
 
+import org.json.JSONObject;
+
 import java.util.List;
 
 import static android.text.TextUtils.isEmpty;
@@ -53,8 +55,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	//region API Requests
 
-	public RawHttpRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		RawHttpRequest request = createRawRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest.toString().getBytes(), HttpRequestMethod.POST);
+	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
+		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
@@ -100,6 +102,28 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//endregion
 
 	//region Helpers
+
+	private HttpJsonRequest createJsonRequest(String oauthToken, String endpoint, JSONObject json, HttpRequestMethod method) {
+		if (oauthToken == null) {
+			throw new IllegalArgumentException("OAuth token is null");
+		}
+		if (endpoint == null) {
+			throw new IllegalArgumentException("Endpoint is null");
+		}
+		if (json == null) {
+			throw new IllegalArgumentException("Json is null");
+		}
+		if (method == null) {
+			throw new IllegalArgumentException("Method is null");
+		}
+
+		String url = createEndpointURL(endpoint);
+		HttpJsonRequest request = new HttpJsonRequest(url, json);
+		setupRequestDefaults(request, oauthToken);
+		request.setMethod(method);
+		request.setRequestProperty("Content-Type", "application/json");
+		return request;
+	}
 
 	private RawHttpRequest createRawRequest(String oauthToken, String endpoint, byte[] data, HttpRequestMethod method) {
 		if (oauthToken == null) {

@@ -476,13 +476,22 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadData payload = null;
 			if (cursor.moveToFirst()) {
 				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
+				if (conversationId == null) {
+					return null;
+				}
+
+				final String authToken = cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index);
+				if (authToken == null) {
+					return null;
+				}
+
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
 
 				payload = new PayloadData();
 				payload.setHttpRequestPath(httpRequestPath);
 				payload.setHttpRequestMethod(HttpRequestMethod.valueOf(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				payload.setContentType(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
-				payload.setAuthToken(cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index));
+				payload.setAuthToken(authToken);
 				payload.setData(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
 			}
 			return payload;
