@@ -43,8 +43,8 @@ public class SurveyResponsePayload extends ConversationItem {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/surveys/%s/respond", getConversationId(), getId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/surveys/%s/respond", conversationId, getId());
 	}
 
 	@Override

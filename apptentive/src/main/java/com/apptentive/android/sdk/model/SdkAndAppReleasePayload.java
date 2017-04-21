@@ -51,8 +51,8 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/sdkapprelease", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/sdkapprelease", conversationId);
 	}
 
 	@Override

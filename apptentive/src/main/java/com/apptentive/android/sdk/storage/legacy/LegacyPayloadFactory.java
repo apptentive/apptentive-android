@@ -9,11 +9,10 @@ package com.apptentive.android.sdk.storage.legacy;
 import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.EventPayload;
-import com.apptentive.android.sdk.model.LogoutPayload;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.PersonPayload;
-import com.apptentive.android.sdk.model.SdkAndAppReleasePayload;
 import com.apptentive.android.sdk.model.SdkPayload;
 import com.apptentive.android.sdk.model.SurveyResponsePayload;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
@@ -24,7 +23,7 @@ import org.json.JSONException;
  * We only keep this class for legacy database migration purposes
  */
 public final class LegacyPayloadFactory {
-	public static Payload createPayload(PayloadType type, String json) throws JSONException {
+	public static JsonPayload createPayload(PayloadType type, String json) throws JSONException {
 		switch (type) {
 			case message:
 				return MessageFactory.fromJson(json);
@@ -36,12 +35,8 @@ public final class LegacyPayloadFactory {
 				return new SdkPayload(json);
 			case app_release:
 				return new AppReleasePayload(json);
-			case sdk_and_app_release:
-				return new SdkAndAppReleasePayload(json);
 			case person:
 				return new PersonPayload(json);
-			case logout:
-				return new LogoutPayload(json);
 			case survey:
 				return new SurveyResponsePayload(json);
 			default:

@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.storage;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
@@ -42,7 +43,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {
@@ -89,14 +90,13 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		);
 	}
 
-	class MockPayload extends JsonPayload {
+	class MockPayload extends PayloadData {
 		private final String json;
 		private ResponseHandler responseHandler;
 
 		public MockPayload(String key, Object value) {
 			json = StringUtils.format("{'%s':'%s'}", key, value);
 			responseHandler = new DefaultResponseHandler();
-			setDatabaseId(0L);
 		}
 
 		public MockPayload setResponseCode(int responseCode) {
@@ -114,21 +114,6 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public String getHttpEndPoint() {
-			return null;
-		}
-
-		@Override
-		public HttpRequestMethod getHttpRequestMethod() {
-			return null;
-		}
-
-		@Override
-		public String getHttpRequestContentType() {
-			return null;
-		}
-
-		@Override
 		public String toString() {
 			return json;
 		}
@@ -142,7 +127,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
+		public HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());
 			request.addListener(listener);

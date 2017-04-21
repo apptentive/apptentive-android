@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
@@ -45,10 +46,10 @@ import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver, PayloadSender.Listener {
+public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveDatabaseHelper.DataSource, ApptentiveNotificationObserver, PayloadSender.Listener {
 
-	private ApptentiveDatabaseHelper dbHelper;
-	private ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
+	private final ApptentiveDatabaseHelper dbHelper;
+	private final ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
 
 	// Set when receiving an ApptentiveNotification
 	private String currentConversationId;
@@ -61,7 +62,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
 	 */
 	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient) {
-		dbHelper = new ApptentiveDatabaseHelper(context);
+		dbHelper = new ApptentiveDatabaseHelper(context, this);
 		/* When a new database task is submitted, the executor has the following behaviors:
 		 * 1. If the thread pool has no thread yet, it creates a single worker thread.
 		 * 2. If the single worker thread is running with tasks, it queues tasks.
@@ -99,10 +100,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * a new message is added.
 	 */
 	public void addPayload(final Payload... payloads) {
-		for (Payload payload : payloads) {
-			payload.setConversationId(currentConversationId);
-			payload.setAuthToken(currentConversationToken);
-		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -112,12 +109,12 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		});
 	}
 
-	public void deletePayload(final Payload payload) {
-		if (payload != null) {
+	public void deletePayload(final String payloadIdentifier) {
+		if (payloadIdentifier != null) {
 			singleThreadExecutor.execute(new Runnable() {
 				@Override
 				public void run() {
-					dbHelper.deletePayload(payload);
+					dbHelper.deletePayload(payloadIdentifier);
 					sendNextPayloadSync();
 				}
 			});
@@ -133,16 +130,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		});
 	}
 
-	public synchronized Future<Payload> getOldestUnsentPayload() throws Exception {
-		return singleThreadExecutor.submit(new Callable<Payload>() {
-			@Override
-			public Payload call() throws Exception {
-				return getOldestUnsentPayloadSync();
-			}
-		});
-	}
-
-	private Payload getOldestUnsentPayloadSync() {
+	private PayloadData getOldestUnsentPayloadSync() {
 		return dbHelper.getOldestUnsentPayload();
 	}
 
@@ -180,7 +168,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	//region PayloadSender.Listener
 
 	@Override
-	public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+	public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage) {
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_PAYLOAD_DID_FINISH_SEND,
 				NOTIFICATION_KEY_PAYLOAD, payload,
@@ -201,7 +189,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
 		}
 
-		deletePayload(payload);
+		deletePayload(payload.getPayloadIdentifier());
 	}
 
 	//endregion
@@ -227,7 +215,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		final Payload payload;
+		final PayloadData payload;
 		try {
 			payload = getOldestUnsentPayloadSync();
 		} catch (Exception e) {
@@ -240,8 +228,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			return;
 		}
 
-		if (StringUtils.isNullOrEmpty(payload.getConversationId()) || StringUtils.isNullOrEmpty(payload.getAuthToken())) {
-			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no conversation id");
+		if (StringUtils.isNullOrEmpty(payload.getAuthToken())) {
+			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no auth token");
 			return;
 		}
 
@@ -292,4 +280,18 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			appInBackground = true;
 		}
 	}
+
+	//region ApptentiveDatabaseHelper.DataSource
+
+	@Override
+	public String getConversationId() {
+		return currentConversationId;
+	}
+
+	@Override
+	public String getAuthToken() {
+		return currentConversationToken;
+	}
+
+	//endregion
 }

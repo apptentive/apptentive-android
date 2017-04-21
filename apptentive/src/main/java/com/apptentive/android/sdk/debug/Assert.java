@@ -78,6 +78,12 @@ public class Assert {
 
 	//region Nullability
 
+	/** Helper function for getting non-null references */
+	public static <T> T notNull(T reference) {
+		assertNotNull(reference);
+		return reference;
+	}
+
 	/**
 	 * Asserts that an object isn't <code>null</code>
 	 */

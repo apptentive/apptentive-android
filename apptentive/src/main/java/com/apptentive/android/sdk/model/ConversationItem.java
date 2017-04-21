@@ -22,25 +22,17 @@ public abstract class ConversationItem extends JsonPayload {
 	protected static final String KEY_CLIENT_CREATED_AT_UTC_OFFSET = "client_created_at_utc_offset";
 
 	protected ConversationItem() {
-		super();
-		setNonce(UUID.randomUUID().toString());
+		put(KEY_NONCE, getNonce());
 
 		double seconds = Util.currentTimeSeconds();
 		int utcOffset = Util.getUtcOffset();
 
 		setClientCreatedAt(seconds);
 		setClientCreatedAtUtcOffset(utcOffset);
-
 	}
 
 	protected ConversationItem(String json) throws JSONException {
 		super(json);
-	}
-
-	@Override
-	public void setNonce(String nonce) {
-		super.setNonce(nonce);
-		put(KEY_NONCE, nonce);
 	}
 
 	public Double getClientCreatedAt() {

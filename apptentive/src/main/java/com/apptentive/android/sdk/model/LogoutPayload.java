@@ -22,8 +22,8 @@ public class LogoutPayload extends JsonPayload {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/logout", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/logout", conversationId);
 	}
 
 	@Override

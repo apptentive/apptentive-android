@@ -9,107 +9,36 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import java.util.List;
+import java.util.UUID;
 
 public abstract class Payload {
-	private long databaseId;
-	protected String type;
-	protected String nonce;
-	protected int apiVersion;
-	protected String contentType;
-	protected String authToken;
-	protected String method;
-	protected String path;
-	protected String conversationId;
-	protected List<Object> attachments; // TODO: Figure out attachment handling
+	/**
+	 * A value that can be used to correlate a payload with another object
+	 * (for example, to update the sent status of a message)
+	 */
+	private String nonce;
 
-	public String getType() {
-		return type;
+	private List<Object> attachments; // TODO: Figure out attachment handling
+
+	protected Payload() {
+		nonce = UUID.randomUUID().toString();
 	}
 
-	public void setType(String type) {
-		this.type = type;
-	}
+	//region Data
 
-	public String getNonce() {
-		return nonce;
-	}
-
-	public void setNonce(String nonce) {
-		this.nonce = nonce;
-	}
-
-	public int getApiVersion() {
-		return apiVersion;
-	}
-
-	public void setApiVersion(int apiVersion) {
-		this.apiVersion = apiVersion;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
-	public String getMethod() {
-		return method;
-	}
-
-	public void setMethod(String method) {
-		this.method = method;
-	}
-
-	public String getPath() {
-		return path;
-	}
-
-	public void setPath(String path) {
-		this.path = path;
-	}
-
-	public List<Object> getAttachments() {
-		return attachments;
-	}
-
-	public void setAttachments(List<Object> attachments) {
-		this.attachments = attachments;
-	}
-
-	public String getConversationId() {
-		return conversationId;
-	}
-
-	public void setConversationId(String conversationId) {
-		this.conversationId = conversationId;
-	}
-
-	public long getDatabaseId() {
-		return databaseId;
-	}
-
-	public void setDatabaseId(long databaseId) {
-		this.databaseId = databaseId;
-	}
-
+	/**
+	 * Binary data to be stored in database
+	 */
 	public abstract byte[] getData();
+
+	//region
 
 	//region Http-request
 
 	/**
 	 * Http endpoint for sending this payload
 	 */
-	public abstract String getHttpEndPoint();
+	public abstract String getHttpEndPoint(String conversationId);
 
 	/**
 	 * Http request method for sending this payload
@@ -120,6 +49,26 @@ public abstract class Payload {
 	 * Http content type for sending this payload
 	 */
 	public abstract String getHttpRequestContentType();
+
+	//endregion
+
+	//region Getters/Setters
+
+	public String getNonce() {
+		return nonce;
+	}
+
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
+	}
+
+	public List<Object> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Object> attachments) {
+		this.attachments = attachments;
+	}
 
 	//endregion
 }

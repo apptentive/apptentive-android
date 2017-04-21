@@ -14,11 +14,8 @@ public enum PayloadType {
 	device,
 	sdk,
 	app_release,
-	sdk_and_app_release,
 	person,
-	logout,
 	unknown,
-	outgoing,
 	// Legacy
 	survey;
 

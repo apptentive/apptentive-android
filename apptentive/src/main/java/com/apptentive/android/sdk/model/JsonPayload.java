@@ -88,7 +88,7 @@ public abstract class JsonPayload extends Payload {
 		jsonObject.remove(key);
 	}
 
-	protected String getString(String key) {
+	public String getString(String key) {
 		return jsonObject.optString(key);
 	}
 

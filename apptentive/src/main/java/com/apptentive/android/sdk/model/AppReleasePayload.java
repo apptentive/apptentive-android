@@ -34,7 +34,7 @@ public class AppReleasePayload extends JsonPayload {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
+	public String getHttpEndPoint(String conversationId) {
 		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
 	}
 

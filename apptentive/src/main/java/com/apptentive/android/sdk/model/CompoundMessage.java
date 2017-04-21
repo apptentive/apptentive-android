@@ -66,8 +66,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/messages", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/messages", conversationId);
 	}
 
 	@Override

@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 
 /**
@@ -20,5 +20,5 @@ public interface PayloadRequestSender {
 	 * @param payload  to be sent
 	 * @param listener Http-request listener for the payload request
 	 */
-	HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener);
+	HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener);
 }

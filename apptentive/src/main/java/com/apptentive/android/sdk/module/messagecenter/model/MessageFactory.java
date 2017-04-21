@@ -6,12 +6,11 @@
 
 package com.apptentive.android.sdk.module.messagecenter.model;
 
-import android.text.TextUtils;
-
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -24,7 +23,7 @@ public class MessageFactory {
 			JSONObject root = new JSONObject(json);
 			if (!root.isNull(ApptentiveMessage.KEY_TYPE)) {
 				String typeStr = root.getString(ApptentiveMessage.KEY_TYPE);
-				if (!TextUtils.isEmpty(typeStr)) {
+				if (!StringUtils.isNullOrEmpty(typeStr)) {
 					type = ApptentiveMessage.Type.valueOf(typeStr);
 				}
 			}

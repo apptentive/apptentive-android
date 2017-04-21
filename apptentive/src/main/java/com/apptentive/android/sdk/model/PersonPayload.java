@@ -37,8 +37,8 @@ public class PersonPayload extends JsonPayload {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/converations/%s/people", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/converations/%s/people", conversationId);
 	}
 
 	@Override

@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -56,7 +57,7 @@ class PayloadSender {
 	 *
 	 * @throws IllegalArgumentException is payload is null
 	 */
-	synchronized boolean sendPayload(final Payload payload) {
+	synchronized boolean sendPayload(final PayloadData payload) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
@@ -90,9 +91,10 @@ class PayloadSender {
 
 	/**
 	 * Creates and sends payload Http-request asynchronously (returns immediately)
+	 * @param payload
 	 */
-	private synchronized void sendPayloadRequest(final Payload payload) {
-		ApptentiveLog.d(PAYLOADS, "Sending payload: %s:%d (%s)", payload.getClass().getName(), payload.getDatabaseId(), payload.getConversationId());
+	private synchronized void sendPayloadRequest(final PayloadData payload) {
+		ApptentiveLog.v(PAYLOADS, "Sending payload: %s", payload.getClass().getName());
 
 		// create request object
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
@@ -122,12 +124,11 @@ class PayloadSender {
 
 	/**
 	 * Executed when we're done with the current payload
-	 *
-	 * @param payload      - current payload
+	 *  @param payload      - current payload
 	 * @param cancelled    - flag indicating if payload Http-request was cancelled
 	 * @param errorMessage - if not <code>null</code> - payload request failed
 	 */
-	private synchronized void handleFinishSendingPayload(Payload payload, boolean cancelled, String errorMessage) {
+	private synchronized void handleFinishSendingPayload(PayloadData payload, boolean cancelled, String errorMessage) {
 		sendingFlag = false; // mark sender as 'not busy'
 
 		try {
@@ -159,7 +160,7 @@ class PayloadSender {
 	//region Listener
 
 	public interface Listener {
-		void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage);
+		void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage);
 	}
 
 	//endregion
