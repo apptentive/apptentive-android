@@ -23,6 +23,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	private static final String KEY_SURVEY_ANSWERS = "answers";
 
 	public SurveyResponsePayload(SurveyInteraction definition, Map<String, Object> answers) {
+		super(PayloadType.survey);
 		try {
 			put(KEY_SURVEY_ID, definition.getId());
 			JSONObject answersJson = new JSONObject();
@@ -37,7 +38,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	}
 
 	public SurveyResponsePayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.survey, json);
 	}
 
 	//region Http-request

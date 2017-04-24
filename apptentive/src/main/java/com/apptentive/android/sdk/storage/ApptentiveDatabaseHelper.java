@@ -54,13 +54,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	static final class PayloadEntry {
 		static final String TABLE_NAME = "pending_payload";
 		static final DatabaseColumn COLUMN_PRIMARY_KEY = new DatabaseColumn(0, "_id");
-		static final DatabaseColumn COLUMN_IDENTIFIER = new DatabaseColumn(1, "identifier");
-		static final DatabaseColumn COLUMN_CONTENT_TYPE = new DatabaseColumn(2, "contentType");
-		static final DatabaseColumn COLUMN_AUTH_TOKEN = new DatabaseColumn(3, "authToken");
-		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(4, "conversationId");
-		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(5, "requestMethod");
-		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(6, "path");
-		static final DatabaseColumn COLUMN_DATA = new DatabaseColumn(7, "data");
+		static final DatabaseColumn COLUMN_PAYLOAD_TYPE = new DatabaseColumn(1, "payloadType");
+		static final DatabaseColumn COLUMN_IDENTIFIER = new DatabaseColumn(2, "identifier");
+		static final DatabaseColumn COLUMN_CONTENT_TYPE = new DatabaseColumn(3, "contentType");
+		static final DatabaseColumn COLUMN_AUTH_TOKEN = new DatabaseColumn(4, "authToken");
+		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(5, "conversationId");
+		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
+		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
+		static final DatabaseColumn COLUMN_DATA = new DatabaseColumn(8, "data");
 	}
 
 	static final class LegacyPayloadEntry {
@@ -74,6 +75,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		"CREATE TABLE " + PayloadEntry.TABLE_NAME +
 			" (" +
 			PayloadEntry.COLUMN_PRIMARY_KEY + " INTEGER PRIMARY KEY, " +
+			PayloadEntry.COLUMN_PAYLOAD_TYPE + " TEXT, " +
 			PayloadEntry.COLUMN_IDENTIFIER + " TEXT, " +
 			PayloadEntry.COLUMN_CONTENT_TYPE + " TEXT," +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " TEXT," +
@@ -422,6 +424,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			for (Payload payload : payloads) {
 				ContentValues values = new ContentValues();
 				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
+				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
 				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
 				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, authToken); // might be null
 				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, conversationId); // might be null
@@ -485,9 +488,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					return null;
 				}
 
+				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
+				if (PayloadType.unknown.equals(payloadType)) {
+					return null;
+				}
+
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
 
-				payload = new PayloadData();
+				payload = new PayloadData(payloadType);
 				payload.setHttpRequestPath(httpRequestPath);
 				payload.setHttpRequestMethod(HttpRequestMethod.valueOf(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				payload.setContentType(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));

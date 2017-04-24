@@ -42,10 +42,11 @@ public class DevicePayload extends JsonPayload {
 	private static final String KEY_INTEGRATION_CONFIG = "integration_config";
 
 	public DevicePayload() {
+		super(PayloadType.device);
 	}
 
 	public DevicePayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.device, json);
 	}
 
 	//region Http-request

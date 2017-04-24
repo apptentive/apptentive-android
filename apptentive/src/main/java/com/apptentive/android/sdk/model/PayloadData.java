@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 public class PayloadData {
+	private final PayloadType type;
 	private String contentType;
 	private String authToken;
 	private byte[] data;
@@ -16,7 +17,8 @@ public class PayloadData {
 	private HttpRequestMethod httpRequestMethod;
 	private String payloadIdentifier;
 
-	public PayloadData() {
+	public PayloadData(PayloadType type) {
+		this.type = type;
 	}
 
 	public void setContentType(String contentType) {
@@ -53,6 +55,10 @@ public class PayloadData {
 
 	public HttpRequestMethod getHttpRequestMethod() {
 		return httpRequestMethod;
+	}
+
+	public PayloadType getType() {
+		return type;
 	}
 
 	public void setHttpRequestMethod(HttpRequestMethod httpRequestMethod) {

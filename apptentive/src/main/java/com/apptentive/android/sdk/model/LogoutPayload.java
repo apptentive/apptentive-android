@@ -13,10 +13,11 @@ import org.json.JSONException;
 
 public class LogoutPayload extends JsonPayload {
 	public LogoutPayload() {
+		super(PayloadType.logout);
 	}
 
 	public LogoutPayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.logout, json);
 	}
 
 	//region Http-request

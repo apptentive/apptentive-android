@@ -20,12 +20,13 @@ public abstract class JsonPayload extends Payload {
 
 	// These three are not stored in the JSON, only the DB.
 
-	public JsonPayload() {
-		super();
+	public JsonPayload(PayloadType type) {
+		super(type);
 		jsonObject = new JSONObject();
 	}
 
-	public JsonPayload(String json) throws JSONException {
+	public JsonPayload(PayloadType type, String json) throws JSONException {
+		super(type);
 		jsonObject = new JSONObject(json);
 	}
 

@@ -21,7 +21,9 @@ public abstract class ConversationItem extends JsonPayload {
 	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
 	protected static final String KEY_CLIENT_CREATED_AT_UTC_OFFSET = "client_created_at_utc_offset";
 
-	protected ConversationItem() {
+	protected ConversationItem(PayloadType type) {
+		super(type);
+
 		put(KEY_NONCE, getNonce());
 
 		double seconds = Util.currentTimeSeconds();
@@ -31,8 +33,8 @@ public abstract class ConversationItem extends JsonPayload {
 		setClientCreatedAtUtcOffset(utcOffset);
 	}
 
-	protected ConversationItem(String json) throws JSONException {
-		super(json);
+	protected ConversationItem(PayloadType type, String json) throws JSONException {
+		super(type, json);
 	}
 
 	public Double getClientCreatedAt() {

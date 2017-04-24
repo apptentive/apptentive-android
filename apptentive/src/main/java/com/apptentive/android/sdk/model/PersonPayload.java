@@ -28,10 +28,11 @@ public class PersonPayload extends JsonPayload {
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public PersonPayload() {
+		super(PayloadType.person);
 	}
 
 	public PersonPayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.person, json);
 	}
 
 	//region Http-request

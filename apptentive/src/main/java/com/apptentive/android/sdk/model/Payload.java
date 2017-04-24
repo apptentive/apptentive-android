@@ -12,6 +12,8 @@ import java.util.List;
 import java.util.UUID;
 
 public abstract class Payload {
+	private final PayloadType payloadType;
+
 	/**
 	 * A value that can be used to correlate a payload with another object
 	 * (for example, to update the sent status of a message)
@@ -20,7 +22,12 @@ public abstract class Payload {
 
 	private List<Object> attachments; // TODO: Figure out attachment handling
 
-	protected Payload() {
+	protected Payload(PayloadType type) {
+		if (type == null) {
+			throw new IllegalArgumentException("Payload type is null");
+		}
+
+		this.payloadType = type;
 		nonce = UUID.randomUUID().toString();
 	}
 
@@ -53,6 +60,10 @@ public abstract class Payload {
 	//endregion
 
 	//region Getters/Setters
+
+	public PayloadType getPayloadType() {
+		return payloadType;
+	}
 
 	public String getNonce() {
 		return nonce;

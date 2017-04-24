@@ -25,10 +25,11 @@ public class AppReleasePayload extends JsonPayload {
 	private static final String KEY_DEBUG = "debug";
 
 	public AppReleasePayload() {
+		super(PayloadType.app_release);
 	}
 
 	public AppReleasePayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.app_release, json);
 	}
 
 	//region Http-request

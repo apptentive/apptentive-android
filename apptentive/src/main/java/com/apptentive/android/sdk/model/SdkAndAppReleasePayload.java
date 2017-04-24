@@ -33,6 +33,8 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	private final AppReleasePayload appRelease;
 
 	public SdkAndAppReleasePayload() {
+		super(PayloadType.sdk_and_app_release);
+
 		sdk = new SdkPayload();
 		appRelease = new AppReleasePayload();
 
@@ -42,7 +44,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public SdkAndAppReleasePayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.sdk_and_app_release, json);
 
 		sdk = new SdkPayload(getJSONObject("sdk").toString());
 		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());

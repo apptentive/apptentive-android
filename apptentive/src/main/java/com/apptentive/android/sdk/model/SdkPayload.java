@@ -23,10 +23,11 @@ public class SdkPayload extends JsonPayload {
 	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
 
 	public SdkPayload() {
+		super(PayloadType.sdk);
 	}
 
 	public SdkPayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.sdk, json);
 	}
 
 	//region Http-request

@@ -37,14 +37,14 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 
 
 	protected ApptentiveMessage() {
-		super();
+		super(PayloadType.message);
 		state = State.sending;
 		read = true; // This message originated here.
 		initType();
 	}
 
 	protected ApptentiveMessage(String json) throws JSONException {
-		super(json);
+		super(PayloadType.message, json);
 		state = State.unknown;
 		initType();
 	}

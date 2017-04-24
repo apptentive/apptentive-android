@@ -28,11 +28,11 @@ public class EventPayload extends ConversationItem {
 	private static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public EventPayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.event, json);
 	}
 
 	public EventPayload(String label, JSONObject data) {
-		super();
+		super(PayloadType.event);
 		put(KEY_LABEL, label);
 		if (data != null) {
 			put(KEY_DATA, data);
@@ -40,7 +40,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public EventPayload(String label, Map<String, String> data) {
-		super();
+		super(PayloadType.event);
 		try {
 			put(KEY_LABEL, label);
 			if (data != null && !data.isEmpty()) {
@@ -56,7 +56,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public EventPayload(String label, String interactionId, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		super();
+		super(PayloadType.event);
 		try {
 			put(KEY_LABEL, label);
 			if (interactionId != null) {
