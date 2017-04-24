@@ -87,7 +87,7 @@ class FileMessageStore implements MessageStore {
 			if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
 				entry.isRead = true;
 			}
-			entry.json = apptentiveMessage.toString();
+			entry.json = apptentiveMessage.getJsonObject().toString();
 			writeToFile();
 		}
 	}

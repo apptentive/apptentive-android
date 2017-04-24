@@ -23,6 +23,8 @@ import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
+import org.json.JSONObject;
+
 import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
@@ -36,6 +38,8 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_DATA;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
@@ -168,11 +172,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	//region PayloadSender.Listener
 
 	@Override
-	public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage) {
+	public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode, JSONObject responseData) {
 		ApptentiveNotificationCenter.defaultCenter()
 			.postNotification(NOTIFICATION_PAYLOAD_DID_FINISH_SEND,
 				NOTIFICATION_KEY_PAYLOAD, payload,
-				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null && !cancelled ? TRUE : FALSE);
+				NOTIFICATION_KEY_SUCCESSFUL, errorMessage == null && !cancelled ? TRUE : FALSE,
+				NOTIFICATION_KEY_RESPONSE_CODE, responseCode,
+				NOTIFICATION_KEY_RESPONSE_DATA, responseData);
 
 		if (cancelled) {
 			ApptentiveLog.v(PAYLOADS, "Payload sending was cancelled: %s", payload);
@@ -189,7 +195,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
 		}
 
-		deletePayload(payload.getPayloadIdentifier());
+		deletePayload(payload.getNonce());
 	}
 
 	//endregion

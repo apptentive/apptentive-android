@@ -7,12 +7,10 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.TestCaseBase;
-import com.apptentive.android.sdk.model.JsonPayload;
-import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.network.MockHttpRequest;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.DefaultResponseHandler;
@@ -43,7 +41,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage) {
+			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {
@@ -95,6 +93,8 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		private ResponseHandler responseHandler;
 
 		public MockPayload(String key, Object value) {
+			super(PayloadType.unknown); // TODO: figure out a better type
+
 			json = StringUtils.format("{'%s':'%s'}", key, value);
 			responseHandler = new DefaultResponseHandler();
 		}

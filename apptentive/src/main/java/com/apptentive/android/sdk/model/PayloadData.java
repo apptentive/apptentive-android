@@ -15,7 +15,7 @@ public class PayloadData {
 	private byte[] data;
 	private String path;
 	private HttpRequestMethod httpRequestMethod;
-	private String payloadIdentifier;
+	private String nonce;
 
 	public PayloadData(PayloadType type) {
 		this.type = type;
@@ -65,11 +65,11 @@ public class PayloadData {
 		this.httpRequestMethod = httpRequestMethod;
 	}
 
-	public String getPayloadIdentifier() {
-		return payloadIdentifier;
+	public String getNonce() {
+		return nonce;
 	}
 
-	public void setPayloadIdentifier(String payloadIdentifier) {
-		this.payloadIdentifier = payloadIdentifier;
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
 	}
 }

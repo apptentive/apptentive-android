@@ -41,7 +41,7 @@ public class ApptentiveNotifications {
 	/**
 	 * Sent after payload sending if finished (might be successful or not)
 	 */
-	public static final String NOTIFICATION_PAYLOAD_DID_FINISH_SEND = "NOTIFICATION_PAYLOAD_DID_FINISH_SEND";  // { successful : boolean, payload: PayloadData }
+	public static final String NOTIFICATION_PAYLOAD_DID_FINISH_SEND = "NOTIFICATION_PAYLOAD_DID_FINISH_SEND";  // { successful : boolean, payload: PayloadData, responseCode: int, responseData: JSONObject }
 
 	/**
 	 * Sent if user requested to close all interactions.
@@ -53,4 +53,6 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
 	public static final String NOTIFICATION_KEY_CONVERSATION = "conversation";
 	public static final String NOTIFICATION_KEY_PAYLOAD = "payload";
+	public static final String NOTIFICATION_KEY_RESPONSE_CODE = "responseCode";
+	public static final String NOTIFICATION_KEY_RESPONSE_DATA = "responseData";
 }

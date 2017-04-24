@@ -7,11 +7,12 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
 import com.apptentive.android.sdk.util.StringUtils;
+
+import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
@@ -83,7 +84,7 @@ class PayloadSender {
 			}
 
 			// if an exception was thrown - mark payload as failed
-			handleFinishSendingPayload(payload, false, message);
+			handleFinishSendingPayload(payload, false, message, -1, null); // FIXME: a better approach
 		}
 
 		return true;
@@ -100,17 +101,23 @@ class PayloadSender {
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
 			@Override
 			public void onFinish(HttpRequest request) {
-				handleFinishSendingPayload(payload, false, null);
+				try {
+					final JSONObject responseData = new JSONObject(request.getResponseData());
+					handleFinishSendingPayload(payload, false, null, request.getResponseCode(), responseData);
+				} catch (Exception e) {
+					ApptentiveLog.e(PAYLOADS, "Exception while handling payload send response");
+					handleFinishSendingPayload(payload, false, null, -1, null);
+				}
 			}
 
 			@Override
 			public void onCancel(HttpRequest request) {
-				handleFinishSendingPayload(payload, true, null);
+				handleFinishSendingPayload(payload, true, null, request.getResponseCode(), null);
 			}
 
 			@Override
 			public void onFail(HttpRequest request, String reason) {
-				handleFinishSendingPayload(payload, false, reason);
+				handleFinishSendingPayload(payload, false, reason, request.getResponseCode(), null);
 			}
 		});
 
@@ -124,16 +131,18 @@ class PayloadSender {
 
 	/**
 	 * Executed when we're done with the current payload
-	 *  @param payload      - current payload
+	 * @param payload      - current payload
 	 * @param cancelled    - flag indicating if payload Http-request was cancelled
 	 * @param errorMessage - if not <code>null</code> - payload request failed
+	 * @param responseCode - http-request response code
+	 * @param responseData - http-reqeust response json (or null if failed)
 	 */
-	private synchronized void handleFinishSendingPayload(PayloadData payload, boolean cancelled, String errorMessage) {
+	private synchronized void handleFinishSendingPayload(PayloadData payload, boolean cancelled, String errorMessage, int responseCode, JSONObject responseData) {
 		sendingFlag = false; // mark sender as 'not busy'
 
 		try {
 			if (listener != null) {
-				listener.onFinishSending(this, payload, cancelled, errorMessage);
+				listener.onFinishSending(this, payload, cancelled, errorMessage, responseCode, responseData);
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while notifying payload listener");
@@ -160,7 +169,7 @@ class PayloadSender {
 	//region Listener
 
 	public interface Listener {
-		void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage);
+		void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode, JSONObject responseData);
 	}
 
 	//endregion
