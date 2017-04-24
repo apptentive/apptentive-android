@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.storage.MessageStore;
@@ -87,7 +87,7 @@ class FileMessageStore implements MessageStore {
 			if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
 				entry.isRead = true;
 			}
-			entry.json = apptentiveMessage.toString();
+			entry.json = apptentiveMessage.getJsonObject().toString();
 			writeToFile();
 		}
 	}
@@ -154,6 +154,20 @@ class FileMessageStore implements MessageStore {
 				break;
 			}
 		}
+	}
+
+	@Override
+	public ApptentiveMessage findMessage(String nonce) {
+		fetchEntries();
+
+		for (int i = 0; i < messageEntries.size(); ++i) {
+			final MessageEntry messageEntry = messageEntries.get(i);
+			if (StringUtils.equal(nonce, messageEntry.nonce)) {
+				return MessageFactory.fromJson(messageEntry.json);
+			}
+		}
+
+		return null;
 	}
 
 	//endregion

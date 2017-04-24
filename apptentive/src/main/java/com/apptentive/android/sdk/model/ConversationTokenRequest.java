@@ -12,8 +12,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ConversationTokenRequest extends JSONObject {
-
-
 	public ConversationTokenRequest() {
 	}
 
@@ -43,9 +41,9 @@ public class ConversationTokenRequest extends JSONObject {
 
 	public void setAppRelease(AppReleasePayload appRelease) {
 		try {
-			put(appRelease.getBaseType().name(), appRelease);
+			put(AppReleasePayload.KEY, appRelease);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getBaseType().name());
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", AppReleasePayload.KEY);
 		}
 	}
 }

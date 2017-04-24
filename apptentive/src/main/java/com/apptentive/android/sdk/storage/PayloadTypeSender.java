@@ -7,8 +7,8 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.JsonPayload;
 
-interface PayloadTypeSender<T extends Payload> {
+interface PayloadTypeSender<T extends JsonPayload> {
 	ApptentiveHttpResponse sendPayload(T payload);
 }

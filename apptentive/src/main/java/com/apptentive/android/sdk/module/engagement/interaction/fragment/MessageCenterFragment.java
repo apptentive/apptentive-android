@@ -42,14 +42,13 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -726,10 +725,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@SuppressWarnings("unchecked")
 	// We should never get a message passed in that is not appropriate for the view it goes into.
-	public synchronized void onMessageSent(ApptentiveHttpResponse response, final ApptentiveMessage apptentiveMessage) {
-		if (response.isSuccessful() || response.isRejectedPermanently() || response.isBadPayload()) {
-			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_SENT,
-				apptentiveMessage));
+	public synchronized void onMessageSent(int responseCode, final ApptentiveMessage apptentiveMessage) {
+		final boolean isRejectedPermanently = responseCode >= 400 && responseCode < 500;
+		final boolean isSuccessful = responseCode >= 200 && responseCode < 300;
+
+		if (isSuccessful || isRejectedPermanently || responseCode == -1) {
+			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_MESSAGE_SENT, apptentiveMessage));
 		}
 	}
 

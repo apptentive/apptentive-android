@@ -6,127 +6,46 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
+import java.util.UUID;
 
-public abstract class Payload extends JSONObject {
-
-	// These three are not stored in the JSON, only the DB.
-	private Long databaseId; // FIXME: use 'long' instead
-	private BaseType baseType;
-	private String conversationId;
-	private String token;
-
-	public Payload() {
-		initBaseType();
-	}
-
-	public Payload(String json) throws JSONException {
-		super(json);
-		initBaseType();
-	}
-
-	public Payload(String json, String conversationId, String token) throws JSONException {
-		this(json);
-		this.conversationId = conversationId;
-		this.token = token;
-	}
+public abstract class Payload {
+	private final PayloadType payloadType;
 
 	/**
-	 * Each subclass must set its type in this method.
+	 * A value that can be used to correlate a payload with another object
+	 * (for example, to update the sent status of a message)
 	 */
-	protected abstract void initBaseType();
+	private String nonce;
 
-	/**
-	 * Subclasses should override this method if there is any peculiarity in how they present or wrap json before sending.
-	 *
-	 * @return A wrapper object containing the name of the object type, the value of which is the contents of this Object.
-	 */
-	public String marshallForSending() {
-		JSONObject wrapper = new JSONObject();
-		try {
-			wrapper.put(getBaseType().name(), this);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error wrapping Payload in JSONObject.", e);
-			return null;
-		}
-		return wrapper.toString();
-	}
+	private List<Object> attachments; // TODO: Figure out attachment handling
 
-	public long getDatabaseId() {
-		return databaseId;
-	}
-
-	public void setDatabaseId(long databaseId) {
-		this.databaseId = databaseId;
-	}
-
-	public BaseType getBaseType() {
-		return baseType;
-	}
-
-	protected void setBaseType(BaseType baseType) {
-		this.baseType = baseType;
-	}
-
-	public String getConversationId() {
-		return conversationId;
-	}
-
-	public void setConversationId(String conversationId) {
-		this.conversationId = conversationId;
-	}
-
-	public void setToken(String token) {
-		this.token = token;
-	}
-
-	public String getToken() {
-		return token;
-	}
-
-	public enum BaseType {
-		message,
-		event,
-		device,
-		sdk,
-		app_release,
-		sdk_and_app_release,
-		person,
-		logout,
-		unknown,
-		// Legacy
-		survey;
-
-		public static BaseType parse(String type) {
-			try {
-				return BaseType.valueOf(type);
-			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Payload.BaseType: " + type);
-			}
-			return unknown;
+	protected Payload(PayloadType type) {
+		if (type == null) {
+			throw new IllegalArgumentException("Payload type is null");
 		}
 
+		this.payloadType = type;
+		nonce = UUID.randomUUID().toString();
 	}
 
+	//region Data
+
 	/**
-	 * @deprecated Do not use this method to check for key existence. Instead us !isNull(KEY_NAME), as this works better
-	 * with keys with null values.
+	 * Binary data to be stored in database
 	 */
-	@Override
-	public boolean has(String key) {
-		return super.has(key);
-	}
+	public abstract byte[] getData();
+
+	//region
 
 	//region Http-request
 
 	/**
 	 * Http endpoint for sending this payload
 	 */
-	public abstract String getHttpEndPoint();
+	public abstract String getHttpEndPoint(String conversationId);
 
 	/**
 	 * Http request method for sending this payload
@@ -137,6 +56,30 @@ public abstract class Payload extends JSONObject {
 	 * Http content type for sending this payload
 	 */
 	public abstract String getHttpRequestContentType();
+
+	//endregion
+
+	//region Getters/Setters
+
+	public PayloadType getPayloadType() {
+		return payloadType;
+	}
+
+	public String getNonce() {
+		return nonce;
+	}
+
+	public void setNonce(String nonce) {
+		this.nonce = nonce;
+	}
+
+	public List<Object> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Object> attachments) {
+		this.attachments = attachments;
+	}
 
 	//endregion
 }

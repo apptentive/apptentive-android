@@ -27,47 +27,34 @@ import org.json.JSONException;
  * and {@link AppReleasePayload} payloads (which still kept for backward compatibility
  * purposes).
  */
-public class SdkAndAppReleasePayload extends Payload {
+public class SdkAndAppReleasePayload extends JsonPayload {
 
 	private final SdkPayload sdk;
 	private final AppReleasePayload appRelease;
 
-	public static SdkAndAppReleasePayload fromJson(String json) {
-		try {
-			return new SdkAndAppReleasePayload(json);
-		} catch (JSONException e) {
-			ApptentiveLog.v("Error parsing json as SdkAndAppReleasePayload: %s", e, json);
-		} catch (IllegalArgumentException e) {
-			// Unknown unknown #rumsfeld
-		}
-		return null;
+	public SdkAndAppReleasePayload() {
+		super(PayloadType.sdk_and_app_release);
+
+		sdk = new SdkPayload();
+		appRelease = new AppReleasePayload();
+
+		// TODO: a better solution
+		put("sdk", sdk.getJsonObject());
+		put("app_release", appRelease.getJsonObject());
 	}
 
-	private SdkAndAppReleasePayload(String json) throws JSONException {
-		super(json);
+	public SdkAndAppReleasePayload(String json) throws JSONException {
+		super(PayloadType.sdk_and_app_release, json);
 
 		sdk = new SdkPayload(getJSONObject("sdk").toString());
 		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());
 	}
 
-	public SdkAndAppReleasePayload() {
-		super();
-		sdk = new SdkPayload();
-		appRelease = new AppReleasePayload();
-
-		try {
-			put("sdk", sdk);
-			put("app_release", appRelease);
-		} catch (JSONException e) {
-			throw new IllegalStateException(e); // that should not happen but we can't ignore that
-		}
-	}
-
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/sdkapprelease", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/sdkapprelease", conversationId);
 	}
 
 	@Override
@@ -80,12 +67,6 @@ public class SdkAndAppReleasePayload extends Payload {
 		return "application/json";
 	}
 
-	//endregion
-
-	//region Inheritance
-	public void initBaseType() {
-		setBaseType(BaseType.sdk_and_app_release);
-	}
 	//endregion
 
 	//region Sdk getters/setters

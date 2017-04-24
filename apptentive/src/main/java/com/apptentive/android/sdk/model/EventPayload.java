@@ -28,23 +28,19 @@ public class EventPayload extends ConversationItem {
 	private static final String KEY_CUSTOM_DATA = "custom_data";
 
 	public EventPayload(String json) throws JSONException {
-		super(json);
+		super(PayloadType.event, json);
 	}
 
 	public EventPayload(String label, JSONObject data) {
-		super();
-		try {
-			put(KEY_LABEL, label);
-			if (data != null) {
-				put(KEY_DATA, data);
-			}
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to construct Event.", e);
+		super(PayloadType.event);
+		put(KEY_LABEL, label);
+		if (data != null) {
+			put(KEY_DATA, data);
 		}
 	}
 
 	public EventPayload(String label, Map<String, String> data) {
-		super();
+		super(PayloadType.event);
 		try {
 			put(KEY_LABEL, label);
 			if (data != null && !data.isEmpty()) {
@@ -60,7 +56,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public EventPayload(String label, String interactionId, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		super();
+		super(PayloadType.event);
 		try {
 			put(KEY_LABEL, label);
 			if (interactionId != null) {
@@ -88,7 +84,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public String getEventLabel() {
-		return optString(KEY_LABEL, null);
+		return getString(KEY_LABEL);
 	}
 
 	private JSONObject generateCustomDataJson(Map<String, Object> customData) {
@@ -108,7 +104,7 @@ public class EventPayload extends ConversationItem {
 
 	public EventPayload(String label, String trigger) {
 		this(label, (Map<String, String>) null);
-		Map<String, String> data = new HashMap<String, String>();
+		Map<String, String> data = new HashMap<>();
 		data.put(KEY_TRIGGER, trigger);
 		putData(data);
 	}
@@ -116,8 +112,8 @@ public class EventPayload extends ConversationItem {
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/event", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/event", conversationId);
 	}
 
 	@Override
@@ -131,11 +127,6 @@ public class EventPayload extends ConversationItem {
 	}
 
 	//endregion
-
-	@Override
-	protected void initBaseType() {
-		setBaseType(BaseType.event);
-	}
 
 	public void putData(Map<String, String> data) {
 		if (data == null || data.isEmpty()) {

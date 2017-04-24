@@ -22,13 +22,8 @@ public class SurveyResponsePayload extends ConversationItem {
 
 	private static final String KEY_SURVEY_ANSWERS = "answers";
 
-	public SurveyResponsePayload(String json) throws JSONException {
-		super(json);
-	}
-
 	public SurveyResponsePayload(SurveyInteraction definition, Map<String, Object> answers) {
-		super();
-
+		super(PayloadType.survey);
 		try {
 			put(KEY_SURVEY_ID, definition.getId());
 			JSONObject answersJson = new JSONObject();
@@ -42,11 +37,15 @@ public class SurveyResponsePayload extends ConversationItem {
 		}
 	}
 
+	public SurveyResponsePayload(String json) throws JSONException {
+		super(PayloadType.survey, json);
+	}
+
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/surveys/%s/respond", getConversationId(), getId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/surveys/%s/respond", conversationId, getId());
 	}
 
 	@Override
@@ -62,11 +61,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	//endregion
 
 	public String getId() {
-		return optString(KEY_SURVEY_ID, "");
+		return getString(KEY_SURVEY_ID);
 	}
 
-	@Override
-	protected void initBaseType() {
-		setBaseType(BaseType.survey);
-	}
 }

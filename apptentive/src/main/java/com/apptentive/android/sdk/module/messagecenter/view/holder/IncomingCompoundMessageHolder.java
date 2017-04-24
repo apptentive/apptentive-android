@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;

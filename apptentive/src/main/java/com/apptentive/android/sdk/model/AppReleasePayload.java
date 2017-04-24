@@ -6,20 +6,13 @@
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-
-import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
-import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
-public class AppReleasePayload extends Payload {
+public class AppReleasePayload extends JsonPayload {
+
+	public static final String KEY = "app_release";
 
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION_NAME = "version_name";
@@ -31,18 +24,18 @@ public class AppReleasePayload extends Payload {
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 	private static final String KEY_DEBUG = "debug";
 
-	public AppReleasePayload(String json) throws JSONException {
-		super(json);
+	public AppReleasePayload() {
+		super(PayloadType.app_release);
 	}
 
-	public AppReleasePayload() {
-		super();
+	public AppReleasePayload(String json) throws JSONException {
+		super(PayloadType.app_release, json);
 	}
 
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
+	public String getHttpEndPoint(String conversationId) {
 		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
 	}
 
@@ -58,175 +51,80 @@ public class AppReleasePayload extends Payload {
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.app_release);
-	}
-
 	public String getType() {
-		if (!isNull(KEY_TYPE)) {
-			return optString(KEY_TYPE, null);
-		}
-		return null;
+		return getString(KEY_TYPE);
 	}
 
 	public void setType(String type) {
-		try {
-			put(KEY_TYPE, type);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TYPE);
-		}
+		put(KEY_TYPE, type);
 	}
 
 	public String getVersionName() {
-		if (!isNull(KEY_VERSION_NAME)) {
-			return optString(KEY_VERSION_NAME, null);
-		}
-		return null;
+		return getString(KEY_VERSION_NAME);
 	}
 
 	public void setVersionName(String versionName) {
-		try {
-			put(KEY_VERSION_NAME, versionName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_NAME);
-		}
+		put(KEY_VERSION_NAME, versionName);
 	}
 
 	public int getVersionCode() {
 		if (!isNull(KEY_VERSION_CODE)) {
-			return optInt(KEY_VERSION_CODE, -1);
+			return getInt(KEY_VERSION_CODE);
 		}
 		return -1;
 	}
 
 	public void setVersionCode(int versionCode) {
-		try {
-			put(KEY_VERSION_CODE, versionCode);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_CODE);
-		}
+		put(KEY_VERSION_CODE, versionCode);
 	}
 
 	public String getIdentifier() {
-		if (!isNull(KEY_IDENTIFIER)) {
-			return optString(KEY_IDENTIFIER, null);
-		}
-		return null;
+		return getString(KEY_IDENTIFIER);
 	}
 
 	public void setIdentifier(String identifier) {
-		try {
-			put(KEY_IDENTIFIER, identifier);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
-		}
+		put(KEY_IDENTIFIER, identifier);
 	}
 
 	public String getTargetSdkVersion() {
-		if (!isNull(KEY_TARGET_SDK_VERSION)) {
-			return optString(KEY_TARGET_SDK_VERSION);
-		}
-		return null;
+		return getString(KEY_TARGET_SDK_VERSION);
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
-		try {
-			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
-		}
+		put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
 	}
 
 	public String getAppStore() {
-		if (!isNull(KEY_APP_STORE)) {
-			return optString(KEY_APP_STORE, null);
-		}
-		return null;
+		return getString(KEY_APP_STORE);
 	}
 
 	public void setAppStore(String appStore) {
-		try {
-			put(KEY_APP_STORE, appStore);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_APP_STORE);
-		}
+		put(KEY_APP_STORE, appStore);
 	}
 
 	// Flag for whether the apptentive is inheriting styles from the host app
 	public boolean getInheritStyle() {
-		return optBoolean(KEY_STYLE_INHERIT);
+		return getBoolean(KEY_STYLE_INHERIT);
 	}
 
 	public void setInheritStyle(boolean inheritStyle) {
-		try {
-			put(KEY_STYLE_INHERIT, inheritStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
-		}
+		put(KEY_STYLE_INHERIT, inheritStyle);
 	}
 
 	// Flag for whether the app is overriding any Apptentive Styles
 	public boolean getOverrideStyle() {
-		return optBoolean(KEY_STYLE_OVERRIDE);
+		return getBoolean(KEY_STYLE_OVERRIDE);
 	}
 
 	public void setOverrideStyle(boolean overrideStyle) {
-		try {
-			put(KEY_STYLE_OVERRIDE, overrideStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
-		}
+		put(KEY_STYLE_OVERRIDE, overrideStyle);
 	}
 
 	public boolean getDebug() {
-		return optBoolean(KEY_DEBUG);
+		return getBoolean(KEY_DEBUG);
 	}
 
 	public void setDebug(boolean debug) {
-		try {
-			put(KEY_DEBUG, debug);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_DEBUG);
-		}
-	}
-
-	public static AppReleasePayload generateCurrentAppRelease(Context context) {
-
-		AppReleasePayload appRelease = new AppReleasePayload();
-
-		String appPackageName = context.getPackageName();
-		PackageManager packageManager = context.getPackageManager();
-
-		int currentVersionCode = 0;
-		String currentVersionName = "0";
-		int targetSdkVersion = 0;
-		boolean isAppDebuggable = false;
-		try {
-			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
-			ApplicationInfo ai = packageInfo.applicationInfo;
-			currentVersionCode = packageInfo.versionCode;
-			currentVersionName = packageInfo.versionName;
-			targetSdkVersion = packageInfo.applicationInfo.targetSdkVersion;
-			Bundle metaData = ai.metaData;
-			if (metaData != null) {
-				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
-		}
-
-		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
-
-		appRelease.setType("android");
-		appRelease.setVersionName(currentVersionName);
-		appRelease.setIdentifier(appPackageName);
-		appRelease.setVersionCode(currentVersionCode);
-		appRelease.setTargetSdkVersion(String.valueOf(targetSdkVersion));
-		appRelease.setAppStore(Util.getInstallerPackageName(context));
-		appRelease.setInheritStyle(ApptentiveInternal.getInstance().isAppUsingAppCompatTheme());
-		appRelease.setOverrideStyle(themeOverrideResId != 0);
-		appRelease.setDebug(isAppDebuggable);
-
-		return appRelease;
+		put(KEY_DEBUG, debug);
 	}
 }

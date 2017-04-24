@@ -528,8 +528,12 @@ public class HttpRequest {
 		this.callbackQueue = callbackQueue;
 	}
 
-	String getResponseData() {
+	public String getResponseData() {
 		return responseData;
+	}
+
+	public int getResponseCode() {
+		return responseCode;
 	}
 
 	public HttpRequest setRetryPolicy(HttpRequestRetryPolicy retryPolicy) {

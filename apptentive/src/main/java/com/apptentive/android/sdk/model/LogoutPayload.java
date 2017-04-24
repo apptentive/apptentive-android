@@ -11,25 +11,20 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
-public class LogoutPayload extends Payload {
+public class LogoutPayload extends JsonPayload {
 	public LogoutPayload() {
-		super();
+		super(PayloadType.logout);
 	}
 
 	public LogoutPayload(String json) throws JSONException {
-		super(json);
-	}
-
-	@Override
-	protected void initBaseType() {
-		setBaseType(BaseType.logout);
+		super(PayloadType.logout, json);
 	}
 
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/logout", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/logout", conversationId);
 	}
 
 	@Override

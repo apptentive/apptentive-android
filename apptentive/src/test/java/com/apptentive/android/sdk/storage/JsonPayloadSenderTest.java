@@ -7,25 +7,25 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.TestCaseBase;
-import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PayloadData;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.network.MockHttpRequest;
-import com.apptentive.android.sdk.network.MockHttpURLConnection;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.DefaultResponseHandler;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.ResponseHandler;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-public class PayloadSenderTest extends TestCaseBase {
+public class JsonPayloadSenderTest extends TestCaseBase {
 	private MockDispatchQueue networkQueue;
 
 	@Before
@@ -42,7 +42,7 @@ public class PayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, Payload payload, boolean cancelled, String errorMessage) {
+			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode, JSONObject responseData) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {
@@ -89,19 +89,15 @@ public class PayloadSenderTest extends TestCaseBase {
 		);
 	}
 
-	class MockPayload extends Payload {
+	class MockPayload extends PayloadData {
 		private final String json;
 		private ResponseHandler responseHandler;
 
 		public MockPayload(String key, Object value) {
+			super(PayloadType.unknown, nonce, data, authToken, contentType, path, httpRequestMethod); // TODO: figure out a better type
+
 			json = StringUtils.format("{'%s':'%s'}", key, value);
 			responseHandler = new DefaultResponseHandler();
-			setDatabaseId(0L);
-		}
-
-		@Override
-		protected void initBaseType() {
-			setBaseType(BaseType.event);
 		}
 
 		public MockPayload setResponseCode(int responseCode) {
@@ -119,21 +115,6 @@ public class PayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public String getHttpEndPoint() {
-			return null;
-		}
-
-		@Override
-		public HttpRequestMethod getHttpRequestMethod() {
-			return null;
-		}
-
-		@Override
-		public String getHttpRequestContentType() {
-			return null;
-		}
-
-		@Override
 		public String toString() {
 			return json;
 		}
@@ -147,8 +128,7 @@ public class PayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public HttpRequest sendPayload(Payload payload, HttpRequest.Listener<HttpRequest> listener) {
-
+		public HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());
 			request.addListener(listener);

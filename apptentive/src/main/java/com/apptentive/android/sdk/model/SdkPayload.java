@@ -6,16 +6,11 @@
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
-import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
-/**
- * @author Sky Kelsey
- */
-public class SdkPayload extends Payload {
+public class SdkPayload extends JsonPayload {
 
 	public static final String KEY = "sdk";
 
@@ -27,167 +22,104 @@ public class SdkPayload extends Payload {
 	private static final String KEY_DISTRIBUTION = "distribution";
 	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
 
-	public SdkPayload(String json) throws JSONException {
-		super(json);
+	public SdkPayload() {
+		super(PayloadType.sdk);
 	}
 
-	public SdkPayload() {
-		super();
+	public SdkPayload(String json) throws JSONException {
+		super(PayloadType.sdk, json);
 	}
 
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+	public String getHttpEndPoint(String conversationId) {
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
 	}
 
 	@Override
 	public HttpRequestMethod getHttpRequestMethod() {
-		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
 	}
 
 	@Override
 	public String getHttpRequestContentType() {
-		throw new RuntimeException(getClass().getName() +  " is deprecated"); // FIXME: find a better approach
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
 	}
 
 	//endregion
 
-	public void initBaseType() {
-		setBaseType(BaseType.sdk);
-	}
-
 	public String getVersion() {
-		try {
-			if(!isNull(KEY_VERSION)) {
-				return getString(KEY_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_VERSION)) {
+			return getString(KEY_VERSION);
 		}
 		return null;
 	}
 
 	public void setVersion(String version) {
-		try {
-			put(KEY_VERSION, version);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_VERSION);
-		}
+		put(KEY_VERSION, version);
 	}
 
 	public String getProgrammingLanguage() {
-		try {
-			if(!isNull(KEY_PROGRAMMING_LANGUAGE)) {
-				return getString(KEY_PROGRAMMING_LANGUAGE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_PROGRAMMING_LANGUAGE);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
-		try {
-			put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
-		}
+		put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
 	}
 
 	public String getAuthorName() {
-		try {
-			if(!isNull(KEY_AUTHOR_NAME)) {
-				return getString(KEY_AUTHOR_NAME);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_AUTHOR_NAME)) {
+			return getString(KEY_AUTHOR_NAME);
 		}
 		return null;
 	}
 
 	public void setAuthorName(String authorName) {
-		try {
-			put(KEY_AUTHOR_NAME, authorName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_NAME);
-		}
+		put(KEY_AUTHOR_NAME, authorName);
 	}
 
 	public String getAuthorEmail() {
-		try {
-			if(!isNull(KEY_AUTHOR_EMAIL)) {
-				return getString(KEY_AUTHOR_EMAIL);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_AUTHOR_EMAIL)) {
+			return getString(KEY_AUTHOR_EMAIL);
 		}
 		return null;
 	}
 
 	public void setAuthorEmail(String authorEmail) {
-		try {
-			put(KEY_AUTHOR_EMAIL, authorEmail);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
-		}
+		put(KEY_AUTHOR_EMAIL, authorEmail);
 	}
 
 	public String getPlatform() {
-		try {
-			if(!isNull(KEY_PLATFORM)) {
-				return getString(KEY_PLATFORM);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_PLATFORM)) {
+			return getString(KEY_PLATFORM);
 		}
 		return null;
 	}
 
 	public void setPlatform(String platform) {
-		try {
-			put(KEY_PLATFORM, platform);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PLATFORM);
-		}
+		put(KEY_PLATFORM, platform);
 	}
 
 	public String getDistribution() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION)) {
-				return getString(KEY_DISTRIBUTION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_DISTRIBUTION)) {
+			return getString(KEY_DISTRIBUTION);
 		}
 		return null;
 	}
 
 	public void setDistribution(String distribution) {
-		try {
-			put(KEY_DISTRIBUTION, distribution);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
-		}
+		put(KEY_DISTRIBUTION, distribution);
 	}
 
 	public String getDistributionVersion() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION_VERSION)) {
-				return getString(KEY_DISTRIBUTION_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
+		if (!isNull(KEY_DISTRIBUTION_VERSION)) {
+			return getString(KEY_DISTRIBUTION_VERSION);
 		}
 		return null;
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
-		try {
-			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
-		}
+		put(KEY_DISTRIBUTION_VERSION, distributionVersion);
 	}
 }

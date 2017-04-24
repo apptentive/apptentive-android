@@ -58,7 +58,7 @@ public abstract class ExtendedData extends JSONObject {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown ExtendedData.BaseType: " + type);
+				ApptentiveLog.v("Error parsing unknown ExtendedData.PayloadType: " + type);
 			}
 			return unknown;
 		}

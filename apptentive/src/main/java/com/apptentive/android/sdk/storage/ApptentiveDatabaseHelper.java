@@ -15,11 +15,15 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
+import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.model.PayloadFactory;
+import com.apptentive.android.sdk.model.PayloadData;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
@@ -28,8 +32,10 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
+import static com.apptentive.android.sdk.debug.Assert.notNull;
 
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
@@ -40,39 +46,74 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
-	private File fileDir; // data dir of the application
+	private final DataSource dataSource;
+	private final File fileDir; // data dir of the application
 
 	//region Payload SQL
 
-	public static final String TABLE_PAYLOAD = "payload";
-	public static final String PAYLOAD_KEY_DB_ID = "_id";           // 0
-	public static final String PAYLOAD_KEY_BASE_TYPE = "base_type"; // 1
-	public static final String PAYLOAD_KEY_JSON = "json";           // 2
-	private static final String PAYLOAD_KEY_CONVERSATION_ID = "conversation_id"; // 3
-	private static final String PAYLOAD_KEY_TOKEN = "token"; // 4
+	static final class PayloadEntry {
+		static final String TABLE_NAME = "pending_payload";
+		static final DatabaseColumn COLUMN_PRIMARY_KEY = new DatabaseColumn(0, "_id");
+		static final DatabaseColumn COLUMN_PAYLOAD_TYPE = new DatabaseColumn(1, "payloadType");
+		static final DatabaseColumn COLUMN_IDENTIFIER = new DatabaseColumn(2, "identifier");
+		static final DatabaseColumn COLUMN_CONTENT_TYPE = new DatabaseColumn(3, "contentType");
+		static final DatabaseColumn COLUMN_AUTH_TOKEN = new DatabaseColumn(4, "authToken");
+		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(5, "conversationId");
+		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
+		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
+		static final DatabaseColumn COLUMN_DATA = new DatabaseColumn(8, "data");
+	}
+
+	static final class LegacyPayloadEntry {
+		static final String TABLE_NAME = "payload";
+		static final DatabaseColumn PAYLOAD_KEY_DB_ID = new DatabaseColumn(0, "_id");
+		static final DatabaseColumn PAYLOAD_KEY_BASE_TYPE = new DatabaseColumn(1, "base_type");
+		static final DatabaseColumn PAYLOAD_KEY_JSON = new DatabaseColumn(2, "json");
+	}
 
 	private static final String TABLE_CREATE_PAYLOAD =
-		"CREATE TABLE " + TABLE_PAYLOAD +
+		"CREATE TABLE " + PayloadEntry.TABLE_NAME +
 			" (" +
-			PAYLOAD_KEY_DB_ID + " INTEGER PRIMARY KEY, " +
-			PAYLOAD_KEY_BASE_TYPE + " TEXT, " +
-			PAYLOAD_KEY_JSON + " TEXT," +
-			PAYLOAD_KEY_CONVERSATION_ID + " TEXT," +
-			PAYLOAD_KEY_TOKEN + " TEXT" +
+			PayloadEntry.COLUMN_PRIMARY_KEY + " INTEGER PRIMARY KEY, " +
+			PayloadEntry.COLUMN_PAYLOAD_TYPE + " TEXT, " +
+			PayloadEntry.COLUMN_IDENTIFIER + " TEXT, " +
+			PayloadEntry.COLUMN_CONTENT_TYPE + " TEXT," +
+			PayloadEntry.COLUMN_AUTH_TOKEN + " TEXT," +
+			PayloadEntry.COLUMN_CONVERSATION_ID + " TEXT," +
+			PayloadEntry.COLUMN_REQUEST_METHOD + " TEXT," +
+			PayloadEntry.COLUMN_PATH + " TEXT," +
+			PayloadEntry.COLUMN_DATA + " BLOB" +
 			");";
 
-	public static final String QUERY_PAYLOAD_GET_NEXT_TO_SEND = "SELECT * FROM " + TABLE_PAYLOAD + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC LIMIT 1";
-	private static final String QUERY_UPDATE_INCOMPLETE_PAYLOADS = StringUtils.format("UPDATE %s SET %s = ?, %s = ? WHERE %s IS NULL OR %s IS NULL", TABLE_PAYLOAD, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN, PAYLOAD_KEY_CONVERSATION_ID, PAYLOAD_KEY_TOKEN);
+	private static final String SQL_QUERY_PAYLOAD_LIST_LEGACY =
+		"SELECT * FROM " + LegacyPayloadEntry.TABLE_NAME +
+			" ORDER BY " + LegacyPayloadEntry.PAYLOAD_KEY_DB_ID;
 
-	private static final String QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER = "SELECT * FROM " + TABLE_PAYLOAD + " WHERE " + PAYLOAD_KEY_BASE_TYPE + " = ?" + " ORDER BY " + PAYLOAD_KEY_DB_ID + " ASC";
-	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_CONVERSATION_ID + " TEXT";
-	private static final String UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN = "ALTER TABLE " + TABLE_PAYLOAD + " ADD COLUMN " + PAYLOAD_KEY_TOKEN + " TEXT";
+	private static final String SQL_QUERY_PAYLOAD_GET_NEXT_TO_SEND =
+		"SELECT * FROM " + PayloadEntry.TABLE_NAME +
+			" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY +
+			" ASC LIMIT 1";
+
+	private static final String SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS =
+		"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
+			PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
+			PayloadEntry.COLUMN_CONVERSATION_ID + " = ? " +
+			"WHERE " +
+			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL OR " +
+			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
+
+	private static final String SQL_QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER =
+		"SELECT * FROM " + PayloadEntry.TABLE_NAME +
+			" WHERE " + LegacyPayloadEntry.PAYLOAD_KEY_BASE_TYPE + " = ?" +
+			" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY +
+			" ASC";
 
 	//endregion
 
-	//region Message SQL
+	//region Message SQL (region)
 
 	private static final String TABLE_MESSAGE = "message";
+
 	private static final String MESSAGE_KEY_DB_ID = "_id";                           // 0
 	private static final String MESSAGE_KEY_ID = "id";                               // 1
 	private static final String MESSAGE_KEY_CLIENT_CREATED_AT = "client_created_at"; // 2
@@ -101,7 +142,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region File SQL
+	//region File SQL (legacy)
 
 	private static final String TABLE_FILESTORE = "file_store";
 	private static final String FILESTORE_KEY_ID = "id";                         // 0
@@ -121,7 +162,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region Compound Message FileStore SQL
+	//region Compound Message FileStore SQL (legacy)
+
 	/* Compound Message FileStore:
 	 * For Compound Messages stored in TABLE_MESSAGE, each associated file will add a row to this table
 	 * using the message's "nonce" key
@@ -152,10 +194,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// endregion
 
-
-	public ApptentiveDatabaseHelper(Context context) {
+	ApptentiveDatabaseHelper(Context context, DataSource dataSource) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		fileDir = context.getFilesDir();
+		if (dataSource == null) {
+			throw new IllegalArgumentException("Data source is null");
+		}
+
+		this.dataSource = dataSource;
+		this.fileDir = context.getFilesDir();
 	}
 
 	//region Create & Upgrade
@@ -168,6 +214,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onCreate(db)");
 		db.execSQL(TABLE_CREATE_PAYLOAD);
+
+		// TODO: remove legacy tables
 		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
 		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
@@ -182,13 +230,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
-				upgradeVersion1to2(db);
+				upgradeVersion1to3(db);
 			case 2:
 				upgradeVersion2to3(db);
 		}
 	}
 
-	private void upgradeVersion1to2(SQLiteDatabase db) {
+	private void upgradeVersion1to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v1 to v2");
 		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
 		Cursor cursor = null;
@@ -230,7 +278,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(6);
-					JSONObject root = null;
+					JSONObject root;
 					boolean bUpdateRecord = false;
 					try {
 						root = new JSONObject(json);
@@ -275,7 +323,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// Migrate all pending payload messages
 		// Migrate legacy message types to CompoundMessage Type
 		try {
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{Payload.BaseType.message.name()});
+			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{PayloadType.message.name()});
 			if (cursor.moveToFirst()) {
 				do {
 					String json = cursor.getString(2);
@@ -305,10 +353,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 								break;
 						}
 						if (bUpdateRecord) {
-							String databaseId = cursor.getString(0);
+							String databaseId = cursor.getString(LegacyPayloadEntry.PAYLOAD_KEY_DB_ID.index);
 							ContentValues messageValues = new ContentValues();
-							messageValues.put(PAYLOAD_KEY_JSON, root.toString());
-							db.update(TABLE_PAYLOAD, messageValues, PAYLOAD_KEY_DB_ID + " = ?", new String[]{databaseId});
+							messageValues.put(LegacyPayloadEntry.PAYLOAD_KEY_JSON.name, root.toString());
+							db.update(PayloadEntry.TABLE_NAME, messageValues, PayloadEntry.COLUMN_PRIMARY_KEY + " = ?", new String[]{databaseId});
 						}
 					} catch (JSONException e) {
 						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
@@ -324,8 +372,36 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	private void upgradeVersion2to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
-		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_CONVERSATION_ID);
-		db.execSQL(UPGRADE_V2_to_v3_ALTER_PAYLOAD_ADD_TOKEN);
+
+		Cursor cursor = null;
+		try {
+			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST_LEGACY, null);
+			List<Payload> payloads = new ArrayList<>(cursor.getCount());
+
+			JsonPayload payload;
+			while (cursor.moveToNext()) {
+				PayloadType payloadType = PayloadType.parse(cursor.getString(1));
+				String json = cursor.getString(LegacyPayloadEntry.PAYLOAD_KEY_JSON.index);
+
+				payload = LegacyPayloadFactory.createPayload(payloadType, json);
+
+				// the legacy payload format didn't store 'nonce' in the database so we need to extract if from json
+				String nonce = payload.getString("nonce");
+				if (nonce == null) {
+					nonce = UUID.randomUUID().toString(); // if 'nonce' is missing - generate a new one
+				}
+				payload.setNonce(nonce);
+
+				payloads.add(payload);
+			}
+
+			addPayload(payloads.toArray(new Payload[payloads.size()]));
+
+		} catch (Exception e) {
+			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + e.getMessage());
+		} finally {
+			ensureClosed(cursor);
+		}
 	}
 
 	//endregion
@@ -336,18 +412,29 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public void addPayload(Payload... payloads) {
-		SQLiteDatabase db = null;
+	void addPayload(Payload... payloads) {
+		SQLiteDatabase db;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
+
+			final String conversationId = dataSource.getConversationId();
+			final String authToken = dataSource.getAuthToken();
+
 			for (Payload payload : payloads) {
 				ContentValues values = new ContentValues();
-				values.put(PAYLOAD_KEY_BASE_TYPE, payload.getBaseType().name());
-				values.put(PAYLOAD_KEY_JSON, payload.toString());
-				values.put(PAYLOAD_KEY_CONVERSATION_ID, payload.getConversationId());
-				values.put(PAYLOAD_KEY_TOKEN, payload.getToken());
-				db.insert(TABLE_PAYLOAD, null, values);
+				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
+				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
+				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
+				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, authToken); // might be null
+				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, conversationId); // might be null
+				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
+				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
+					StringUtils.isNullOrEmpty(conversationId) ? "${conversationId}" : conversationId) // if conversation id is missing we replace it with a place holder and update it later
+				);
+				values.put(PayloadEntry.COLUMN_DATA.name, notNull(payload.getData()));
+
+				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
@@ -356,51 +443,66 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void deletePayload(Payload payload) {
-		if (payload != null) {
-			SQLiteDatabase db = null;
-			try {
-				db = getWritableDatabase();
-				db.delete(TABLE_PAYLOAD, PAYLOAD_KEY_DB_ID + " = ?", new String[]{Long.toString(payload.getDatabaseId())});
-			} catch (SQLException sqe) {
-				ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
-			}
+	void deletePayload(String payloadIdentifier) {
+		if (payloadIdentifier == null) {
+			throw new IllegalArgumentException("Payload identifier is null");
+		}
+
+		SQLiteDatabase db;
+		try {
+			db = getWritableDatabase();
+			db.delete(
+				PayloadEntry.TABLE_NAME,
+				PayloadEntry.COLUMN_IDENTIFIER + " = ?",
+				new String[]{payloadIdentifier}
+			);
+		} catch (SQLException sqe) {
+			ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
 	public void deleteAllPayloads() {
-		SQLiteDatabase db = null;
+		SQLiteDatabase db;
 		try {
 			db = getWritableDatabase();
-			db.delete(TABLE_PAYLOAD, "", null);
+			db.delete(PayloadEntry.TABLE_NAME, "", null);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "deleteAllPayloads EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
-	public Payload getOldestUnsentPayload() {
+	public PayloadData getOldestUnsentPayload() {
 
-		SQLiteDatabase db = null;
+		SQLiteDatabase db;
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
-			cursor = db.rawQuery(QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-			Payload payload = null;
+			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
 			if (cursor.moveToFirst()) {
-				long databaseId = Long.parseLong(cursor.getString(0));
-				Payload.BaseType baseType = Payload.BaseType.parse(cursor.getString(1));
-				String json = cursor.getString(2);
-				String conversationId = cursor.getString(3);
-				String token = cursor.getString(4);
-				payload = PayloadFactory.fromJson(json, baseType);
-				if (payload != null) {
-					payload.setDatabaseId(databaseId);
-					payload.setConversationId(conversationId);
-					payload.setToken(token);
+				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
+				if (conversationId == null) {
+					return null;
 				}
+
+				final String authToken = cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index);
+				if (authToken == null) {
+					return null;
+				}
+
+				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
+				if (PayloadType.unknown.equals(payloadType)) {
+					return null;
+				}
+
+				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
+				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
+				final byte[] data = notNull(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
+				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
+				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
+				return new PayloadData(payloadType, nonce, data, authToken, contentType, httpRequestPath, httpRequestMethod);
 			}
-			return payload;
-		} catch (SQLException sqe) {
+			return null;
+		} catch (Exception sqe) {
 			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
 			return null;
 		} finally {
@@ -408,17 +510,23 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void updateIncompletePayloads(String conversationId, String token) {
+	private String updatePayloadRequestPath(String path, String conversationId) {
+		return path.replace("${conversationId}", conversationId);
+	}
+
+	public void updateIncompletePayloads(String conversationId, String authToken) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
-		if (StringUtils.isNullOrEmpty(token)) {
+		if (StringUtils.isNullOrEmpty(authToken)) {
 			throw new IllegalArgumentException("Token is null or empty");
 		}
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] { conversationId , token});
+			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[]{
+				authToken, conversationId
+			});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
 		} catch (SQLException e) {
@@ -430,49 +538,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region Messages
-
-	public synchronized int getUnreadMessageCount() {
-		SQLiteDatabase db = null;
-		Cursor cursor = null;
-		try {
-			db = getWritableDatabase();
-			cursor = db.rawQuery(QUERY_MESSAGE_UNREAD, null);
-			return cursor.getCount();
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "getUnreadMessageCount EXCEPTION: " + sqe.getMessage());
-			return 0;
-		} finally {
-			ensureClosed(cursor);
-		}
-	}
-
-	public synchronized void deleteAllMessages() {
-		SQLiteDatabase db = null;
-		try {
-			db = getWritableDatabase();
-			db.delete(TABLE_MESSAGE, "", null);
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "deleteAllMessages EXCEPTION: " + sqe.getMessage());
-		}
-	}
-
-	public synchronized void deleteMessage(String nonce) {
-		SQLiteDatabase db = null;
-		try {
-			db = getWritableDatabase();
-			int deleted = db.delete(TABLE_MESSAGE, MESSAGE_KEY_NONCE + " = ?", new String[]{nonce});
-			ApptentiveLog.d(DATABASE, "Deleted %d messages.", deleted);
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "deleteMessage EXCEPTION: " + sqe.getMessage());
-		}
-	}
-
-	//endregion
-
 	//region Files
 
-	public void deleteAssociatedFiles(String messageNonce) {
+	void deleteAssociatedFiles(String messageNonce) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -483,7 +551,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public List<StoredFile> getAssociatedFiles(String nonce) {
+	List<StoredFile> getAssociatedFiles(String nonce) {
 		SQLiteDatabase db = null;
 		Cursor cursor = null;
 		List<StoredFile> associatedFiles = new ArrayList<StoredFile>();
@@ -517,7 +585,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * @param associatedFiles list of associated files
 	 * @return true if succeed
 	 */
-	public boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
+	boolean addCompoundMessageFiles(List<StoredFile> associatedFiles) {
 		String messageNonce = associatedFiles.get(0).getId();
 		SQLiteDatabase db = null;
 		long ret = -1;
@@ -567,6 +635,31 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		 * payloads, messages, and files.
 		 */
 		context.deleteDatabase(DATABASE_NAME);
+	}
+
+	//endregion
+
+	//region Helper classes
+
+	interface DataSource {
+		String getConversationId();
+
+		String getAuthToken();
+	}
+
+	private static final class DatabaseColumn {
+		public final String name;
+		public final int index;
+
+		DatabaseColumn(int index, String name) {
+			this.index = index;
+			this.name = name;
+		}
+
+		@Override
+		public String toString() {
+			return name;
+		}
 	}
 
 	//endregion

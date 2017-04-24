@@ -21,9 +21,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
@@ -248,7 +248,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			JSONObject data = new JSONObject();
 			try {
 				data.put("message_id", messages[0].getId());
-				data.put("message_type", messages[0].getType().name());
+				data.put("message_type", messages[0].getMessageType().name());
 			} catch (JSONException e) {
 				//
 			}

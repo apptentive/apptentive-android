@@ -4,12 +4,11 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.module.messagecenter.model;
+package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.MultipartPayload;
-import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.image.ImageItem;
@@ -67,8 +66,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	//region Http-request
 
 	@Override
-	public String getHttpEndPoint() {
-		return StringUtils.format("/conversations/%s/messages", getConversationId());
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/messages", conversationId);
 	}
 
 	@Override
@@ -88,66 +87,32 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		setType(Type.CompoundMessage);
 	}
 
-	@Override
-	public String marshallForSending() {
-		return toString();
-	}
-
 	// Get text message body, maybe empty
 	@Override
 	public String getBody() {
-		try {
-			if (!isNull(KEY_BODY)) {
-				return getString(KEY_BODY);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_BODY);
 	}
 
 	// Set text message body, maybe empty
 	@Override
 	public void setBody(String body) {
-		try {
-			put(KEY_BODY, body);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set message body.");
-		}
+		put(KEY_BODY, body);
 	}
 
 	public String getTitle() {
-		try {
-			return getString(KEY_TITLE);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return getString(KEY_TITLE);
 	}
 
 	public void setTitle(String title) {
-		try {
-			put(KEY_TITLE, title);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set title.");
-		}
+		put(KEY_TITLE, title);
 	}
 
 	public boolean getTextOnly() {
-		try {
-			return getBoolean(KEY_TEXT_ONLY);
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return true;
+		return getBoolean(KEY_TEXT_ONLY);
 	}
 
 	public void setTextOnly(boolean bVal) {
-		try {
-			put(KEY_TEXT_ONLY, bVal);
-		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to set file filePath.");
-		}
+		put(KEY_TEXT_ONLY, bVal);
 	}
 
 

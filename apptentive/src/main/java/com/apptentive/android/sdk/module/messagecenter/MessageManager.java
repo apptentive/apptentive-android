@@ -16,10 +16,11 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.PayloadData;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -37,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -48,8 +50,11 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_DATA;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 public class MessageManager implements Destroyable, ApptentiveNotificationObserver {
 
@@ -158,7 +163,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 					apptentiveMessage.setRead(true);
 				} else {
 					if (messageOnToast == null) {
-						if (apptentiveMessage.getType() == ApptentiveMessage.Type.CompoundMessage) {
+						if (apptentiveMessage.getMessageType() == ApptentiveMessage.Type.CompoundMessage) {
 							messageOnToast = (CompoundMessage) apptentiveMessage;
 						}
 					}
@@ -272,26 +277,36 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	}
 
-	public void onSentMessage(ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
+	public void onSentMessage(String nonce, int responseCode, JSONObject responseJson) {
 
-		if (response.isRejectedPermanently() || response.isBadPayload()) {
+		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
+		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
+		if (apptentiveMessage == null) {
+			return; // should not happen but we want to stay safe
+		}
+
+		final boolean isRejectedPermanently = responseCode >= 400 && responseCode < 500;
+		final boolean isSuccessful = responseCode >= 200 && responseCode < 300;
+		final boolean isRejectedTemporarily = !(isSuccessful || isRejectedPermanently);
+
+		if (isRejectedPermanently || responseCode == -1) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
 				messageStore.updateMessage(apptentiveMessage);
 				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-					afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+					afterSendMessageListener.get().onMessageSent(responseCode, apptentiveMessage);
 				}
 
 			}
 			return;
 		}
 
-		if (response.isRejectedTemporarily()) {
+		if (isRejectedTemporarily) {
 			pauseSending(SEND_PAUSE_REASON_SERVER);
 			return;
 		}
 
-		if (response.isSuccessful()) {
+		if (isSuccessful) {
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
 				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
@@ -299,8 +314,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				return;
 			}
 			try {
-				JSONObject responseJson = new JSONObject(response.getContent());
-
+				// TODO: update the database with these values
 				apptentiveMessage.setState(ApptentiveMessage.State.sent);
 
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
@@ -311,7 +325,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			messageStore.updateMessage(apptentiveMessage);
 
 			if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+				afterSendMessageListener.get().onMessageSent(responseCode, apptentiveMessage);
 			}
 		}
 	}
@@ -354,14 +368,16 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			setCurrentForegroundActivity(null);
 			appWentToBackground();
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {
-			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
-			if (payload instanceof ApptentiveMessage) {
+			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
+			if (payload.getType().equals(PayloadType.message)) {
 				resumeSending();
 			}
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
-			final Payload payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, Payload.class);
-			if (payload instanceof ApptentiveMessage) {
-				// onSentMessage((ApptentiveMessage) payload, ???);
+			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
+			final Integer responseCode = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_CODE, Integer.class);
+			final JSONObject responseData = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_DATA, JSONObject.class);
+			if (payload.getType().equals(PayloadType.message)) {
+				onSentMessage(payload.getNonce(), responseCode, responseData);
 			}
 		}
 	}
@@ -380,7 +396,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	// Listeners
 	public interface AfterSendMessageListener {
-		void onMessageSent(ApptentiveHttpResponse response, ApptentiveMessage apptentiveMessage);
+		void onMessageSent(int responseCode, ApptentiveMessage apptentiveMessage);
 
 		void onPauseSending(int reason);
 
