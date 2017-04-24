@@ -7,69 +7,90 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 public class PayloadData {
 	private final PayloadType type;
-	private String contentType;
-	private String authToken;
-	private byte[] data;
-	private String path;
-	private HttpRequestMethod httpRequestMethod;
-	private String nonce;
+	private final String nonce;
+	private final byte[] data;
+	private final String authToken;
+	private final String contentType;
+	private final String httpRequestPath;
+	private final HttpRequestMethod httpRequestMethod;
 
-	public PayloadData(PayloadType type) {
+
+	public PayloadData(PayloadType type, String nonce, byte[] data, String authToken, String contentType, String httpRequestPath, HttpRequestMethod httpRequestMethod) {
+		if (type == null) {
+			throw new IllegalArgumentException("Payload type is null");
+		}
+
+		if (nonce == null) {
+			throw new IllegalArgumentException("Nonce is null");
+		}
+
+		if (authToken == null) {
+			throw new IllegalArgumentException("Auth token is null");
+		}
+
+		if (contentType == null) {
+			throw new IllegalArgumentException("Content type is null");
+		}
+
+		if (httpRequestPath == null) {
+			throw new IllegalArgumentException("Path is null");
+		}
+
+		if (httpRequestMethod == null) {
+			throw new IllegalArgumentException("Http request method is null");
+		}
+
 		this.type = type;
-	}
-
-	public void setContentType(String contentType) {
-		this.contentType = contentType;
-	}
-
-	public String getContentType() {
-		return contentType;
-	}
-
-	public void setAuthToken(String authToken) {
-		this.authToken = authToken;
-	}
-
-	public String getAuthToken() {
-		return authToken;
-	}
-
-	public void setData(byte[] data) {
+		this.nonce = nonce;
 		this.data = data;
+		this.authToken = authToken;
+		this.contentType = contentType;
+		this.httpRequestPath = httpRequestPath;
+		this.httpRequestMethod = httpRequestMethod;
 	}
 
-	public byte[] getData() {
-		return data;
+	//region String representation
+
+	@Override
+	public String toString() {
+		return StringUtils.format("type=%s nonce=%s authToken=%s httpRequestPath=%s", type, nonce, authToken, httpRequestPath);
 	}
 
-	public void setHttpRequestPath(String path) {
-		this.path = path;
-	}
+	//endregion
 
-	public String getHttpEndPoint() {
-		return path;
-	}
-
-	public HttpRequestMethod getHttpRequestMethod() {
-		return httpRequestMethod;
-	}
+	//region Getters
 
 	public PayloadType getType() {
 		return type;
-	}
-
-	public void setHttpRequestMethod(HttpRequestMethod httpRequestMethod) {
-		this.httpRequestMethod = httpRequestMethod;
 	}
 
 	public String getNonce() {
 		return nonce;
 	}
 
-	public void setNonce(String nonce) {
-		this.nonce = nonce;
+	public byte[] getData() {
+		return data;
 	}
+
+	public String getAuthToken() {
+		return authToken;
+	}
+
+	public String getContentType() {
+		return contentType;
+	}
+
+	public String getHttpRequestPath() {
+		return httpRequestPath;
+	}
+
+	public HttpRequestMethod getHttpRequestMethod() {
+		return httpRequestMethod;
+	}
+
+	//endregion
 }

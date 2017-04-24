@@ -444,18 +444,20 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	void deletePayload(String payloadIdentifier) {
-		if (payloadIdentifier != null) {
-			SQLiteDatabase db;
-			try {
-				db = getWritableDatabase();
-				db.delete(
-					PayloadEntry.TABLE_NAME,
-					PayloadEntry.COLUMN_IDENTIFIER + " = ?",
-					new String[]{payloadIdentifier}
-				);
-			} catch (SQLException sqe) {
-				ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
-			}
+		if (payloadIdentifier == null) {
+			throw new IllegalArgumentException("Payload identifier is null");
+		}
+
+		SQLiteDatabase db;
+		try {
+			db = getWritableDatabase();
+			db.delete(
+				PayloadEntry.TABLE_NAME,
+				PayloadEntry.COLUMN_IDENTIFIER + " = ?",
+				new String[]{payloadIdentifier}
+			);
+		} catch (SQLException sqe) {
+			ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
 		}
 	}
 
@@ -476,7 +478,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		try {
 			db = getWritableDatabase();
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-			PayloadData payload = null;
 			if (cursor.moveToFirst()) {
 				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
 				if (conversationId == null) {
@@ -494,16 +495,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				}
 
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
-
-				payload = new PayloadData(payloadType);
-				payload.setHttpRequestPath(httpRequestPath);
-				payload.setHttpRequestMethod(HttpRequestMethod.valueOf(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
-				payload.setContentType(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
-				payload.setAuthToken(authToken);
-				payload.setData(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
+				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
+				final byte[] data = notNull(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
+				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
+				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
+				return new PayloadData(payloadType, nonce, data, authToken, contentType, httpRequestPath, httpRequestMethod);
 			}
-			return payload;
-		} catch (SQLException sqe) {
+			return null;
+		} catch (Exception sqe) {
 			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
 			return null;
 		} finally {
@@ -525,7 +524,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] {
+			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[]{
 				authToken, conversationId
 			});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database

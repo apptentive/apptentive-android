@@ -87,16 +87,16 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	private HttpRequest createPayloadRequest(PayloadData payload) {
 		final String token = payload.getAuthToken();
-		final String endPoint = payload.getHttpEndPoint();
+		final String httpPath = payload.getHttpRequestPath();
 		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();
 
 		// TODO: figure out a better solution
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			return createMultipartRequest(token, endPoint, payload.getData(), associatedFiles, requestMethod);
+			return createMultipartRequest(token, httpPath, payload.getData(), associatedFiles, requestMethod);
 		}
 
-		return createRawRequest(token, endPoint, payload.getData(), requestMethod);
+		return createRawRequest(token, httpPath, payload.getData(), requestMethod);
 	}
 
 	//endregion

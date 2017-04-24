@@ -94,7 +94,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		private ResponseHandler responseHandler;
 
 		public MockPayload(String key, Object value) {
-			super(PayloadType.unknown); // TODO: figure out a better type
+			super(PayloadType.unknown, nonce, data, authToken, contentType, path, httpRequestMethod); // TODO: figure out a better type
 
 			json = StringUtils.format("{'%s':'%s'}", key, value);
 			responseHandler = new DefaultResponseHandler();
