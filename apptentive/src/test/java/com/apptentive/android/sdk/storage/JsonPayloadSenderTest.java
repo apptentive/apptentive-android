@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.network.MockHttpURLConnection.ResponseHandler;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
+import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,7 +42,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		PayloadSender sender = new PayloadSender(requestSender, new HttpRequestRetryPolicyDefault());
 		sender.setListener(new PayloadSender.Listener() {
 			@Override
-			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode) {
+			public void onFinishSending(PayloadSender sender, PayloadData payload, boolean cancelled, String errorMessage, int responseCode, JSONObject responseData) {
 				if (cancelled) {
 					addResult("cancelled: " + payload);
 				} else if (errorMessage != null) {

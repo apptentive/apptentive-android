@@ -156,6 +156,20 @@ class FileMessageStore implements MessageStore {
 		}
 	}
 
+	@Override
+	public ApptentiveMessage findMessage(String nonce) {
+		fetchEntries();
+
+		for (int i = 0; i < messageEntries.size(); ++i) {
+			final MessageEntry messageEntry = messageEntries.get(i);
+			if (StringUtils.equal(nonce, messageEntry.nonce)) {
+				return MessageFactory.fromJson(messageEntry.json);
+			}
+		}
+
+		return null;
+	}
+
 	//endregion
 
 	//region File save/load

@@ -29,4 +29,6 @@ public interface MessageStore {
 	void deleteAllMessages();
 
 	void deleteMessage(String nonce);
+
+	ApptentiveMessage findMessage(String nonce);
 }
