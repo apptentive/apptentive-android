@@ -37,13 +37,13 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 	private static final String KEY_DEBUG = "debug";
 
-	private static final String KEY_VERSION = "sdk_version";
-	private static final String KEY_PROGRAMMING_LANGUAGE = "sdk_programming_language";
-	private static final String KEY_AUTHOR_NAME = "sdk_author_name";
-	private static final String KEY_AUTHOR_EMAIL = "sdk_author_email";
-	private static final String KEY_PLATFORM = "sdk_platform";
-	private static final String KEY_DISTRIBUTION = "sdk_distribution";
-	private static final String KEY_DISTRIBUTION_VERSION = "sdk_distribution_version";
+	private static final String KEY_SDK_VERSION = "sdk_version";
+	private static final String KEY_SDK_PROGRAMMING_LANGUAGE = "sdk_programming_language";
+	private static final String KEY_SDK_AUTHOR_NAME = "sdk_author_name";
+	private static final String KEY_SDK_AUTHOR_EMAIL = "sdk_author_email";
+	private static final String KEY_SDK_PLATFORM = "sdk_platform";
+	private static final String KEY_SDK_DISTRIBUTION = "sdk_distribution";
+	private static final String KEY_SDK_DISTRIBUTION_VERSION = "sdk_distribution_version";
 
 	public SdkAndAppReleasePayload() {
 		super(PayloadType.sdk_and_app_release);
@@ -70,59 +70,59 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 
 	//region Sdk getters/setters
 	public String getVersion() {
-		return getString(KEY_VERSION);
+		return getString(KEY_SDK_VERSION);
 	}
 
 	public void setVersion(String version) {
-		put(KEY_VERSION, version);
+		put(KEY_SDK_VERSION, version);
 	}
 
 	public String getProgrammingLanguage() {
-		return getString(KEY_PROGRAMMING_LANGUAGE);
+		return getString(KEY_SDK_PROGRAMMING_LANGUAGE);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
-		put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
+		put(KEY_SDK_PROGRAMMING_LANGUAGE, programmingLanguage);
 	}
 
 	public String getAuthorName() {
-		return getString(KEY_AUTHOR_NAME);
+		return getString(KEY_SDK_AUTHOR_NAME);
 	}
 
 	public void setAuthorName(String authorName) {
-		put(KEY_AUTHOR_NAME, authorName);
+		put(KEY_SDK_AUTHOR_NAME, authorName);
 	}
 
 	public String getAuthorEmail() {
-		return getString(KEY_AUTHOR_EMAIL);
+		return getString(KEY_SDK_AUTHOR_EMAIL);
 	}
 
 	public void setAuthorEmail(String authorEmail) {
-		put(KEY_AUTHOR_EMAIL, authorEmail);
+		put(KEY_SDK_AUTHOR_EMAIL, authorEmail);
 	}
 
 	public String getPlatform() {
-		return getString(KEY_PLATFORM);
+		return getString(KEY_SDK_PLATFORM);
 	}
 
 	public void setPlatform(String platform) {
-		put(KEY_PLATFORM, platform);
+		put(KEY_SDK_PLATFORM, platform);
 	}
 
 	public String getDistribution() {
-		return getString(KEY_DISTRIBUTION);
+		return getString(KEY_SDK_DISTRIBUTION);
 	}
 
 	public void setDistribution(String distribution) {
-		put(KEY_DISTRIBUTION, distribution);
+		put(KEY_SDK_DISTRIBUTION, distribution);
 	}
 
 	public String getDistributionVersion() {
-		return getString(KEY_DISTRIBUTION_VERSION);
+		return getString(KEY_SDK_DISTRIBUTION_VERSION);
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
-		put(KEY_DISTRIBUTION_VERSION, distributionVersion);
+		put(KEY_SDK_DISTRIBUTION_VERSION, distributionVersion);
 	}
 	//endregion
 
