@@ -246,7 +246,7 @@ public class HttpRequest {
 	private void sendRequestSync() throws IOException {
 		try {
 			URL url = new URL(urlString);
-			ApptentiveLog.d(NETWORK, "Performing request: %s", url);
+			ApptentiveLog.d(NETWORK, "Performing request: %s %s", method, url);
 
 			retrying = false;
 
