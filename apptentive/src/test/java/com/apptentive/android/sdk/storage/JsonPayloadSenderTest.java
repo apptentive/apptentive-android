@@ -11,6 +11,7 @@ import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.network.MockHttpRequest;
 import com.apptentive.android.sdk.network.MockHttpURLConnection.DefaultResponseHandler;
@@ -94,7 +95,7 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		private ResponseHandler responseHandler;
 
 		public MockPayload(String key, Object value) {
-			super(PayloadType.unknown, nonce, data, authToken, contentType, path, httpRequestMethod); // TODO: figure out a better type
+			super(PayloadType.unknown, "nonce", new byte[0], "authToken", "contentType", "path", HttpRequestMethod.GET); // TODO: figure out a better type
 
 			json = StringUtils.format("{'%s':'%s'}", key, value);
 			responseHandler = new DefaultResponseHandler();

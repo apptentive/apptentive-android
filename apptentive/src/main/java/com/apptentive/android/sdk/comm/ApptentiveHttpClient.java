@@ -23,7 +23,7 @@ import static android.text.TextUtils.isEmpty;
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
 public class ApptentiveHttpClient implements PayloadRequestSender {
-	private static final String API_VERSION = "7";
+	private static final String API_VERSION = "9"; // TODO: get rid of duplication in ApptentiveClient
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
