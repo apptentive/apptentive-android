@@ -11,6 +11,7 @@ import com.apptentive.android.sdk.ApptentiveInternalMock;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -22,6 +23,7 @@ import org.junit.rules.TemporaryFolder;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
 
@@ -258,11 +260,14 @@ public class FileMessageStoreTest extends TestCaseBase {
 		message.setId(id);
 		message.setState(state);
 		message.setRead(read);
+		message.setNonce(nonce);
 		return message;
 	}
 
 	private File getTempFile() throws IOException {
-		return tempFolder.newFile();
+		final File file = tempFolder.newFile();
+		file.delete(); // this file might exist
+		return file;
 	}
 
 	private void addResult(List<ApptentiveMessage> messages) throws JSONException {
@@ -273,21 +278,21 @@ public class FileMessageStoreTest extends TestCaseBase {
 
 	private String toString(ApptentiveMessage message) throws JSONException {
 		String result = "{";
-/*
- // FIXME
-		final Iterator<String> keys = message.keys();
+		final Iterator<String> keys = message.getJsonObject().keys();
 		while (keys.hasNext()) {
 			String key = keys.next();
 			if (key.equals("id")) { // 'id' is randomly generated each time (so don't test it)
 				continue;
 			}
-			result += StringUtils.format("'%s':'%s',", key, message.get(key));
+			if (key.equals("type")) { // it's always 'CompoundMessage'
+				continue;
+			}
+			result += StringUtils.format("'%s':'%s',", key, message.getJsonObject().get(key));
 		}
 
 		result += StringUtils.format("'state':'%s',", message.getState().name());
 		result += StringUtils.format("'read':'%s'", message.isRead());
 		result += "}";
-*/
 		return result;
 	}
 }
