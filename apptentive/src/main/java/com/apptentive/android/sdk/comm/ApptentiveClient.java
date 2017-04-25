@@ -24,7 +24,7 @@ import java.util.zip.GZIPInputStream;
 
 public class ApptentiveClient {
 
-	public static final int API_VERSION = 7;
+	public static final int API_VERSION = 9;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
