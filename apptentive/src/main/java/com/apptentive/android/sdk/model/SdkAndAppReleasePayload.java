@@ -18,36 +18,35 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
-import org.json.JSONException;
-
 /**
  * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
- *
+ * <p>
  * This class effectively contains the source code from both {@link SdkPayload}
  * and {@link AppReleasePayload} payloads (which still kept for backward compatibility
  * purposes).
  */
 public class SdkAndAppReleasePayload extends JsonPayload {
 
-	private final SdkPayload sdk;
-	private final AppReleasePayload appRelease;
+	private static final String KEY_TYPE = "type";
+	private static final String KEY_VERSION_NAME = "version_name";
+	private static final String KEY_VERSION_CODE = "version_code";
+	private static final String KEY_IDENTIFIER = "identifier";
+	private static final String KEY_TARGET_SDK_VERSION = "target_sdk_version";
+	private static final String KEY_APP_STORE = "app_store";
+	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
+	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
+	private static final String KEY_DEBUG = "debug";
+
+	private static final String KEY_VERSION = "sdk_version";
+	private static final String KEY_PROGRAMMING_LANGUAGE = "sdk_programming_language";
+	private static final String KEY_AUTHOR_NAME = "sdk_author_name";
+	private static final String KEY_AUTHOR_EMAIL = "sdk_author_email";
+	private static final String KEY_PLATFORM = "sdk_platform";
+	private static final String KEY_DISTRIBUTION = "sdk_distribution";
+	private static final String KEY_DISTRIBUTION_VERSION = "sdk_distribution_version";
 
 	public SdkAndAppReleasePayload() {
 		super(PayloadType.sdk_and_app_release);
-
-		sdk = new SdkPayload();
-		appRelease = new AppReleasePayload();
-
-		// TODO: a better solution
-		put("sdk", sdk.getJsonObject());
-		put("app_release", appRelease.getJsonObject());
-	}
-
-	public SdkAndAppReleasePayload(String json) throws JSONException {
-		super(PayloadType.sdk_and_app_release, json);
-
-		sdk = new SdkPayload(getJSONObject("sdk").toString());
-		appRelease = new AppReleasePayload(getJSONObject("app_release").toString());
 	}
 
 	//region Http-request
@@ -71,135 +70,136 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 
 	//region Sdk getters/setters
 	public String getVersion() {
-		return sdk.getVersion();
+		return getString(KEY_VERSION);
 	}
 
 	public void setVersion(String version) {
-		sdk.setVersion(version);
+		put(KEY_VERSION, version);
 	}
 
 	public String getProgrammingLanguage() {
-		return sdk.getProgrammingLanguage();
+		return getString(KEY_PROGRAMMING_LANGUAGE);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
-		sdk.setProgrammingLanguage(programmingLanguage);
+		put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
 	}
 
 	public String getAuthorName() {
-		return sdk.getAuthorName();
+		return getString(KEY_AUTHOR_NAME);
 	}
 
 	public void setAuthorName(String authorName) {
-		sdk.setAuthorName(authorName);
+		put(KEY_AUTHOR_NAME, authorName);
 	}
 
 	public String getAuthorEmail() {
-		return sdk.getAuthorEmail();
+		return getString(KEY_AUTHOR_EMAIL);
 	}
 
 	public void setAuthorEmail(String authorEmail) {
-		sdk.setAuthorEmail(authorEmail);
+		put(KEY_AUTHOR_EMAIL, authorEmail);
 	}
 
 	public String getPlatform() {
-		return sdk.getPlatform();
+		return getString(KEY_PLATFORM);
 	}
 
 	public void setPlatform(String platform) {
-		sdk.setPlatform(platform);
+		put(KEY_PLATFORM, platform);
 	}
 
 	public String getDistribution() {
-		return sdk.getDistribution();
+		return getString(KEY_DISTRIBUTION);
 	}
 
 	public void setDistribution(String distribution) {
-		sdk.setDistribution(distribution);
+		put(KEY_DISTRIBUTION, distribution);
 	}
 
 	public String getDistributionVersion() {
-		return sdk.getDistributionVersion();
+		return getString(KEY_DISTRIBUTION_VERSION);
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
-		sdk.setDistributionVersion(distributionVersion);
+		put(KEY_DISTRIBUTION_VERSION, distributionVersion);
 	}
 	//endregion
 
 	//region AppRelease getters/setters
+
 	public String getType() {
-		return appRelease.getType();
+		return getString(KEY_TYPE);
 	}
 
 	public void setType(String type) {
-		appRelease.setType(type);
+		put(KEY_TYPE, type);
 	}
 
 	public String getVersionName() {
-		return appRelease.getVersionName();
+		return getString(KEY_VERSION_NAME);
 	}
 
 	public void setVersionName(String versionName) {
-		appRelease.setVersionName(versionName);
+		put(KEY_VERSION_NAME, versionName);
 	}
 
 	public int getVersionCode() {
-		return appRelease.getVersionCode();
+		return getInt(KEY_VERSION_CODE, -1);
 	}
 
 	public void setVersionCode(int versionCode) {
-		appRelease.setVersionCode(versionCode);
+		put(KEY_VERSION_CODE, versionCode);
 	}
 
 	public String getIdentifier() {
-		return appRelease.getIdentifier();
+		return getString(KEY_IDENTIFIER);
 	}
 
 	public void setIdentifier(String identifier) {
-		appRelease.setIdentifier(identifier);
+		put(KEY_IDENTIFIER, identifier);
 	}
 
 	public String getTargetSdkVersion() {
-		return appRelease.getTargetSdkVersion();
+		return getString(KEY_TARGET_SDK_VERSION);
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
-		appRelease.setTargetSdkVersion(targetSdkVersion);
+		put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
 	}
 
 	public String getAppStore() {
-		return appRelease.getAppStore();
+		return getString(KEY_APP_STORE);
 	}
 
 	public void setAppStore(String appStore) {
-		appRelease.setAppStore(appStore);
+		put(KEY_APP_STORE, appStore);
 	}
 
 	// Flag for whether the apptentive is inheriting styles from the host app
 	public boolean getInheritStyle() {
-		return appRelease.getInheritStyle();
+		return getBoolean(KEY_STYLE_INHERIT);
 	}
 
 	public void setInheritStyle(boolean inheritStyle) {
-		appRelease.setInheritStyle(inheritStyle);
+		put(KEY_STYLE_INHERIT, inheritStyle);
 	}
 
 	// Flag for whether the app is overriding any Apptentive Styles
 	public boolean getOverrideStyle() {
-		return appRelease.getOverrideStyle();
+		return getBoolean(KEY_STYLE_OVERRIDE);
 	}
 
 	public void setOverrideStyle(boolean overrideStyle) {
-		appRelease.setOverrideStyle(overrideStyle);
+		put(KEY_STYLE_OVERRIDE, overrideStyle);
 	}
 
 	public boolean getDebug() {
-		return appRelease.getDebug();
+		return getBoolean(KEY_DEBUG);
 	}
 
 	public void setDebug(boolean debug) {
-		appRelease.setDebug(debug);
+		put(KEY_DEBUG, debug);
 	}
 
 	public static AppReleasePayload generateCurrentAppRelease(Context context) {
