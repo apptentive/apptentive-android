@@ -94,4 +94,8 @@ public class ConversationMetadataItem implements SerializableObject {
 	public ConversationState getState() {
 		return state;
 	}
+
+	public String getEncryptionKey() {
+		return encryptionKey;
+	}
 }
