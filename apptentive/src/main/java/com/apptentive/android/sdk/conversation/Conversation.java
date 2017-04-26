@@ -52,6 +52,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private ConversationData conversationData;
 
 	/**
+	 * Encryption key for payloads
+	 */
+	private String encryptionKey;
+
+	/**
 	 * File which represents serialized conversation data on the disk
 	 */
 	private final File conversationDataFile;
@@ -476,6 +481,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	synchronized File getConversationMessagesFile() {
 		return conversationMessagesFile;
+	}
+
+	public String getEncryptionKey() {
+		return encryptionKey;
+	}
+
+	void setEncryptionKey(String encryptionKey) {
+		this.encryptionKey = encryptionKey;
 	}
 
 	//endregion

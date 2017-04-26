@@ -360,6 +360,11 @@ public class ConversationManager {
 			}
 		}
 
+		// delete all existing encryption keys
+		for (ConversationMetadataItem item : conversationMetadata) {
+			item.encryptionKey = null;
+		}
+
 		// update the state of the corresponding item
 		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
 		if (item == null) {
@@ -367,6 +372,11 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
+
+		// update encryption key (if necessary)
+		if (conversation.hasState(LOGGED_IN)) {
+			item.encryptionKey = notNull(conversation.getEncryptionKey());
+		}
 
 		// apply changes
 		saveMetadata();
@@ -494,8 +504,63 @@ public class ConversationManager {
 		}
 	}
 
-	private void sendLoginRequest(String token, LoginCallback callback) {
-		callback.onLoginFail("login not yet implemented"); // FIXME: kick off login request
+	private void sendLoginRequest(String token, final LoginCallback callback) {
+		getHttpClient().login(token, new HttpRequest.Listener<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				try {
+					final JSONObject responseObject = request.getResponseObject();
+					final String encryptionKey = responseObject.getString("encryption_key");
+					notifyLoginFinished(encryptionKey);
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while parsing login response");
+				}
+			}
+
+			@Override
+			public void onCancel(HttpJsonRequest request) {
+				notifyLoginFailed("Login request was cancelled");
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				notifyLoginFailed(reason);
+			}
+
+			private void notifyLoginFinished(final String encryptionKey) {
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						assertFalse(StringUtils.isNullOrEmpty(encryptionKey));
+
+						try {
+							if (activeConversation != null) {
+								activeConversation.setEncryptionKey(encryptionKey);
+								activeConversation.setState(LOGGED_IN);
+								handleConversationStateChange(activeConversation);
+
+								// notify delegate
+								callback.onLoginFinish();
+							} else {
+								notifyLoginFailed("Missing active conversation");
+							}
+						} catch (Exception e) {
+							ApptentiveLog.e(e, "Exception while creating logged-in conversation");
+							notifyLoginFailed("Internal error");
+						}
+					}
+				});
+			}
+
+			private void notifyLoginFailed(final String reason) {
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						callback.onLoginFail(reason);
+					}
+				});
+			}
+		});
 	}
 
 	public void logout() {

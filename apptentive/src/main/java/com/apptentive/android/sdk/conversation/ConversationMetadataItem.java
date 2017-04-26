@@ -14,6 +14,11 @@ import java.io.IOException;
 public class ConversationMetadataItem implements SerializableObject {
 
 	/**
+	 * We store an empty string for a missing key
+	 */
+	private static final String EMPTY_ENCRYPTION_KEY = "";
+
+	/**
 	 * The state of the target conversation
 	 */
 	ConversationState state = ConversationState.UNDEFINED;
@@ -33,8 +38,12 @@ public class ConversationMetadataItem implements SerializableObject {
 	 */
 	final File messagesFile;
 
-	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile)
-	{
+	/**
+	 * Key for encrypting payloads
+	 */
+	String encryptionKey;
+
+	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
@@ -57,6 +66,7 @@ public class ConversationMetadataItem implements SerializableObject {
 		dataFile = new File(in.readUTF());
 		messagesFile = new File(in.readUTF());
 		state = ConversationState.valueOf(in.readByte());
+		encryptionKey = readEncryptionKey(in);
 	}
 
 	@Override
@@ -65,6 +75,16 @@ public class ConversationMetadataItem implements SerializableObject {
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
 		out.writeByte(state.ordinal());
+		writeEncryptionKey(out, encryptionKey);
+	}
+
+	private static String readEncryptionKey(DataInput in) throws IOException {
+		final String key = in.readLine();
+		return !StringUtils.equal(key, EMPTY_ENCRYPTION_KEY) ? key : null;
+	}
+
+	private void writeEncryptionKey(DataOutput out, String key) throws IOException {
+		out.writeUTF(key != null ? key : EMPTY_ENCRYPTION_KEY);
 	}
 
 	public String getConversationId() {
@@ -73,5 +93,9 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	public ConversationState getState() {
 		return state;
+	}
+
+	public String getEncryptionKey() {
+		return encryptionKey;
 	}
 }

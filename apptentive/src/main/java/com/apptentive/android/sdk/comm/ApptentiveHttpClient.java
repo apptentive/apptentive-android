@@ -32,6 +32,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
+	private static final String ENDPOINT_LOGIN = "/login";
 
 	private final String apiKey;
 	private final String serverURL;
@@ -57,6 +58,15 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
+		request.addListener(listener);
+		httpRequestManager.startRequest(request);
+		return request;
+	}
+
+	public HttpJsonRequest login(String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+		JSONObject json = new JSONObject(); // TODO: create an actual payload
+
+		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_LOGIN, json, HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
