@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.encryption.Encryptor;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -155,6 +156,20 @@ public abstract class JsonPayload extends Payload {
 
 	public JSONObject getJsonObject() {
 		return jsonObject;
+	}
+
+	@Override
+	public HttpRequestMethod getHttpRequestMethod() {
+		return HttpRequestMethod.PUT;
+	}
+
+	@Override
+	public String getHttpRequestContentType() {
+		if (encryptor != null) {
+			return "application/json";
+		} else {
+			return "application/octet-stream";
+		}
 	}
 
 	//endregion

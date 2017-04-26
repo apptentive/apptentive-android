@@ -32,10 +32,5 @@ public class LogoutPayload extends JsonPayload {
 		return HttpRequestMethod.POST;
 	}
 
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json"; // TODO: application/octet-stream
-	}
-
 	//endregion
 }

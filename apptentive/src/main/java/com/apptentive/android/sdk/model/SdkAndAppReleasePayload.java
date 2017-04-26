@@ -56,16 +56,6 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 		return StringUtils.format("/conversations/%s/sdkapprelease", conversationId);
 	}
 
-	@Override
-	public HttpRequestMethod getHttpRequestMethod() {
-		return HttpRequestMethod.PUT;
-	}
-
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json";
-	}
-
 	//endregion
 
 	//region Sdk getters/setters
