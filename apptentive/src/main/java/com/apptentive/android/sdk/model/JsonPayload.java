@@ -8,26 +8,34 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;
+import com.apptentive.android.sdk.encryption.Encryptor;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.UnsupportedEncodingException;
-
 public abstract class JsonPayload extends Payload {
 
 	private final JSONObject jsonObject;
+	private final Encryptor encryptor;
 
 	// These three are not stored in the JSON, only the DB.
 
 	public JsonPayload(PayloadType type) {
 		super(type);
 		jsonObject = new JSONObject();
+		this.encryptor = null;
+	}
+
+	public JsonPayload(PayloadType type, Encryptor encryptor) {
+		super(type);
+		jsonObject = new JSONObject();
+		this.encryptor = encryptor;
 	}
 
 	public JsonPayload(PayloadType type, String json) throws JSONException {
 		super(type);
 		jsonObject = new JSONObject(json);
+		this.encryptor = null;
 	}
 
 	//region Data
@@ -35,10 +43,16 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] getData() {
 		try {
-			return jsonObject.toString().getBytes("utf-8");
-		} catch (UnsupportedEncodingException e) {
-			throw new IllegalStateException(e);
+			byte[] bytes = jsonObject.toString().getBytes();
+			if (encryptor != null) {
+				return encryptor.encrypt(bytes);
+			} else {
+				return bytes;
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
 		}
+		return null;
 	}
 
 	//endregion
