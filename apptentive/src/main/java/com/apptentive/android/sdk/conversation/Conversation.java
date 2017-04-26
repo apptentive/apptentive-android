@@ -57,6 +57,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private String encryptionKey;
 
 	/**
+	 * Optional user id for logged-in conversations
+	 */
+	private String userId;
+
+	/**
 	 * File which represents serialized conversation data on the disk
 	 */
 	private final File conversationDataFile;
@@ -489,6 +494,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	void setEncryptionKey(String encryptionKey) {
 		this.encryptionKey = encryptionKey;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 
 	//endregion

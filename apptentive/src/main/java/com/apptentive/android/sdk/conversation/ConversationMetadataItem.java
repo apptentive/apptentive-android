@@ -43,6 +43,11 @@ public class ConversationMetadataItem implements SerializableObject {
 	 */
 	String encryptionKey;
 
+	/**
+	 * An optional user ID for logged in conversations
+	 */
+	String userId;
+
 	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
@@ -97,5 +102,13 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	public String getEncryptionKey() {
 		return encryptionKey;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
 	}
 }

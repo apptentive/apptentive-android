@@ -22,6 +22,7 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
+import com.apptentive.android.sdk.util.Jwt;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -176,6 +177,7 @@ public class ConversationManager {
 		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
 		conversation.loadConversationData();
 		conversation.setState(item.getState()); // set the state same as the item's state
+		conversation.setUserId(item.getUserId());
 		return conversation;
 	}
 
@@ -376,6 +378,7 @@ public class ConversationManager {
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {
 			item.encryptionKey = notNull(conversation.getEncryptionKey());
+			item.userId = notNull(conversation.getUserId());
 		}
 
 		// apply changes
@@ -432,12 +435,16 @@ public class ConversationManager {
 
 	public void login(final String token, final LoginCallback callback) {
 		// we only deal with an active conversation on the main thread
-		DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
-			}
-		});
+		if (Looper.getMainLooper() == Looper.myLooper()) {
+			requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
+		} else {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
+				}
+			});
+		}
 	}
 
 	private void requestLoggedInConversation(final String token, final LoginCallback callback) {
@@ -504,55 +511,81 @@ public class ConversationManager {
 		}
 	}
 
-	private void sendLoginRequest(String token, final LoginCallback callback) {
+	private void sendLoginRequest(final String token, final LoginCallback callback) {
 		getHttpClient().login(token, new HttpRequest.Listener<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
+				final String userId;
+
+				try {
+					final Jwt jwt = Jwt.decode(token);
+					userId = jwt.getPayload().getString("user_id");
+				} catch (Exception e) {
+					handleLoginFailed(e.getMessage());
+					return;
+				}
+
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");
-					notifyLoginFinished(encryptionKey);
+					handleLoginFinished(userId, encryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while parsing login response");
+					handleLoginFailed("Internal error");
 				}
 			}
 
 			@Override
 			public void onCancel(HttpJsonRequest request) {
-				notifyLoginFailed("Login request was cancelled");
+				handleLoginFailed("Login request was cancelled");
 			}
 
 			@Override
 			public void onFail(HttpJsonRequest request, String reason) {
-				notifyLoginFailed(reason);
+				handleLoginFailed(reason);
 			}
 
-			private void notifyLoginFinished(final String encryptionKey) {
+			private void handleLoginFinished(final String userId, final String encryptionKey) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
 						assertFalse(StringUtils.isNullOrEmpty(encryptionKey));
 
 						try {
-							if (activeConversation != null) {
-								activeConversation.setEncryptionKey(encryptionKey);
-								activeConversation.setState(LOGGED_IN);
-								handleConversationStateChange(activeConversation);
+							// if we were previously logged out we might end up with no active conversation
+							if (activeConversation == null) {
+								// attempt to find previous logged out conversation
+								final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
+									@Override
+									public boolean accept(ConversationMetadataItem item) {
+										return StringUtils.equal(item.getUserId(), userId);
+									}
+								});
 
-								// notify delegate
-								callback.onLoginFinish();
-							} else {
-								notifyLoginFailed("Missing active conversation");
+								if (conversationItem == null) {
+									handleLoginFailed("Unable to find an existing conversation with for user: '" + userId + "'");
+									return;
+								}
+
+								activeConversation = loadConversation(conversationItem);
 							}
+
+							activeConversation.setEncryptionKey(encryptionKey);
+							activeConversation.setUserId(userId);
+							activeConversation.setState(LOGGED_IN);
+							handleConversationStateChange(activeConversation);
+
+							// notify delegate
+							callback.onLoginFinish();
 						} catch (Exception e) {
 							ApptentiveLog.e(e, "Exception while creating logged-in conversation");
-							notifyLoginFailed("Internal error");
+							handleLoginFailed("Internal error");
 						}
 					}
 				});
 			}
 
-			private void notifyLoginFailed(final String reason) {
+			private void handleLoginFailed(final String reason) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
