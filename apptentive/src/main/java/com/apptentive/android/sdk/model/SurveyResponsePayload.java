@@ -53,11 +53,6 @@ public class SurveyResponsePayload extends ConversationItem {
 		return HttpRequestMethod.POST;
 	}
 
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json";
-	}
-
 	//endregion
 
 	public String getId() {

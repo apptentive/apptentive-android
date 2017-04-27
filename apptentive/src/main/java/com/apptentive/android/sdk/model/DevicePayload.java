@@ -56,16 +56,6 @@ public class DevicePayload extends JsonPayload {
 		return StringUtils.format("/conversations/%s/devices", conversationId);
 	}
 
-	@Override
-	public HttpRequestMethod getHttpRequestMethod() {
-		return HttpRequestMethod.PUT;
-	}
-
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json";
-	}
-
 	//endregion
 
 	public void setUuid(String uuid) {

@@ -121,10 +121,6 @@ public class EventPayload extends ConversationItem {
 		return HttpRequestMethod.POST;
 	}
 
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json";
-	}
 
 	//endregion
 

@@ -42,16 +42,6 @@ public class PersonPayload extends JsonPayload {
 		return StringUtils.format("/converations/%s/people", conversationId);
 	}
 
-	@Override
-	public HttpRequestMethod getHttpRequestMethod() {
-		return HttpRequestMethod.PUT;
-	}
-
-	@Override
-	public String getHttpRequestContentType() {
-		return "application/json";
-	}
-
 	//endregion
 
 	public String getId() {
