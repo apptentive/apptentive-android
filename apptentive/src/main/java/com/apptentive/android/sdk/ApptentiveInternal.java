@@ -122,6 +122,7 @@ public class ApptentiveInternal {
 	private Map<String, Object> customData;
 
 	private static final String PUSH_ACTION = "action";
+	private static final String PUSH_CONVERSATION_ID = "conversationid";
 
 	private enum PushAction {
 		pmc,       // Present Message Center.
@@ -832,6 +833,25 @@ public class ApptentiveInternal {
 		if (!TextUtils.isEmpty(apptentivePushData)) {
 			try {
 				JSONObject pushJson = new JSONObject(apptentivePushData);
+
+				// we need to check if current user is actually the receiver of this notification
+				final String conversationId = pushJson.optString(PUSH_CONVERSATION_ID, null);
+				if (conversationId != null) {
+					final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+
+					// do we have a conversation right now?
+					if (conversation == null) {
+						ApptentiveLog.e("Can't generate pending intent from Apptentive push data: no active conversation");
+						return null;
+					}
+
+					// is it an actual receiver?
+					if (!StringUtils.equal(conversation.getConversationId(), conversationId)) {
+						ApptentiveLog.e("Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
+						return null;
+					}
+				}
+
 				ApptentiveInternal.PushAction action = ApptentiveInternal.PushAction.unknown;
 				if (pushJson.has(ApptentiveInternal.PUSH_ACTION)) {
 					action = ApptentiveInternal.PushAction.parse(pushJson.getString(ApptentiveInternal.PUSH_ACTION));
