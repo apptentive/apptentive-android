@@ -11,6 +11,7 @@ import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -34,7 +35,7 @@ public class ApptentiveClient {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
-	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&after_id=%s&before_id=%s";
 	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
 
 	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
@@ -53,8 +54,23 @@ public class ApptentiveClient {
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
 	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
-		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), uri, Method.GET, null);
+		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
+			throw new IllegalStateException("Conversation is null");
+		}
+
+		final String conversationId = conversation.getConversationId();
+		if (conversationId == null) {
+			throw new IllegalStateException("Conversation id is null");
+		}
+
+		final String conversationToken = conversation.getConversationToken();
+		if (conversationToken == null) {
+			throw new IllegalStateException("Conversation token is null");
+		}
+
+		String uri = String.format(ENDPOINT_MESSAGES, conversationId, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
+		return performHttpRequest(conversationToken, uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse getInteractions(String conversationId) {
