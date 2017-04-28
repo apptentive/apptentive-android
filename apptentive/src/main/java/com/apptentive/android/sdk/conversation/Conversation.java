@@ -59,6 +59,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private String encryptionKey;
 
 	/**
+	 * Optional user id for logged-in conversations
+	 */
+	private String userId;
+	
+	/**
 	 * A utility for encrypting the data in payloads, files, and the conversation itself.
 	 * Should be set on this object when it becomes LOGGED_IN.
 	 * TODO: Create an encryptor, use it to decrypt this Conversation object as it's streamed from disk,
@@ -501,6 +506,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.encryptionKey = encryptionKey;
 	}
 
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+	
 	public Encryptor getEncryptor() {
 		return encryptor;
 	}
