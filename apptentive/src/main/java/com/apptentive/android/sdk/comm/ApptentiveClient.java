@@ -34,9 +34,8 @@ public class ApptentiveClient {
 	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
 
 	// Active API
-	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&after_id=%s&before_id=%s";
-	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
+	private static final String ENDPOINT_CONFIGURATION = "/conversations/%s/configuration";
 
 	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
 
@@ -45,7 +44,23 @@ public class ApptentiveClient {
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
 	public static ApptentiveHttpResponse getAppConfiguration() {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONFIGURATION, Method.GET, null);
+		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
+			throw new IllegalStateException("Conversation is null");
+		}
+
+		final String conversationId = conversation.getConversationId();
+		if (conversationId == null) {
+			throw new IllegalStateException("Conversation id is null");
+		}
+
+		final String conversationToken = conversation.getConversationToken();
+		if (conversationToken == null) {
+			throw new IllegalStateException("Conversation token is null");
+		}
+
+		final String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
+		return performHttpRequest(conversationToken, endPoint, Method.GET, null);
 	}
 
 	/**
