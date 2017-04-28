@@ -841,13 +841,13 @@ public class ApptentiveInternal {
 
 					// do we have a conversation right now?
 					if (conversation == null) {
-						ApptentiveLog.e("Can't generate pending intent from Apptentive push data: no active conversation");
+						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: no active conversation");
 						return null;
 					}
 
 					// is it an actual receiver?
 					if (!StringUtils.equal(conversation.getConversationId(), conversationId)) {
-						ApptentiveLog.e("Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
+						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
 						return null;
 					}
 				}
