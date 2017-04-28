@@ -52,6 +52,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KE
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_DATA;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
@@ -373,9 +374,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				resumeSending();
 			}
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
+			final boolean successful = notification.getRequiredUserInfo(NOTIFICATION_KEY_SUCCESSFUL, Boolean.class);
 			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
 			final Integer responseCode = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_CODE, Integer.class);
-			final JSONObject responseData = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_DATA, JSONObject.class);
+			final JSONObject responseData = successful ? notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_DATA, JSONObject.class) : null;
 			if (payload.getType().equals(PayloadType.message)) {
 				onSentMessage(payload.getNonce(), responseCode, responseData);
 			}
