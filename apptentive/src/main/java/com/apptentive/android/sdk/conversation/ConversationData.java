@@ -99,7 +99,7 @@ public class ConversationData implements Saveable, DataChangedListener {
 	}
 
 	public void setConversationId(String conversationId) {
-		if (conversationToken == null) {
+		if (conversationId == null) {
 			throw new IllegalArgumentException("Conversation id is null");
 		}
 
