@@ -454,10 +454,35 @@ public class ConversationManager {
 			throw new IllegalArgumentException("Callback is null");
 		}
 
+		final String userId;
+		try {
+			final Jwt jwt = Jwt.decode(token);
+			userId = jwt.getPayload().getString("user_id");
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Error while extracting user id");
+			callback.onLoginFail(e.getMessage());
+			return;
+		}
+
 		// check if active conversation exists
 		if (activeConversation == null) {
 			ApptentiveLog.d(CONVERSATION, "No active conversation. Performing login...");
-			sendLoginRequest(token, callback);
+
+			// attempt to find previous logged out conversation
+			final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
+				@Override
+				public boolean accept(ConversationMetadataItem item) {
+					return StringUtils.equal(item.getUserId(), userId);
+				}
+			});
+
+			if (conversationItem == null) {
+				ApptentiveLog.e("Unable to find an existing conversation with for user: '" + userId + "'");
+				callback.onLoginFail("No previous conversation found");
+				return;
+			}
+
+			sendLoginRequest(conversationItem.conversationId, userId, token, callback);
 			return;
 		}
 
@@ -479,7 +504,7 @@ public class ConversationManager {
 
 						if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
 							ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
-							sendLoginRequest(token, callback);
+							sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 						} else {
 							callback.onLoginFail("Conversation fetching completed abnormally");
 						}
@@ -499,7 +524,7 @@ public class ConversationManager {
 				});
 				break;
 			case ANONYMOUS:
-				sendLoginRequest(token, callback);
+				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
 				callback.onLoginFail("already logged in"); // TODO: force logout?
@@ -511,20 +536,10 @@ public class ConversationManager {
 		}
 	}
 
-	private void sendLoginRequest(final String token, final LoginCallback callback) {
-		getHttpClient().login(token, new HttpRequest.Listener<HttpJsonRequest>() {
+	private void sendLoginRequest(String conversationId, final String userId, final String token, final LoginCallback callback) {
+		getHttpClient().login(conversationId, token, new HttpRequest.Listener<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
-				final String userId;
-
-				try {
-					final Jwt jwt = Jwt.decode(token);
-					userId = jwt.getPayload().getString("user_id");
-				} catch (Exception e) {
-					handleLoginFailed(e.getMessage());
-					return;
-				}
-
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");

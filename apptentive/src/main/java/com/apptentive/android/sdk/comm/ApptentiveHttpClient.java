@@ -12,6 +12,7 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.RawHttpRequest;
 import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONObject;
 
@@ -32,7 +33,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
-	private static final String ENDPOINT_LOGIN = "/login";
+	private static final String ENDPOINT_LOGIN = "/conversations/%s/session";
 
 	private final String apiKey;
 	private final String serverURL;
@@ -63,10 +64,18 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
-	public HttpJsonRequest login(String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+	public HttpJsonRequest login(String conversationId, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (conversationId == null) {
+			throw new IllegalArgumentException("Conversation id is null");
+		}
+		if (token == null) {
+			throw new IllegalArgumentException("Token is null");
+		}
+
 		JSONObject json = new JSONObject(); // TODO: create an actual payload
 
-		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_LOGIN, json, HttpRequestMethod.POST);
+		String endPoint = StringUtils.format(ENDPOINT_LOGIN, conversationId);
+		HttpJsonRequest request = createJsonRequest(apiKey, endPoint, json, HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
