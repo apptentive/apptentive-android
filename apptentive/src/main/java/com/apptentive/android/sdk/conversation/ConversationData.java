@@ -84,6 +84,10 @@ public class ConversationData implements Saveable, DataChangedListener {
 	}
 
 	public void setConversationToken(String conversationToken) {
+		if (conversationToken == null) {
+			throw new IllegalArgumentException("Conversation token is null");
+		}
+
 		if (!StringUtils.equal(this.conversationToken, conversationToken)) {
 			this.conversationToken = conversationToken;
 			notifyDataChanged();
@@ -95,6 +99,10 @@ public class ConversationData implements Saveable, DataChangedListener {
 	}
 
 	public void setConversationId(String conversationId) {
+		if (conversationId == null) {
+			throw new IllegalArgumentException("Conversation id is null");
+		}
+
 		if (!StringUtils.equal(this.conversationId, conversationId)) {
 			this.conversationId = conversationId;
 			notifyDataChanged();

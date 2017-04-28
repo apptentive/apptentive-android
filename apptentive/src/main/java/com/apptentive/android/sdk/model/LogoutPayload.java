@@ -24,12 +24,12 @@ public class LogoutPayload extends JsonPayload {
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {
-		return StringUtils.format("/conversations/%s/logout", conversationId);
+		return StringUtils.format("/conversations/%s/session", conversationId);
 	}
 
 	@Override
 	public HttpRequestMethod getHttpRequestMethod() {
-		return HttpRequestMethod.POST;
+		return HttpRequestMethod.DELETE;
 	}
 
 	//endregion

@@ -11,7 +11,9 @@ import android.text.TextUtils;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.*;
@@ -32,18 +34,33 @@ public class ApptentiveClient {
 	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
 
 	// Active API
-	private static final String ENDPOINT_CONVERSATION = "/conversation";
-	private static final String ENDPOINT_CONVERSATION_FETCH = ENDPOINT_CONVERSATION + "?count=%s&after_id=%s&before_id=%s";
-	private static final String ENDPOINT_CONFIGURATION = ENDPOINT_CONVERSATION + "/configuration";
+	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_CONFIGURATION = "/conversations/%s/configuration";
 
-	private static final String ENDPOINT_INTERACTIONS = "/interactions";
+	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
 
 	// Deprecated API
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
 	public static ApptentiveHttpResponse getAppConfiguration() {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_CONFIGURATION, Method.GET, null);
+		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
+			throw new IllegalStateException("Conversation is null");
+		}
+
+		final String conversationId = conversation.getConversationId();
+		if (conversationId == null) {
+			throw new IllegalStateException("Conversation id is null");
+		}
+
+		final String conversationToken = conversation.getConversationToken();
+		if (conversationToken == null) {
+			throw new IllegalStateException("Conversation token is null");
+		}
+
+		final String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
+		return performHttpRequest(conversationToken, endPoint, Method.GET, null);
 	}
 
 	/**
@@ -52,12 +69,31 @@ public class ApptentiveClient {
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
 	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
-		String uri = String.format(ENDPOINT_CONVERSATION_FETCH, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), uri, Method.GET, null);
+		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
+			throw new IllegalStateException("Conversation is null");
+		}
+
+		final String conversationId = conversation.getConversationId();
+		if (conversationId == null) {
+			throw new IllegalStateException("Conversation id is null");
+		}
+
+		final String conversationToken = conversation.getConversationToken();
+		if (conversationToken == null) {
+			throw new IllegalStateException("Conversation token is null");
+		}
+
+		String uri = String.format(ENDPOINT_MESSAGES, conversationId, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
+		return performHttpRequest(conversationToken, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse getInteractions() {
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), ENDPOINT_INTERACTIONS, Method.GET, null);
+	public static ApptentiveHttpResponse getInteractions(String conversationId) {
+		if (conversationId == null) {
+			throw new IllegalArgumentException("Conversation id is null");
+		}
+		final String endPoint = StringUtils.format(ENDPOINT_INTERACTIONS, conversationId);
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), endPoint, Method.GET, null);
 	}
 
 	/**

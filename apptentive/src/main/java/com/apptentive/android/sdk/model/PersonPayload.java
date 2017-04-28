@@ -39,7 +39,7 @@ public class PersonPayload extends JsonPayload {
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {
-		return StringUtils.format("/converations/%s/people", conversationId);
+		return StringUtils.format("/conversations/%s/person", conversationId);
 	}
 
 	//endregion
