@@ -53,7 +53,7 @@ public class DevicePayload extends JsonPayload {
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {
-		return StringUtils.format("/conversations/%s/devices", conversationId);
+		return StringUtils.format("/conversations/%s/device", conversationId);
 	}
 
 	//endregion
