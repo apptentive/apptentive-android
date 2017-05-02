@@ -18,8 +18,6 @@ import org.json.JSONObject;
 
 import java.util.List;
 
-import static android.text.TextUtils.isEmpty;
-
 /**
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
@@ -116,12 +114,19 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		final HttpRequestMethod requestMethod = payload.getHttpRequestMethod();
 
 		// TODO: figure out a better solution
+		HttpRequest request;
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			return createMultipartRequest(token, httpPath, payload.getData(), associatedFiles, requestMethod);
+			request = createMultipartRequest(token, httpPath, payload.getData(), associatedFiles, requestMethod);
+		} else {
+			request = createRawRequest(token, httpPath, payload.getData(), requestMethod);
 		}
 
-		return createRawRequest(token, httpPath, payload.getData(), requestMethod);
+		if (payload.isEncrypted()) {
+			request.setRequestProperty("APPTENTIVE-ENCRYPTED", Boolean.TRUE);
+		}
+
+		return request;
 	}
 
 	//endregion
@@ -199,6 +204,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		request.setRequestProperty("Authorization", "OAuth " + oauthToken);
 		request.setRequestProperty("Accept-Encoding", "gzip");
 		request.setRequestProperty("Accept", "application/json");
+		request.setRequestProperty("APPTENTIVE-APP-KEY", appKey);
+		request.setRequestProperty("APPTENTIVE-APP-SIGNATURE", appSignature);
 		request.setRequestProperty("X-API-Version", API_VERSION);
 		request.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 		request.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);

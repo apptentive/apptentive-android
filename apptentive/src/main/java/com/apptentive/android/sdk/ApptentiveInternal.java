@@ -360,6 +360,10 @@ public class ApptentiveInternal {
 		return appKey;
 	}
 
+	public String getApptentiveAppSignature() {
+		return appSignature;
+	}
+
 	public String getServerUrl() {
 		if (serverUrl == null) {
 			return Constants.CONFIG_DEFAULT_SERVER_URL;
