@@ -15,6 +15,17 @@ public abstract class Payload {
 	private final PayloadType payloadType;
 
 	/**
+	 * If set, this payload should be encrypted in getData().
+	 */
+	protected String encryptionKey;
+
+	/**
+	 * Encrypted Payloads need to include the Conversation JWT inside them so that the server can
+	 * authenticate each payload after it is decrypted.
+	 */
+	protected String token;
+
+	/**
 	 * A value that can be used to correlate a payload with another object
 	 * (for example, to update the sent status of a message)
 	 */
@@ -63,6 +74,14 @@ public abstract class Payload {
 
 	public PayloadType getPayloadType() {
 		return payloadType;
+	}
+
+	public void setEncryptionKey(String encryptionKey) {
+		this.encryptionKey = encryptionKey;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
 	}
 
 	public String getNonce() {

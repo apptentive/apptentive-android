@@ -464,7 +464,7 @@ public class ConversationManager {
 			return;
 		}
 
-		// check if active conversation exists
+		// Check if there is an active conversation
 		if (activeConversation == null) {
 			ApptentiveLog.d(CONVERSATION, "No active conversation. Performing login...");
 
@@ -527,7 +527,8 @@ public class ConversationManager {
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
-				callback.onLoginFail("already logged in"); // TODO: force logout?
+				// FIXME: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
+				callback.onLoginFail("already logged in");
 				break;
 			default:
 				assertFail("Unexpected conversation state: " + activeConversation.getState());
