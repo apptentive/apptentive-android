@@ -17,26 +17,17 @@ import org.json.JSONObject;
 public abstract class JsonPayload extends Payload {
 
 	private final JSONObject jsonObject;
-	private final Encryptor encryptor;
 
 	// These three are not stored in the JSON, only the DB.
 
 	public JsonPayload(PayloadType type) {
 		super(type);
 		jsonObject = new JSONObject();
-		this.encryptor = null;
-	}
-
-	public JsonPayload(PayloadType type, Encryptor encryptor) {
-		super(type);
-		jsonObject = new JSONObject();
-		this.encryptor = encryptor;
 	}
 
 	public JsonPayload(PayloadType type, String json) throws JSONException {
 		super(type);
 		jsonObject = new JSONObject(json);
-		this.encryptor = null;
 	}
 
 	//region Data
@@ -44,11 +35,17 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] getData() {
 		try {
-			byte[] bytes = jsonObject.toString().getBytes();
-			if (encryptor != null) {
+			if (encryptionKey != null) {
+				JSONObject wrapper = new JSONObject();
+				wrapper.put("token", token);
+				wrapper.put("payload", jsonObject);
+				byte[] bytes = wrapper.toString().getBytes();
+				Encryptor encryptor = new Encryptor(encryptionKey);
+				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
 				return encryptor.encrypt(bytes);
 			} else {
-				return bytes;
+				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
+				return jsonObject.toString().getBytes();
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
@@ -165,10 +162,10 @@ public abstract class JsonPayload extends Payload {
 
 	@Override
 	public String getHttpRequestContentType() {
-		if (encryptor != null) {
-			return "application/json";
-		} else {
+		if (encryptionKey != null) {
 			return "application/octet-stream";
+		} else {
+			return "application/json";
 		}
 	}
 

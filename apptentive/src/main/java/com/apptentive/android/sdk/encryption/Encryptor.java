@@ -6,8 +6,8 @@
 
 package com.apptentive.android.sdk.encryption;
 
-import java.io.IOException;
-import java.io.OutputStream;
+import com.apptentive.android.sdk.util.StringUtils;
+
 import java.io.UnsupportedEncodingException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
@@ -17,7 +17,6 @@ import java.security.spec.AlgorithmParameterSpec;
 
 import javax.crypto.BadPaddingException;
 import javax.crypto.Cipher;
-import javax.crypto.CipherOutputStream;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
@@ -29,7 +28,15 @@ public class Encryptor {
 
 	private SecretKeySpec key;
 
-	public Encryptor(byte[] keyBytes) {
+	/**
+	 * Initializes the Encryptor
+	 * @param hexKey A hex encoded String with the key data.
+	 */
+	public Encryptor(String hexKey) {
+		this.key = new SecretKeySpec(StringUtils.hexToBytes(hexKey), "AES");
+	}
+
+	Encryptor(byte[] keyBytes) {
 		this.key = new SecretKeySpec(keyBytes, "AES");
 	}
 
@@ -49,7 +56,7 @@ public class Encryptor {
 		return ret;
 	}
 
-	public byte[] encrypt(byte[] iv, byte[] plainText) throws NoSuchAlgorithmException,
+	private byte[] encrypt(byte[] iv, byte[] plainText) throws NoSuchAlgorithmException,
 	                                                          NoSuchPaddingException,
 	                                                          InvalidAlgorithmParameterException,
 	                                                          InvalidKeyException,
@@ -62,7 +69,7 @@ public class Encryptor {
 		return cipher.doFinal(plainText);
 	}
 
-	public byte[] decrypt(byte[] iv, byte[] cipherText) throws NoSuchPaddingException,
+	private byte[] decrypt(byte[] iv, byte[] cipherText) throws NoSuchPaddingException,
 	                                                           NoSuchAlgorithmException,
 	                                                           BadPaddingException,
 	                                                           IllegalBlockSizeException,

@@ -13,7 +13,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
@@ -53,8 +52,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private ConversationData conversationData;
 
 	/**
-	 * Encryption key for payloads
-	 * TODO: Don't store this in the object. Store it in the Conversation MetaData. It's going to be needed to decrypt the Conversation itself.
+	 * Encryption key for payloads. A hex encoded String.
 	 */
 	private String encryptionKey;
 
@@ -62,14 +60,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * Optional user id for logged-in conversations
 	 */
 	private String userId;
-	
-	/**
-	 * A utility for encrypting the data in payloads, files, and the conversation itself.
-	 * Should be set on this object when it becomes LOGGED_IN.
-	 * TODO: Create an encryptor, use it to decrypt this Conversation object as it's streamed from disk,
-	 * then set the encryptor on the Conversation.
-	 */
-	private Encryptor encryptor;
 
 	/**
 	 * File which represents serialized conversation data on the disk
@@ -513,14 +503,5 @@ public class Conversation implements DataChangedListener, Destroyable {
 	public void setUserId(String userId) {
 		this.userId = userId;
 	}
-	
-	public Encryptor getEncryptor() {
-		return encryptor;
-	}
-
-	public void setEncryptor(Encryptor encryptor) {
-		this.encryptor = encryptor;
-	}
-
 	//endregion
 }

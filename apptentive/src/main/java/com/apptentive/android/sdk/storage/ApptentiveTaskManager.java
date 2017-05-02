@@ -58,6 +58,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	// Set when receiving an ApptentiveNotification
 	private String currentConversationId;
 	private String currentConversationToken;
+	private String conversationEncryptionKey;
 
 	private final PayloadSender payloadSender;
 	private boolean appInBackground;
@@ -104,6 +105,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * a new message is added.
 	 */
 	public void addPayload(final Payload... payloads) {
+		// Set the current encryptor on each payload as they are added.
+		if (conversationEncryptionKey != null) {
+			for (Payload payload : payloads) {
+				payload.setEncryptionKey(conversationEncryptionKey);
+				payload.setToken(currentConversationToken);
+			}
+		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
@@ -261,6 +269,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				Assert.assertNotNull(currentConversationId);
 
 				currentConversationToken = conversation.getConversationToken();
+				conversationEncryptionKey = conversation.getEncryptionKey();
 				Assert.assertNotNull(currentConversationToken);
 
 				// when the Conversation ID comes back from the server, we need to update
