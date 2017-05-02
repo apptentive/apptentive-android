@@ -591,7 +591,7 @@ public class ApptentiveInternal {
 		ApptentiveLog.d("Apptentive App Key: %s", appKey);
 
 		// The app signature can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(appSignature) || appSignature.contains(Constants.EXAMPLE_APP_KEY_VALUE)) {
+		if (TextUtils.isEmpty(appSignature) || appSignature.contains(Constants.EXAMPLE_APP_SIGNATURE_VALUE)) {
 			String errorMessage = "The Apptentive App Signature is not defined. You may provide your Apptentive App Signature in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
 				"<meta-data android:name=\"apptentive_app_signature\"\n" +
 				"           android:value=\"@string/your_apptentive_app_signature\"/>";
