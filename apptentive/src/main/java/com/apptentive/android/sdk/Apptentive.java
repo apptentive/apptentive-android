@@ -52,16 +52,16 @@ public class Apptentive {
 	 * @param application The {@link Application} object for this app.
 	 */
 	public static void register(Application application) {
-		Apptentive.register(application, null);
+		Apptentive.register(application, null, null);
 	}
 
-	public static void register(Application application, String apptentiveApiKey) {
-		register(application, apptentiveApiKey, null);
+	public static void register(Application application, String apptentiveAppKey, String apptentiveAppSignature) {
+		register(application, apptentiveAppKey, apptentiveAppSignature, null);
 	}
 
-	private static void register(Application application, String apptentiveApiKey, String serverUrl) {
+	private static void register(Application application, String apptentiveAppKey, String apptentiveAppSignature, String serverUrl) {
 		ApptentiveLog.i("Registering Apptentive.");
-		ApptentiveInternal.createInstance(application, apptentiveApiKey, serverUrl);
+		ApptentiveInternal.createInstance(application, apptentiveAppKey, apptentiveAppSignature, serverUrl);
 	}
 
 	//region Global Data Methods

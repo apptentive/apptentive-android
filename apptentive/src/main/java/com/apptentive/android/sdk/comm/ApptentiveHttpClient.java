@@ -35,22 +35,28 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_LOGIN = "/conversations/%s/session";
 
-	private final String apiKey;
+	private final String appKey;
+	private final String appSignature;
 	private final String serverURL;
 	private final String userAgentString;
 	private final HttpRequestManager httpRequestManager;
 
-	public ApptentiveHttpClient(String apiKey, String serverURL) {
-		if (isEmpty(apiKey)) {
-			throw new IllegalArgumentException("Illegal API key: '" + apiKey + "'");
+	public ApptentiveHttpClient(String appKey, String appSignature, String serverURL) {
+		if (StringUtils.isNullOrEmpty(appKey)) {
+			throw new IllegalArgumentException("Illegal app key: '" + appKey + "'");
 		}
 
-		if (isEmpty(serverURL)) {
+		if (StringUtils.isNullOrEmpty(appSignature)) {
+			throw new IllegalArgumentException("Illegal app signature: '" + appSignature + "'");
+		}
+
+		if (StringUtils.isNullOrEmpty(serverURL)) {
 			throw new IllegalArgumentException("Illegal server URL: '" + serverURL + "'");
 		}
 
 		this.httpRequestManager = new HttpRequestManager();
-		this.apiKey = apiKey;
+		this.appKey = appKey;
+		this.appSignature = appSignature;
 		this.serverURL = serverURL;
 		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
@@ -58,7 +64,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region API Requests
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
-		HttpJsonRequest request = createJsonRequest(apiKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
+		HttpJsonRequest request = createJsonRequest(appKey, ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
@@ -75,7 +81,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		JSONObject json = new JSONObject(); // TODO: create an actual payload
 
 		String endPoint = StringUtils.format(ENDPOINT_LOGIN, conversationId);
-		HttpJsonRequest request = createJsonRequest(apiKey, endPoint, json, HttpRequestMethod.POST);
+		HttpJsonRequest request = createJsonRequest(appKey, endPoint, json, HttpRequestMethod.POST);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;
