@@ -217,7 +217,7 @@ public class ApptentiveInternal {
 				}
 
 				// if App signature is not defined - try loading from AndroidManifest.xml
-				if (StringUtils.isNullOrEmpty(apptentiveAppKey)) {
+				if (StringUtils.isNullOrEmpty(apptentiveAppSignature)) {
 					apptentiveAppSignature = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_APP_SIGNATURE);
 					// TODO: check if signature key is still empty
 				}

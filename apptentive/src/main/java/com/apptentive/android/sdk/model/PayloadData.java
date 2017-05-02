@@ -29,6 +29,10 @@ public class PayloadData {
 			throw new IllegalArgumentException("Nonce is null");
 		}
 
+		if (data == null) {
+			throw new IllegalArgumentException("Data is null");
+		}
+
 		if (authToken == null) {
 			throw new IllegalArgumentException("Auth token is null");
 		}

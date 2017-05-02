@@ -74,7 +74,7 @@ class PayloadSender {
 		try {
 			sendPayloadRequest(payload);
 		} catch (Exception e) {
-			ApptentiveLog.e(PAYLOADS, "Exception while sending payload: %s", payload);
+			ApptentiveLog.e(e, "Exception while sending payload: %s", payload);
 
 			// for NullPointerException, the message object would be null, we should handle it separately
 			// TODO: add a helper class for handling that
