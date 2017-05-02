@@ -39,7 +39,7 @@ public abstract class JsonPayload extends Payload {
 				JSONObject wrapper = new JSONObject();
 				wrapper.put("token", token);
 				wrapper.put("payload", jsonObject);
-				byte[] bytes = jsonObject.toString().getBytes();
+				byte[] bytes = wrapper.toString().getBytes();
 				Encryptor encryptor = new Encryptor(encryptionKey);
 				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
 				return encryptor.encrypt(bytes);
