@@ -20,8 +20,10 @@ public class Constants {
 
 	// Globals
 	public static final String PREF_KEY_SERVER_URL = "serverUrl";
+
 	// Just in case a customer copies the example text verbatim.
-	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
+	public static final String EXAMPLE_APP_KEY_VALUE = "YOUR_APPTENTIVE_APP_KEY";
+	public static final String EXAMPLE_APP_SIGNATURE_VALUE = "YOUR_APPTENTIVE_APP_SIGNATURE";
 
 	// Session Data
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
@@ -45,7 +47,8 @@ public class Constants {
 
 	// Manifest keys
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
-	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_APPTENTIVE_APP_KEY = "apptentive_app_key";
+	public static final String MANIFEST_KEY_APPTENTIVE_APP_SIGNATURE = "apptentive_app_signature";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";

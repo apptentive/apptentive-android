@@ -24,6 +24,8 @@ import java.net.URL;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
+import static com.apptentive.android.sdk.debug.Assert.notNull;
+
 public class ApptentiveClient {
 
 	public static final int API_VERSION = 9;
@@ -129,6 +131,8 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Accept-Encoding", "gzip");
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
+			connection.setRequestProperty("APPTENTIVE-APP-KEY", notNull(ApptentiveInternal.getInstance().getApptentiveAppKey()));
+			connection.setRequestProperty("APPTENTIVE-APP-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveAppSignature()));
 
 			switch (method) {
 				case GET:

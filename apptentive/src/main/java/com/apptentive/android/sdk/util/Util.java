@@ -27,6 +27,7 @@ import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
@@ -863,5 +864,34 @@ public class Util {
 			}
 		}
 		return internalDir;
+	}
+
+	/**
+	 * Helper method for resolving manifest metadata string value
+	 *
+	 * @return null if key is missing or exception is thrown
+	 */
+	public static String getManifestMetadataString(Context context, String key) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		if (key == null) {
+			throw new IllegalArgumentException("Key is null");
+		}
+
+		try {
+			String appPackageName = context.getPackageName();
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
+			Bundle metaData = packageInfo.applicationInfo.metaData;
+			if (metaData != null) {
+				return Util.trim(metaData.getString(key));
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
+		}
+
+		return null;
 	}
 }

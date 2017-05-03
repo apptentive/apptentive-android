@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.List;
 import java.util.UUID;
@@ -78,6 +79,10 @@ public abstract class Payload {
 
 	public void setEncryptionKey(String encryptionKey) {
 		this.encryptionKey = encryptionKey;
+	}
+
+	public boolean hasEncryptionKey() {
+		return !StringUtils.isNullOrEmpty(encryptionKey);
 	}
 
 	public void setToken(String token) {
