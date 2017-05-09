@@ -17,8 +17,11 @@ import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
+import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.util.Constants;
+
+import org.json.JSONObject;
 
 import java.util.Iterator;
 
@@ -41,6 +44,7 @@ public class Migrator {
 		migrateDevice();
 		migrateSdk();
 		migrateAppRelease();
+		migratePerson();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -136,8 +140,44 @@ public class Migrator {
 				appRelease.setType(appReleaseOld.getType());
 				appRelease.setVersionCode(appReleaseOld.getVersionCode());
 				appRelease.setVersionName(appReleaseOld.getVersionName());
+				conversation.setAppRelease(appRelease);
 			} catch (Exception e) {
 				ApptentiveLog.e("Error migrating AppRelease.", e);
+			}
+		}
+	}
+
+	private void migratePerson() {
+		String personString = prefs.getString(Constants.PREF_KEY_PERSON, null);
+
+		if (personString != null) {
+			try {
+				Person person = new Person();
+				com.apptentive.android.sdk.migration.v4_0_0.Person personOld = new com.apptentive.android.sdk.migration.v4_0_0.Person(personString);
+				person.setEmail(personOld.getEmail());
+				person.setBirthday(personOld.getBirthday());
+				person.setCity(personOld.getCity());
+				person.setCountry(personOld.getCountry());
+				person.setFacebookId(personOld.getFacebookId());
+				person.setId(personOld.getId());
+				person.setName(personOld.getName());
+				person.setPhoneNumber(personOld.getPhoneNumber());
+				person.setStreet(personOld.getStreet());
+				person.setZip(personOld.getZip());
+
+				JSONObject customDataOld = personOld.getCustomData();
+				if (customDataOld != null) {
+					CustomData customData = new CustomData();
+					Iterator it = customDataOld.keys();
+					while (it.hasNext()) {
+						String key = (String) it.next();
+						customData.put(key, customDataOld.get(key));
+					}
+					person.setCustomData(customData);
+				}
+				conversation.setPerson(person);
+			} catch (Exception e) {
+				ApptentiveLog.e("Error migrating Person.", e);
 			}
 		}
 	}
