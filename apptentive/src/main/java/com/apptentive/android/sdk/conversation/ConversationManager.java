@@ -8,7 +8,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.Migrator;
+import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;

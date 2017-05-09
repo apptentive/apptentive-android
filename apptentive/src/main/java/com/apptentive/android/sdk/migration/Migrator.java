@@ -4,12 +4,14 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk;
+package com.apptentive.android.sdk.migration;
 
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
@@ -38,6 +40,7 @@ public class Migrator {
 
 		migrateDevice();
 		migrateSdk();
+		migrateAppRelease();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -70,7 +73,7 @@ public class Migrator {
 				while (it.hasNext()) {
 					String key = (String) it.next();
 					IntegrationConfigItem item = new IntegrationConfigItem();
-					switch (key ) {
+					switch (key) {
 						case INTEGRATION_APPTENTIVE_PUSH:
 							item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
 							integrationConfig.setApptentive(item);
@@ -112,8 +115,29 @@ public class Migrator {
 				sdk.setAuthorName(sdkOld.getAuthorName());
 				sdk.setAuthorEmail(sdkOld.getAuthorEmail());
 				conversation.setSdk(sdk);
-			}catch (Exception  e) {
+			} catch (Exception e) {
 				ApptentiveLog.e("Error migrating Sdk.", e);
+			}
+		}
+	}
+
+	private void migrateAppRelease() {
+		String appReleaseString = prefs.getString(Constants.PREF_KEY_APP_RELEASE, null);
+		if (appReleaseString != null) {
+			try {
+				com.apptentive.android.sdk.migration.v4_0_0.AppRelease appReleaseOld = new com.apptentive.android.sdk.migration.v4_0_0.AppRelease(appReleaseString);
+				AppRelease appRelease = new AppRelease();
+				appRelease.setAppStore(appReleaseOld.getAppStore());
+				appRelease.setDebug(appReleaseOld.getDebug());
+				appRelease.setIdentifier(appReleaseOld.getIdentifier());
+				appRelease.setInheritStyle(appReleaseOld.getInheritStyle());
+				appRelease.setOverrideStyle(appReleaseOld.getOverrideStyle());
+				appRelease.setTargetSdkVersion(appReleaseOld.getTargetSdkVersion());
+				appRelease.setType(appReleaseOld.getType());
+				appRelease.setVersionCode(appReleaseOld.getVersionCode());
+				appRelease.setVersionName(appReleaseOld.getVersionName());
+			} catch (Exception e) {
+				ApptentiveLog.e("Error migrating AppRelease.", e);
 			}
 		}
 	}
