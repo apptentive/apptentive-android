@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.storage;
 import org.json.JSONException;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
 
@@ -74,4 +75,20 @@ public class CustomData extends HashMap<String, Object> implements Saveable {
 		}
 		return null;
 	}
+
+	public static CustomData fromJson(com.apptentive.android.sdk.model.CustomData input) {
+		try {
+			CustomData ret = new CustomData();
+			Iterator keys = input.keys();
+			while(keys.hasNext()) {
+				String key = (String) keys.next();
+				ret.put(key, input.get(key));
+			}
+			return ret;
+		} catch (JSONException e) {
+			// This can't happen.
+		}
+		return null;
+	}
+
 }

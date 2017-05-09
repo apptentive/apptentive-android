@@ -1,11 +1,14 @@
 package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Looper;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Migrator;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
@@ -22,6 +25,7 @@ import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Jwt;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -167,9 +171,32 @@ public class ConversationManager {
 		File dataFile = new File(storageDir, Util.generateRandomFilename());
 		File messagesFile = new File(storageDir, Util.generateRandomFilename());
 		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
-		anonymousConversation.setState(ANONYMOUS_PENDING);
-		fetchConversationToken(anonymousConversation);
-		return anonymousConversation;
+
+		// If there is a Legacy Conversation, migrate it into the new Conversation object.
+		// Check whether migration is needed.
+		// No Conversations exist in the meta-data.
+		// Do we have a Legacy Conversation or not?
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
+		Apptentive.Version version4 = new Apptentive.Version();
+		version4.setVersion("4.0.0");
+		Apptentive.Version lastSeenVersion = new Apptentive.Version();
+		lastSeenVersion.setVersion(lastSeenVersionString);
+		if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
+
+			Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
+			migrator.migrate();
+
+			anonymousConversation.setState(ANONYMOUS_PENDING);
+			fetchConversationToken(anonymousConversation);
+			return anonymousConversation;
+		} else {
+
+			// If there is no Legacy Conversation, then just connect it to the server.
+			anonymousConversation.setState(ANONYMOUS_PENDING);
+			fetchConversationToken(anonymousConversation);
+			return anonymousConversation;
+		}
 	}
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
