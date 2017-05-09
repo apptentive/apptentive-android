@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
+import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.util.Constants;
 
 import java.util.Iterator;
@@ -36,7 +37,7 @@ public class Migrator {
 		conversation.setLastSeenSdkVersion(prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null));
 
 		migrateDevice();
-
+		migrateSdk();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -95,5 +96,25 @@ public class Migrator {
 		}
 
 		conversation.setDevice(device);
+	}
+
+	private void migrateSdk() {
+		String sdkString = prefs.getString(Constants.PREF_KEY_SDK, null);
+		if (sdkString != null) {
+			try {
+				com.apptentive.android.sdk.migration.v4_0_0.Sdk sdkOld = new com.apptentive.android.sdk.migration.v4_0_0.Sdk(sdkString);
+				Sdk sdk = new Sdk();
+				sdk.setVersion(sdkOld.getVersion());
+				sdk.setDistribution(sdkOld.getDistribution());
+				sdk.setDistributionVersion(sdkOld.getDistributionVersion());
+				sdk.setPlatform(sdkOld.getPlatform());
+				sdk.setProgrammingLanguage(sdkOld.getProgrammingLanguage());
+				sdk.setAuthorName(sdkOld.getAuthorName());
+				sdk.setAuthorEmail(sdkOld.getAuthorEmail());
+				conversation.setSdk(sdk);
+			}catch (Exception  e) {
+				ApptentiveLog.e("Error migrating Sdk.", e);
+			}
+		}
 	}
 }
