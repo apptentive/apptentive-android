@@ -45,6 +45,7 @@ public class Migrator {
 		migrateSdk();
 		migrateAppRelease();
 		migratePerson();
+		migrateMessageCenter();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -209,5 +210,10 @@ public class Migrator {
 				ApptentiveLog.e("Error migrating Person.", e);
 			}
 		}
+	}
+
+	private void migrateMessageCenter() {
+		conversation.setMessageCenterFeatureUsed(prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false));
+		conversation.setMessageCenterWhoCardPreviouslyDisplayed(prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, false));
 	}
 }
