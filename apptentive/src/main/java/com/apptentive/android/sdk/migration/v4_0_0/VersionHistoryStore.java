@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.storage.legacy;
+package com.apptentive.android.sdk.migration.v4_0_0;
 
 import android.content.SharedPreferences;
 
@@ -163,6 +163,7 @@ public class VersionHistoryStore {
 	 * @return the base JSONArray
 	 */
 	public static JSONArray getBaseArray() {
+		ensureLoaded();
 		JSONArray baseArray = new JSONArray();
 		for (VersionHistoryEntry entry : versionHistoryEntries) {
 			baseArray.put(entry);

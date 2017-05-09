@@ -11,6 +11,8 @@ import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryEntry;
+import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryStore;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
@@ -18,9 +20,11 @@ import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Sdk;
+import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.util.Iterator;
@@ -46,6 +50,7 @@ public class Migrator {
 		migrateAppRelease();
 		migratePerson();
 		migrateMessageCenter();
+		migrateVersionHistory();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -215,5 +220,23 @@ public class Migrator {
 	private void migrateMessageCenter() {
 		conversation.setMessageCenterFeatureUsed(prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_FEATURE_USED, false));
 		conversation.setMessageCenterWhoCardPreviouslyDisplayed(prefs.getBoolean(Constants.PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE, false));
+	}
+
+	private void migrateVersionHistory() {
+		// An existing static initializer will trigger the V1 to V2 migration of VersionHistory when VersionHistoryStore is loaded below.
+
+		// Then migrate to V3, which is stored in the Conversation object.
+		JSONArray versionHistoryOld = VersionHistoryStore.getBaseArray();
+		try {
+			if (versionHistoryOld != null && versionHistoryOld.length() > 0) {
+				VersionHistory versionHistory = conversation.getVersionHistory();
+				for (int i = 0; i < versionHistoryOld.length(); i++) {
+					VersionHistoryEntry versionHistoryEntryOld = new VersionHistoryEntry((JSONObject) versionHistoryOld.get(i));
+					versionHistory.updateVersionHistory(versionHistoryEntryOld.getTimestamp(), versionHistoryEntryOld.getVersionCode(), versionHistoryEntryOld.getVersionName());
+				}
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error migrating VersionHistory entries V2 to V3.", e);
+		}
 	}
 }
