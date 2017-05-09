@@ -14,12 +14,12 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
-import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONObject;
 
@@ -55,54 +55,83 @@ public class Migrator {
 	private static final String INTEGRATION_PUSH_TOKEN = "token";
 
 	private void migrateDevice() {
-		// Device, Device Custom Data, Integration Config
-		Device device = DeviceManager.generateNewDevice(context);
-		String deviceDataString = prefs.getString(Constants.PREF_KEY_DEVICE_DATA, null);
-		if (deviceDataString != null) {
-			try {
-				com.apptentive.android.sdk.model.CustomData customDataOld = new com.apptentive.android.sdk.model.CustomData(deviceDataString);
-				CustomData customData = CustomData.fromJson(customDataOld);
-				device.setCustomData(customData);
-			} catch (Exception e) {
-				ApptentiveLog.e("Error migrating Device Custom Data.", e);
-			}
-		}
+		try {
+			String deviceString = prefs.getString(Constants.PREF_KEY_DEVICE, null);
+			if (deviceString != null) {
+				com.apptentive.android.sdk.migration.v4_0_0.Device deviceOld = new com.apptentive.android.sdk.migration.v4_0_0.Device(deviceString);
+				Device device = new Device();
 
-		String integrationConfigString = prefs.getString(Constants.PREF_KEY_DEVICE_INTEGRATION_CONFIG, null);
-		if (integrationConfigString != null) {
-			try {
-				com.apptentive.android.sdk.model.CustomData integrationConfigOld = new com.apptentive.android.sdk.model.CustomData(integrationConfigString);
-				IntegrationConfig integrationConfig = new IntegrationConfig();
-				Iterator it = integrationConfigOld.keys();
-				while (it.hasNext()) {
-					String key = (String) it.next();
-					IntegrationConfigItem item = new IntegrationConfigItem();
-					switch (key) {
-						case INTEGRATION_APPTENTIVE_PUSH:
-							item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
-							integrationConfig.setApptentive(item);
-							break;
-						case INTEGRATION_PARSE:
-							item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
-							integrationConfig.setParse(item);
-							break;
-						case INTEGRATION_URBAN_AIRSHIP:
-							item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
-							integrationConfig.setUrbanAirship(item);
-							break;
-						case INTEGRATION_AWS_SNS:
-							item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
-							integrationConfig.setAmazonAwsSns(item);
-							break;
-					}
+				device.setUuid(deviceOld.getUuid());
+				device.setOsName(deviceOld.getOsName());
+				device.setOsVersion(deviceOld.getOsVersion());
+				device.setOsBuild(deviceOld.getOsBuild());
+				String osApiLevel = deviceOld.getOsApiLevel();
+				if (!StringUtils.isNullOrEmpty(osApiLevel)) {
+					device.setOsApiLevel(Integer.parseInt(osApiLevel));
 				}
-				device.setIntegrationConfig(integrationConfig);
-			} catch (Exception e) {
-				ApptentiveLog.e("Error migrating Device Integration Config.", e);
-			}
-		}
+				device.setManufacturer(deviceOld.getManufacturer());
+				device.setModel(deviceOld.getModel());
+				device.setBoard(deviceOld.getBoard());
+				device.setProduct(deviceOld.getProduct());
+				device.setBrand(deviceOld.getBrand());
+				device.setCpu(deviceOld.getCpu());
+				device.setDevice(deviceOld.getDevice());
+				device.setCarrier(deviceOld.getCarrier());
+				device.setCurrentCarrier(deviceOld.getCurrentCarrier());
+				device.setNetworkType(deviceOld.getNetworkType());
+				device.setBuildType(deviceOld.getBuildType());
+				device.setBuildId(deviceOld.getBuildId());
+				device.setBootloaderVersion(deviceOld.getBootloaderVersion());
+				device.setRadioVersion(deviceOld.getRadioVersion());
+				device.setLocaleCountryCode(deviceOld.getLocaleCountryCode());
+				device.setLocaleLanguageCode(deviceOld.getLocaleLanguageCode());
+				device.setLocaleRaw(deviceOld.getLocaleRaw());
+				device.setUtcOffset(deviceOld.getUtcOffset());
 
-		conversation.setDevice(device);
+				JSONObject customDataOld = deviceOld.getCustomData();
+				if (customDataOld != null) {
+					CustomData customData = new CustomData();
+					Iterator it = customDataOld.keys();
+					while (it.hasNext()) {
+						String key = (String) it.next();
+						customData.put(key, customDataOld.get(key));
+					}
+					device.setCustomData(customData);
+				}
+
+				JSONObject integrationConfigOld = deviceOld.getIntegrationConfig();
+				if (integrationConfigOld != null) {
+					IntegrationConfig integrationConfig = new IntegrationConfig();
+					Iterator it = integrationConfigOld.keys();
+					while (it.hasNext()) {
+						String key = (String) it.next();
+						IntegrationConfigItem item = new IntegrationConfigItem();
+						switch (key) {
+							case INTEGRATION_APPTENTIVE_PUSH:
+								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
+								integrationConfig.setApptentive(item);
+								break;
+							case INTEGRATION_PARSE:
+								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
+								integrationConfig.setParse(item);
+								break;
+							case INTEGRATION_URBAN_AIRSHIP:
+								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
+								integrationConfig.setUrbanAirship(item);
+								break;
+							case INTEGRATION_AWS_SNS:
+								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
+								integrationConfig.setAmazonAwsSns(item);
+								break;
+						}
+					}
+					device.setIntegrationConfig(integrationConfig);
+				}
+				conversation.setDevice(device);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Error migrating Device.", e);
+		}
 	}
 
 	private void migrateSdk() {
