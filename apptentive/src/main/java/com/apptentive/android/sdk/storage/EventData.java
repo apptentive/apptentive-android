@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -143,4 +141,23 @@ public class EventData implements Saveable {
 		}
 		return builder.toString();
 	}
+
+	//region Getters & Setters
+
+	/**
+	 * Used for migration only.
+	 */
+	public void setEvents(Map<String, EventRecord> events) {
+		this.events = events;
+		notifyDataChanged();
+	}
+
+	/**
+	 * Used for migration only.
+	 */
+	public void setInteractions(Map<String, EventRecord> interactions) {
+		this.interactions = interactions;
+		notifyDataChanged();
+	}
+	//endregion
 }

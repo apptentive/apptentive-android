@@ -11,11 +11,14 @@ import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.migration.v4_0_0.CodePointStore;
 import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryEntry;
 import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryStore;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.EventData;
+import com.apptentive.android.sdk.storage.EventRecord;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
@@ -25,9 +28,11 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+import java.util.Map;
 
 public class Migrator {
 
@@ -51,6 +56,7 @@ public class Migrator {
 		migratePerson();
 		migrateMessageCenter();
 		migrateVersionHistory();
+		migrateEventData();
 	}
 
 	private static final String INTEGRATION_APPTENTIVE_PUSH = "apptentive_push";
@@ -237,6 +243,24 @@ public class Migrator {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w("Error migrating VersionHistory entries V2 to V3.", e);
+		}
+	}
+
+	private void migrateEventData() {
+		EventData eventData = conversation.getEventData();
+		String codePointString = prefs.getString(Constants.PREF_KEY_CODE_POINT_STORE, null);
+		try {
+			CodePointStore codePointStore = new CodePointStore(codePointString);
+			Map<String, EventRecord> migratedEvents = codePointStore.migrateCodePoints();
+			Map<String, EventRecord> migratedInteractions = codePointStore.migrateInteractions();
+			if (migratedEvents != null) {
+				eventData.setEvents(migratedEvents);
+			}
+			if (migratedInteractions != null) {
+				eventData.setInteractions(migratedInteractions);
+			}
+		} catch (JSONException e) {
+			ApptentiveLog.w("Error migrating Event Data.", e);
 		}
 	}
 }
