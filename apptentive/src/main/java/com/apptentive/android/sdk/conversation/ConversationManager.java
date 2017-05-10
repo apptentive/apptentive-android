@@ -187,6 +187,7 @@ public class ConversationManager {
 			Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
 			migrator.migrate();
 
+			// FIXME: Figure out how to transition this conversation into a full ANONYMOUS state.
 			anonymousConversation.setState(ANONYMOUS_PENDING);
 			fetchConversationToken(anonymousConversation);
 			return anonymousConversation;
