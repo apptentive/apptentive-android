@@ -259,7 +259,7 @@ public class Migrator {
 			if (migratedInteractions != null) {
 				eventData.setInteractions(migratedInteractions);
 			}
-		} catch (JSONException e) {
+		} catch (Exception e) {
 			ApptentiveLog.w("Error migrating Event Data.", e);
 		}
 	}
