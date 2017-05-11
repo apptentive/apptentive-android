@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -42,7 +42,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * This class contains the complete API for accessing Apptentive features from within your app.
+ * This class contains the complete public API for accessing Apptentive features from within your app.
  */
 public class Apptentive {
 
@@ -55,13 +55,13 @@ public class Apptentive {
 		Apptentive.register(application, null, null);
 	}
 
-	public static void register(Application application, String apptentiveAppKey, String apptentiveAppSignature) {
-		register(application, apptentiveAppKey, apptentiveAppSignature, null);
+	public static void register(Application application, String apptentiveKey, String apptentiveSignature) {
+		register(application, apptentiveKey, apptentiveSignature, null);
 	}
 
-	private static void register(Application application, String apptentiveAppKey, String apptentiveAppSignature, String serverUrl) {
+	private static void register(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
 		ApptentiveLog.i("Registering Apptentive.");
-		ApptentiveInternal.createInstance(application, apptentiveAppKey, apptentiveAppSignature, serverUrl);
+		ApptentiveInternal.createInstance(application, apptentiveKey, apptentiveSignature, serverUrl);
 	}
 
 	//region Global Data Methods

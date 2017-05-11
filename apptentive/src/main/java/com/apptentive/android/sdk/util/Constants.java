@@ -24,8 +24,8 @@ public class Constants {
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
 
 	// Just in case a customer copies the example text verbatim.
-	public static final String EXAMPLE_APP_KEY_VALUE = "YOUR_APPTENTIVE_APP_KEY";
-	public static final String EXAMPLE_APP_SIGNATURE_VALUE = "YOUR_APPTENTIVE_APP_SIGNATURE";
+	public static final String EXAMPLE_APPTENTIVE_KEY_VALUE = "YOUR_APPTENTIVE_KEY";
+	public static final String EXAMPLE_APPTENTIVE_SIGNATURE_VALUE = "YOUR_APPTENTIVE_SIGNATURE";
 
 
 
@@ -51,8 +51,8 @@ public class Constants {
 
 	// region Android Manifest Keys
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
-	public static final String MANIFEST_KEY_APPTENTIVE_APP_KEY = "apptentive_app_key";
-	public static final String MANIFEST_KEY_APPTENTIVE_APP_SIGNATURE = "apptentive_app_signature";
+	public static final String MANIFEST_KEY_APPTENTIVE_KEY = "apptentive_key";
+	public static final String MANIFEST_KEY_APPTENTIVE_SIGNATURE = "apptentive_signature";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";

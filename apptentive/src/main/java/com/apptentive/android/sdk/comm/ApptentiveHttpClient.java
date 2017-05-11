@@ -35,19 +35,19 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
 	private static final String ENDPOINT_LOGIN = "/conversations/%s/session";
 
-	private final String appKey;
-	private final String appSignature;
+	private final String apptentiveKey;
+	private final String apptentiveSignature;
 	private final String serverURL;
 	private final String userAgentString;
 	private final HttpRequestManager httpRequestManager;
 
-	public ApptentiveHttpClient(String appKey, String appSignature, String serverURL) {
-		if (StringUtils.isNullOrEmpty(appKey)) {
-			throw new IllegalArgumentException("Illegal app key: '" + appKey + "'");
+	public ApptentiveHttpClient(String apptentiveKey, String apptentiveSignature, String serverURL) {
+		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
+			throw new IllegalArgumentException("Illegal Apptentive Key: '" + apptentiveKey + "'");
 		}
 
-		if (StringUtils.isNullOrEmpty(appSignature)) {
-			throw new IllegalArgumentException("Illegal app signature: '" + appSignature + "'");
+		if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
+			throw new IllegalArgumentException("Illegal Apptentive Signature: '" + apptentiveSignature + "'");
 		}
 
 		if (StringUtils.isNullOrEmpty(serverURL)) {
@@ -55,8 +55,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 
 		this.httpRequestManager = new HttpRequestManager();
-		this.appKey = appKey;
-		this.appSignature = appSignature;
+		this.apptentiveKey = apptentiveKey;
+		this.apptentiveSignature = apptentiveSignature;
 		this.serverURL = serverURL;
 		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
 	}
@@ -198,8 +198,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		request.setRequestProperty("Connection", "Keep-Alive");
 		request.setRequestProperty("Accept-Encoding", "gzip");
 		request.setRequestProperty("Accept", "application/json");
-		request.setRequestProperty("APPTENTIVE-KEY", appKey);
-		request.setRequestProperty("APPTENTIVE-SIGNATURE", appSignature);
+		request.setRequestProperty("APPTENTIVE-KEY", apptentiveKey);
+		request.setRequestProperty("APPTENTIVE-SIGNATURE", apptentiveSignature);
 		request.setRequestProperty("X-API-Version", API_VERSION);
 		request.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 		request.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
