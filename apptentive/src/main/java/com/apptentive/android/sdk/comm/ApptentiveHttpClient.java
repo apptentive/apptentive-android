@@ -198,8 +198,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		request.setRequestProperty("Connection", "Keep-Alive");
 		request.setRequestProperty("Accept-Encoding", "gzip");
 		request.setRequestProperty("Accept", "application/json");
-		request.setRequestProperty("APPTENTIVE-APP-KEY", appKey);
-		request.setRequestProperty("APPTENTIVE-APP-SIGNATURE", appSignature);
+		request.setRequestProperty("APPTENTIVE-KEY", appKey);
+		request.setRequestProperty("APPTENTIVE-SIGNATURE", appSignature);
 		request.setRequestProperty("X-API-Version", API_VERSION);
 		request.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 		request.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);

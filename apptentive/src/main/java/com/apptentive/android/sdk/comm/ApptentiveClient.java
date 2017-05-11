@@ -131,8 +131,8 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Accept-Encoding", "gzip");
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
-			connection.setRequestProperty("APPTENTIVE-APP-KEY", notNull(ApptentiveInternal.getInstance().getApptentiveAppKey()));
-			connection.setRequestProperty("APPTENTIVE-APP-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveAppSignature()));
+			connection.setRequestProperty("APPTENTIVE-KEY", notNull(ApptentiveInternal.getInstance().getApptentiveAppKey()));
+			connection.setRequestProperty("APPTENTIVE-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveAppSignature()));
 
 			switch (method) {
 				case GET:
