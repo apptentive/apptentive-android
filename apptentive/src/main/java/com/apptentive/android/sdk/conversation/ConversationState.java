@@ -13,6 +13,12 @@ public enum ConversationState {
 	UNDEFINED,
 
 	/**
+	 * A Legacy Conversation has been migrated, but still has an old OAuth token. Waiting to get a new
+	 * JWT and Conversation ID from the server.
+	 */
+	LEGACY_PENDING,
+
+	/**
 	 * No logged in user and no conversation token
 	 */
 	ANONYMOUS_PENDING,
