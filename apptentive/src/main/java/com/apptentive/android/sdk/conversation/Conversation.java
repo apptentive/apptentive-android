@@ -229,7 +229,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
+		ApptentiveLog.d(CONVERSATION, "Saving %sconversation data...", state == LOGGED_IN ? "encrypted " : "");
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
 		long start = System.currentTimeMillis();
@@ -259,7 +259,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
-		ApptentiveLog.d(CONVERSATION, "Loading conversation data...");
+		ApptentiveLog.d(CONVERSATION, "Loading %sconversation data...", state == LOGGED_IN ? "encrypted " : "");
 		conversationData = (ConversationData) serializer.deserialize();
 		conversationData.setDataChangedListener(this);
 		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", System.currentTimeMillis() - start);
