@@ -499,17 +499,17 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.encryptionKey = encryptionKey;
 	}
 
-	public String getUserId() {
+	String getUserId() {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	void setUserId(String userId) {
 		this.userId = userId;
 	}
 
 	public void setPushIntegration(int pushProvider, String token) {
-		ApptentiveLog.v("Setting push provider: %d with token %s", pushProvider, token);
-		IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getConversation().getDevice().getIntegrationConfig();
+		ApptentiveLog.v(CONVERSATION, "Setting push provider: %d with token %s", pushProvider, token);
+		IntegrationConfig integrationConfig = getDevice().getIntegrationConfig();
 		IntegrationConfigItem item = new IntegrationConfigItem();
 		item.put(Apptentive.INTEGRATION_PUSH_TOKEN, token);
 		switch (pushProvider) {
@@ -527,7 +527,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 				break;
 			default:
 				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
-				return;
+				break;
 		}
 	}
 	//endregion
