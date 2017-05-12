@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
@@ -34,6 +35,7 @@ import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.RuntimeUtils;
+import com.apptentive.android.sdk.util.StopWatch;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -235,10 +237,16 @@ public class Conversation implements DataChangedListener, Destroyable {
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Loading conversation data");
-		FileSerializer serializer = new FileSerializer(conversationDataFile);
+		StopWatch stopWatch = new StopWatch();
+
+		FileSerializer serializer = state == LOGGED_IN ?
+			new EncryptedFileSerializer(conversationDataFile, encryptionKey) :
+			new FileSerializer(conversationDataFile);
+
+		ApptentiveLog.d(CONVERSATION, "Loading conversation data...");
 		conversationData = (ConversationData) serializer.deserialize();
 		conversationData.setDataChangedListener(this);
+		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", stopWatch.getElaspedMillis());
 	}
 
 	//endregion
