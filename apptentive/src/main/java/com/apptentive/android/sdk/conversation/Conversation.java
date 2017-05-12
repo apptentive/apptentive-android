@@ -43,6 +43,9 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.Assert.assertNull;
+import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -231,9 +234,15 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		long start = System.currentTimeMillis();
 
-		FileSerializer serializer = state == LOGGED_IN ?
-			new EncryptedFileSerializer(conversationDataFile, encryptionKey) :
-			new FileSerializer(conversationDataFile);
+		FileSerializer serializer;
+		if (state == LOGGED_IN) {
+			assertNotNull(encryptionKey, "Missing encryption key");
+			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
+		} else {
+			assertNull(encryptionKey, "Encryption key should be null");
+			serializer = new FileSerializer(conversationDataFile);
+		}
+
 		serializer.serialize(conversationData);
 		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
@@ -241,9 +250,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 	synchronized void loadConversationData() throws SerializerException {
 		long start = System.currentTimeMillis();
 
-		FileSerializer serializer = state == LOGGED_IN ?
-			new EncryptedFileSerializer(conversationDataFile, encryptionKey) :
-			new FileSerializer(conversationDataFile);
+		FileSerializer serializer;
+		if (state == LOGGED_IN) {
+			assertNotNull(encryptionKey, "Missing encryption key");
+			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
+		} else {
+			assertNull(encryptionKey, "Encryption key should be null");
+			serializer = new FileSerializer(conversationDataFile);
+		}
 
 		ApptentiveLog.d(CONVERSATION, "Loading conversation data...");
 		conversationData = (ConversationData) serializer.deserialize();
