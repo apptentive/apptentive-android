@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.conversation;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
@@ -24,6 +25,8 @@ import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
+import com.apptentive.android.sdk.storage.IntegrationConfig;
+import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -502,6 +505,30 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public void setUserId(String userId) {
 		this.userId = userId;
+	}
+
+	public void setPushIntegration(int pushProvider, String token) {
+		ApptentiveLog.v("Setting push provider: %d with token %s", pushProvider, token);
+		IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getConversation().getDevice().getIntegrationConfig();
+		IntegrationConfigItem item = new IntegrationConfigItem();
+		item.put(Apptentive.INTEGRATION_PUSH_TOKEN, token);
+		switch (pushProvider) {
+			case Apptentive.PUSH_PROVIDER_APPTENTIVE:
+				integrationConfig.setApptentive(item);
+				break;
+			case Apptentive.PUSH_PROVIDER_PARSE:
+				integrationConfig.setParse(item);
+				break;
+			case Apptentive.PUSH_PROVIDER_URBAN_AIRSHIP:
+				integrationConfig.setUrbanAirship(item);
+				break;
+			case Apptentive.PUSH_PROVIDER_AMAZON_AWS_SNS:
+				integrationConfig.setAmazonAwsSns(item);
+				break;
+			default:
+				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
+				return;
+		}
 	}
 	//endregion
 }

@@ -348,6 +348,14 @@ public class ConversationManager {
 
 			if (conversation.hasActiveState()) {
 				conversation.fetchInteractions(getContext());
+
+				// Update conversation with push configuration changes that happened while it wasn't active.
+				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+				int pushProvider = prefs.getInt(Constants.PREF_KEY_PUSH_PROVIDER, -1);
+				String pushToken = prefs.getString(Constants.PREF_KEY_PUSH_TOKEN, null);
+				if (pushProvider != -1 && pushToken != null) {
+					conversation.setPushIntegration(pushProvider, pushToken);
+				}
 			}
 
 			updateMetadataItems(conversation);

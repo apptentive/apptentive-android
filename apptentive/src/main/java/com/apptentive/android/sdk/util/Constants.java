@@ -22,6 +22,8 @@ public class Constants {
 	public static final String PREF_KEY_SERVER_URL = "serverUrl";
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
+	public static final String PREF_KEY_PUSH_PROVIDER = "pushProvider";
+	public static final String PREF_KEY_PUSH_TOKEN = "pushToken";
 
 	// Just in case a customer copies the example text verbatim.
 	public static final String EXAMPLE_APPTENTIVE_KEY_VALUE = "YOUR_APPTENTIVE_KEY";
