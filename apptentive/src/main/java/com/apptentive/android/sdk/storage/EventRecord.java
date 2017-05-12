@@ -75,6 +75,34 @@ public class EventRecord implements Serializable {
 		return 0L;
 	}
 
+	/**
+	 * Only access directly for migration.
+	 */
+	public void setLast(double last) {
+		this.last = last;
+	}
+
+	/**
+	 * Only access directly for migration.
+	 */
+	public void setTotal(long total) {
+		this.total = total;
+	}
+
+	/**
+	 * Only access directly for migration.
+	 */
+	public void setVersionCodes(Map<Integer, Long> versionCodes) {
+		this.versionCodes = versionCodes;
+	}
+
+	/**
+	 * Only access directly for migration.
+	 */
+	public void setVersionNames(Map<String, Long> versionNames) {
+		this.versionNames = versionNames;
+	}
+
 	@Override
 	public String toString() {
 		return "EventRecord{" +

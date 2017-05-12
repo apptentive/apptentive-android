@@ -1,10 +1,10 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.storage.legacy;
+package com.apptentive.android.sdk.migration.v4_0_0;
 
 import android.content.SharedPreferences;
 
@@ -12,7 +12,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 
-public class VersionHistoryStoreMigrator {
+class VersionHistoryStoreMigrator {
 
 	private static final String OLD_ENTRY_SEP = "__";
 	private static final String OLD_FIELD_SEP = "--";
@@ -22,7 +22,7 @@ public class VersionHistoryStoreMigrator {
 
 	private static boolean migrated_to_v2;
 
-	public static void migrateV1ToV2(String oldFormat) {
+	static void migrateV1ToV2(String oldFormat) {
 		ApptentiveLog.i("Migrating VersionHistoryStore V1 to V2.");
 		ApptentiveLog.i("V1: %s", oldFormat);
 		try {

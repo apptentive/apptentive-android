@@ -4,7 +4,7 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.storage.legacy;
+package com.apptentive.android.sdk.migration.v4_0_0;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +15,7 @@ public class VersionHistoryEntry extends JSONObject {
 	private static final String KEY_VERSION_NAME = "versionName";
 	private static final String KEY_TIMESTAMP = "timestamp";
 
-	VersionHistoryEntry(JSONObject jsonObject) throws JSONException {
+	public VersionHistoryEntry(JSONObject jsonObject) throws JSONException {
 		this(jsonObject.toString());
 	}
 
