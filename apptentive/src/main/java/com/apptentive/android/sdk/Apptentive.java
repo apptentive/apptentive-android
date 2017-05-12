@@ -10,6 +10,7 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -29,8 +30,7 @@ import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.IntegrationConfig;
-import com.apptentive.android.sdk.storage.IntegrationConfigItem;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
@@ -312,7 +312,10 @@ public class Apptentive {
 
 	//region Third Party Integrations
 
-	private static final String INTEGRATION_PUSH_TOKEN = "token";
+	/**
+	 * For internal use only.
+	 */
+	public static final String INTEGRATION_PUSH_TOKEN = "token";
 
 	/**
 	 * Call {@link #setPushNotificationIntegration(int, String)} with this value to allow Apptentive to send pushes
@@ -374,28 +377,16 @@ public class Apptentive {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return;
 		}
+		// Store the push stuff globally
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
+			.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
+			.apply();
+
+		// Also set it on the active Conversation, if there is one.
 		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 		if (conversation != null) {
-			IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getConversation().getDevice().getIntegrationConfig();
-			IntegrationConfigItem item = new IntegrationConfigItem();
-			item.put(INTEGRATION_PUSH_TOKEN, token);
-			switch (pushProvider) {
-				case PUSH_PROVIDER_APPTENTIVE:
-					integrationConfig.setApptentive(item);
-					break;
-				case PUSH_PROVIDER_PARSE:
-					integrationConfig.setParse(item);
-					break;
-				case PUSH_PROVIDER_URBAN_AIRSHIP:
-					integrationConfig.setUrbanAirship(item);
-					break;
-				case PUSH_PROVIDER_AMAZON_AWS_SNS:
-					integrationConfig.setAmazonAwsSns(item);
-					break;
-				default:
-					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
-					return;
-			}
+			conversation.setPushIntegration(pushProvider, token);
 		}
 	}
 
