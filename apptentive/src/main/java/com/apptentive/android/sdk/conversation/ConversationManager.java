@@ -211,6 +211,8 @@ public class ConversationManager {
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
 		conversation.loadConversationData();
+		conversation.checkInternalConsistency();
+
 		return conversation;
 	}
 

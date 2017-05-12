@@ -722,6 +722,18 @@ public class Util {
 		}
 	}
 
+	public static void writeNullableUTF(DataOutput out, String value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeUTF(value);
+		}
+	}
+
+	public static String readNullableUTF(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readUTF() : null;
+	}
+
 	public static boolean isMimeTypeImage(String mimeType) {
 		if (TextUtils.isEmpty(mimeType)) {
 			return false;

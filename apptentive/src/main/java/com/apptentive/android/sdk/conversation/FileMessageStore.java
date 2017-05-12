@@ -26,6 +26,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.util.Util.readNullableUTF;
+import static com.apptentive.android.sdk.util.Util.writeNullableUTF;
+
 class FileMessageStore implements MessageStore {
 	/**
 	 * Binary format version
@@ -285,18 +288,6 @@ class FileMessageStore implements MessageStore {
 			writeNullableUTF(out, state);
 			out.writeBoolean(isRead);
 			writeNullableUTF(out, json);
-		}
-
-		private static void writeNullableUTF(DataOutput out, String value) throws IOException {
-			out.writeBoolean(value != null);
-			if (value != null) {
-				out.writeUTF(value);
-			}
-		}
-
-		private static String readNullableUTF(DataInput in) throws IOException {
-			boolean notNull = in.readBoolean();
-			return notNull ? in.readUTF() : null;
 		}
 	}
 
