@@ -667,6 +667,61 @@ public class Util {
 		}
 	}
 
+	public static void writeBytes(File file, byte[] bytes) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
+
+		if (bytes == null) {
+			throw new IllegalArgumentException("'bytes' is null");
+		}
+
+		ByteArrayInputStream input = null;
+		FileOutputStream output = null;
+		try {
+			input = new ByteArrayInputStream(bytes);
+			output = new FileOutputStream(file);
+			copy(input, output);
+		} finally {
+			ensureClosed(input);
+			ensureClosed(output);
+		}
+	}
+
+	public static byte[] readBytes(File file) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
+
+		if (!file.exists()) {
+			throw new FileNotFoundException("File does not exist: " + file);
+		}
+
+		if (file.isDirectory()) {
+			throw new FileNotFoundException("File is directory: " + file);
+		}
+
+		FileInputStream input = null;
+		ByteArrayOutputStream output = null;
+		try {
+			input = new FileInputStream(file);
+			output = new ByteArrayOutputStream();
+			copy(input, output);
+			return output.toByteArray();
+		} finally {
+			ensureClosed(input);
+			ensureClosed(output);
+		}
+	}
+
+	private static void copy(InputStream input, OutputStream output) throws IOException {
+		byte[] buffer = new byte[4096];
+		int bytesRead;
+		while ((bytesRead = input.read(buffer)) > 0) {
+			output.write(buffer, 0, bytesRead);
+		}
+	}
+
 	public static boolean isMimeTypeImage(String mimeType) {
 		if (TextUtils.isEmpty(mimeType)) {
 			return false;

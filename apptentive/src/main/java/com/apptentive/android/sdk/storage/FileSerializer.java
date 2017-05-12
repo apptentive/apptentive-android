@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.File;
@@ -17,22 +16,33 @@ import java.io.ObjectOutputStream;
 
 public class FileSerializer implements Serializer {
 
-	private File file;
+	private final File file;
 
 	public FileSerializer(File file) {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
 		this.file = file;
 	}
 
 	@Override
 	public void serialize(Object object) throws SerializerException {
+		file.getParentFile().mkdirs();
+		serialize(file, object);
+	}
+
+	@Override
+	public Object deserialize() throws SerializerException {
+		return deserialize(file);
+	}
+
+	protected void serialize(File file, Object object) throws SerializerException {
 		FileOutputStream fos = null;
 		ObjectOutputStream oos = null;
 		try {
-			file.getParentFile().mkdirs();
 			fos = new FileOutputStream(file);
 			oos = new ObjectOutputStream(fos);
 			oos.writeObject(object);
-			ApptentiveLog.v("Session data written to file of length: %s", Util.humanReadableByteCount(file.length(), false));
 		} catch (Exception e) {
 			throw new SerializerException(e);
 		} finally {
@@ -41,8 +51,7 @@ public class FileSerializer implements Serializer {
 		}
 	}
 
-	@Override
-	public Object deserialize() throws SerializerException {
+	protected Object deserialize(File file) throws SerializerException {
 		FileInputStream fis = null;
 		ObjectInputStream ois = null;
 		try {
