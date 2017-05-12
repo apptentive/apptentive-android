@@ -91,8 +91,8 @@ public class ApptentiveInternal {
 
 	private boolean appIsInForeground;
 	private final SharedPreferences globalSharedPrefs;
-	private final String appKey;
-	private final String appSignature;
+	private final String apptentiveKey;
+	private final String apptentiveSignature;
 	private String serverUrl;
 	private String personId;
 	private String androidId; // FIXME: remove this field (never used)
@@ -146,8 +146,8 @@ public class ApptentiveInternal {
 	protected ApptentiveInternal() {
 		taskManager = null;
 		globalSharedPrefs = null;
-		appKey = null;
-		appSignature = null;
+		apptentiveKey = null;
+		apptentiveSignature = null;
 		apptentiveHttpClient = null;
 		conversationManager = null;
 		appContext = null;
@@ -156,23 +156,23 @@ public class ApptentiveInternal {
 		lifecycleCallbacks = null;
 	}
 
-	private ApptentiveInternal(Application application, String appKey, String appSignature, String serverUrl) {
-		if (StringUtils.isNullOrEmpty(appKey)) {
-			throw new IllegalArgumentException("App key is null or empty");
+	private ApptentiveInternal(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
+		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
+			throw new IllegalArgumentException("Apptentive Key is null or empty");
 		}
 
-		if (StringUtils.isNullOrEmpty(appSignature)) {
-			throw new IllegalArgumentException("App signature is null or empty");
+		if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
+			throw new IllegalArgumentException("Apptentive Signature is null or empty");
 		}
 
-		this.appKey = appKey;
-		this.appSignature = appSignature;
+		this.apptentiveKey = apptentiveKey;
+		this.apptentiveSignature = apptentiveSignature;
 		this.serverUrl = serverUrl;
 
 		appContext = application.getApplicationContext();
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
-		apptentiveHttpClient = new ApptentiveHttpClient(appKey, appSignature, getEndpointBase(globalSharedPrefs));
+		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
@@ -198,7 +198,7 @@ public class ApptentiveInternal {
 	 *
 	 * @param application the context of the app that is creating the instance
 	 */
-	static void createInstance(Application application, String apptentiveAppKey, String apptentiveAppSignature, final String serverUrl) {
+	static void createInstance(Application application, String apptentiveKey, String apptentiveSignature, final String serverUrl) {
 		if (application == null) {
 			throw new IllegalArgumentException("Application is null");
 		}
@@ -207,24 +207,24 @@ public class ApptentiveInternal {
 			if (sApptentiveInternal == null) {
 
 				// trim spaces
-				apptentiveAppKey = Util.trim(apptentiveAppKey);
-				apptentiveAppSignature = Util.trim(apptentiveAppSignature);
+				apptentiveKey = Util.trim(apptentiveKey);
+				apptentiveSignature = Util.trim(apptentiveSignature);
 
 				// if App key is not defined - try loading from AndroidManifest.xml
-				if (StringUtils.isNullOrEmpty(apptentiveAppKey)) {
-					apptentiveAppKey = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_APP_KEY);
-					// TODO: check if app key is still empty
+				if (StringUtils.isNullOrEmpty(apptentiveKey)) {
+					apptentiveKey = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_KEY);
+					// TODO: check if Apptentive Key is still empty
 				}
 
 				// if App signature is not defined - try loading from AndroidManifest.xml
-				if (StringUtils.isNullOrEmpty(apptentiveAppSignature)) {
-					apptentiveAppSignature = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_APP_SIGNATURE);
-					// TODO: check if signature key is still empty
+				if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
+					apptentiveSignature = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_SIGNATURE);
+					// TODO: check if Apptentive Signature is still empty
 				}
 
 				try {
-					ApptentiveLog.v("Initializing Apptentive instance: appKey=%s appSignature=%s", apptentiveAppKey, apptentiveAppSignature);
-					sApptentiveInternal = new ApptentiveInternal(application, apptentiveAppKey, apptentiveAppSignature, serverUrl);
+					ApptentiveLog.v("Initializing Apptentive instance: apptentiveKey=%s apptentiveSignature=%s", apptentiveKey, apptentiveSignature);
+					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, serverUrl);
 					sApptentiveInternal.start(); // TODO: check the result of this call
 					application.registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
 				} catch (Exception e) {
@@ -356,12 +356,12 @@ public class ApptentiveInternal {
 		return conversationManager.getActiveConversation();
 	}
 
-	public String getApptentiveAppKey() {
-		return appKey;
+	public String getApptentiveKey() {
+		return apptentiveKey;
 	}
 
-	public String getApptentiveAppSignature() {
-		return appSignature;
+	public String getApptentiveSignature() {
+		return apptentiveSignature;
 	}
 
 	public String getServerUrl() {
@@ -576,10 +576,10 @@ public class ApptentiveInternal {
 		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
 
 		// The app key can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(appKey) || appKey.contains(Constants.EXAMPLE_APP_KEY_VALUE)) {
-			String errorMessage = "The Apptentive App Key is not defined. You may provide your Apptentive API Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				"<meta-data android:name=\"apptentive_app_key\"\n" +
-				"           android:value=\"@string/your_apptentive_app_key\"/>";
+		if (TextUtils.isEmpty(apptentiveKey) || apptentiveKey.contains(Constants.EXAMPLE_APPTENTIVE_KEY_VALUE)) {
+			String errorMessage = "The Apptentive Key is not defined. You may provide your Apptentive Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
+				"<meta-data android:name=\"apptentive_key\"\n" +
+				"           android:value=\"@string/your_apptentive_key\"/>";
 			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
@@ -588,13 +588,13 @@ public class ApptentiveInternal {
 		} else {
 			ApptentiveLog.d("Using cached Apptentive App Key");
 		}
-		ApptentiveLog.d("Apptentive App Key: %s", appKey);
+		ApptentiveLog.d("Apptentive App Key: %s", apptentiveKey);
 
 		// The app signature can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(appSignature) || appSignature.contains(Constants.EXAMPLE_APP_SIGNATURE_VALUE)) {
-			String errorMessage = "The Apptentive App Signature is not defined. You may provide your Apptentive App Signature in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				"<meta-data android:name=\"apptentive_app_signature\"\n" +
-				"           android:value=\"@string/your_apptentive_app_signature\"/>";
+		if (TextUtils.isEmpty(apptentiveSignature) || apptentiveSignature.contains(Constants.EXAMPLE_APPTENTIVE_SIGNATURE_VALUE)) {
+			String errorMessage = "The Apptentive Signature is not defined. You may provide your Apptentive Signature in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
+				"<meta-data android:name=\"apptentive_signature\"\n" +
+				"           android:value=\"@string/your_apptentive_signature\"/>";
 			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
@@ -603,7 +603,7 @@ public class ApptentiveInternal {
 		} else {
 			ApptentiveLog.d("Using cached Apptentive App Signature");
 		}
-		ApptentiveLog.d("Apptentive App Signature: %s", appSignature);
+		ApptentiveLog.d("Apptentive App Signature: %s", apptentiveSignature);
 
 		// Grab app info we need to access later on.
 		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
