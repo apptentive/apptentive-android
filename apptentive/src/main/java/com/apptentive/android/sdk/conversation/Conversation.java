@@ -35,7 +35,6 @@ import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.RuntimeUtils;
-import com.apptentive.android.sdk.util.StopWatch;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -226,18 +225,21 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
 	 * if succeed.
 	 */
-	synchronized void saveConversationData() throws SerializerException {
+	private synchronized void saveConversationData() throws SerializerException {
 		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
 		long start = System.currentTimeMillis();
-		FileSerializer serializer = new FileSerializer(conversationDataFile);
+
+		FileSerializer serializer = state == LOGGED_IN ?
+			new EncryptedFileSerializer(conversationDataFile, encryptionKey) :
+			new FileSerializer(conversationDataFile);
 		serializer.serialize(conversationData);
 		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
-		StopWatch stopWatch = new StopWatch();
+		long start = System.currentTimeMillis();
 
 		FileSerializer serializer = state == LOGGED_IN ?
 			new EncryptedFileSerializer(conversationDataFile, encryptionKey) :
@@ -246,7 +248,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.d(CONVERSATION, "Loading conversation data...");
 		conversationData = (ConversationData) serializer.deserialize();
 		conversationData.setDataChangedListener(this);
-		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", stopWatch.getElaspedMillis());
+		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	//endregion
