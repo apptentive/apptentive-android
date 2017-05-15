@@ -33,6 +33,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
+	private static final String ENDPOINT_LEGACY_CONVERSATION = "/conversation/login";
 	private static final String ENDPOINT_LOGIN = "/conversations/%s/session";
 
 	private final String apptentiveKey;
@@ -65,6 +66,18 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
+		request.addListener(listener);
+		httpRequestManager.startRequest(request);
+		return request;
+	}
+
+	public HttpJsonRequest getLegacyConversationId(String conversationToken, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (StringUtils.isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		HttpJsonRequest request = createJsonRequest(ENDPOINT_LEGACY_CONVERSATION, new JSONObject(), HttpRequestMethod.POST);
+		request.setRequestProperty("Authorization", "OAuth " + conversationToken);
 		request.addListener(listener);
 		httpRequestManager.startRequest(request);
 		return request;

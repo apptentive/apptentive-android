@@ -177,10 +177,9 @@ public class ConversationManager {
 		// Check whether migration is needed.
 		// No Conversations exist in the meta-data.
 		// Do we have a Legacy Conversation or not?
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String legacyConversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-		String legacyConversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
-		if (!isNullOrEmpty(legacyConversationToken) && !isNullOrEmpty(legacyConversationId)) {
+		if (!isNullOrEmpty(legacyConversationToken)) {
 			String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
 			Apptentive.Version version4 = new Apptentive.Version();
 			version4.setVersion("4.0.0");
@@ -192,7 +191,17 @@ public class ConversationManager {
 				migrator.migrate();
 
 				anonymousConversation.setState(LEGACY_PENDING);
-				fetchLegacyConversation(anonymousConversation, legacyConversationId, legacyConversationToken);
+
+				fetchLegacyConversation(anonymousConversation, legacyConversationToken)
+					// remove legacy key when request is finished
+					.addListener(new HttpRequest.Adapter<HttpRequest>() {
+						@Override
+						public void onFinish(HttpRequest request) {
+							prefs.edit()
+								.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
+								.apply();
+						}
+					});
 				return anonymousConversation;
 			}
 		}
@@ -203,12 +212,68 @@ public class ConversationManager {
 		return anonymousConversation;
 	}
 
-	private void fetchLegacyConversation(Conversation conversation, String conversationId, String conversationToken) {
-		assertEquals(conversation.getState(), ConversationState.LEGACY_PENDING);
-		assertNotNull(conversationId);
-		assertNotNull(conversationToken);
+	private HttpRequest fetchLegacyConversation(final Conversation conversation, final String conversationToken) {
+		assertNotNull(conversation);
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
 
-		throw new RuntimeException("Implement me");
+		assertEquals(conversation.getState(), ConversationState.LEGACY_PENDING);
+
+		assertFalse(isNullOrEmpty(conversationToken));
+		if (isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		HttpRequest request = getHttpClient()
+			.getLegacyConversationId(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
+				@Override
+				public void onFinish(HttpJsonRequest request) {
+					assertMainThread();
+
+					try {
+						JSONObject root = request.getResponseObject();
+						String conversationId = root.getString("conversation_id");
+						ApptentiveLog.d(CONVERSATION, "Conversation id: %s", conversationId);
+
+						if (isNullOrEmpty(conversationId)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'id'");
+							return;
+						}
+
+						String conversationJWT = root.getString("anonymous_jwt_token");
+						if (isNullOrEmpty(conversationId)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'anonymous_jwt_token'");
+							return;
+						}
+
+						ApptentiveLog.d(CONVERSATION, "Conversation JWT: %s", conversationJWT);
+
+						// set conversation data
+						conversation.setState(ANONYMOUS);
+						conversation.setConversationToken(conversationToken);
+						conversation.setConversationId(conversationId);
+
+						// handle state change
+						handleConversationStateChange(conversation);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while handling legacy conversation id");
+					}
+				}
+
+				@Override
+				public void onCancel(HttpJsonRequest request) {
+				}
+
+				@Override
+				public void onFail(HttpJsonRequest request, String reason) {
+					ApptentiveLog.w("Failed to fetch legacy conversation id: %s", reason);
+				}
+			});
+
+		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
+		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		return request;
 	}
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
@@ -241,7 +306,7 @@ public class ConversationManager {
 	//region Conversation Token Fetching
 
 	/**
-	 * Starts fetching conversation token. Returns immediately if conversation is already fetching.
+	 * Starts fetching conversation. Returns immediately if conversation is already fetching.
 	 *
 	 * @return a new http-request object if conversation is not currently fetched or an instance of
 	 * the existing request
