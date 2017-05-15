@@ -45,6 +45,7 @@ import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 import static com.apptentive.android.sdk.debug.Tester.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
+import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
 
 /**
  * Class responsible for managing conversations.
@@ -177,37 +178,43 @@ public class ConversationManager {
 		// No Conversations exist in the meta-data.
 		// Do we have a Legacy Conversation or not?
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
-		Apptentive.Version version4 = new Apptentive.Version();
-		version4.setVersion("4.0.0");
-		Apptentive.Version lastSeenVersion = new Apptentive.Version();
-		lastSeenVersion.setVersion(lastSeenVersionString);
-		if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
+		String legacyConversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
+		String legacyConversationId = prefs.getString(Constants.PREF_KEY_CONVERSATION_ID, null);
+		if (!isNullOrEmpty(legacyConversationToken) && !isNullOrEmpty(legacyConversationId)) {
+			String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
+			Apptentive.Version version4 = new Apptentive.Version();
+			version4.setVersion("4.0.0");
+			Apptentive.Version lastSeenVersion = new Apptentive.Version();
+			lastSeenVersion.setVersion(lastSeenVersionString);
+			if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
 
-			Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
-			migrator.migrate();
+				Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
+				migrator.migrate();
 
-			/*
-			* FIXME: Figure out how to transition this conversation into a full ANONYMOUS state.
-			* We can also only go down this path if there is a minimum amount of information migrated, including
-			* the OAuth token.
-			*/
-			anonymousConversation.setState(LEGACY_PENDING);
-			//fetchConversationToken(anonymousConversation);
-			return anonymousConversation;
-		} else {
-
-			// If there is no Legacy Conversation, then just connect it to the server.
-			anonymousConversation.setState(ANONYMOUS_PENDING);
-			fetchConversationToken(anonymousConversation);
-			return anonymousConversation;
+				anonymousConversation.setState(LEGACY_PENDING);
+				fetchLegacyConversation(anonymousConversation, legacyConversationId, legacyConversationToken);
+				return anonymousConversation;
+			}
 		}
+
+		// If there is no Legacy Conversation, then just connect it to the server.
+		anonymousConversation.setState(ANONYMOUS_PENDING);
+		fetchConversationToken(anonymousConversation);
+		return anonymousConversation;
+	}
+
+	private void fetchLegacyConversation(Conversation conversation, String conversationId, String conversationToken) {
+		assertEquals(conversation.getState(), ConversationState.LEGACY_PENDING);
+		assertNotNull(conversationId);
+		assertNotNull(conversationToken);
+
+		throw new RuntimeException("Implement me");
 	}
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
 		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
-		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to sent encryption key before loading data
+		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
 		conversation.loadConversationData();
@@ -282,13 +289,13 @@ public class ConversationManager {
 						String conversationId = root.getString("id");
 						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
-						if (StringUtils.isNullOrEmpty(conversationToken)) {
+						if (isNullOrEmpty(conversationToken)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
 							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
-						if (StringUtils.isNullOrEmpty(conversationId)) {
+						if (isNullOrEmpty(conversationId)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
 							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
@@ -608,7 +615,7 @@ public class ConversationManager {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
-						assertFalse(StringUtils.isNullOrEmpty(encryptionKey));
+						assertFalse(isNullOrEmpty(encryptionKey));
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
