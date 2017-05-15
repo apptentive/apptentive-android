@@ -282,6 +282,7 @@ public class ConversationManager {
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
+		conversation.setJWT(item.getJWT());
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -489,6 +490,7 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
+		item.JWT = conversation.getJWT(); // TODO: not null?
 
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {

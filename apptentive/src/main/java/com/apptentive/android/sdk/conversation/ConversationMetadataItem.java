@@ -47,6 +47,11 @@ public class ConversationMetadataItem implements SerializableObject {
 	 */
 	String userId;
 
+	/**
+	 * A JWT for active conversations
+	 */
+	String JWT;
+
 	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
@@ -72,6 +77,7 @@ public class ConversationMetadataItem implements SerializableObject {
 		state = ConversationState.valueOf(in.readByte());
 		encryptionKey = readNullableUTF(in);
 		userId = readNullableUTF(in);
+		JWT = readNullableUTF(in);
 	}
 
 	@Override
@@ -82,6 +88,7 @@ public class ConversationMetadataItem implements SerializableObject {
 		out.writeByte(state.ordinal());
 		writeNullableUTF(out, encryptionKey);
 		writeNullableUTF(out, userId);
+		writeNullableUTF(out, JWT);
 	}
 
 	public String getConversationId() {
@@ -98,5 +105,9 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	public String getUserId() {
 		return userId;
+	}
+
+	public String getJWT() {
+		return JWT;
 	}
 }
