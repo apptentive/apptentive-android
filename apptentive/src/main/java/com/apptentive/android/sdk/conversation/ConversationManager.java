@@ -472,7 +472,7 @@ public class ConversationManager {
 	private void updateMetadataItems(Conversation conversation) {
 
 		if (conversation.hasState(ANONYMOUS_PENDING, LEGACY_PENDING)) {
-			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is %@", conversation.getState());
+			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is %s", conversation.getState());
 			return;
 		}
 
