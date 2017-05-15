@@ -259,6 +259,7 @@ public class ConversationManager {
 						conversation.setState(ANONYMOUS);
 						conversation.setConversationToken(conversationToken);
 						conversation.setConversationId(conversationId);
+						conversation.setJWT(conversationJWT);
 
 						// handle state change
 						handleConversationStateChange(conversation);
