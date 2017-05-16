@@ -207,9 +207,12 @@ public class ConversationManager {
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
 		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
-		conversation.loadConversationData();
+		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to sent encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
+		conversation.loadConversationData();
+		conversation.checkInternalConsistency();
+
 		return conversation;
 	}
 

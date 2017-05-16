@@ -23,6 +23,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
@@ -34,6 +35,7 @@ import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.RuntimeUtils;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -42,6 +44,9 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import static com.apptentive.android.sdk.debug.Assert.assertFail;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.Assert.assertNull;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -224,21 +229,41 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
 	 * if succeed.
 	 */
-	synchronized void saveConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Saving Conversation");
+	private synchronized void saveConversationData() throws SerializerException {
+		ApptentiveLog.d(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
 		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
 
 		long start = System.currentTimeMillis();
-		FileSerializer serializer = new FileSerializer(conversationDataFile);
+
+		FileSerializer serializer;
+		if (hasState(LOGGED_IN)) {
+			assertNotNull(encryptionKey, "Missing encryption key");
+			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
+		} else {
+			assertNull(encryptionKey, "Encryption key should be null");
+			serializer = new FileSerializer(conversationDataFile);
+		}
+
 		serializer.serialize(conversationData);
 		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Loading conversation data");
-		FileSerializer serializer = new FileSerializer(conversationDataFile);
+		long start = System.currentTimeMillis();
+
+		FileSerializer serializer;
+		if (hasState(LOGGED_IN)) {
+			assertNotNull(encryptionKey, "Missing encryption key");
+			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
+		} else {
+			assertNull(encryptionKey, "Encryption key should be null");
+			serializer = new FileSerializer(conversationDataFile);
+		}
+
+		ApptentiveLog.d(CONVERSATION, "Loading %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
 		conversationData = (ConversationData) serializer.deserialize();
 		conversationData.setDataChangedListener(this);
+		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	//endregion
@@ -527,6 +552,30 @@ public class Conversation implements DataChangedListener, Destroyable {
 				break;
 			default:
 				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
+				break;
+		}
+	}
+
+	/**
+	 * Checks the internal consistency of the conversation object (temporary solution)
+	 */
+	void checkInternalConsistency() throws IllegalStateException {
+		switch (state) {
+			case LOGGED_IN:
+				if (StringUtils.isNullOrEmpty(encryptionKey)) {
+					assertFail("Missing encryption key");
+					throw new IllegalStateException("Missing encryption key");
+				}
+				if (StringUtils.isNullOrEmpty(userId)) {
+					assertFail("Missing user id");
+					throw new IllegalStateException("Missing user id");
+				}
+				break;
+			default:
+				if (!StringUtils.isNullOrEmpty(encryptionKey)) {
+					assertFail("Encryption key should be null");
+					throw new IllegalStateException("Encryption key should be null");
+				}
 				break;
 		}
 	}

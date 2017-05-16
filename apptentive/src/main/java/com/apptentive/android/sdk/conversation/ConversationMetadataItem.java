@@ -2,21 +2,20 @@ package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
+import static com.apptentive.android.sdk.util.Util.readNullableUTF;
+import static com.apptentive.android.sdk.util.Util.writeNullableUTF;
+
 /**
  * A light weight representation of the conversation object stored on the disk.
  */
 public class ConversationMetadataItem implements SerializableObject {
-
-	/**
-	 * We store an empty string for a missing key
-	 */
-	private static final String EMPTY_ENCRYPTION_KEY = "";
 
 	/**
 	 * The state of the target conversation
@@ -71,7 +70,8 @@ public class ConversationMetadataItem implements SerializableObject {
 		dataFile = new File(in.readUTF());
 		messagesFile = new File(in.readUTF());
 		state = ConversationState.valueOf(in.readByte());
-		encryptionKey = readEncryptionKey(in);
+		encryptionKey = readNullableUTF(in);
+		userId = readNullableUTF(in);
 	}
 
 	@Override
@@ -80,16 +80,8 @@ public class ConversationMetadataItem implements SerializableObject {
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
 		out.writeByte(state.ordinal());
-		writeEncryptionKey(out, encryptionKey);
-	}
-
-	private static String readEncryptionKey(DataInput in) throws IOException {
-		final String key = in.readLine();
-		return !StringUtils.equal(key, EMPTY_ENCRYPTION_KEY) ? key : null;
-	}
-
-	private void writeEncryptionKey(DataOutput out, String key) throws IOException {
-		out.writeUTF(key != null ? key : EMPTY_ENCRYPTION_KEY);
+		writeNullableUTF(out, encryptionKey);
+		writeNullableUTF(out, userId);
 	}
 
 	public String getConversationId() {
@@ -106,9 +98,5 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	public String getUserId() {
 		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
 	}
 }
