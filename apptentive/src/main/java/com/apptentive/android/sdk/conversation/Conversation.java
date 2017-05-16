@@ -70,6 +70,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private String userId;
 
 	/**
+	 * Optional JWT for active conversations
+	 */
+	private String JWT;
+
+	/**
 	 * File which represents serialized conversation data on the disk
 	 */
 	private final File conversationDataFile;
@@ -532,6 +537,14 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.userId = userId;
 	}
 
+	String getJWT() {
+		return JWT;
+	}
+
+	void setJWT(String JWT) {
+		this.JWT = JWT;
+	}
+
 	public void setPushIntegration(int pushProvider, String token) {
 		ApptentiveLog.v(CONVERSATION, "Setting push provider: %d with token %s", pushProvider, token);
 		IntegrationConfig integrationConfig = getDevice().getIntegrationConfig();
@@ -579,5 +592,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 				break;
 		}
 	}
+
 	//endregion
 }

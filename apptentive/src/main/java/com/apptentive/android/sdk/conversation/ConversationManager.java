@@ -45,6 +45,7 @@ import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 import static com.apptentive.android.sdk.debug.Tester.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
+import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
 
 /**
  * Class responsible for managing conversations.
@@ -176,40 +177,119 @@ public class ConversationManager {
 		// Check whether migration is needed.
 		// No Conversations exist in the meta-data.
 		// Do we have a Legacy Conversation or not?
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
-		Apptentive.Version version4 = new Apptentive.Version();
-		version4.setVersion("4.0.0");
-		Apptentive.Version lastSeenVersion = new Apptentive.Version();
-		lastSeenVersion.setVersion(lastSeenVersionString);
-		if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
+		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		String legacyConversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
+		if (!isNullOrEmpty(legacyConversationToken)) {
+			String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
+			Apptentive.Version version4 = new Apptentive.Version();
+			version4.setVersion("4.0.0");
+			Apptentive.Version lastSeenVersion = new Apptentive.Version();
+			lastSeenVersion.setVersion(lastSeenVersionString);
+			if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
 
-			Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
-			migrator.migrate();
+				Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
+				migrator.migrate();
 
-			/*
-			* FIXME: Figure out how to transition this conversation into a full ANONYMOUS state.
-			* We can also only go down this path if there is a minimum amount of information migrated, including
-			* the OAuth token.
-			*/
-			anonymousConversation.setState(LEGACY_PENDING);
-			//fetchConversationToken(anonymousConversation);
-			return anonymousConversation;
-		} else {
+				anonymousConversation.setState(LEGACY_PENDING);
+				anonymousConversation.setConversationToken(legacyConversationToken);
 
-			// If there is no Legacy Conversation, then just connect it to the server.
-			anonymousConversation.setState(ANONYMOUS_PENDING);
-			fetchConversationToken(anonymousConversation);
-			return anonymousConversation;
+				fetchLegacyConversation(anonymousConversation)
+					// remove legacy key when request is finished
+					.addListener(new HttpRequest.Adapter<HttpRequest>() {
+						@Override
+						public void onFinish(HttpRequest request) {
+							prefs.edit()
+								.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
+								.apply();
+						}
+					});
+				return anonymousConversation;
+			}
 		}
+
+		// If there is no Legacy Conversation, then just connect it to the server.
+		anonymousConversation.setState(ANONYMOUS_PENDING);
+		fetchConversationToken(anonymousConversation);
+		return anonymousConversation;
+	}
+
+	private HttpRequest fetchLegacyConversation(final Conversation conversation) {
+		assertNotNull(conversation);
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		assertEquals(conversation.getState(), ConversationState.LEGACY_PENDING);
+
+		final String conversationToken = conversation.getConversationToken();
+		if (isNullOrEmpty(conversationToken)) {
+			throw new IllegalStateException("Missing conversation token");
+		}
+
+		assertFalse(isNullOrEmpty(conversationToken));
+		if (isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		HttpRequest request = getHttpClient()
+			.getLegacyConversationId(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
+				@Override
+				public void onFinish(HttpJsonRequest request) {
+					assertMainThread();
+
+					try {
+						JSONObject root = request.getResponseObject();
+						String conversationId = root.getString("conversation_id");
+						ApptentiveLog.d(CONVERSATION, "Conversation id: %s", conversationId);
+
+						if (isNullOrEmpty(conversationId)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'id'");
+							return;
+						}
+
+						String conversationJWT = root.getString("anonymous_jwt_token");
+						if (isNullOrEmpty(conversationId)) {
+							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'anonymous_jwt_token'");
+							return;
+						}
+
+						ApptentiveLog.d(CONVERSATION, "Conversation JWT: %s", conversationJWT);
+
+						// set conversation data
+						conversation.setState(ANONYMOUS);
+						conversation.setConversationToken(conversationToken);
+						conversation.setConversationId(conversationId);
+						conversation.setJWT(conversationJWT);
+
+						// handle state change
+						handleConversationStateChange(conversation);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while handling legacy conversation id");
+					}
+				}
+
+				@Override
+				public void onCancel(HttpJsonRequest request) {
+				}
+
+				@Override
+				public void onFail(HttpJsonRequest request, String reason) {
+					ApptentiveLog.w("Failed to fetch legacy conversation id: %s", reason);
+				}
+			});
+
+		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
+		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		return request;
 	}
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
 		// TODO: use same serialization logic across the project
 		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
-		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to sent encryption key before loading data
+		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
+		conversation.setJWT(item.getJWT());
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -234,7 +314,7 @@ public class ConversationManager {
 	//region Conversation Token Fetching
 
 	/**
-	 * Starts fetching conversation token. Returns immediately if conversation is already fetching.
+	 * Starts fetching conversation. Returns immediately if conversation is already fetching.
 	 *
 	 * @return a new http-request object if conversation is not currently fetched or an instance of
 	 * the existing request
@@ -282,13 +362,13 @@ public class ConversationManager {
 						String conversationId = root.getString("id");
 						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
-						if (StringUtils.isNullOrEmpty(conversationToken)) {
+						if (isNullOrEmpty(conversationToken)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
 							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
 						}
 
-						if (StringUtils.isNullOrEmpty(conversationId)) {
+						if (isNullOrEmpty(conversationId)) {
 							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
 							dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 							return;
@@ -391,8 +471,8 @@ public class ConversationManager {
 
 	private void updateMetadataItems(Conversation conversation) {
 
-		if (conversation.hasState(ANONYMOUS_PENDING)) {
-			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is anonymous and pending");
+		if (conversation.hasState(ANONYMOUS_PENDING, LEGACY_PENDING)) {
+			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is %s", conversation.getState());
 			return;
 		}
 
@@ -417,6 +497,7 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
+		item.JWT = conversation.getJWT(); // TODO: can it be null for active conversations?
 
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {
@@ -531,40 +612,44 @@ public class ConversationManager {
 
 		switch (activeConversation.getState()) {
 			case ANONYMOUS_PENDING:
-				// start fetching conversation token (if not yet fetched)
-				final HttpRequest fetchRequest = fetchConversationToken(activeConversation);
-				if (fetchRequest == null) {
-					ApptentiveLog.e(CONVERSATION, "Unable to login: fetch request failed to send");
-					callback.onLoginFail("fetch request failed to send");
-					return;
-				}
+			case LEGACY_PENDING: {
+					// start fetching conversation token (if not yet fetched)
+					final HttpRequest fetchRequest = activeConversation.hasState(ANONYMOUS_PENDING) ?
+								fetchConversationToken(activeConversation) :
+								fetchLegacyConversation(activeConversation);
+					if (fetchRequest == null) {
+						ApptentiveLog.e(CONVERSATION, "Unable to login: fetch request failed to send");
+						callback.onLoginFail("fetch request failed to send");
+						return;
+					}
 
-				// attach a listener to an active request
-				fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
-					@Override
-					public void onFinish(HttpRequest request) {
-						assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
+					// attach a listener to an active request
+					fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
+						@Override
+						public void onFinish(HttpRequest request) {
+							assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
 
-						if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
-							ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
-							sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
-						} else {
-							callback.onLoginFail("Conversation fetching completed abnormally");
+							if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
+								ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
+								sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
+							} else {
+								callback.onLoginFail("Conversation fetching completed abnormally");
+							}
 						}
-					}
 
-					@Override
-					public void onCancel(HttpRequest request) {
-						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching cancelled.");
-						callback.onLoginFail("Conversation fetching was cancelled");
-					}
+						@Override
+						public void onCancel(HttpRequest request) {
+							ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching cancelled.");
+							callback.onLoginFail("Conversation fetching was cancelled");
+						}
 
-					@Override
-					public void onFail(HttpRequest request, String reason) {
-						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching failed.");
-						callback.onLoginFail("Conversation fetching failed: " + reason);
-					}
-				});
+						@Override
+						public void onFail(HttpRequest request, String reason) {
+							ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching failed.");
+							callback.onLoginFail("Conversation fetching failed: " + reason);
+						}
+					});
+				}
 				break;
 			case ANONYMOUS:
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
@@ -608,7 +693,7 @@ public class ConversationManager {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
-						assertFalse(StringUtils.isNullOrEmpty(encryptionKey));
+						assertFalse(isNullOrEmpty(encryptionKey));
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
