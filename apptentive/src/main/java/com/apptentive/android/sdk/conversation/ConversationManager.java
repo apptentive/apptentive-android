@@ -581,9 +581,9 @@ public class ConversationManager {
 		final String userId;
 		try {
 			final Jwt jwt = Jwt.decode(token);
-			userId = jwt.getPayload().getString("user_id");
+			userId = jwt.getPayload().getString("sub");
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error while extracting user id");
+			ApptentiveLog.e(e, "Error while extracting user id: Missing field \"sub\"");
 			callback.onLoginFail(e.getMessage());
 			return;
 		}
