@@ -282,6 +282,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
 		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
+		assertNotNull(responseJson, "Missing required responseJson.");
 		if (apptentiveMessage == null) {
 			return; // should not happen but we want to stay safe
 		}

@@ -41,7 +41,8 @@ public class ApptentiveNotification {
 
 	public <T> T getRequiredUserInfo(String key, Class<? extends T> valueClass) {
 		final T userInfo = getUserInfo(key, valueClass);
-		Assert.assertNotNull(userInfo, "Missing required user info '%s' for '%s' notification", key, name);
+		// FIXME: Why was this assert here? Not all requests will have response data.
+		//Assert.assertNotNull(userInfo, "Missing required user info '%s' for '%s' notification", key, name);
 		return userInfo;
 	}
 
