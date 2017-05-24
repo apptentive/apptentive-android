@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
@@ -91,8 +92,12 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			throw new IllegalArgumentException("Token is null");
 		}
 
-		JSONObject json = new JSONObject(); // TODO: create an actual payload
-
+		JSONObject json = new JSONObject();
+		try {
+			json.put("token", token);
+		} catch (JSONException e) {
+			// Can't happen
+		}
 		String endPoint = StringUtils.format(ENDPOINT_LOGIN, conversationId);
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);
 		request.addListener(listener);
