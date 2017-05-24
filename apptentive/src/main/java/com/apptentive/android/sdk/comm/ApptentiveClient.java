@@ -62,7 +62,7 @@ public class ApptentiveClient {
 		}
 
 		final String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
-		return performHttpRequest(conversationToken, endPoint, Method.GET, null);
+		return performHttpRequest(conversationToken, true, endPoint, Method.GET, null);
 	}
 
 	/**
@@ -87,7 +87,7 @@ public class ApptentiveClient {
 		}
 
 		String uri = String.format(ENDPOINT_MESSAGES, conversationId, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
-		return performHttpRequest(conversationToken, uri, Method.GET, null);
+		return performHttpRequest(conversationToken, true, uri, Method.GET, null);
 	}
 
 	public static ApptentiveHttpResponse getInteractions(String conversationId) {
@@ -95,19 +95,20 @@ public class ApptentiveClient {
 			throw new IllegalArgumentException("Conversation id is null");
 		}
 		final String endPoint = StringUtils.format(ENDPOINT_INTERACTIONS, conversationId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), endPoint, Method.GET, null);
+		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), true, endPoint, Method.GET, null);
 	}
 
 	/**
 	 * Perform a Http request.
 	 *
-	 * @param oauthToken authorization token for the current connection
+	 * @param authToken authorization token for the current connection. Might be an OAuth token for legacy conversations, or Bearer JWT for modern conversations.
+	 * @param bearer If true, the token is a bearer JWT, else it is an OAuth token.
 	 * @param uri        server url.
 	 * @param method     Get/Post/Put
 	 * @param body       Data to be POSTed/Put, not used for GET
 	 * @return ApptentiveHttpResponse containing content and response returned from the server.
 	 */
-	private static ApptentiveHttpResponse performHttpRequest(String oauthToken, String uri, Method method, String body) {
+	private static ApptentiveHttpResponse performHttpRequest(String authToken, boolean bearer, String uri, Method method, String body) {
 		uri = getEndpointBase() + uri;
 		ApptentiveLog.d("Performing %s request to %s", method.name(), uri);
 		//ApptentiveLog.e("OAUTH Token: %s", oauthToken);
@@ -127,7 +128,11 @@ public class ApptentiveClient {
 			connection.setRequestProperty("Connection", "Keep-Alive");
 			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
-			connection.setRequestProperty("Authorization", "OAuth " + oauthToken);
+			if (bearer) {
+				connection.setRequestProperty("Authorization", "Bearer " + authToken);
+			} else {
+				connection.setRequestProperty("Authorization", "OAuth " + authToken);
+			}
 			connection.setRequestProperty("Accept-Encoding", "gzip");
 			connection.setRequestProperty("Accept", "application/json");
 			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
