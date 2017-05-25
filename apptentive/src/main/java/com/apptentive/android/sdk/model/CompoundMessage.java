@@ -25,12 +25,11 @@ import java.util.concurrent.Future;
 
 public class CompoundMessage extends ApptentiveMessage implements MultipartPayload, MessageCenterUtil.CompoundMessageCommonInterface {
 
+	public static final String KEY_MESSAGE = "message";
+
 	private static final String KEY_BODY = "body";
-
 	public static final String KEY_TEXT_ONLY = "text_only";
-
 	private static final String KEY_TITLE = "title";
-
 	private static final String KEY_ATTACHMENTS = "attachments";
 
 	private boolean isLast;
@@ -264,5 +263,16 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		} else {
 			return MESSAGE_INCOMING;
 		}
+	}
+
+	@Override
+	protected JSONObject marshallForSending() {
+		JSONObject wrapper = new JSONObject();
+		try {
+			wrapper.put(KEY_MESSAGE, super.marshallForSending());
+		} catch (JSONException e) {
+			// Can't happen.
+		}
+		return wrapper;
 	}
 }
