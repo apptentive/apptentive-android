@@ -45,8 +45,8 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PA
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 import static com.apptentive.android.sdk.conversation.ConversationState.ANONYMOUS;
 import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINED;
+import static com.apptentive.android.sdk.debug.Assert.assertNotEquals;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
-import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -262,7 +262,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
-			assertTrue(conversation != null && !conversation.hasState(UNDEFINED)); // sanity check
+			assertNotNull(conversation); // sanity check
+			assertNotEquals(conversation.getState(), UNDEFINED);
 			if (conversation.hasActiveState()) {
 				assertNotNull(conversation.getConversationId());
 				currentConversationId = conversation.getConversationId();
@@ -271,7 +272,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				currentConversationToken = conversation.getConversationToken();
 				conversationEncryptionKey = conversation.getEncryptionKey();
 				Assert.assertNotNull(currentConversationToken);
-
+				ApptentiveLog.d("Conversation %s state changed to %s.", currentConversationId, conversation.getState());
 				// when the Conversation ID comes back from the server, we need to update
 				// the payloads that may have already been enqueued so
 				// that they each have the Conversation ID.
