@@ -36,9 +36,8 @@ public abstract class JsonPayload extends Payload {
 	public byte[] getData() {
 		try {
 			if (encryptionKey != null) {
-				JSONObject wrapper = new JSONObject();
+				JSONObject wrapper = marshallForSending();
 				wrapper.put("token", token);
-				wrapper.put("payload", marshallForSending());
 				byte[] bytes = wrapper.toString().getBytes();
 				Encryptor encryptor = new Encryptor(encryptionKey);
 				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");

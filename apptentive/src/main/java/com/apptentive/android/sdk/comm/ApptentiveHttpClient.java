@@ -129,20 +129,24 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	}
 
 	private HttpRequest createPayloadRequest(PayloadData payload) {
-		final String oauthToken = notNull(payload.getAuthToken());
+		final String authToken = payload.getAuthToken();
 		final String httpPath = notNull(payload.getHttpRequestPath());
 		final HttpRequestMethod requestMethod = notNull(payload.getHttpRequestMethod());
+		final String contentType = notNull(payload.getContentType());
 
 		// TODO: figure out a better solution
 		HttpRequest request;
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			request = createMultipartRequest(httpPath, payload.getData(), associatedFiles, requestMethod);
+			request = createMultipartRequest(httpPath, payload.getData(), associatedFiles, requestMethod, contentType);
 		} else {
-			request = createRawRequest(httpPath, payload.getData(), requestMethod);
+			request = createRawRequest(httpPath, payload.getData(), requestMethod, contentType);
 		}
 
-		request.setRequestProperty("Authorization", "Bearer " + oauthToken);
+		// Encrypted requests don't use an Auth token on the request. It's stored in the encrypted body.
+		if (!StringUtils.isNullOrEmpty(authToken)) {
+			request.setRequestProperty("Authorization", "Bearer " + authToken);
+		}
 
 		if (payload.isEncrypted()) {
 			request.setRequestProperty("APPTENTIVE-ENCRYPTED", Boolean.TRUE);
@@ -174,7 +178,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
-	private RawHttpRequest createRawRequest(String endpoint, byte[] data, HttpRequestMethod method) {
+	private RawHttpRequest createRawRequest(String endpoint, byte[] data, HttpRequestMethod method, String contentType) {
 		if (endpoint == null) {
 			throw new IllegalArgumentException("Endpoint is null");
 		}
@@ -184,16 +188,19 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		if (method == null) {
 			throw new IllegalArgumentException("Method is null");
 		}
+		if (contentType == null) {
+			throw new IllegalArgumentException("ContentType is null");
+		}
 
 		String url = createEndpointURL(endpoint);
 		RawHttpRequest request = new RawHttpRequest(url, data);
 		setupRequestDefaults(request);
 		request.setMethod(method);
-		request.setRequestProperty("Content-Type", "application/json");
+		request.setRequestProperty("Content-Type", contentType);
 		return request;
 	}
 
-	private HttpJsonMultipartRequest createMultipartRequest(String endpoint, byte[] data, List<StoredFile> files, HttpRequestMethod method) {
+	private HttpJsonMultipartRequest createMultipartRequest(String endpoint, byte[] data, List<StoredFile> files, HttpRequestMethod method, String contentType) {
 		if (endpoint == null) {
 			throw new IllegalArgumentException("Endpoint is null");
 		}
@@ -203,9 +210,12 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		if (method == null) {
 			throw new IllegalArgumentException("Method is null");
 		}
+		if (contentType == null) {
+			throw new IllegalArgumentException("ContentType is null");
+		}
 
 		String url = createEndpointURL(endpoint);
-		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, data, files);
+		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, data, files, contentType);
 		setupRequestDefaults(request);
 		request.setMethod(method);
 		return request;

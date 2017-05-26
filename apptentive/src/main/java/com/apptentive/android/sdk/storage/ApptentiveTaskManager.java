@@ -19,7 +19,6 @@ import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
-import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -239,11 +238,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		if (payload == null) {
 			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no unsent payloads found");
-			return;
-		}
-
-		if (StringUtils.isNullOrEmpty(payload.getAuthToken())) {
-			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no auth token");
 			return;
 		}
 

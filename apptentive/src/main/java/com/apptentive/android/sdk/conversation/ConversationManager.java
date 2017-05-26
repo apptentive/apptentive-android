@@ -655,8 +655,13 @@ public class ConversationManager {
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
+				if (activeConversation.getUserId().equals(userId)) {
+					ApptentiveLog.w("Already logged in as \"%s\"", userId);
+					callback.onLoginFinish();
+					return;
+				}
 				// FIXME: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
-				callback.onLoginFail("already logged in");
+				callback.onLoginFail("Already logged in. You must log out first.");
 				break;
 			default:
 				assertFail("Unexpected conversation state: " + activeConversation.getState());
@@ -672,7 +677,7 @@ public class ConversationManager {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");
-					handleLoginFinished(userId, encryptionKey);
+					handleLoginFinished(userId, token, encryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -689,11 +694,12 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String userId, final String encryptionKey) {
+			private void handleLoginFinished(final String userId, final String token, final String encryptionKey) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
-						assertFalse(isNullOrEmpty(encryptionKey));
+						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
@@ -715,6 +721,7 @@ public class ConversationManager {
 							}
 
 							activeConversation.setEncryptionKey(encryptionKey);
+							activeConversation.setConversationToken(token);
 							activeConversation.setUserId(userId);
 							activeConversation.setState(LOGGED_IN);
 							handleConversationStateChange(activeConversation);

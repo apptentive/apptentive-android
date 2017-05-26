@@ -33,10 +33,6 @@ public class PayloadData {
 			throw new IllegalArgumentException("Data is null");
 		}
 
-		if (authToken == null) {
-			throw new IllegalArgumentException("Auth token is null");
-		}
-
 		if (contentType == null) {
 			throw new IllegalArgumentException("Content type is null");
 		}

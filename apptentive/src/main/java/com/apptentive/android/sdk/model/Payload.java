@@ -85,6 +85,10 @@ public abstract class Payload {
 		return !StringUtils.isNullOrEmpty(encryptionKey);
 	}
 
+	public String getToken() {
+		return token;
+	}
+
 	public void setToken(String token) {
 		this.token = token;
 	}
