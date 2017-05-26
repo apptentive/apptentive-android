@@ -87,7 +87,7 @@ public class ConversationManager {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					if (activeConversation != null && activeConversation.hasActiveState()) {
-						ApptentiveLog.v(CONVERSATION, "Activity 'start' notification received. Trying to fetch interactions...");
+						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch interactions...");
 						final Context context = getContext();
 						if (context != null) {
 							activeConversation.fetchInteractions(context);

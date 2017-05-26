@@ -32,8 +32,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
@@ -95,8 +95,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
-			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
-			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this);
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, this);
 	}
 
 	/**
@@ -286,10 +286,10 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			} else {
 				currentConversationId = null;
 			}
-		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
 			appInBackground = false;
 			sendNextPayload(); // when the app comes back from the background - we need to resume sending payloads
-		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_BACKGROUND)) {
 			appInBackground = true;
 		}
 	}

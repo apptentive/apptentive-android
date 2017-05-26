@@ -24,14 +24,14 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_ACTIVITY_RESUMED = "NOTIFICATION_ACTIVITY_RESUMED"; // { activity : Activity }
 
 	/**
-	 * Sent if app enter foreground
+	 * Sent if app entered foreground
 	 */
-	public static final String NOTIFICATION_APP_ENTER_FOREGROUND = "NOTIFICATION_APP_ENTER_FOREGROUND";
+	public static final String NOTIFICATION_APP_ENTERED_FOREGROUND = "NOTIFICATION_APP_ENTERED_FOREGROUND";
 
 	/**
-	 * Sent if app enter background
+	 * Sent if app entered background
 	 */
-	public static final String NOTIFICATION_APP_ENTER_BACKGROUND = "NOTIFICATION_APP_ENTER_BACKGROUND";
+	public static final String NOTIFICATION_APP_ENTERED_BACKGROUND = "NOTIFICATION_APP_ENTERED_BACKGROUND";
 
 	/**
 	 * Sent before payload request is sent to the server
