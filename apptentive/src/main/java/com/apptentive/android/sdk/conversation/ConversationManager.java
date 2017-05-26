@@ -83,7 +83,7 @@ public class ConversationManager {
 		this.storageDir = storageDir;
 
 		ApptentiveNotificationCenter.defaultCenter()
-			.addObserver(NOTIFICATION_ACTIVITY_STARTED, new ApptentiveNotificationObserver() {
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					if (activeConversation != null && activeConversation.hasActiveState()) {
