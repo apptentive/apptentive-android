@@ -104,10 +104,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * a new message is added.
 	 */
 	public void addPayload(final Payload... payloads) {
-		// Set the current encryptor on each payload as they are added.
-		if (conversationEncryptionKey != null) {
-			for (Payload payload : payloads) {
+
+		// Provide each payload with the information it will need to send itself to the server securely.
+		for (Payload payload : payloads) {
+			if (conversationEncryptionKey != null) {
 				payload.setEncryptionKey(conversationEncryptionKey);
+			}
+			if (currentConversationToken != null) {
 				payload.setToken(currentConversationToken);
 			}
 		}
