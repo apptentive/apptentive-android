@@ -379,8 +379,10 @@ public class ConversationManager {
 						conversation.setConversationToken(conversationToken);
 						conversation.setConversationId(conversationId);
 						conversation.setDevice(device);
-						conversation.setSdk(sdk);
+						conversation.setLastSentDevice(device);
 						conversation.setAppRelease(appRelease);
+						conversation.setSdk(sdk);
+						conversation.setLastSeenSdkVersion(sdk.getVersion());
 
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
