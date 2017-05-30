@@ -251,8 +251,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	private List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<>();
 		JSONObject root = new JSONObject(messageString);
-		if (!root.isNull("items")) {
-			JSONArray items = root.getJSONArray("items");
+		if (!root.isNull("messages")) {
+			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
 				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
