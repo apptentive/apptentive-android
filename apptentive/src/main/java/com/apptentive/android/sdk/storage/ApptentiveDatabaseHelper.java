@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.model.MultipartPayload;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -25,6 +26,7 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -48,6 +50,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private static final int FALSE = 0;
 	private final DataSource dataSource;
 	private final File fileDir; // data dir of the application
+
+	/** We store temporary multipart payload body files here */
+	private final File multipartPayloadDataDir;
 
 	//region Payload SQL
 
@@ -204,6 +209,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 		this.dataSource = dataSource;
 		this.fileDir = context.getFilesDir();
+		this.multipartPayloadDataDir = new File(fileDir, "multipart-payloads"); // FIXME: figure out a better directory structure
 	}
 
 	//region Create & Upgrade
@@ -437,14 +443,22 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
 					StringUtils.isNullOrEmpty(conversationId) ? "${conversationId}" : conversationId) // if conversation id is missing we replace it with a place holder and update it later
 				);
-				values.put(PayloadEntry.COLUMN_DATA.name, notNull(payload.getData()));
+
+				if (payload instanceof MultipartPayload) {
+					File dest = getMultipartFile(payload.getNonce());
+					ApptentiveLog.v(DATABASE, "Save multipart payload: " + dest);
+					Util.writeBytes(dest, payload.renderData());
+				} else {
+					values.put(PayloadEntry.COLUMN_DATA.name, notNull(payload.renderData()));
+				}
+
 				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
 
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
 			db.setTransactionSuccessful();
 			db.endTransaction();
-		} catch (SQLException sqe) {
+		} catch (Exception sqe) {
 			ApptentiveLog.e(DATABASE, "addPayload EXCEPTION: " + sqe.getMessage());
 		}
 	}
@@ -499,7 +513,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
 				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
-				final byte[] data = notNull(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
+				byte[] data = null;
+				switch (payloadType) {
+					case message:
+						data = Util.readBytes(getMultipartFile(nonce));
+						break;
+					default:
+						data = notNull(cursor.getBlob(PayloadEntry.COLUMN_DATA.index));
+				}
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
@@ -622,6 +643,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	//endregion
 
 	// region Helpers
+
+	private File getMultipartFile(String nonce) {
+		return new File(multipartPayloadDataDir, nonce + ".multipart");
+	}
 
 	private void ensureClosed(Cursor cursor) {
 		try {

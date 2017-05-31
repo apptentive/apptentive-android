@@ -31,7 +31,7 @@ public abstract class JsonPayload extends Payload {
 	//region Data
 
 	@Override
-	public byte[] getData() {
+	public byte[] renderData() {
 		if (encryptionKey != null) {
 			byte[] bytes = marshallForSending().toString().getBytes();
 			Encryptor encryptor = new Encryptor(encryptionKey);

@@ -16,7 +16,7 @@ public abstract class Payload {
 	private final PayloadType payloadType;
 
 	/**
-	 * If set, this payload should be encrypted in getData().
+	 * If set, this payload should be encrypted in renderData().
 	 */
 	protected String encryptionKey;
 
@@ -48,7 +48,7 @@ public abstract class Payload {
 	/**
 	 * Binary data to be stored in database
 	 */
-	public abstract byte[] getData();
+	public abstract byte[] renderData();
 
 	//region
 
