@@ -135,6 +135,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		final String contentType = notNull(payload.getContentType());
 
 		// TODO: figure out a better solution
+		// TODO: This isn't working. The payload is only ever of type PayloadData. This never got migrated.
 		HttpRequest request;
 		if (payload instanceof MultipartPayload) {
 			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();

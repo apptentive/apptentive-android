@@ -18,8 +18,6 @@ public abstract class JsonPayload extends Payload {
 
 	private final JSONObject jsonObject;
 
-	// These three are not stored in the JSON, only the DB.
-
 	public JsonPayload(PayloadType type) {
 		super(type);
 		jsonObject = new JSONObject();
@@ -34,22 +32,20 @@ public abstract class JsonPayload extends Payload {
 
 	@Override
 	public byte[] getData() {
-		try {
-			if (encryptionKey != null) {
-				JSONObject wrapper = marshallForSending();
-				wrapper.put("token", token);
-				byte[] bytes = wrapper.toString().getBytes();
-				Encryptor encryptor = new Encryptor(encryptionKey);
-				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
+		if (encryptionKey != null) {
+			byte[] bytes = marshallForSending().toString().getBytes();
+			Encryptor encryptor = new Encryptor(encryptionKey);
+			ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
+			try {
 				return encryptor.encrypt(bytes);
-			} else {
-				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
-				return marshallForSending().toString().getBytes();
+			} catch (Exception e) {
+				ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
+			return null;
+		} else {
+			ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
+			return marshallForSending().toString().getBytes();
 		}
-		return null;
 	}
 
 	//endregion
@@ -171,6 +167,14 @@ public abstract class JsonPayload extends Payload {
 	//endregion
 
 	protected JSONObject marshallForSending() {
+		try {
+			if (encryptionKey != null) {
+				JSONObject wrapper = new JSONObject();
+				wrapper.put("token", token);
+			}
+		} catch (Exception e) {
+			// Can't happen.
+		}
 		return jsonObject;
 	}
 }

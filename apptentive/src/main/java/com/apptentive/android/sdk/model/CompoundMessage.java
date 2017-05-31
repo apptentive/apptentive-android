@@ -20,6 +20,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -38,6 +39,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 
 	private boolean isOutgoing = true;
 
+	private final String boundary;
+
 	/* For incoming message, this array stores attachment Urls
 	 * StoredFile::apptentiveUri is set by the "url" of the remote attachment file
 	 * StoredFile:localFilePath is set by the "thumbnail_url" of the remote attachment (maybe empty)
@@ -47,6 +50,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	// Default constructor will only be called when the message is created from local, a.k.a outgoing
 	public CompoundMessage() {
 		super();
+		boundary = UUID.randomUUID().toString();
 		isOutgoing = true;
 	}
 
@@ -57,6 +61,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	 */
 	public CompoundMessage(String json, boolean bOutgoing) throws JSONException {
 		super(json);
+		boundary = UUID.randomUUID().toString();
 		parseAttachmentsArray(json);
 		hasNoAttachments = getTextOnly();
 		isOutgoing = bOutgoing;
@@ -76,7 +81,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 
 	@Override
 	public String getHttpRequestContentType() {
-		return "multipart/mixed;boundary=xxx";
+		return String.format("%s;boundary=%s", encryptionKey != null ? "multipart/encrypted" : "multipart/mixed", boundary);
 	}
 
 	//endregion
@@ -115,6 +120,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	}
 
 
+	private List<StoredFile> attachedFiles;
+
 	public boolean setAssociatedImages(List<ImageItem> attachedImages) {
 
 		if (attachedImages == null || attachedImages.size() == 0) {
@@ -136,6 +143,9 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
+
+		attachedFiles = attachmentStoredFiles;
+
 		boolean bRet = false;
 		try {
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachmentStoredFiles);
@@ -148,6 +158,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	}
 
 	public boolean setAssociatedFiles(List<StoredFile> attachedFiles) {
+
+		this.attachedFiles = attachedFiles;
 
 		if (attachedFiles == null || attachedFiles.size() == 0) {
 			hasNoAttachments = true;
@@ -267,6 +279,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 
 	@Override
 	protected JSONObject marshallForSending() {
+/*
 		JSONObject wrapper = new JSONObject();
 		try {
 			wrapper.put(KEY_MESSAGE, super.marshallForSending());
@@ -274,5 +287,56 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 			// Can't happen.
 		}
 		return wrapper;
+*/
+		return super.marshallForSending();
+	}
+
+	private static final String lineEnd = "\r\n";
+	private static final String twoHyphens = "--";
+
+	/**
+	 * This is a multipart request. To accomplish this, we will create a data blog that is the entire contents
+	 * of the request after the request's headers. Each part of the body includes its own headers,
+	 * boundary, and data, but that is all rolled into one byte array to be stored pending sending.
+	 * This enables the contents to be stores securely via encryption the moment it is created, and
+	 * not read again as plain text while it sits on the device.
+	 * @return a Byte array that can be set on the payload request.
+	 */
+	@Override
+	public byte[] getData() {
+
+		// First write the message body out as the first "part".
+		StringBuilder bodyData = new StringBuilder(twoHyphens);
+		bodyData
+			.append(boundary).append(lineEnd)
+			.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
+			.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
+			.append(lineEnd)
+			.append(marshallForSending().toString()).append(lineEnd);
+
+		// TODO: Then write out each attached file.
+		if (attachedFiles != null) {
+			for (StoredFile storedFile : attachedFiles) {
+				storedFile.getLocalFilePath();
+			}
+		}
+
+		bodyData.append(twoHyphens).append(boundary).append(twoHyphens).append(lineEnd);
+
+		byte[] plainTextData = bodyData.toString().getBytes();
+		return plainTextData;
+/*
+		if (encryptionKey != null) {
+			Encryptor encryptor = new Encryptor(encryptionKey);
+			try {
+				return encryptor.encrypt(plainTextData);
+			} catch (Exception e) {
+				ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
+			}
+		} else {
+			return plainTextData;
+		}
+		return null;
+*/
 	}
 }
