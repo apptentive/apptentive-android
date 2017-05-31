@@ -676,6 +676,11 @@ public class Util {
 			throw new IllegalArgumentException("'bytes' is null");
 		}
 
+		File parentFile = file.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			throw new IOException("Parent file could not be created: " + parentFile);
+		}
+
 		ByteArrayInputStream input = null;
 		FileOutputStream output = null;
 		try {
