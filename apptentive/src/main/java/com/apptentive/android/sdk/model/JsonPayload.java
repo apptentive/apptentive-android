@@ -169,8 +169,7 @@ public abstract class JsonPayload extends Payload {
 	protected JSONObject marshallForSending() {
 		try {
 			if (encryptionKey != null) {
-				JSONObject wrapper = new JSONObject();
-				wrapper.put("token", token);
+				jsonObject.put("token", token);
 			}
 		} catch (Exception e) {
 			// Can't happen.
