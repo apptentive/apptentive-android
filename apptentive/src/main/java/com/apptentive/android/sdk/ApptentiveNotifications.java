@@ -14,6 +14,11 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_CONVERSATION_STATE_DID_CHANGE = "CONVERSATION_STATE_DID_CHANGE"; // { conversation : Conversation }
 
 	/**
+	 * Sent when conversation is about to be logged out, to allow necessary tasks to be completed within the ending conversation.
+	 */
+	public static final String NOTIFICATION_CONVERSATION_WILL_LOGOUT = "CONVERSATION_WILL_LOGOUT"; // { conversation : Conversation }
+
+	/**
 	 * Sent if a new activity is started.
 	 */
 	public static final String NOTIFICATION_ACTIVITY_STARTED = "NOTIFICATION_ACTIVITY_STARTED"; // { activity : Activity }
