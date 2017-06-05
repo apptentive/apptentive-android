@@ -326,6 +326,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 					.append(lineEnd);
 				data.write(header.toString().getBytes());
 				data.write(encryptor.encrypt(partBytes));
+				data.write("\r\n".getBytes());
 			} else {
 				data.write(header.toString().getBytes());
 				data.write(partBytes);
@@ -376,6 +377,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 							byte[] encryptedAttachment = encryptor.encrypt(attachmentBytes.toByteArray());
 							ApptentiveLog.e("Writing encrypted attachment bytes: %d", encryptedAttachment.length);
 							data.write(encryptedAttachment);
+							data.write("\r\n".getBytes());
 						} else {
 							ApptentiveLog.e("Writing attachment bytes: %d", attachmentBytes.size());
 							data.write(attachmentBytes.toByteArray());
