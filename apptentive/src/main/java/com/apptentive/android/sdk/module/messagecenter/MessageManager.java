@@ -38,7 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -46,8 +45,8 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
@@ -282,6 +281,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
 		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
+		assertNotNull(responseJson, "Missing required responseJson.");
 		if (apptentiveMessage == null) {
 			return; // should not happen but we want to stay safe
 		}
@@ -347,8 +347,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_ACTIVITY_STARTED, this)
 			.addObserver(NOTIFICATION_ACTIVITY_RESUMED, this)
-			.addObserver(NOTIFICATION_APP_ENTER_FOREGROUND, this)
-			.addObserver(NOTIFICATION_APP_ENTER_BACKGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, this)
 			.addObserver(NOTIFICATION_PAYLOAD_WILL_START_SEND, this)
 			.addObserver(NOTIFICATION_PAYLOAD_DID_FINISH_SEND, this);
 	}
@@ -363,9 +363,9 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			notification.hasName(NOTIFICATION_ACTIVITY_RESUMED)) {
 			final Activity activity = notification.getRequiredUserInfo(NOTIFICATION_KEY_ACTIVITY, Activity.class);
 			setCurrentForegroundActivity(activity);
-		} else if (notification.hasName(NOTIFICATION_APP_ENTER_FOREGROUND)) {
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
 			appWentToForeground();
-		} else if (notification.hasName(NOTIFICATION_APP_ENTER_BACKGROUND)) {
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_BACKGROUND)) {
 			setCurrentForegroundActivity(null);
 			appWentToBackground();
 		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {

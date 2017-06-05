@@ -148,6 +148,12 @@ public class Assert {
 		}
 	}
 
+	public static void assertNotEquals(Object first, Object second) {
+		if (imp != null && ObjectUtils.equal(first, second)) {
+			imp.assertFailed(StringUtils.format("Expected '%s' and '%s' to differ, but they are the same.", first, second));
+		}
+	}
+
 	//endregion
 
 	//region Threading

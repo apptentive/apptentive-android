@@ -428,7 +428,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
 				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
 				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
-				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, authToken); // might be null
+				// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
+				if (!payload.hasEncryptionKey()) {
+					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
+				}
 				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, conversationId); // might be null
 				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
 				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
@@ -488,9 +491,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				}
 
 				final String authToken = cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index);
-				if (authToken == null) {
-					return null;
-				}
 
 				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
 				if (PayloadType.unknown.equals(payloadType)) {

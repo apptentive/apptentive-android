@@ -36,16 +36,15 @@ public abstract class JsonPayload extends Payload {
 	public byte[] getData() {
 		try {
 			if (encryptionKey != null) {
-				JSONObject wrapper = new JSONObject();
+				JSONObject wrapper = marshallForSending();
 				wrapper.put("token", token);
-				wrapper.put("payload", jsonObject);
 				byte[] bytes = wrapper.toString().getBytes();
 				Encryptor encryptor = new Encryptor(encryptionKey);
 				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
 				return encryptor.encrypt(bytes);
 			} else {
 				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
-				return jsonObject.toString().getBytes();
+				return marshallForSending().toString().getBytes();
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
@@ -170,4 +169,8 @@ public abstract class JsonPayload extends Payload {
 	}
 
 	//endregion
+
+	protected JSONObject marshallForSending() {
+		return jsonObject;
+	}
 }

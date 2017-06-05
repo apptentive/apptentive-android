@@ -30,7 +30,7 @@ public class HttpJsonMultipartRequest extends HttpRequest {
 	private final List<StoredFile> files;
 	private final String boundary;
 
-	public HttpJsonMultipartRequest(String urlString, byte[] requestData, List<StoredFile> files) {
+	public HttpJsonMultipartRequest(String urlString, byte[] requestData, List<StoredFile> files, String contentType) {
 		super(urlString);
 
 		if (files == null) {
@@ -40,7 +40,7 @@ public class HttpJsonMultipartRequest extends HttpRequest {
 		this.requestData = requestData;
 
 		boundary = UUID.randomUUID().toString();
-		setRequestProperty("Content-Type", "multipart/mixed;boundary=" + boundary);
+		setRequestProperty("Content-Type", String.format("%s;boundary=%s", contentType, boundary));
 	}
 
 	@Override

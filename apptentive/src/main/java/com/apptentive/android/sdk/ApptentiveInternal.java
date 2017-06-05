@@ -67,8 +67,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_BACKGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTER_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 
@@ -430,7 +430,7 @@ public class ApptentiveInternal {
 		appIsInForeground = true;
 
 		// Post a notification
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_FOREGROUND);
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);
 	}
 
 	public void onAppEnterBackground() {
@@ -438,7 +438,7 @@ public class ApptentiveInternal {
 		currentTaskStackTopActivity = null;
 
 		// Post a notification
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTER_BACKGROUND);
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_BACKGROUND);
 	}
 
 	/* Apply Apptentive styling layers to the theme to be used by interaction. The layers include

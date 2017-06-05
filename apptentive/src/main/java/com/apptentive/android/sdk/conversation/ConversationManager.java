@@ -83,11 +83,11 @@ public class ConversationManager {
 		this.storageDir = storageDir;
 
 		ApptentiveNotificationCenter.defaultCenter()
-			.addObserver(NOTIFICATION_ACTIVITY_STARTED, new ApptentiveNotificationObserver() {
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					if (activeConversation != null && activeConversation.hasActiveState()) {
-						ApptentiveLog.v(CONVERSATION, "Activity 'start' notification received. Trying to fetch interactions...");
+						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch interactions...");
 						final Context context = getContext();
 						if (context != null) {
 							activeConversation.fetchInteractions(context);
@@ -379,8 +379,10 @@ public class ConversationManager {
 						conversation.setConversationToken(conversationToken);
 						conversation.setConversationId(conversationId);
 						conversation.setDevice(device);
-						conversation.setSdk(sdk);
+						conversation.setLastSentDevice(device);
 						conversation.setAppRelease(appRelease);
+						conversation.setSdk(sdk);
+						conversation.setLastSeenSdkVersion(sdk.getVersion());
 
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
@@ -581,9 +583,9 @@ public class ConversationManager {
 		final String userId;
 		try {
 			final Jwt jwt = Jwt.decode(token);
-			userId = jwt.getPayload().getString("user_id");
+			userId = jwt.getPayload().getString("sub");
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error while extracting user id");
+			ApptentiveLog.e(e, "Error while extracting user id: Missing field \"sub\"");
 			callback.onLoginFail(e.getMessage());
 			return;
 		}
@@ -655,8 +657,13 @@ public class ConversationManager {
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
+				if (activeConversation.getUserId().equals(userId)) {
+					ApptentiveLog.w("Already logged in as \"%s\"", userId);
+					callback.onLoginFinish();
+					return;
+				}
 				// FIXME: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
-				callback.onLoginFail("already logged in");
+				callback.onLoginFail("Already logged in. You must log out first.");
 				break;
 			default:
 				assertFail("Unexpected conversation state: " + activeConversation.getState());
@@ -672,7 +679,7 @@ public class ConversationManager {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");
-					handleLoginFinished(userId, encryptionKey);
+					handleLoginFinished(userId, token, encryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -689,11 +696,12 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String userId, final String encryptionKey) {
+			private void handleLoginFinished(final String userId, final String token, final String encryptionKey) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
-						assertFalse(isNullOrEmpty(encryptionKey));
+						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
@@ -715,6 +723,7 @@ public class ConversationManager {
 							}
 
 							activeConversation.setEncryptionKey(encryptionKey);
+							activeConversation.setConversationToken(token);
 							activeConversation.setUserId(userId);
 							activeConversation.setState(LOGGED_IN);
 							handleConversationStateChange(activeConversation);
