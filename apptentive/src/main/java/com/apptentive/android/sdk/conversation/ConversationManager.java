@@ -657,7 +657,7 @@ public class ConversationManager {
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
-				if (activeConversation.getUserId().equals(userId)) {
+				if (StringUtils.equal(activeConversation.getUserId(), userId)) {
 					ApptentiveLog.w("Already logged in as \"%s\"", userId);
 					callback.onLoginFinish();
 					return;
