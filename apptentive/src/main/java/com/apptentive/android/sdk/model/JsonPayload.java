@@ -7,12 +7,13 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 public abstract class JsonPayload extends Payload {
 
@@ -33,17 +34,17 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] renderData() {
 		if (encryptionKey != null) {
+			ApptentiveLog.v(PAYLOADS, "Getting data for encrypted payload.");
 			byte[] bytes = marshallForSending().toString().getBytes();
 			Encryptor encryptor = new Encryptor(encryptionKey);
-			ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
 			try {
 				return encryptor.encrypt(bytes);
 			} catch (Exception e) {
-				ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
+				ApptentiveLog.e(PAYLOADS, "Error encrypting payload data", e);
 			}
 			return null;
 		} else {
-			ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
+			ApptentiveLog.v(PAYLOADS, "Getting data for plaintext payload.");
 			return marshallForSending().toString().getBytes();
 		}
 	}

@@ -21,6 +21,11 @@ public abstract class Payload {
 	protected String encryptionKey;
 
 	/**
+	 * The Conversation ID of the payload, if known at this time.
+	 */
+	protected String conversationId;
+
+	/**
 	 * Encrypted Payloads need to include the Conversation JWT inside them so that the server can
 	 * authenticate each payload after it is decrypted.
 	 */
@@ -83,6 +88,14 @@ public abstract class Payload {
 
 	public boolean hasEncryptionKey() {
 		return !StringUtils.isNullOrEmpty(encryptionKey);
+	}
+
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
 	}
 
 	public String getToken() {

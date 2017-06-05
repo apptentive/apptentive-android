@@ -107,11 +107,14 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		// Provide each payload with the information it will need to send itself to the server securely.
 		for (Payload payload : payloads) {
-			if (conversationEncryptionKey != null) {
-				payload.setEncryptionKey(conversationEncryptionKey);
+			if (currentConversationId != null) {
+				payload.setConversationId(currentConversationId);
 			}
 			if (currentConversationToken != null) {
 				payload.setToken(currentConversationToken);
+			}
+			if (conversationEncryptionKey != null) {
+				payload.setEncryptionKey(conversationEncryptionKey);
 			}
 		}
 		singleThreadExecutor.execute(new Runnable() {

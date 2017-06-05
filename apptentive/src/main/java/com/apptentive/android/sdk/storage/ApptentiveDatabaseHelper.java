@@ -425,9 +425,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db = getWritableDatabase();
 			db.beginTransaction();
 
-			final String conversationId = dataSource.getConversationId();
-			final String authToken = dataSource.getAuthToken();
-
 			for (Payload payload : payloads) {
 				ContentValues values = new ContentValues();
 				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
@@ -437,10 +434,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				if (!payload.hasEncryptionKey()) {
 					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
 				}
-				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, conversationId); // might be null
+				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
 				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
 				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
-					StringUtils.isNullOrEmpty(conversationId) ? "${conversationId}" : conversationId) // if conversation id is missing we replace it with a place holder and update it later
+					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
 				);
 
 				File dest = getMultipartFile(payload.getNonce());
