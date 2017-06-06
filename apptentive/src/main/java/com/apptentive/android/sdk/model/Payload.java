@@ -10,7 +10,6 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 public abstract class Payload {
 	private final PayloadType payloadType;
@@ -31,12 +30,6 @@ public abstract class Payload {
 	 */
 	protected String token;
 
-	/**
-	 * A value that can be used to correlate a payload with another object
-	 * (for example, to update the sent status of a message)
-	 */
-	private String nonce;
-
 	private List<Object> attachments; // TODO: Figure out attachment handling
 
 	protected Payload(PayloadType type) {
@@ -45,7 +38,6 @@ public abstract class Payload {
 		}
 
 		this.payloadType = type;
-		nonce = UUID.randomUUID().toString();
 	}
 
 	//region Data
@@ -106,13 +98,9 @@ public abstract class Payload {
 		this.token = token;
 	}
 
-	public String getNonce() {
-		return nonce;
-	}
+	public abstract String getNonce();
 
-	public void setNonce(String nonce) {
-		this.nonce = nonce;
-	}
+	public abstract void setNonce(String nonce);
 
 	public List<Object> getAttachments() {
 		return attachments;

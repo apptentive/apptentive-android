@@ -13,15 +13,20 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 public abstract class JsonPayload extends Payload {
+
+	private static final String KEY_NONCE = "nonce";
 
 	private final JSONObject jsonObject;
 
 	public JsonPayload(PayloadType type) {
 		super(type);
 		jsonObject = new JSONObject();
+		setNonce(UUID.randomUUID().toString());
 	}
 
 	public JsonPayload(PayloadType type, String json) throws JSONException {
@@ -97,15 +102,14 @@ public abstract class JsonPayload extends Payload {
 		jsonObject.remove(key);
 	}
 
-	public String getString(String key) {
-		return jsonObject.optString(key);
+	public String optString(String key, String fallback) {
+		if (!jsonObject.isNull(key)) {
+			return jsonObject.optString(key, fallback);
+		}
+		return null;
 	}
 
-	public int getInt(String key) {
-		return getInt(key, 0);
-	}
-
-	public int getInt(String key, int defaultValue) {
+	public int optInt(String key, int defaultValue) {
 		return jsonObject.optInt(key, defaultValue);
 	}
 
@@ -117,8 +121,13 @@ public abstract class JsonPayload extends Payload {
 		return jsonObject.optBoolean(key, defaultValue);
 	}
 
-	protected double getDouble(String key) {
-		return getDouble(key, 0.0);
+	protected Double getDouble(String key) {
+		try {
+			return jsonObject.getDouble(key);
+		} catch (Exception e) {
+			// Ignore.
+		}
+		return null;
 	}
 
 	protected double getDouble(String key, double defaultValue) {
@@ -163,6 +172,16 @@ public abstract class JsonPayload extends Payload {
 		} else {
 			return "application/json";
 		}
+	}
+
+	@Override
+	public String getNonce() {
+		return optString(KEY_NONCE, null);
+	}
+
+	@Override
+	public void setNonce(String nonce) {
+		put(KEY_NONCE, nonce);
 	}
 
 	//endregion
