@@ -101,7 +101,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	// Get text message body, maybe empty
 	@Override
 	public String getBody() {
-		return getString(KEY_BODY);
+		return optString(KEY_BODY, null);
 	}
 
 	// Set text message body, maybe empty
@@ -111,7 +111,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	}
 
 	public String getTitle() {
-		return getString(KEY_TITLE);
+		return optString(KEY_TITLE, null);
 	}
 
 	public void setTitle(String title) {

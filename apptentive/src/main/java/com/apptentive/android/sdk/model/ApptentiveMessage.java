@@ -56,10 +56,10 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	}
 
 	public String getId() {
-		return getString(KEY_ID);
+		return optString(KEY_ID, null);
 	}
 
-	public Double getCreatedAt() { // // FIXME: figure out primitive vs Double
+	public Double getCreatedAt() {
 		return getDouble(KEY_CREATED_AT);
 	}
 
@@ -71,7 +71,8 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 		if (isNull(KEY_TYPE)) {
 			return Type.CompoundMessage;
 		}
-		return Type.parse(getString(KEY_TYPE));
+		String typeString = optString(KEY_TYPE, null);
+		return typeString == null ? Type.unknown : Type.parse(typeString);
 	}
 
 	protected void setType(Type type) {

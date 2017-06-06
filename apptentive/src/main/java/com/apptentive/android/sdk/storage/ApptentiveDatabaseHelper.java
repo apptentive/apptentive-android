@@ -393,7 +393,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				payload = LegacyPayloadFactory.createPayload(payloadType, json);
 
 				// the legacy payload format didn't store 'nonce' in the database so we need to extract if from json
-				String nonce = payload.getString("nonce");
+				String nonce = payload.optString("nonce", null);
 				if (nonce == null) {
 					nonce = UUID.randomUUID().toString(); // if 'nonce' is missing - generate a new one
 				}

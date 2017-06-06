@@ -50,10 +50,7 @@ public class SdkPayload extends JsonPayload {
 	//endregion
 
 	public String getVersion() {
-		if (!isNull(KEY_VERSION)) {
-			return getString(KEY_VERSION);
-		}
-		return null;
+		return optString(KEY_VERSION, null);
 	}
 
 	public void setVersion(String version) {
@@ -61,7 +58,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getProgrammingLanguage() {
-		return getString(KEY_PROGRAMMING_LANGUAGE);
+		return optString(KEY_PROGRAMMING_LANGUAGE, null);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
@@ -69,10 +66,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getAuthorName() {
-		if (!isNull(KEY_AUTHOR_NAME)) {
-			return getString(KEY_AUTHOR_NAME);
-		}
-		return null;
+		return optString(KEY_AUTHOR_NAME, null);
 	}
 
 	public void setAuthorName(String authorName) {
@@ -80,10 +74,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getAuthorEmail() {
-		if (!isNull(KEY_AUTHOR_EMAIL)) {
-			return getString(KEY_AUTHOR_EMAIL);
-		}
-		return null;
+		return optString(KEY_AUTHOR_EMAIL, null);
 	}
 
 	public void setAuthorEmail(String authorEmail) {
@@ -91,10 +82,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getPlatform() {
-		if (!isNull(KEY_PLATFORM)) {
-			return getString(KEY_PLATFORM);
-		}
-		return null;
+		return optString(KEY_PLATFORM, null);
 	}
 
 	public void setPlatform(String platform) {
@@ -102,10 +90,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getDistribution() {
-		if (!isNull(KEY_DISTRIBUTION)) {
-			return getString(KEY_DISTRIBUTION);
-		}
-		return null;
+		return optString(KEY_DISTRIBUTION, null);
 	}
 
 	public void setDistribution(String distribution) {
@@ -113,10 +98,7 @@ public class SdkPayload extends JsonPayload {
 	}
 
 	public String getDistributionVersion() {
-		if (!isNull(KEY_DISTRIBUTION_VERSION)) {
-			return getString(KEY_DISTRIBUTION_VERSION);
-		}
-		return null;
+		return optString(KEY_DISTRIBUTION_VERSION, null);
 	}
 
 	public void setDistributionVersion(String distributionVersion) {

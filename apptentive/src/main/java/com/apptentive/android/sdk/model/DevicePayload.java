@@ -1,12 +1,11 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
@@ -83,10 +82,7 @@ public class DevicePayload extends JsonPayload {
 	}
 
 	public String getModel() {
-		if (!isNull(KEY_MODEL)) {
-			return getString(KEY_MODEL);
-		}
-		return null;
+		return optString(KEY_MODEL, null);
 	}
 
 	public void setModel(String model) {
@@ -110,7 +106,7 @@ public class DevicePayload extends JsonPayload {
 	}
 
 	public String getDevice() {
-		return getString(KEY_DEVICE);
+		return optString(KEY_DEVICE, null);
 	}
 
 	public void setDevice(String device) {
