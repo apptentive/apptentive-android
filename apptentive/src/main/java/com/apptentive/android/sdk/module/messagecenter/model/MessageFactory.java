@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.messagecenter.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -40,7 +41,12 @@ public class MessageFactory {
 					} catch (JSONException e) {
 						// Ignore, senderId would be null
 					}
-					String personId = ApptentiveInternal.getInstance() != null ? ApptentiveInternal.getInstance().getPersonId() : null;
+					// TODO: Should we pass the person ID in when we ask this object if it's outgoing instead?
+					if (!ApptentiveInternal.isConversationActive()) {
+						ApptentiveLog.d(ApptentiveLogTag.MESSAGES, "Can't load message because no active conversation.");
+						return null;
+					}
+					String personId = ApptentiveInternal.getInstance().getConversation().getPerson().getId();
 					// If senderId is null or same as the locally stored id, construct message as outgoing
 					return new CompoundMessage(json, (senderId == null || (personId != null && senderId.equals(personId))));
 				case unknown:

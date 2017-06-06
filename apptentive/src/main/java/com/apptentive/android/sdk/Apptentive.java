@@ -80,7 +80,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				conversation.setPersonEmail(email);
+				conversation.getPerson().setEmail(email);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				return conversation.getPersonEmail();
+				return conversation.getPerson().getEmail();
 			}
 		}
 		return null;
@@ -115,7 +115,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				conversation.setPersonName(name);
+				conversation.getPerson().setName(name);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				return conversation.getPersonName();
+				return conversation.getPerson().getName();
 			}
 		}
 		return null;
@@ -769,7 +769,10 @@ public class Apptentive {
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().getMessageManager().addHostUnreadMessagesListener(listener);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getMessageManager().addHostUnreadMessagesListener(listener);
+			}
 		}
 	}
 
@@ -781,7 +784,10 @@ public class Apptentive {
 	public static int getUnreadMessageCount() {
 		try {
 			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().getMessageManager().getUnreadMessageCount();
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					return conversation.getMessageManager().getUnreadMessageCount();
+				}
 			}
 		} catch (Exception e) {
 			MetricModule.sendError(e, null, null);
@@ -796,22 +802,25 @@ public class Apptentive {
 	 * @param text The message you wish to send.
 	 */
 	public static void sendAttachmentText(String text) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			try {
-				CompoundMessage message = new CompoundMessage();
-				message.setBody(text);
-				message.setRead(true);
-				message.setHidden(true);
-				message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
-				message.setAssociatedFiles(null);
-				MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-				if (mgr != null) {
-					mgr.sendMessage(message);
-				}
-			} catch (Exception e) {
-				ApptentiveLog.w("Error sending attachment text.", e);
-				MetricModule.sendError(e, null, null);
+		if (!ApptentiveInternal.isConversationActive()) {
+			ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+			return;
+		}
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		try {
+			CompoundMessage message = new CompoundMessage();
+			message.setBody(text);
+			message.setRead(true);
+			message.setHidden(true);
+			message.setSenderId(conversation.getPerson().getId());
+			message.setAssociatedFiles(null);
+			MessageManager mgr = conversation.getMessageManager();
+			if (mgr != null) {
+				mgr.sendMessage(message);
 			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error sending attachment text.", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -823,17 +832,22 @@ public class Apptentive {
 	 * @param uri The URI of the local resource file.
 	 */
 	public static void sendAttachmentFile(String uri) {
-		try {
-			if (TextUtils.isEmpty(uri) || !ApptentiveInternal.isApptentiveRegistered()) {
-				return;
-			}
+		if (!ApptentiveInternal.isConversationActive()) {
+			ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+			return;
+		}
+		if (TextUtils.isEmpty(uri)) {
+			return;
+		}
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 
+		try {
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
@@ -905,17 +919,22 @@ public class Apptentive {
 	 * @param mimeType The mime type of the file.
 	 */
 	public static void sendAttachmentFile(InputStream is, String mimeType) {
-		try {
-			if (is == null || !ApptentiveInternal.isApptentiveRegistered()) {
-				return;
-			}
+		if (!ApptentiveInternal.isConversationActive()) {
+			ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+			return;
+		}
+		if (is == null) {
+			return;
+		}
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 
+		try {
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
