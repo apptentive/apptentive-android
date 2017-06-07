@@ -26,6 +26,7 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 /**
@@ -134,7 +135,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				if (bRequestRedirectThroughApptentive) {
 					connection.setRequestProperty("User-Agent", ApptentiveClient.getUserAgentString());
 					connection.setRequestProperty("Authorization", "OAuth " + conversationToken);
-					connection.setRequestProperty("X-API-Version", String.valueOf(ApptentiveClient.API_VERSION));
+					connection.setRequestProperty("X-API-Version", String.valueOf(Constants.API_VERSION));
 				} else if (cookies != null) {
 					connection.setRequestProperty("Cookie", cookies);
 				}

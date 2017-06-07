@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
@@ -20,7 +26,6 @@ import static com.apptentive.android.sdk.debug.Assert.notNull;
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
 public class ApptentiveHttpClient implements PayloadRequestSender {
-	private static final String API_VERSION = "9"; // TODO: get rid of duplication in ApptentiveClient
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -195,7 +200,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		request.setRequestProperty("Accept", "application/json");
 		request.setRequestProperty("APPTENTIVE-KEY", apptentiveKey);
 		request.setRequestProperty("APPTENTIVE-SIGNATURE", apptentiveSignature);
-		request.setRequestProperty("X-API-Version", API_VERSION);
+		request.setRequestProperty("X-API-Version", String.valueOf(Constants.API_VERSION));
 		request.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 		request.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
 	}
