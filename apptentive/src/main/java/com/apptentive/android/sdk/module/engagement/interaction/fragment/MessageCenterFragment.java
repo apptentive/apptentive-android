@@ -874,6 +874,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
 			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));
 
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null && conversation.hasActiveState()) {
+				compoundMessage.setSenderId(conversation.getPerson().getId());
+			}
+
 			messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_START_SENDING, compoundMessage));
 			composingViewSavedState = null;
 			composerEditText.getText().clear();
