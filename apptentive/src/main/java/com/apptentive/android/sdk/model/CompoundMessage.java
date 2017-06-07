@@ -31,7 +31,7 @@ import java.util.concurrent.Future;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
-public class CompoundMessage extends ApptentiveMessage implements MultipartPayload, MessageCenterUtil.CompoundMessageCommonInterface {
+public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 	public static final String KEY_TEXT_ONLY = "text_only";
@@ -185,7 +185,6 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		}
 	}
 
-	@Override
 	public List<StoredFile> getAssociatedFiles() {
 		if (hasNoAttachments) {
 			return null;

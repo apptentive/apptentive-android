@@ -1,10 +1,7 @@
 package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.MultipartPayload;
 import com.apptentive.android.sdk.model.PayloadData;
-import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.network.HttpJsonMultipartRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
@@ -16,8 +13,6 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
-
-import java.util.List;
 
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 
@@ -134,15 +129,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		final HttpRequestMethod requestMethod = notNull(payload.getHttpRequestMethod());
 		final String contentType = notNull(payload.getContentType());
 
-		// TODO: figure out a better solution
-		// TODO: This isn't working. The payload is only ever of type PayloadData. This never got migrated.
-		HttpRequest request;
-		if (payload instanceof MultipartPayload) {
-			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			request = createMultipartRequest(httpPath, payload.getData(), associatedFiles, requestMethod, contentType);
-		} else {
-			request = createRawRequest(httpPath, payload.getData(), requestMethod, contentType);
-		}
+		HttpRequest request = createRawRequest(httpPath, payload.getData(), requestMethod, contentType);
 
 		// Encrypted requests don't use an Auth token on the request. It's stored in the encrypted body.
 		if (!StringUtils.isNullOrEmpty(authToken)) {
@@ -198,27 +185,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		setupRequestDefaults(request);
 		request.setMethod(method);
 		request.setRequestProperty("Content-Type", contentType);
-		return request;
-	}
-
-	private HttpJsonMultipartRequest createMultipartRequest(String endpoint, byte[] data, List<StoredFile> files, HttpRequestMethod method, String contentType) {
-		if (endpoint == null) {
-			throw new IllegalArgumentException("Endpoint is null");
-		}
-		if (data == null) {
-			throw new IllegalArgumentException("Data is null");
-		}
-		if (method == null) {
-			throw new IllegalArgumentException("Method is null");
-		}
-		if (contentType == null) {
-			throw new IllegalArgumentException("ContentType is null");
-		}
-
-		String url = createEndpointURL(endpoint);
-		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, data, files, contentType);
-		setupRequestDefaults(request);
-		request.setMethod(method);
 		return request;
 	}
 
