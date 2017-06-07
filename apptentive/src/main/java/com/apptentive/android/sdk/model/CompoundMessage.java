@@ -373,11 +373,11 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 							byte[] encryptedAttachment = encryptor.encrypt(attachmentBytes.toByteArray());
 							ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
 							data.write(encryptedAttachment);
-							data.write("\r\n".getBytes());
 						} else {
 							ApptentiveLog.v(PAYLOADS, "Writing attachment bytes: %d", attachmentBytes.size());
 							data.write(attachmentBytes.toByteArray());
 						}
+						data.write("\r\n".getBytes());
 					} catch (Exception e) {
 						ApptentiveLog.e(PAYLOADS, "Error getting data for Message Payload attachments.", e);
 						return null;
