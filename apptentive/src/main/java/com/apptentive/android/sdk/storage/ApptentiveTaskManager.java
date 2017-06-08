@@ -49,7 +49,7 @@ import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
-public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveDatabaseHelper.DataSource, ApptentiveNotificationObserver, PayloadSender.Listener {
+public class ApptentiveTaskManager implements PayloadStore, EventStore, ApptentiveNotificationObserver, PayloadSender.Listener {
 
 	private final ApptentiveDatabaseHelper dbHelper;
 	private final ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
@@ -66,7 +66,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
 	 */
 	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient) {
-		dbHelper = new ApptentiveDatabaseHelper(context, this);
+		dbHelper = new ApptentiveDatabaseHelper(context);
 		/* When a new database task is submitted, the executor has the following behaviors:
 		 * 1. If the thread pool has no thread yet, it creates a single worker thread.
 		 * 2. If the single worker thread is running with tasks, it queues tasks.
@@ -296,18 +296,4 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			appInBackground = true;
 		}
 	}
-
-	//region ApptentiveDatabaseHelper.DataSource
-
-	@Override
-	public String getConversationId() {
-		return currentConversationId;
-	}
-
-	@Override
-	public String getAuthToken() {
-		return currentConversationToken;
-	}
-
-	//endregion
 }
