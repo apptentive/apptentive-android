@@ -676,6 +676,11 @@ public class Util {
 			throw new IllegalArgumentException("'bytes' is null");
 		}
 
+		File parentFile = file.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			throw new IOException("Parent file could not be created: " + parentFile);
+		}
+
 		ByteArrayInputStream input = null;
 		FileOutputStream output = null;
 		try {
@@ -689,6 +694,17 @@ public class Util {
 	}
 
 	public static byte[] readBytes(File file) throws IOException {
+		ByteArrayOutputStream output = null;
+		try {
+			output = new ByteArrayOutputStream();
+			appendFileToStream(file, output);
+			return output.toByteArray();
+		} finally {
+			ensureClosed(output);
+		}
+	}
+
+	public static void appendFileToStream(File file, OutputStream outputStream) throws IOException {
 		if (file == null) {
 			throw new IllegalArgumentException("'file' is null");
 		}
@@ -702,15 +718,11 @@ public class Util {
 		}
 
 		FileInputStream input = null;
-		ByteArrayOutputStream output = null;
 		try {
 			input = new FileInputStream(file);
-			output = new ByteArrayOutputStream();
-			copy(input, output);
-			return output.toByteArray();
+			copy(input, outputStream);
 		} finally {
 			ensureClosed(input);
-			ensureClosed(output);
 		}
 	}
 

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -27,8 +27,6 @@ import java.util.zip.GZIPInputStream;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 
 public class ApptentiveClient {
-
-	public static final int API_VERSION = 9;
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -135,7 +133,7 @@ public class ApptentiveClient {
 			}
 			connection.setRequestProperty("Accept-Encoding", "gzip");
 			connection.setRequestProperty("Accept", "application/json");
-			connection.setRequestProperty("X-API-Version", String.valueOf(API_VERSION));
+			connection.setRequestProperty("X-API-Version", String.valueOf(Constants.API_VERSION));
 			connection.setRequestProperty("APPTENTIVE-KEY", notNull(ApptentiveInternal.getInstance().getApptentiveKey()));
 			connection.setRequestProperty("APPTENTIVE-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveSignature()));
 

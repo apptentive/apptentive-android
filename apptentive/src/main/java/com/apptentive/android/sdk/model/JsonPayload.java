@@ -7,22 +7,26 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.UUID;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+
 public abstract class JsonPayload extends Payload {
 
-	private final JSONObject jsonObject;
+	private static final String KEY_NONCE = "nonce";
 
-	// These three are not stored in the JSON, only the DB.
+	private final JSONObject jsonObject;
 
 	public JsonPayload(PayloadType type) {
 		super(type);
 		jsonObject = new JSONObject();
+		setNonce(UUID.randomUUID().toString());
 	}
 
 	public JsonPayload(PayloadType type, String json) throws JSONException {
@@ -33,23 +37,21 @@ public abstract class JsonPayload extends Payload {
 	//region Data
 
 	@Override
-	public byte[] getData() {
-		try {
-			if (encryptionKey != null) {
-				JSONObject wrapper = marshallForSending();
-				wrapper.put("token", token);
-				byte[] bytes = wrapper.toString().getBytes();
-				Encryptor encryptor = new Encryptor(encryptionKey);
-				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for encrypted payload.");
+	public byte[] renderData() {
+		if (encryptionKey != null) {
+			ApptentiveLog.v(PAYLOADS, "Getting data for encrypted payload.");
+			byte[] bytes = marshallForSending().toString().getBytes();
+			Encryptor encryptor = new Encryptor(encryptionKey);
+			try {
 				return encryptor.encrypt(bytes);
-			} else {
-				ApptentiveLog.v(ApptentiveLogTag.PAYLOADS, "Getting data for plaintext payload.");
-				return marshallForSending().toString().getBytes();
+			} catch (Exception e) {
+				ApptentiveLog.e(PAYLOADS, "Error encrypting payload data", e);
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error encrypting payload data", e);
+			return null;
+		} else {
+			ApptentiveLog.v(PAYLOADS, "Getting data for plaintext payload.");
+			return marshallForSending().toString().getBytes();
 		}
-		return null;
 	}
 
 	//endregion
@@ -100,15 +102,14 @@ public abstract class JsonPayload extends Payload {
 		jsonObject.remove(key);
 	}
 
-	public String getString(String key) {
-		return jsonObject.optString(key);
+	public String optString(String key, String fallback) {
+		if (!jsonObject.isNull(key)) {
+			return jsonObject.optString(key, fallback);
+		}
+		return null;
 	}
 
-	public int getInt(String key) {
-		return getInt(key, 0);
-	}
-
-	public int getInt(String key, int defaultValue) {
+	public int optInt(String key, int defaultValue) {
 		return jsonObject.optInt(key, defaultValue);
 	}
 
@@ -120,8 +121,13 @@ public abstract class JsonPayload extends Payload {
 		return jsonObject.optBoolean(key, defaultValue);
 	}
 
-	protected double getDouble(String key) {
-		return getDouble(key, 0.0);
+	protected Double getDouble(String key) {
+		try {
+			return jsonObject.getDouble(key);
+		} catch (Exception e) {
+			// Ignore.
+		}
+		return null;
 	}
 
 	protected double getDouble(String key, double defaultValue) {
@@ -168,9 +174,26 @@ public abstract class JsonPayload extends Payload {
 		}
 	}
 
+	@Override
+	public String getNonce() {
+		return optString(KEY_NONCE, null);
+	}
+
+	@Override
+	public void setNonce(String nonce) {
+		put(KEY_NONCE, nonce);
+	}
+
 	//endregion
 
 	protected JSONObject marshallForSending() {
+		try {
+			if (encryptionKey != null) {
+				jsonObject.put("token", token);
+			}
+		} catch (Exception e) {
+			// Can't happen.
+		}
 		return jsonObject;
 	}
 }

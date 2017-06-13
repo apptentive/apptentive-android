@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,21 +10,13 @@ import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONException;
 
-import java.util.UUID;
-
-/**
- * @author Sky Kelsey
- */
 public abstract class ConversationItem extends JsonPayload {
 
-	protected static final String KEY_NONCE = "nonce";
 	protected static final String KEY_CLIENT_CREATED_AT = "client_created_at";
 	protected static final String KEY_CLIENT_CREATED_AT_UTC_OFFSET = "client_created_at_utc_offset";
 
 	protected ConversationItem(PayloadType type) {
 		super(type);
-
-		put(KEY_NONCE, getNonce());
 
 		double seconds = Util.currentTimeSeconds();
 		int utcOffset = Util.getUtcOffset();
@@ -51,6 +43,4 @@ public abstract class ConversationItem extends JsonPayload {
 	public void setClientCreatedAtUtcOffset(int clientCreatedAtUtcOffset) {
 		put(KEY_CLIENT_CREATED_AT_UTC_OFFSET, clientCreatedAtUtcOffset);
 	}
-
-
 }

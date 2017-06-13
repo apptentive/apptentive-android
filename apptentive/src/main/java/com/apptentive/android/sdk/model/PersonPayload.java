@@ -45,10 +45,7 @@ public class PersonPayload extends JsonPayload {
 	//endregion
 
 	public String getId() {
-		if (!isNull(KEY_ID)) {
-			return getString(KEY_ID);
-		}
-		return null;
+		return optString(KEY_ID, null);
 	}
 
 	public void setId(String id) {
@@ -56,7 +53,7 @@ public class PersonPayload extends JsonPayload {
 	}
 
 	public String getEmail() {
-		return getString(KEY_EMAIL);
+		return optString(KEY_EMAIL, null);
 	}
 
 	public void setEmail(String email) {
@@ -64,7 +61,7 @@ public class PersonPayload extends JsonPayload {
 	}
 
 	public String getName() {
-		return getString(KEY_NAME);
+		return optString(KEY_NAME, null);
 	}
 
 	public void setName(String name) {

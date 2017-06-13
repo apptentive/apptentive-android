@@ -60,7 +60,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 
 	//region Sdk getters/setters
 	public String getVersion() {
-		return getString(KEY_SDK_VERSION);
+		return optString(KEY_SDK_VERSION, null);
 	}
 
 	public void setVersion(String version) {
@@ -68,7 +68,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getProgrammingLanguage() {
-		return getString(KEY_SDK_PROGRAMMING_LANGUAGE);
+		return optString(KEY_SDK_PROGRAMMING_LANGUAGE, null);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
@@ -76,7 +76,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getAuthorName() {
-		return getString(KEY_SDK_AUTHOR_NAME);
+		return optString(KEY_SDK_AUTHOR_NAME, null);
 	}
 
 	public void setAuthorName(String authorName) {
@@ -84,7 +84,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getAuthorEmail() {
-		return getString(KEY_SDK_AUTHOR_EMAIL);
+		return optString(KEY_SDK_AUTHOR_EMAIL, null);
 	}
 
 	public void setAuthorEmail(String authorEmail) {
@@ -92,7 +92,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getPlatform() {
-		return getString(KEY_SDK_PLATFORM);
+		return optString(KEY_SDK_PLATFORM, null);
 	}
 
 	public void setPlatform(String platform) {
@@ -100,7 +100,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getDistribution() {
-		return getString(KEY_SDK_DISTRIBUTION);
+		return optString(KEY_SDK_DISTRIBUTION, null);
 	}
 
 	public void setDistribution(String distribution) {
@@ -108,7 +108,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getDistributionVersion() {
-		return getString(KEY_SDK_DISTRIBUTION_VERSION);
+		return optString(KEY_SDK_DISTRIBUTION_VERSION, null);
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
@@ -119,7 +119,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	//region AppRelease getters/setters
 
 	public String getType() {
-		return getString(KEY_TYPE);
+		return optString(KEY_TYPE, null);
 	}
 
 	public void setType(String type) {
@@ -127,7 +127,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getVersionName() {
-		return getString(KEY_VERSION_NAME);
+		return optString(KEY_VERSION_NAME, null);
 	}
 
 	public void setVersionName(String versionName) {
@@ -135,7 +135,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public int getVersionCode() {
-		return getInt(KEY_VERSION_CODE, -1);
+		return optInt(KEY_VERSION_CODE, -1);
 	}
 
 	public void setVersionCode(int versionCode) {
@@ -143,7 +143,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getIdentifier() {
-		return getString(KEY_IDENTIFIER);
+		return optString(KEY_IDENTIFIER, null);
 	}
 
 	public void setIdentifier(String identifier) {
@@ -151,7 +151,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getTargetSdkVersion() {
-		return getString(KEY_TARGET_SDK_VERSION);
+		return optString(KEY_TARGET_SDK_VERSION, null);
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
@@ -159,7 +159,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	}
 
 	public String getAppStore() {
-		return getString(KEY_APP_STORE);
+		return optString(KEY_APP_STORE, null);
 	}
 
 	public void setAppStore(String appStore) {

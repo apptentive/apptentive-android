@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
@@ -22,9 +23,6 @@ public class ConversationData implements Saveable, DataChangedListener {
 
 	private String conversationToken;
 	private String conversationId;
-	private String personId;
-	private String personEmail;
-	private String personName;
 	private Device device;
 	private Device lastSentDevice;
 	private Person person;
@@ -109,44 +107,12 @@ public class ConversationData implements Saveable, DataChangedListener {
 		}
 	}
 
-	public String getPersonId() {
-		return personId;
-	}
-
-	public void setPersonId(String personId) {
-		if (!StringUtils.equal(this.personId, personId)) {
-			this.personId = personId;
-			notifyDataChanged();
-		}
-	}
-
-	public String getPersonEmail() {
-		return personEmail;
-	}
-
-	public void setPersonEmail(String personEmail) {
-		if (!StringUtils.equal(this.personEmail, personEmail)) {
-			this.personEmail = personEmail;
-			notifyDataChanged();
-		}
-	}
-
-	public String getPersonName() {
-		return personName;
-	}
-
-	public void setPersonName(String personName) {
-		if (!StringUtils.equal(this.personName, personName)) {
-			this.personName = personName;
-			notifyDataChanged();
-		}
-	}
-
 	public Device getDevice() {
 		return device;
 	}
 
 	public void setDevice(Device device) {
+		Assert.assertNotNull(device, "Device may not be null.");
 		this.device = device;
 		device.setDataChangedListener(this);
 		notifyDataChanged();
@@ -167,6 +133,7 @@ public class ConversationData implements Saveable, DataChangedListener {
 	}
 
 	public void setPerson(Person person) {
+		Assert.assertNotNull(person, "Person may not be null.");
 		this.person = person;
 		this.person.setDataChangedListener(this);
 		notifyDataChanged();

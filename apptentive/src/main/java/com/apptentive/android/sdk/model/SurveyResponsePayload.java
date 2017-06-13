@@ -56,7 +56,7 @@ public class SurveyResponsePayload extends ConversationItem {
 	//endregion
 
 	public String getId() {
-		return getString(KEY_SURVEY_ID);
+		return optString(KEY_SURVEY_ID, null);
 	}
 
 }

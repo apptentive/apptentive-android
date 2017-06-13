@@ -263,7 +263,7 @@ public class HttpRequest {
 				setupRequestProperties(connection, requestProperties);
 			}
 
-			if (HttpRequestMethod.POST.equals(method) || HttpRequestMethod.PUT.equals(method)) {
+			if (!HttpRequestMethod.GET.equals(method)) {
 				connection.setDoInput(true);
 				connection.setDoOutput(true);
 				connection.setUseCaches(false);

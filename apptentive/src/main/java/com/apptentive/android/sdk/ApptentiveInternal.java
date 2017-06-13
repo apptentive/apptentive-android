@@ -33,6 +33,7 @@ import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventPayload;
+import com.apptentive.android.sdk.model.LogoutPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -41,7 +42,9 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
@@ -69,13 +72,14 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AC
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal {
+public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	private final ApptentiveTaskManager taskManager;
 
@@ -94,7 +98,6 @@ public class ApptentiveInternal {
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
 	private String serverUrl;
-	private String personId;
 	private String androidId; // FIXME: remove this field (never used)
 	private String appPackageName;
 
@@ -180,10 +183,15 @@ public class ApptentiveInternal {
 		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
+		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this);
 	}
 
 	public static boolean isApptentiveRegistered() {
-		return (sApptentiveInternal != null);
+		return sApptentiveInternal != null;
+	}
+
+	public static boolean isConversationActive() {
+		return sApptentiveInternal != null && sApptentiveInternal.getConversation() != null;
 	}
 
 	/**
@@ -377,10 +385,6 @@ public class ApptentiveInternal {
 
 	public boolean isApptentiveDebuggable() {
 		return appRelease.isDebug();
-	}
-
-	public String getPersonId() {
-		return personId;
 	}
 
 	public SharedPreferences getGlobalSharedPrefs() {
@@ -1015,5 +1019,12 @@ public class ApptentiveInternal {
 	 */
 	public static void dismissAllInteractions() {
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS);
+	}
+
+	@Override
+	public void onReceiveNotification(ApptentiveNotification notification) {
+		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
+			getApptentiveTaskManager().addPayload(new LogoutPayload());
+		}
 	}
 }

@@ -84,7 +84,7 @@ public class EventPayload extends ConversationItem {
 	}
 
 	public String getEventLabel() {
-		return getString(KEY_LABEL);
+		return optString(KEY_LABEL, null);
 	}
 
 	private JSONObject generateCustomDataJson(Map<String, Object> customData) {

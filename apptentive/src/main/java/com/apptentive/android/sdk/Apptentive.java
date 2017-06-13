@@ -80,7 +80,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				conversation.setPersonEmail(email);
+				conversation.getPerson().setEmail(email);
 			}
 		}
 	}
@@ -95,7 +95,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				return conversation.getPersonEmail();
+				return conversation.getPerson().getEmail();
 			}
 		}
 		return null;
@@ -115,7 +115,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				conversation.setPersonName(name);
+				conversation.getPerson().setName(name);
 			}
 		}
 	}
@@ -130,7 +130,7 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				return conversation.getPersonName();
+				return conversation.getPerson().getName();
 			}
 		}
 		return null;
@@ -720,11 +720,13 @@ public class Apptentive {
 	 */
 	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
 		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				return false;
 			}
+			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error starting Apptentive Activity.", e);
+			ApptentiveLog.w("Error in Apptentive.showMessageCenter()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -737,8 +739,15 @@ public class Apptentive {
 	 * @return true if a call to {@link #showMessageCenter(Context)} will display Message Center, else false.
 	 */
 	public static boolean canShowMessageCenter() {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				return false;
+			}
 			return ApptentiveInternal.getInstance().canShowMessageCenterInternal();
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.canShowMessageCenter()", e);
+			MetricModule.sendError(e, null, null);
 		}
 		return false;
 	}
@@ -755,8 +764,15 @@ public class Apptentive {
 	 */
 	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				return;
+			}
 			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -768,8 +784,18 @@ public class Apptentive {
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().getMessageManager().addHostUnreadMessagesListener(listener);
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getMessageManager().addHostUnreadMessagesListener(listener);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.addUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -780,10 +806,14 @@ public class Apptentive {
 	 */
 	public static int getUnreadMessageCount() {
 		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().getMessageManager().getUnreadMessageCount();
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				return 0;
 			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			return conversation.getMessageManager().getUnreadMessageCount();
 		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.getUnreadMessageCount()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return 0;
@@ -796,22 +826,25 @@ public class Apptentive {
 	 * @param text The message you wish to send.
 	 */
 	public static void sendAttachmentText(String text) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			try {
-				CompoundMessage message = new CompoundMessage();
-				message.setBody(text);
-				message.setRead(true);
-				message.setHidden(true);
-				message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
-				message.setAssociatedFiles(null);
-				MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-				if (mgr != null) {
-					mgr.sendMessage(message);
-				}
-			} catch (Exception e) {
-				ApptentiveLog.w("Error sending attachment text.", e);
-				MetricModule.sendError(e, null, null);
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				return;
 			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			CompoundMessage message = new CompoundMessage();
+			message.setBody(text);
+			message.setRead(true);
+			message.setHidden(true);
+			message.setSenderId(conversation.getPerson().getId());
+			message.setAssociatedFiles(null);
+			MessageManager mgr = conversation.getMessageManager();
+			if (mgr != null) {
+				mgr.sendMessage(message);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentText(String)", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -824,16 +857,20 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(String uri) {
 		try {
-			if (TextUtils.isEmpty(uri) || !ApptentiveInternal.isApptentiveRegistered()) {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
-
+			if (TextUtils.isEmpty(uri)) {
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
@@ -869,9 +906,8 @@ public class Apptentive {
 			if (mgr != null) {
 				mgr.sendMessage(message);
 			}
-
 		} catch (Exception e) {
-			ApptentiveLog.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(String)", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -885,7 +921,11 @@ public class Apptentive {
 	 * @param mimeType The mime type of the file.
 	 */
 	public static void sendAttachmentFile(byte[] content, String mimeType) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				return;
+			}
 			ByteArrayInputStream is = null;
 			try {
 				is = new ByteArrayInputStream(content);
@@ -893,6 +933,9 @@ public class Apptentive {
 			} finally {
 				Util.ensureClosed(is);
 			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(byte[], String)", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -906,16 +949,20 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(InputStream is, String mimeType) {
 		try {
-			if (is == null || !ApptentiveInternal.isApptentiveRegistered()) {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
-
+			if (is == null) {
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
@@ -935,7 +982,7 @@ public class Apptentive {
 			message.setAssociatedFiles(attachmentStoredFiles);
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(InputStream, String)", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1028,8 +1075,11 @@ public class Apptentive {
 	 */
 	public static synchronized boolean canShowInteraction(String event) {
 		try {
-			return EngagementModule.canShowInteraction("local", "app", event);
+			if (ApptentiveInternal.isConversationActive()) {
+				return EngagementModule.canShowInteraction("local", "app", event);
+			}
 		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.canShowInteraction()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -1045,9 +1095,14 @@ public class Apptentive {
 	 *                 to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
-		ApptentiveInternal internal = ApptentiveInternal.getInstance();
-		if (internal != null) {
-			internal.setOnSurveyFinishedListener(listener);
+		try {
+			ApptentiveInternal internal = ApptentiveInternal.getInstance();
+			if (internal != null) {
+				internal.setOnSurveyFinishedListener(listener);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.setOnSurveyFinishedListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -1057,22 +1112,26 @@ public class Apptentive {
 	 * Starts login process asynchronously. This call returns immediately.
 	 */
 	public static void login(String token, LoginCallback callback) {
-		if (token == null) {
-			if (callback != null) {
-				callback.onLoginFail("token is null");
+		try {
+			if (token == null) {
+				if (callback != null) {
+					callback.onLoginFail("token is null");
+				}
+				return;
 			}
 
-			return;
-		}
-
-		final ApptentiveInternal instance = ApptentiveInternal.getInstance();
-		if (instance == null) {
-			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
-			if (callback != null) {
-				callback.onLoginFail("Apptentive instance is not properly initialized");
+			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+			if (instance == null) {
+				ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+				if (callback != null) {
+					callback.onLoginFail("Apptentive instance is not properly initialized");
+				}
+			} else {
+				ApptentiveInternal.getInstance().login(token, callback);
 			}
-		} else {
-			instance.login(token, callback);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.login()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -1102,7 +1161,8 @@ public class Apptentive {
 				instance.logout();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Exception while logging out of conversation.", e);
+			ApptentiveLog.e("Exception in Apptentive.logout()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 

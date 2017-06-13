@@ -52,7 +52,7 @@ public class AppReleasePayload extends JsonPayload {
 	//endregion
 
 	public String getType() {
-		return getString(KEY_TYPE);
+		return optString(KEY_TYPE, null);
 	}
 
 	public void setType(String type) {
@@ -60,7 +60,7 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	public String getVersionName() {
-		return getString(KEY_VERSION_NAME);
+		return optString(KEY_VERSION_NAME, null);
 	}
 
 	public void setVersionName(String versionName) {
@@ -68,10 +68,7 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	public int getVersionCode() {
-		if (!isNull(KEY_VERSION_CODE)) {
-			return getInt(KEY_VERSION_CODE);
-		}
-		return -1;
+		return optInt(KEY_VERSION_CODE, -1);
 	}
 
 	public void setVersionCode(int versionCode) {
@@ -79,7 +76,7 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	public String getIdentifier() {
-		return getString(KEY_IDENTIFIER);
+		return optString(KEY_IDENTIFIER, null);
 	}
 
 	public void setIdentifier(String identifier) {
@@ -87,7 +84,7 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	public String getTargetSdkVersion() {
-		return getString(KEY_TARGET_SDK_VERSION);
+		return optString(KEY_TARGET_SDK_VERSION, null);
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
@@ -95,7 +92,7 @@ public class AppReleasePayload extends JsonPayload {
 	}
 
 	public String getAppStore() {
-		return getString(KEY_APP_STORE);
+		return optString(KEY_APP_STORE, null);
 	}
 
 	public void setAppStore(String appStore) {

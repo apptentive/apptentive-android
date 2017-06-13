@@ -1,10 +1,13 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.comm;
 
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
-import com.apptentive.android.sdk.model.MultipartPayload;
 import com.apptentive.android.sdk.model.PayloadData;
-import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.network.HttpJsonMultipartRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
@@ -17,15 +20,12 @@ import com.apptentive.android.sdk.util.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.List;
-
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 
 /**
  * Class responsible for all client-server network communications using asynchronous HTTP requests
  */
 public class ApptentiveHttpClient implements PayloadRequestSender {
-	private static final String API_VERSION = "9"; // TODO: get rid of duplication in ApptentiveClient
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
@@ -134,14 +134,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		final HttpRequestMethod requestMethod = notNull(payload.getHttpRequestMethod());
 		final String contentType = notNull(payload.getContentType());
 
-		// TODO: figure out a better solution
-		HttpRequest request;
-		if (payload instanceof MultipartPayload) {
-			final List<StoredFile> associatedFiles = ((MultipartPayload) payload).getAssociatedFiles();
-			request = createMultipartRequest(httpPath, payload.getData(), associatedFiles, requestMethod, contentType);
-		} else {
-			request = createRawRequest(httpPath, payload.getData(), requestMethod, contentType);
-		}
+		HttpRequest request = createRawRequest(httpPath, payload.getData(), requestMethod, contentType);
 
 		// Encrypted requests don't use an Auth token on the request. It's stored in the encrypted body.
 		if (!StringUtils.isNullOrEmpty(authToken)) {
@@ -200,27 +193,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
-	private HttpJsonMultipartRequest createMultipartRequest(String endpoint, byte[] data, List<StoredFile> files, HttpRequestMethod method, String contentType) {
-		if (endpoint == null) {
-			throw new IllegalArgumentException("Endpoint is null");
-		}
-		if (data == null) {
-			throw new IllegalArgumentException("Data is null");
-		}
-		if (method == null) {
-			throw new IllegalArgumentException("Method is null");
-		}
-		if (contentType == null) {
-			throw new IllegalArgumentException("ContentType is null");
-		}
-
-		String url = createEndpointURL(endpoint);
-		HttpJsonMultipartRequest request = new HttpJsonMultipartRequest(url, data, files, contentType);
-		setupRequestDefaults(request);
-		request.setMethod(method);
-		return request;
-	}
-
 	private void setupRequestDefaults(HttpRequest request) {
 		request.setRequestProperty("User-Agent", userAgentString);
 		request.setRequestProperty("Connection", "Keep-Alive");
@@ -228,7 +200,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		request.setRequestProperty("Accept", "application/json");
 		request.setRequestProperty("APPTENTIVE-KEY", apptentiveKey);
 		request.setRequestProperty("APPTENTIVE-SIGNATURE", apptentiveSignature);
-		request.setRequestProperty("X-API-Version", API_VERSION);
+		request.setRequestProperty("X-API-Version", String.valueOf(Constants.API_VERSION));
 		request.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
 		request.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
 	}

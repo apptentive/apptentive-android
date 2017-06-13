@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,24 +8,30 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageItem;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class CompoundMessage extends ApptentiveMessage implements MultipartPayload, MessageCenterUtil.CompoundMessageCommonInterface {
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
-	public static final String KEY_MESSAGE = "message";
+public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 	public static final String KEY_TEXT_ONLY = "text_only";
@@ -38,6 +44,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 
 	private boolean isOutgoing = true;
 
+	private final String boundary;
+
 	/* For incoming message, this array stores attachment Urls
 	 * StoredFile::apptentiveUri is set by the "url" of the remote attachment file
 	 * StoredFile:localFilePath is set by the "thumbnail_url" of the remote attachment (maybe empty)
@@ -47,6 +55,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	// Default constructor will only be called when the message is created from local, a.k.a outgoing
 	public CompoundMessage() {
 		super();
+		boundary = UUID.randomUUID().toString();
 		isOutgoing = true;
 	}
 
@@ -57,6 +66,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	 */
 	public CompoundMessage(String json, boolean bOutgoing) throws JSONException {
 		super(json);
+		boundary = UUID.randomUUID().toString();
 		parseAttachmentsArray(json);
 		hasNoAttachments = getTextOnly();
 		isOutgoing = bOutgoing;
@@ -76,7 +86,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 
 	@Override
 	public String getHttpRequestContentType() {
-		return "multipart/mixed;boundary=xxx";
+		return String.format("%s;boundary=%s", encryptionKey != null ? "multipart/encrypted" : "multipart/mixed", boundary);
 	}
 
 	//endregion
@@ -89,7 +99,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	// Get text message body, maybe empty
 	@Override
 	public String getBody() {
-		return getString(KEY_BODY);
+		return optString(KEY_BODY, null);
 	}
 
 	// Set text message body, maybe empty
@@ -99,7 +109,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	}
 
 	public String getTitle() {
-		return getString(KEY_TITLE);
+		return optString(KEY_TITLE, null);
 	}
 
 	public void setTitle(String title) {
@@ -114,6 +124,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		put(KEY_TEXT_ONLY, bVal);
 	}
 
+
+	private List<StoredFile> attachedFiles;
 
 	public boolean setAssociatedImages(List<ImageItem> attachedImages) {
 
@@ -136,6 +148,9 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 			storedFile.setCreationTime(image.time);
 			attachmentStoredFiles.add(storedFile);
 		}
+
+		attachedFiles = attachmentStoredFiles;
+
 		boolean bRet = false;
 		try {
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachmentStoredFiles);
@@ -148,6 +163,8 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 	}
 
 	public boolean setAssociatedFiles(List<StoredFile> attachedFiles) {
+
+		this.attachedFiles = attachedFiles;
 
 		if (attachedFiles == null || attachedFiles.size() == 0) {
 			hasNoAttachments = true;
@@ -168,7 +185,6 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		}
 	}
 
-	@Override
 	public List<StoredFile> getAssociatedFiles() {
 		if (hasNoAttachments) {
 			return null;
@@ -265,14 +281,114 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		}
 	}
 
+	private static final String lineEnd = "\r\n";
+	private static final String twoHyphens = "--";
+
+	/**
+	 * This is a multipart request. To accomplish this, we will create a data blog that is the entire contents
+	 * of the request after the request's headers. Each part of the body includes its own headers,
+	 * boundary, and data, but that is all rolled into one byte array to be stored pending sending.
+	 * This enables the contents to be stores securely via encryption the moment it is created, and
+	 * not read again as plain text while it sits on the device.
+	 *
+	 * @return a Byte array that can be set on the payload request.
+	 * TODO: Refactor this API so that the resulting byte array is streamed to a file for later retrieval.
+	 */
 	@Override
-	protected JSONObject marshallForSending() {
-		JSONObject wrapper = new JSONObject();
-		try {
-			wrapper.put(KEY_MESSAGE, super.marshallForSending());
-		} catch (JSONException e) {
-			// Can't happen.
+	public byte[] renderData() {
+		boolean encrypted = encryptionKey != null;
+		Encryptor encryptor = null;
+		if (encrypted) {
+			encryptor = new Encryptor(encryptionKey);
 		}
-		return wrapper;
+		ByteArrayOutputStream data = new ByteArrayOutputStream();
+
+		// First write the message body out as the first "part".
+		StringBuilder header = new StringBuilder();
+		header.append(twoHyphens).append(boundary).append(lineEnd);
+
+		StringBuilder part = new StringBuilder();
+		part
+			.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
+			.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
+			.append(lineEnd)
+			.append(marshallForSending().toString()).append(lineEnd);
+		byte[] partBytes = part.toString().getBytes();
+
+		try {
+			if (encrypted) {
+				header
+					.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
+					.append("Content-Type: application/octet-stream").append(lineEnd)
+					.append(lineEnd);
+				data.write(header.toString().getBytes());
+				data.write(encryptor.encrypt(partBytes));
+				data.write("\r\n".getBytes());
+			} else {
+				data.write(header.toString().getBytes());
+				data.write(partBytes);
+			}
+
+			// Then append attachments
+			if (attachedFiles != null) {
+				for (StoredFile storedFile : attachedFiles) {
+					ApptentiveLog.v(PAYLOADS, "Starting to write an attachment part.");
+					data.write(("--" + boundary + lineEnd).getBytes());
+					StringBuilder attachmentEnvelope = new StringBuilder();
+					attachmentEnvelope.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd)
+						.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd)
+						.append(lineEnd);
+					ByteArrayOutputStream attachmentBytes = new ByteArrayOutputStream();
+					FileInputStream fileInputStream = null;
+					try {
+						ApptentiveLog.v(PAYLOADS, "Writing attachment envelope: %s", attachmentEnvelope.toString());
+						attachmentBytes.write(attachmentEnvelope.toString().getBytes());
+
+						try {
+							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+								ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
+								ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
+							} else {
+								ApptentiveLog.v("Appending non-image attachment.");
+								Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
+							}
+						} catch (Exception e) {
+							ApptentiveLog.e(PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
+							continue;
+						} finally {
+							Util.ensureClosed(fileInputStream);
+						}
+
+						if (encrypted) {
+							// If encrypted, each part must be encrypted, and wrapped in a plain text set of headers.
+							StringBuilder encryptionEnvelope = new StringBuilder();
+							encryptionEnvelope
+								.append("Content-Disposition: form-data; name=\"file[]\"").append(lineEnd)
+								.append("Content-Type: application/octet-stream").append(lineEnd)
+								.append(lineEnd);
+							ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
+							data.write(encryptionEnvelope.toString().getBytes());
+							ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
+							byte[] encryptedAttachment = encryptor.encrypt(attachmentBytes.toByteArray());
+							ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
+							data.write(encryptedAttachment);
+						} else {
+							ApptentiveLog.v(PAYLOADS, "Writing attachment bytes: %d", attachmentBytes.size());
+							data.write(attachmentBytes.toByteArray());
+						}
+						data.write("\r\n".getBytes());
+					} catch (Exception e) {
+						ApptentiveLog.e(PAYLOADS, "Error getting data for Message Payload attachments.", e);
+						return null;
+					}
+				}
+			}
+			data.write(("--" + boundary + "--").getBytes());
+		} catch (Exception e) {
+			ApptentiveLog.e(PAYLOADS, "Error assembling Message Payload.", e);
+			return null;
+		}
+		ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
+		return data.toByteArray();
 	}
 }

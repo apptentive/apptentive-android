@@ -10,27 +10,25 @@ import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.List;
-import java.util.UUID;
 
 public abstract class Payload {
 	private final PayloadType payloadType;
 
 	/**
-	 * If set, this payload should be encrypted in getData().
+	 * If set, this payload should be encrypted in renderData().
 	 */
 	protected String encryptionKey;
+
+	/**
+	 * The Conversation ID of the payload, if known at this time.
+	 */
+	protected String conversationId;
 
 	/**
 	 * Encrypted Payloads need to include the Conversation JWT inside them so that the server can
 	 * authenticate each payload after it is decrypted.
 	 */
 	protected String token;
-
-	/**
-	 * A value that can be used to correlate a payload with another object
-	 * (for example, to update the sent status of a message)
-	 */
-	private String nonce;
 
 	private List<Object> attachments; // TODO: Figure out attachment handling
 
@@ -40,7 +38,6 @@ public abstract class Payload {
 		}
 
 		this.payloadType = type;
-		nonce = UUID.randomUUID().toString();
 	}
 
 	//region Data
@@ -48,7 +45,7 @@ public abstract class Payload {
 	/**
 	 * Binary data to be stored in database
 	 */
-	public abstract byte[] getData();
+	public abstract byte[] renderData();
 
 	//region
 
@@ -85,6 +82,14 @@ public abstract class Payload {
 		return !StringUtils.isNullOrEmpty(encryptionKey);
 	}
 
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
+	}
+
 	public String getToken() {
 		return token;
 	}
@@ -93,13 +98,9 @@ public abstract class Payload {
 		this.token = token;
 	}
 
-	public String getNonce() {
-		return nonce;
-	}
+	public abstract String getNonce();
 
-	public void setNonce(String nonce) {
-		this.nonce = nonce;
-	}
+	public abstract void setNonce(String nonce);
 
 	public List<Object> getAttachments() {
 		return attachments;

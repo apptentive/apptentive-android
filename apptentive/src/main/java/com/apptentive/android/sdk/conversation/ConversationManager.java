@@ -296,19 +296,6 @@ public class ConversationManager {
 		return conversation;
 	}
 
-	/**
-	 * Ends active conversation (user logs out, etc)
-	 */
-	public synchronized boolean endActiveConversation() {
-		if (activeConversation != null) {
-			activeConversation.setState(LOGGED_OUT);
-			handleConversationStateChange(activeConversation);
-			activeConversation = null;
-			return true;
-		}
-		return false;
-	}
-
 	//endregion
 
 	//region Conversation Token Fetching
@@ -386,7 +373,7 @@ public class ConversationManager {
 
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
-						conversation.setPersonId(personId);
+						conversation.getPerson().setId(personId);
 
 						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 
@@ -657,7 +644,7 @@ public class ConversationManager {
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
 			case LOGGED_IN:
-				if (activeConversation.getUserId().equals(userId)) {
+				if (StringUtils.equal(activeConversation.getUserId(), userId)) {
 					ApptentiveLog.w("Already logged in as \"%s\"", userId);
 					callback.onLoginFinish();
 					return;
@@ -764,11 +751,15 @@ public class ConversationManager {
 	}
 
 	private void doLogout() {
-		// 1. Check to make sure we need to log out.
 		if (activeConversation != null) {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
-					endActiveConversation();
+					ApptentiveLog.d("Ending active conversation.");
+					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
+					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
+					activeConversation.setState(LOGGED_OUT);
+					handleConversationStateChange(activeConversation);
+					activeConversation = null;
 					break;
 				default:
 					ApptentiveLog.w(CONVERSATION, "Attempted to logout() from Conversation, but the Active Conversation was not in LOGGED_IN state.");

@@ -25,11 +25,12 @@ public class EncryptedPayloadSenderTest extends TestCaseBase {
 	@Test
 	public void testEncryptedPayload() throws Exception {
 
+/*
 		final EventPayload original = new EventPayload(EVENT_LABEL, "trigger");
 		original.setToken(AUTH_TOKEN);
 		original.setEncryptionKey(ENCRYPTION_KEY);
 
-		byte[] cipherText = original.getData();
+		byte[] cipherText = original.getData(file);
 
 		Encryptor encryptor = new Encryptor(ENCRYPTION_KEY);
 
@@ -41,5 +42,7 @@ public class EncryptedPayloadSenderTest extends TestCaseBase {
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
+*/
+		throw new Exception("FIXME");
 	}
 }
