@@ -373,7 +373,7 @@ public class ConversationManager {
 
 						String personId = root.getString("person_id");
 						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
-						conversation.setPersonId(personId);
+						conversation.getPerson().setId(personId);
 
 						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, true);
 

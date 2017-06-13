@@ -88,17 +88,7 @@ public class ApptentiveDatabaseHelperTest {
 				" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY;
 
 		ApptentiveDatabaseMockHelper(Context context) {
-			super(context, new DataSource() {
-				@Override
-				public String getConversationId() {
-					throw new RuntimeException("Implement me");
-				}
-
-				@Override
-				public String getAuthToken() {
-					throw new RuntimeException("Implement me");
-				}
-			});
+			super(context);
 		}
 
 		List<Payload> listPayloads(SQLiteDatabase db) throws JSONException {

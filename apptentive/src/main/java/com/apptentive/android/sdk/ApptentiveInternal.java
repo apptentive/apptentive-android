@@ -98,7 +98,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
 	private String serverUrl;
-	private String personId;
 	private String androidId; // FIXME: remove this field (never used)
 	private String appPackageName;
 
@@ -188,7 +187,11 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public static boolean isApptentiveRegistered() {
-		return (sApptentiveInternal != null);
+		return sApptentiveInternal != null;
+	}
+
+	public static boolean isConversationActive() {
+		return sApptentiveInternal != null && sApptentiveInternal.getConversation() != null;
 	}
 
 	/**
@@ -382,10 +385,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	public boolean isApptentiveDebuggable() {
 		return appRelease.isDebug();
-	}
-
-	public String getPersonId() {
-		return personId;
 	}
 
 	public SharedPreferences getGlobalSharedPrefs() {

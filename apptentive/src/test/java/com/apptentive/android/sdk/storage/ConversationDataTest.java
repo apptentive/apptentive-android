@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationData;
 import com.apptentive.android.sdk.util.Util;
 
@@ -32,9 +31,6 @@ public class ConversationDataTest {
 		ConversationData expected = new ConversationData();
 		expected.setConversationId("jvnuveanesndndnadldbj");
 		expected.setConversationToken("watgsiovncsagjmcneiusdolnfcs");
-		expected.setPersonId("sijngmkmvewsnblkfmsd");
-		expected.setPersonEmail("nvuewnfaslvbgflkanbx");
-		expected.setPersonName("fslkgkdsnbnvwasdibncksd");
 		expected.setLastSeenSdkVersion("mdvnjfuoivsknbjgfaoskdl");
 		expected.setMessageCenterFeatureUsed(true);
 		expected.setMessageCenterWhoCardPreviouslyDisplayed(false);
@@ -66,9 +62,6 @@ public class ConversationDataTest {
 			ConversationData actual = (ConversationData) ois.readObject();
 			assertEquals(expected.getConversationId(), actual.getConversationId());
 			assertEquals(expected.getConversationToken(), actual.getConversationToken());
-			assertEquals(expected.getPersonId(), actual.getPersonId());
-			assertEquals(expected.getPersonName(), actual.getPersonName());
-			assertEquals(expected.getPersonEmail(), actual.getPersonEmail());
 			assertEquals(expected.getLastSeenSdkVersion(), actual.getLastSeenSdkVersion());
 			assertEquals(expected.isMessageCenterFeatureUsed(), actual.isMessageCenterFeatureUsed());
 			assertEquals(expected.isMessageCenterWhoCardPreviouslyDisplayed(), actual.isMessageCenterWhoCardPreviouslyDisplayed());
@@ -121,18 +114,6 @@ public class ConversationDataTest {
 		listenerFired = false;
 
 		data.setConversationId("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		data.setPersonId("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		data.setPersonEmail("foo");
-		assertTrue(listenerFired);
-		listenerFired = false;
-
-		data.setPersonName("foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
 

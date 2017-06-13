@@ -29,6 +29,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
@@ -298,6 +299,34 @@ public class ImageUtil {
 		}
 
 		return true;
+	}
+
+	public static boolean appendScaledDownImageToStream(String sourcePath, OutputStream outputStream) {
+		// Retrieve image orientation
+		int imageOrientation = 0;
+		try {
+			ExifInterface exif = new ExifInterface(sourcePath);
+			imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
+		} catch (IOException e) {
+		}
+
+		// Copy the file contents over.
+		CountingOutputStream cos = null;
+		try {
+			cos = new CountingOutputStream(new BufferedOutputStream(outputStream));
+			System.gc();
+			Bitmap smaller = ImageUtil.createScaledBitmapFromLocalImageSource(sourcePath, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
+			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
+			cos.flush();
+			ApptentiveLog.v("Bitmap bytes appended, size = " + (cos.getBytesWritten() / 1024) + "k");
+			smaller.recycle();
+			return true;
+		} catch (Exception e) {
+			ApptentiveLog.a("Error storing image.", e);
+			return false;
+		} finally {
+			Util.ensureClosed(cos);
+		}
 	}
 
 	private static class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {

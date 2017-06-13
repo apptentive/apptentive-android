@@ -349,30 +349,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 		conversationData.setConversationId(conversationId);
 	}
 
-	public String getPersonId() {
-		return conversationData.getPersonId();
-	}
-
-	public void setPersonId(String personId) {
-		conversationData.setPersonId(personId);
-	}
-
-	public String getPersonEmail() {
-		return conversationData.getPersonEmail();
-	}
-
-	public void setPersonEmail(String personEmail) {
-		conversationData.setPersonEmail(personEmail);
-	}
-
-	public String getPersonName() {
-		return conversationData.getPersonName();
-	}
-
-	public void setPersonName(String personName) {
-		conversationData.setPersonName(personName);
-	}
-
 	public Device getDevice() {
 		return conversationData.getDevice();
 	}

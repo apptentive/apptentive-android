@@ -24,6 +24,7 @@ import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
@@ -37,6 +38,7 @@ import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
+import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
 /**
  * There can be only one. SQLiteOpenHelper per database name that is. All new Apptentive tables must be defined here.
@@ -47,11 +49,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
-	private final DataSource dataSource;
 	private final File fileDir; // data dir of the application
 
-	/** We store temporary multipart payload body files here */
-	private final File multipartPayloadDataDir;
+	private final File payloadDataDir;
 
 	//region Payload SQL
 
@@ -95,10 +95,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		"SELECT * FROM " + LegacyPayloadEntry.TABLE_NAME +
 			" ORDER BY " + LegacyPayloadEntry.PAYLOAD_KEY_DB_ID;
 
-	private static final String SQL_QUERY_PAYLOAD_GET_NEXT_TO_SEND =
+	private static final String SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER =
 		"SELECT * FROM " + PayloadEntry.TABLE_NAME +
 			" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY +
-			" ASC LIMIT 1";
+			" ASC";
 
 	private static final String SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS =
 		"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
@@ -200,15 +200,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// endregion
 
-	ApptentiveDatabaseHelper(Context context, DataSource dataSource) {
+	ApptentiveDatabaseHelper(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		if (dataSource == null) {
-			throw new IllegalArgumentException("Data source is null");
-		}
-
-		this.dataSource = dataSource;
 		this.fileDir = context.getFilesDir();
-		this.multipartPayloadDataDir = new File(fileDir, "multipart-payloads"); // FIXME: figure out a better directory structure
+		this.payloadDataDir = new File(fileDir, Constants.PAYLOAD_DATA_DIR);
 	}
 
 	//region Create & Upgrade
@@ -405,7 +400,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			addPayload(payloads.toArray(new Payload[payloads.size()]));
 
 		} catch (Exception e) {
-			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + e.getMessage());
+			ApptentiveLog.e(DATABASE, "upgradeVersion2to3 EXCEPTION: " + e.getMessage());
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -440,7 +435,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
 				);
 
-				File dest = getMultipartFile(payload.getNonce());
+				File dest = getPayloadBodyFile(payload.getNonce());
 				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
 				Util.writeBytes(dest, payload.renderData());
 
@@ -473,7 +468,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 
 		// Then delete the data file
-		File dest = getMultipartFile(payloadIdentifier);
+		File dest = getPayloadBodyFile(payloadIdentifier);
 		ApptentiveLog.v(DATABASE, "Deleted payload \"%s\" data file successfully? %b", payloadIdentifier, dest.delete());
 	}
 
@@ -494,8 +489,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_NEXT_TO_SEND, null);
-			if (cursor.moveToFirst()) {
+			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
+			while(cursor.moveToNext()) {
 				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
 				if (conversationId == null) {
 					return null;
@@ -512,15 +507,22 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
 
 				// TODO: We need a migration for existing payload bodies to put them into files.
-				byte[] data = Util.readBytes(getMultipartFile(nonce));
+
+				File file = getPayloadBodyFile(nonce);
+				if (!file.exists()) {
+					ApptentiveLog.w("Oldest unsent payload had no data file. Deleting.");
+					deletePayload(nonce);
+					continue;
+				}
+				byte[] data = Util.readBytes(file);
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
 				return new PayloadData(payloadType, nonce, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
 			}
 			return null;
-		} catch (Exception sqe) {
-			ApptentiveLog.e(DATABASE, "getOldestUnsentPayload EXCEPTION: " + sqe.getMessage());
+		} catch (Exception e) {
+			ApptentiveLog.e("Error getting oldest unsent payload.", e);
 			return null;
 		} finally {
 			ensureClosed(cursor);
@@ -636,8 +638,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// region Helpers
 
-	private File getMultipartFile(String nonce) {
-		return new File(multipartPayloadDataDir, nonce + ".multipart");
+	private File getPayloadBodyFile(String nonce) {
+		return new File(payloadDataDir, nonce + PAYLOAD_DATA_FILE_SUFFIX);
 	}
 
 	private void ensureClosed(Cursor cursor) {
@@ -661,12 +663,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	//endregion
 
 	//region Helper classes
-
-	interface DataSource {
-		String getConversationId();
-
-		String getAuthToken();
-	}
 
 	private static final class DatabaseColumn {
 		public final String name;

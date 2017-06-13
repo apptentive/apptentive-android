@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.util;
 
 public class Constants {
 
+	public static final int  API_VERSION = 9;
 	public static final String APPTENTIVE_SDK_VERSION = "4.0.0";
 
 
@@ -59,6 +60,11 @@ public class Constants {
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
+	//endregion
+
+	//region Database and File Storage
+	public static final String PAYLOAD_DATA_DIR = "\"payload-datas\"";
+	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".payloads";
 	//endregion
 
 	// region Keys used to access old data for migration

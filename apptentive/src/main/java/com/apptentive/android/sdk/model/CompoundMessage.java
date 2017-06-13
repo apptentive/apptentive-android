@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,13 +8,13 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ImageItem;
+import com.apptentive.android.sdk.util.image.ImageUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -29,11 +29,9 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-public class CompoundMessage extends ApptentiveMessage implements MultipartPayload, MessageCenterUtil.CompoundMessageCommonInterface {
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
-	public static final int READ_CHUNK_SIZE = 128 * 1024;
-
-	public static final String KEY_MESSAGE = "message";
+public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
 	private static final String KEY_BODY = "body";
 	public static final String KEY_TEXT_ONLY = "text_only";
@@ -187,7 +185,6 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 		}
 	}
 
-	@Override
 	public List<StoredFile> getAssociatedFiles() {
 		if (hasNoAttachments) {
 			return null;
@@ -335,7 +332,7 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 			// Then append attachments
 			if (attachedFiles != null) {
 				for (StoredFile storedFile : attachedFiles) {
-					ApptentiveLog.e("Starting and attachment.");
+					ApptentiveLog.v(PAYLOADS, "Starting to write an attachment part.");
 					data.write(("--" + boundary + lineEnd).getBytes());
 					StringBuilder attachmentEnvelope = new StringBuilder();
 					attachmentEnvelope.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd)
@@ -344,21 +341,19 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 					ByteArrayOutputStream attachmentBytes = new ByteArrayOutputStream();
 					FileInputStream fileInputStream = null;
 					try {
-						ApptentiveLog.e("Writing attachment envelope: %s", attachmentEnvelope.toString());
+						ApptentiveLog.v(PAYLOADS, "Writing attachment envelope: %s", attachmentEnvelope.toString());
 						attachmentBytes.write(attachmentEnvelope.toString().getBytes());
 
-						// TODO: Move this into a utility method that returns a byte[] with a shrunk attachment (if it was an image).
-						// Look at ImageUtil.createScaledDownImageCacheFile()
 						try {
-							byte[] buffer = new byte[READ_CHUNK_SIZE];
-							int read;
-							fileInputStream = new FileInputStream(storedFile.getSourceUriOrPath());
-							while ((read = fileInputStream.read(buffer, 0, READ_CHUNK_SIZE)) != -1) {
-								ApptentiveLog.e("Writing attachment bytes: %d", read);
-								attachmentBytes.write(buffer, 0, read);
+							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+								ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
+								ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
+							} else {
+								ApptentiveLog.v("Appending non-image attachment.");
+								Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
 							}
 						} catch (Exception e) {
-							ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
+							ApptentiveLog.e(PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
 							continue;
 						} finally {
 							Util.ensureClosed(fileInputStream);
@@ -371,28 +366,29 @@ public class CompoundMessage extends ApptentiveMessage implements MultipartPaylo
 								.append("Content-Disposition: form-data; name=\"file[]\"").append(lineEnd)
 								.append("Content-Type: application/octet-stream").append(lineEnd)
 								.append(lineEnd);
-							ApptentiveLog.e("Writing encrypted envelope: %s", encryptionEnvelope.toString());
+							ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
 							data.write(encryptionEnvelope.toString().getBytes());
-							ApptentiveLog.e("Encrypting attachment bytes: %d", attachmentBytes.size());
+							ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
 							byte[] encryptedAttachment = encryptor.encrypt(attachmentBytes.toByteArray());
-							ApptentiveLog.e("Writing encrypted attachment bytes: %d", encryptedAttachment.length);
+							ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
 							data.write(encryptedAttachment);
-							data.write("\r\n".getBytes());
 						} else {
-							ApptentiveLog.e("Writing attachment bytes: %d", attachmentBytes.size());
+							ApptentiveLog.v(PAYLOADS, "Writing attachment bytes: %d", attachmentBytes.size());
 							data.write(attachmentBytes.toByteArray());
 						}
+						data.write("\r\n".getBytes());
 					} catch (Exception e) {
-						ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error getting data for Message Payload attachments.", e);
+						ApptentiveLog.e(PAYLOADS, "Error getting data for Message Payload attachments.", e);
 						return null;
 					}
 				}
 			}
 			data.write(("--" + boundary + "--").getBytes());
 		} catch (Exception e) {
-			ApptentiveLog.e(ApptentiveLogTag.PAYLOADS, "Error assembling Message Payload.", e);
+			ApptentiveLog.e(PAYLOADS, "Error assembling Message Payload.", e);
 			return null;
 		}
+		ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
 		return data.toByteArray();
 	}
 }

@@ -47,10 +47,10 @@ public class EngagementModule {
 	}
 
 	public static synchronized boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		if (!ApptentiveInternal.isApptentiveRegistered() || context == null) {
-			return false;
-		}
 		try {
+			if (!ApptentiveInternal.isApptentiveRegistered() || context == null) {
+				return false;
+			}
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			ApptentiveLog.d("engage(%s)", eventLabel);
 
@@ -63,6 +63,7 @@ public class EngagementModule {
 				return doEngage(context, eventLabel);
 			}
 		} catch (Exception e) {
+			ApptentiveLog.w("Error in engage()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
