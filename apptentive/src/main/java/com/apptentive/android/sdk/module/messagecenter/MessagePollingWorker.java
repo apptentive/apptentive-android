@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -14,9 +14,8 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Sky Kelsey
- */
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+
 public class MessagePollingWorker {
 
 	private MessagePollingThread sPollingThread;
@@ -47,7 +46,8 @@ public class MessagePollingWorker {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				MetricModule.sendError(throwable, null, null);
+				ApptentiveLog.e(MESSAGES, "Error polling for messages.", throwable);
+				MetricModule.sendError(throwable, "Error polling for messages.", null);
 			}
 		};
 		newThread.setUncaughtExceptionHandler(handler);
@@ -71,7 +71,7 @@ public class MessagePollingWorker {
 
 		public void run() {
 			try {
-				ApptentiveLog.v("Started %s", toString());
+				ApptentiveLog.v(MESSAGES, "Started %s", toString());
 
 				while (manager.appInForeground.get()) {
 					MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
@@ -80,7 +80,7 @@ public class MessagePollingWorker {
 					}
 					long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
 					if (Apptentive.canShowMessageCenter()) {
-						ApptentiveLog.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
+						ApptentiveLog.v(MESSAGES, "Checking server for new messages every %d seconds", pollingInterval / 1000);
 						manager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 					}
 					goToSleep(pollingInterval);
@@ -88,7 +88,7 @@ public class MessagePollingWorker {
 			} finally {
 				threadRunning.set(false);
 				sPollingThread = null;
-				ApptentiveLog.v("Stopping MessagePollingThread.");
+				ApptentiveLog.v(MESSAGES, "Stopping MessagePollingThread.");
 			}
 		}
 	}
@@ -102,7 +102,7 @@ public class MessagePollingWorker {
 	}
 
 	private void wakeUp() {
-		ApptentiveLog.v("Waking MessagePollingThread.");
+		ApptentiveLog.v(MESSAGES, "Waking MessagePollingThread.");
 		MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
 		if (thread != null && thread.isAlive()) {
 			thread.interrupt();
