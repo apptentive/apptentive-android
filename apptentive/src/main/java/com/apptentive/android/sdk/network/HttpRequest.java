@@ -255,6 +255,11 @@ public class HttpRequest {
 			connection.setConnectTimeout((int) connectTimeout);
 			connection.setReadTimeout((int) readTimeout);
 
+			if (!Util.isNetworkConnectionPresent()) {
+				ApptentiveLog.d("No network connection present. Cancelling request.");
+				cancel();
+			}
+
 			if (isCancelled()) {
 				return;
 			}
