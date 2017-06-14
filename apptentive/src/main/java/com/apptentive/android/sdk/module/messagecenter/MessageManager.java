@@ -227,6 +227,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	private List<ApptentiveMessage> fetchMessages(String afterId) {
 		ApptentiveLog.d("Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
 
+		if (!Util.isNetworkConnectionPresent()) {
+			ApptentiveLog.v("No internet present. Cancelling request.");
+			return null;
+		}
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
