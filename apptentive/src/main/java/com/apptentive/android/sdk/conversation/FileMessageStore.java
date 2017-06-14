@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.util.Util.readNullableBoolean;
+import static com.apptentive.android.sdk.util.Util.readNullableDouble;
 import static com.apptentive.android.sdk.util.Util.readNullableUTF;
+import static com.apptentive.android.sdk.util.Util.writeNullableBoolean;
+import static com.apptentive.android.sdk.util.Util.writeNullableDouble;
 import static com.apptentive.android.sdk.util.Util.writeNullableUTF;
 
 class FileMessageStore implements MessageStore {
@@ -262,10 +266,10 @@ class FileMessageStore implements MessageStore {
 
 	private static class MessageEntry implements SerializableObject {
 		String id;
-		double clientCreatedAt;
+		Double clientCreatedAt;
 		String nonce;
 		String state;
-		boolean isRead;
+		Boolean isRead;
 		String json;
 
 		MessageEntry() {
@@ -273,20 +277,20 @@ class FileMessageStore implements MessageStore {
 
 		MessageEntry(DataInput in) throws IOException {
 			id = readNullableUTF(in);
-			clientCreatedAt = in.readDouble();
+			clientCreatedAt = readNullableDouble(in);
 			nonce = readNullableUTF(in);
 			state = readNullableUTF(in);
-			isRead = in.readBoolean();
+			isRead = readNullableBoolean(in);
 			json = readNullableUTF(in);
 		}
 
 		@Override
 		public void writeExternal(DataOutput out) throws IOException {
 			writeNullableUTF(out, id);
-			out.writeDouble(clientCreatedAt);
+			writeNullableDouble(out, clientCreatedAt);
 			writeNullableUTF(out, nonce);
 			writeNullableUTF(out, state);
-			out.writeBoolean(isRead);
+			writeNullableBoolean(out, isRead);
 			writeNullableUTF(out, json);
 		}
 	}
