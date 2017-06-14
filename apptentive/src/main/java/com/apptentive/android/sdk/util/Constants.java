@@ -11,6 +11,8 @@ public class Constants {
 	public static final int  API_VERSION = 9;
 	public static final String APPTENTIVE_SDK_VERSION = "4.0.0";
 
+	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
+	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
 
 	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 10;
 	public static final int REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION = 20;
