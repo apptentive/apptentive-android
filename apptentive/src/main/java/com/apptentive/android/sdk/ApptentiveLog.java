@@ -68,6 +68,19 @@ public class ApptentiveLog {
 		return logLevel.canLog(level);
 	}
 
+	public static void vv(ApptentiveLogTag tag, String message, Object... args) {
+		if (tag.enabled) {
+			doLog(Level.VERBOSE, tag, null, message, args);
+		}
+	}
+
+	public static void vv(String message, Object... args){
+		doLog(Level.VERBOSE, null, null, message, args);
+	}
+	public static void vv(String message, Throwable throwable, Object... args){
+		doLog(Level.VERBOSE, null, throwable, message, args);
+	}
+
 	public static void v(ApptentiveLogTag tag, String message, Object... args) {
 		if (tag.enabled) {
 			doLog(Level.VERBOSE, tag, null, message, args);
@@ -141,6 +154,7 @@ public class ApptentiveLog {
 	}
 
 	public enum Level {
+		VERY_VERBOSE(Log.VERBOSE),
 		VERBOSE(Log.VERBOSE),
 		DEBUG(Log.DEBUG),
 		INFO(Log.INFO),
