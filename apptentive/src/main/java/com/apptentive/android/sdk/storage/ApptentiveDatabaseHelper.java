@@ -232,15 +232,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
-				upgradeVersion1to3(db);
+				upgradeVersion1to2(db);
 			case 2:
 				upgradeVersion2to3(db);
 		}
 	}
 
-	private void upgradeVersion1to3(SQLiteDatabase db) {
-		ApptentiveLog.i(DATABASE, "Upgrading Database from v1 to v2");
-		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+	private void upgradeVersion1to2(SQLiteDatabase db) {
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
 		try {
