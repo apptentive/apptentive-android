@@ -65,8 +65,9 @@ public class Constants {
 	//endregion
 
 	//region Database and File Storage
-	public static final String PAYLOAD_DATA_DIR = "\"payload-datas\"";
-	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".payloads";
+	public static final String CONVERSATIONS_DIR = "apptentive/conversations";
+	public static final String PAYLOAD_DATA_DIR = "payloads";
+	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".data";
 	//endregion
 
 	// region Keys used to access old data for migration

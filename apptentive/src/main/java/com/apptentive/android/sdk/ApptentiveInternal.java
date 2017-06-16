@@ -75,6 +75,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
+import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
@@ -176,7 +177,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
-		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
