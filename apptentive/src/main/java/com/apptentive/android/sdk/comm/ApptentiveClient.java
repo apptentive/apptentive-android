@@ -31,7 +31,7 @@ public class ApptentiveClient {
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
 	// Active API
-	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&starts_after=%s&before_id=%s";
 	private static final String ENDPOINT_CONFIGURATION = "/conversations/%s/configuration";
 
 	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
