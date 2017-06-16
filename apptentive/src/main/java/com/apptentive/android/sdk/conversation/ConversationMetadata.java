@@ -110,4 +110,12 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 	}
 
 	//endregion
+
+
+	@Override
+	public String toString() {
+		return "ConversationMetadata{" +
+			       "items=" + items +
+			       '}';
+	}
 }

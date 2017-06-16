@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -65,7 +66,7 @@ public class ConversationManager {
 	/**
 	 * A basic directory for storing conversation-related data.
 	 */
-	private final File storageDir;
+	private final File apptentiveConversationsStorageDir;
 
 	/**
 	 * Current state of conversation metadata.
@@ -74,13 +75,13 @@ public class ConversationManager {
 
 	private Conversation activeConversation;
 
-	public ConversationManager(Context context, File storageDir) {
+	public ConversationManager(Context context, File apptentiveConversationsStorageDir) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
-		this.storageDir = storageDir;
+		this.apptentiveConversationsStorageDir = apptentiveConversationsStorageDir;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -169,8 +170,8 @@ public class ConversationManager {
 
 		// no conversation available: create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
-		File dataFile = new File(storageDir, Util.generateRandomFilename());
-		File messagesFile = new File(storageDir, Util.generateRandomFilename());
+		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
 		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
 
 		// If there is a Legacy Conversation, migrate it into the new Conversation object.
@@ -504,7 +505,7 @@ public class ConversationManager {
 
 	private ConversationMetadata resolveMetadata() {
 		try {
-			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			if (metaFile.exists()) {
 				ApptentiveLog.v(CONVERSATION, "Loading meta file: " + metaFile);
 				final ConversationMetadata metadata = ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
@@ -523,8 +524,11 @@ public class ConversationManager {
 
 	private void saveMetadata() {
 		try {
+			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+				ApptentiveLog.vv(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
+			}
 			long start = System.currentTimeMillis();
-			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			ObjectSerialization.serialize(metaFile, conversationMetadata);
 			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {

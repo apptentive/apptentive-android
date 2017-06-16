@@ -110,4 +110,17 @@ public class ConversationMetadataItem implements SerializableObject {
 	public String getJWT() {
 		return JWT;
 	}
+
+	@Override
+	public String toString() {
+		return "ConversationMetadataItem{" +
+			       "state=" + state +
+			       ", conversationId='" + conversationId + '\'' +
+			       ", dataFile=" + dataFile +
+			       ", messagesFile=" + messagesFile +
+			       ", encryptionKey='" + encryptionKey + '\'' +
+			       ", userId='" + userId + '\'' +
+			       ", JWT='" + JWT + '\'' +
+			       '}';
+	}
 }
