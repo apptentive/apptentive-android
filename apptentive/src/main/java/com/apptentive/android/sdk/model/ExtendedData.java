@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -11,21 +11,23 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
-public abstract class ExtendedData extends JSONObject {
+import java.io.Serializable;
+
+public abstract class ExtendedData implements Serializable {
 
 	private static final String KEY_VERSION = "version";
 
 	private Type type = Type.unknown;
+
+	private int version;
 
 	protected ExtendedData() {
 		init();
 	}
 
 	protected ExtendedData(String json) throws JSONException {
-		super(json);
+		JSONObject jsonObject = new JSONObject(json);
+		setVersion(jsonObject.optInt(KEY_VERSION, -1));
 		init();
 	}
 
@@ -38,12 +40,13 @@ public abstract class ExtendedData extends JSONObject {
 	}
 
 	protected void setVersion(int version) {
-		try {
-			put(KEY_VERSION, version);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to ExtendedData.", KEY_VERSION, e);
-		}
-		return;
+		this.version = version;
+	}
+
+	public JSONObject toJsonObject() throws JSONException {
+		JSONObject ret = new JSONObject();
+		ret.put(KEY_VERSION, version);
+		return ret;
 	}
 
 	protected abstract void init();

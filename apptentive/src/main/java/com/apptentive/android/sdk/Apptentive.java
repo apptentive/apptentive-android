@@ -38,6 +38,7 @@ import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -1193,29 +1194,28 @@ public class Apptentive {
 	 * <li>FF01</li>
 	 * </ul>
 	 */
-	public static class Version extends JSONObject implements Comparable<Version> {
+	public static class Version implements Serializable, Comparable<Version> {
+
+		private static final long serialVersionUID = 1L;
+
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "version";
+
+		private String version;
 
 		public Version() {
 		}
 
-		public Version(String json) throws JSONException {
-			super(json);
+		public Version(JSONObject json) throws JSONException {
+			this.version = json.optString(TYPE, null);
 		}
 
 		public Version(long version) {
-			super();
-			setVersion(version);
+			this.version = Long.toString(version);
 		}
 
 		public void setVersion(String version) {
-			try {
-				put(KEY_TYPE, TYPE);
-				put(TYPE, version);
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.Version.", e);
-			}
+			this.version = version;
 		}
 
 		public void setVersion(long version) {
@@ -1223,7 +1223,17 @@ public class Apptentive {
 		}
 
 		public String getVersion() {
-			return optString(TYPE, null);
+			return version;
+		}
+
+		public void toJsonObject() {
+			JSONObject ret = new JSONObject();
+			try {
+				ret.put(KEY_TYPE, TYPE);
+				ret.put(TYPE, version);
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error creating Apptentive.Version.", e);
+			}
 		}
 
 		@Override
@@ -1270,31 +1280,38 @@ public class Apptentive {
 		}
 	}
 
-	public static class DateTime extends JSONObject implements Comparable<DateTime> {
+	public static class DateTime implements Serializable, Comparable<DateTime> {
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "datetime";
 		public static final String SEC = "sec";
 
-		public DateTime(String json) throws JSONException {
-			super(json);
+		private String sec;
+
+		public DateTime(JSONObject json) throws JSONException {
+			this.sec = json.optString(SEC);
 		}
 
 		public DateTime(double dateTime) {
-			super();
 			setDateTime(dateTime);
 		}
 
 		public void setDateTime(double dateTime) {
-			try {
-				put(KEY_TYPE, TYPE);
-				put(SEC, dateTime);
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
-			}
+			sec = String.valueOf(dateTime);
 		}
 
 		public double getDateTime() {
-			return optDouble(SEC);
+			return Double.valueOf(sec);
+		}
+
+		public JSONObject toJSONObject() {
+			JSONObject ret = new JSONObject();
+			try {
+				ret.put(KEY_TYPE, TYPE);
+				ret.put(SEC, sec);
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
+			}
+			return ret;
 		}
 
 		@Override

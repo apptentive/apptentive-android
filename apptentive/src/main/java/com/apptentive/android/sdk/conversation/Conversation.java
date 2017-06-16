@@ -235,8 +235,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
-		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
+		ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+		ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
 
 		long start = System.currentTimeMillis();
 
@@ -250,7 +250,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		}
 
 		serializer.serialize(conversationData);
-		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
+		ApptentiveLog.vv(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
@@ -525,7 +525,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.v(CONVERSATION, "Setting push provider: %d with token %s", pushProvider, token);
 		IntegrationConfig integrationConfig = getDevice().getIntegrationConfig();
 		IntegrationConfigItem item = new IntegrationConfigItem();
-		item.put(Apptentive.INTEGRATION_PUSH_TOKEN, token);
+		item.setToken(token);
 		switch (pushProvider) {
 			case Apptentive.PUSH_PROVIDER_APPTENTIVE:
 				integrationConfig.setApptentive(item);
