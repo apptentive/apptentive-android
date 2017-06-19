@@ -455,7 +455,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			ensureClosed(cursor);
 			if (db != null) {
 				db.endTransaction();
-				ApptentiveLog.e(DATABASE, "Transaction ended.");
 			}
 		}
 	}
