@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class DevicePayload extends JsonPayload {
 
@@ -177,4 +178,14 @@ public class DevicePayload extends JsonPayload {
 		put(KEY_UTC_OFFSET, utcOffset);
 	}
 
+	@Override
+	protected JSONObject marshallForSending() {
+		JSONObject jsonObject = new JSONObject();
+		try {
+			jsonObject.put("device", super.marshallForSending());
+		} catch (JSONException e) {
+			// This can't happen.
+		}
+		return jsonObject;
+	}
 }
