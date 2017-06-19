@@ -258,9 +258,8 @@ public class ConversationManager {
 
 						// set conversation data
 						conversation.setState(ANONYMOUS);
-						conversation.setConversationToken(conversationToken);
+						conversation.setConversationToken(conversationJWT);
 						conversation.setConversationId(conversationId);
-						conversation.setJWT(conversationJWT);
 
 						// handle state change
 						handleConversationStateChange(conversation);
@@ -290,7 +289,7 @@ public class ConversationManager {
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
-		conversation.setJWT(item.getJWT());
+		conversation.setConversationToken(item.getConversationToken());
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -487,7 +486,7 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
-		item.JWT = conversation.getJWT(); // TODO: can it be null for active conversations?
+		item.conversationToken = conversation.getConversationToken(); // TODO: can it be null for active conversations?
 
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {

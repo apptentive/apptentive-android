@@ -2,7 +2,6 @@ package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.Util;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -28,6 +27,11 @@ public class ConversationMetadataItem implements SerializableObject {
 	final String conversationId;
 
 	/**
+	 * The token for active conversations
+	 */
+	String conversationToken;
+
+	/**
 	 * Storage filename for conversation serialized data
 	 */
 	final File dataFile;
@@ -46,11 +50,6 @@ public class ConversationMetadataItem implements SerializableObject {
 	 * An optional user ID for logged in conversations
 	 */
 	String userId;
-
-	/**
-	 * A JWT for active conversations
-	 */
-	String JWT;
 
 	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
@@ -72,23 +71,23 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
 		conversationId = in.readUTF();
+		conversationToken = readNullableUTF(in);
 		dataFile = new File(in.readUTF());
 		messagesFile = new File(in.readUTF());
 		state = ConversationState.valueOf(in.readByte());
 		encryptionKey = readNullableUTF(in);
 		userId = readNullableUTF(in);
-		JWT = readNullableUTF(in);
 	}
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
 		out.writeUTF(conversationId);
+		writeNullableUTF(out, conversationToken);
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
 		out.writeByte(state.ordinal());
 		writeNullableUTF(out, encryptionKey);
 		writeNullableUTF(out, userId);
-		writeNullableUTF(out, JWT);
 	}
 
 	public String getConversationId() {
@@ -107,8 +106,8 @@ public class ConversationMetadataItem implements SerializableObject {
 		return userId;
 	}
 
-	public String getJWT() {
-		return JWT;
+	public String getConversationToken() {
+		return conversationToken;
 	}
 
 	@Override
@@ -116,11 +115,11 @@ public class ConversationMetadataItem implements SerializableObject {
 		return "ConversationMetadataItem{" +
 			       "state=" + state +
 			       ", conversationId='" + conversationId + '\'' +
+			       ", conversationToken='" + conversationToken + '\'' +
 			       ", dataFile=" + dataFile +
 			       ", messagesFile=" + messagesFile +
 			       ", encryptionKey='" + encryptionKey + '\'' +
 			       ", userId='" + userId + '\'' +
-			       ", JWT='" + JWT + '\'' +
 			       '}';
 	}
 }
