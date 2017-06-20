@@ -51,13 +51,13 @@ public class ApptentiveLog {
 				message = extra + " " + message;
 			}
 
-			android.util.Log.println(level.getLevel(), TAG, message);
+			android.util.Log.println(level.getAndroidLevel(), TAG, message);
 			if(throwable != null){
 				if(throwable.getMessage() != null){
-					android.util.Log.println(level.getLevel(), TAG, throwable.getMessage());
+					android.util.Log.println(level.getAndroidLevel(), TAG, throwable.getMessage());
 				}
 				while(throwable != null) {
-					android.util.Log.println(level.getLevel(), TAG, android.util.Log.getStackTraceString(throwable));
+					android.util.Log.println(level.getAndroidLevel(), TAG, android.util.Log.getStackTraceString(throwable));
 					throwable = throwable.getCause();
 				}
 			}
@@ -189,7 +189,7 @@ public class ApptentiveLog {
 
 	//region TODO: Delete these:
 	public static void vv(String message, Throwable throwable, Object... args){
-		doLog(Level.VERBOSE, null, throwable, message, args);
+		doLog(Level.VERY_VERBOSE, null, throwable, message, args);
 	}
 
 	public static void v(String message, Throwable throwable, Object... args){
@@ -213,19 +213,25 @@ public class ApptentiveLog {
 	//endregion
 
 	public enum Level {
-		VERY_VERBOSE(Log.VERBOSE),
-		VERBOSE(Log.VERBOSE),
-		DEBUG(Log.DEBUG),
-		INFO(Log.INFO),
-		WARN(Log.WARN),
-		ERROR(Log.ERROR),
-		ASSERT(Log.ASSERT),
-		DEFAULT(Log.INFO);
+		VERY_VERBOSE(1, Log.VERBOSE),
+		VERBOSE(Log.VERBOSE, Log.VERBOSE),
+		DEBUG(Log.DEBUG, Log.DEBUG),
+		INFO(Log.INFO, Log.INFO),
+		WARN(Log.WARN, Log.WARN),
+		ERROR(Log.ERROR, Log.ERROR),
+		ASSERT(Log.ASSERT, Log.ASSERT),
+		DEFAULT(Log.INFO, Log.INFO);
 
 		private int level;
+		private int androidLevel;
 
-		private Level(int level) {
+		private Level(int level, int androidLevel) {
 			this.level = level;
+			this.androidLevel = androidLevel;
+		}
+
+		public int getAndroidLevel() {
+			return androidLevel;
 		}
 
 		public int getLevel() {
@@ -246,7 +252,7 @@ public class ApptentiveLog {
 		 * @return true if "level" can be logged.
 		 */
 		public boolean canLog(Level level) {
-			return level.getLevel() >= getLevel();
+			return level.level >= this.level;
 		}
 	}
 }
