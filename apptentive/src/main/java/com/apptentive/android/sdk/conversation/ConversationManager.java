@@ -576,7 +576,7 @@ public class ConversationManager {
 			userId = jwt.getPayload().getString("sub");
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error while extracting user id: Missing field \"sub\"");
-			callback.onLoginFail(e.getMessage());
+			callback.onLoginFail("Error while extracting user id: Missing field \"sub\"");
 			return;
 		}
 
@@ -593,8 +593,8 @@ public class ConversationManager {
 			});
 
 			if (conversationItem == null) {
-				ApptentiveLog.e("Unable to find an existing conversation with for user: '" + userId + "'");
-				callback.onLoginFail("No previous conversation found");
+				ApptentiveLog.e("No conversation found matching user: '%s'. Logging in as new user.", userId);
+				sendLoginRequest(null, userId, token, callback);
 				return;
 			}
 
@@ -669,7 +669,8 @@ public class ConversationManager {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");
-					handleLoginFinished(userId, token, encryptionKey);
+					final String incomingConversationId = responseObject.getString("id");
+					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -686,7 +687,7 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String userId, final String token, final String encryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
@@ -704,16 +705,20 @@ public class ConversationManager {
 									}
 								});
 
-								if (conversationItem == null) {
-									handleLoginFailed("Unable to find an existing conversation with for user: '" + userId + "'");
-									return;
+								if (conversationItem != null) {
+									conversationItem.encryptionKey = encryptionKey;
+									activeConversation = loadConversation(conversationItem);
+								} else {
+									ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
+									File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+									File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+									activeConversation = new Conversation(dataFile, messagesFile);
 								}
-
-								activeConversation = loadConversation(conversationItem);
 							}
 
 							activeConversation.setEncryptionKey(encryptionKey);
 							activeConversation.setConversationToken(token);
+							activeConversation.setConversationId(conversationId);
 							activeConversation.setUserId(userId);
 							activeConversation.setState(LOGGED_IN);
 							handleConversationStateChange(activeConversation);
@@ -760,6 +765,7 @@ public class ConversationManager {
 					ApptentiveLog.d("Ending active conversation.");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
+					activeConversation.teardown();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
 					activeConversation = null;

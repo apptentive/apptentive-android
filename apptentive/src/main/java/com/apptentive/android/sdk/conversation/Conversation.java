@@ -45,8 +45,6 @@ import org.json.JSONException;
 import java.io.File;
 
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
-import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
-import static com.apptentive.android.sdk.debug.Assert.assertNull;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -138,6 +136,12 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
+	}
+
+	public void teardown() {
+		if (messageManager != null) {
+			messageManager.teardown();
+		}
 	}
 
 	//region Interactions
@@ -241,11 +245,9 @@ public class Conversation implements DataChangedListener, Destroyable {
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer;
-		if (hasState(LOGGED_IN)) {
-			assertNotNull(encryptionKey, "Missing encryption key");
+		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
-			assertNull(encryptionKey, "Encryption key should be null");
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
@@ -257,11 +259,9 @@ public class Conversation implements DataChangedListener, Destroyable {
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer;
-		if (hasState(LOGGED_IN)) {
-			assertNotNull(encryptionKey, "Missing encryption key");
+		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
-			assertNull(encryptionKey, "Encryption key should be null");
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
@@ -553,10 +553,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 				}
 				break;
 			default:
-				if (!StringUtils.isNullOrEmpty(encryptionKey)) {
-					assertFail("Encryption key should be null");
-					throw new IllegalStateException("Encryption key should be null");
-				}
 				break;
 		}
 	}

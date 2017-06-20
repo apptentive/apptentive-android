@@ -231,6 +231,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			ApptentiveLog.v("No internet present. Cancelling request.");
 			return null;
 		}
+		// TODO: Use the new ApptentiveHttpClient for this.
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
@@ -583,4 +584,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	//endregion
+
+	public void teardown() {
+		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
+	}
 }
