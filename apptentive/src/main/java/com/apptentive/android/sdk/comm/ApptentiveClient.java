@@ -135,7 +135,7 @@ public class ApptentiveClient {
 			connection.setRequestProperty("APPTENTIVE-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveSignature()));
 
 
-			ApptentiveLog.vv("Headers: ", connection.getRequestProperties());
+			ApptentiveLog.vv("Headers: %s", connection.getRequestProperties());
 			switch (method) {
 				case GET:
 					connection.setRequestMethod("GET");
