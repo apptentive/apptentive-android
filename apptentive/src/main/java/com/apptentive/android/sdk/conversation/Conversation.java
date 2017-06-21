@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -279,8 +280,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		FileSerializer serializer;
 		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
+			Assert.assertFalse(hasState(ANONYMOUS, ANONYMOUS_PENDING));
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
+			Assert.assertTrue(hasState(ANONYMOUS, ANONYMOUS_PENDING));
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
