@@ -82,8 +82,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 */
 	private final File conversationMessagesFile;
 
-	// TODO: remove this class
-	private InteractionManager interactionManager;
+	/**
+	 * Internal flag to turn interaction polling on and off fir testing.
+	 */
+	private Boolean pollForInteractions;
 
 	private ConversationState state = ConversationState.UNDEFINED;
 
@@ -186,7 +188,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(conversationId);
 
-		// TODO: Move this to global config
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		boolean updateSuccessful = true;
 
@@ -228,6 +229,39 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished. Successful: %b", updateSuccessful);
 
 		return updateSuccessful;
+	}
+
+	public boolean isPollForInteractions() {
+		if (pollForInteractions == null) {
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+			pollForInteractions = prefs.getBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, true);
+		}
+		return pollForInteractions;
+	}
+
+	public void setPollForInteractions(boolean pollForInteractions) {
+		this.pollForInteractions = pollForInteractions;
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).apply();
+	}
+
+	/**
+	 * Made public for testing. There is no other reason to use this method directly.
+	 */
+	public void storeInteractionManifest(String interactionManifest) {
+		try {
+			InteractionManifest payload = new InteractionManifest(interactionManifest);
+			Interactions interactions = payload.getInteractions();
+			Targets targets = payload.getTargets();
+			if (interactions != null && targets != null) {
+				setTargets(targets.toString());
+				setInteractions(interactions.toString());
+			} else {
+				ApptentiveLog.e("Unable to save InteractionManifest.");
+			}
+		} catch (JSONException e) {
+			ApptentiveLog.w("Invalid InteractionManifest received.");
+		}
 	}
 
 	//endregion
@@ -479,14 +513,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public MessageManager getMessageManager() {
 		return messageManager;
-	}
-
-	public InteractionManager getInteractionManager() {
-		return interactionManager;
-	}
-
-	public void setInteractionManager(InteractionManager interactionManager) {
-		this.interactionManager = interactionManager;
 	}
 
 	synchronized File getConversationDataFile() {

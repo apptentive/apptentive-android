@@ -523,7 +523,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			// if (featureEverUsed) {
 			// 	messageManager.init();
 			// }
-			activeConversation.setInteractionManager(new InteractionManager(activeConversation));
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
