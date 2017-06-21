@@ -42,4 +42,9 @@ public class MockHttpJsonRequest extends HttpJsonRequest {
 		connection.setMockResponseData(responseData);
 		return this;
 	}
+
+	@Override
+	protected boolean isNetworkConnectionPresent() {
+		return true;
+	}
 }
