@@ -14,7 +14,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -136,8 +135,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 		conversationData = new ConversationData();
 		conversationData.setDataChangedListener(this);
 
-		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
-		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
+		FileMessageStore messageStore = new FileMessageStore(getPerson().getId(), conversationMessagesFile);
+		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
 	public void teardown() {
