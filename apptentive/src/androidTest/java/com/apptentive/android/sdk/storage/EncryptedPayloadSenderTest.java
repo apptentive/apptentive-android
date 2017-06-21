@@ -10,7 +10,6 @@ import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.EventPayload;
 
-import org.json.JSONObject;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -25,24 +24,20 @@ public class EncryptedPayloadSenderTest extends TestCaseBase {
 	@Test
 	public void testEncryptedPayload() throws Exception {
 
-/*
 		final EventPayload original = new EventPayload(EVENT_LABEL, "trigger");
 		original.setToken(AUTH_TOKEN);
 		original.setEncryptionKey(ENCRYPTION_KEY);
 
-		byte[] cipherText = original.getData(file);
+		byte[] cipherText = original.renderData();
 
 		Encryptor encryptor = new Encryptor(ENCRYPTION_KEY);
 
 		try {
 			byte[] plainText = encryptor.decrypt(cipherText);
-			JSONObject resultJson = new JSONObject(new String(plainText));
-			EventPayload result = new EventPayload(resultJson.getJSONObject("payload").toString());
+			EventPayload result = new EventPayload(new String(plainText));
 			assertEquals(result.getEventLabel(), EVENT_LABEL);
 		} catch (Exception e) {
 			fail(e.getMessage());
 		}
-*/
-		throw new Exception("FIXME");
 	}
 }
