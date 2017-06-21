@@ -1199,7 +1199,7 @@ public class Apptentive {
 
 		private String error;
 
-		public String message() {
+		public String error() {
 			return error;
 		}
 
