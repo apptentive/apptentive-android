@@ -286,7 +286,6 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
 		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
-		assertNotNull(responseJson, "Missing required responseJson.");
 		if (apptentiveMessage == null) {
 			return; // should not happen but we want to stay safe
 		}
@@ -313,6 +312,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 
 		if (isSuccessful) {
+			assertNotNull(responseJson, "Missing required responseJson.");
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
 				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
@@ -320,9 +320,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				return;
 			}
 			try {
-				// TODO: update the database with these values
 				apptentiveMessage.setState(ApptentiveMessage.State.sent);
-
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
