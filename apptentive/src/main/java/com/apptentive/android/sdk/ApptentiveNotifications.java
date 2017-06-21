@@ -53,10 +53,17 @@ public class ApptentiveNotifications {
 	 */
 	public static final String NOTIFICATION_INTERACTIONS_SHOULD_DISMISS = "NOTIFICATION_INTERACTIONS_SHOULD_DISMISS";
 
+	/**
+	 * Sent when a request to the server fails with a 401, and external code needs to be notified.
+	 */
+	public static final String NOTIFICATION_AUTHENTICATION_FAILED = "NOTIFICATION_AUTHENTICATION_FAILED"; // { conversationId : String, authenticationFailedReason: AuthenticationFailedReason }
+
 	// keys
 	public static final String NOTIFICATION_KEY_SUCCESSFUL = "successful";
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
 	public static final String NOTIFICATION_KEY_CONVERSATION = "conversation";
+	public static final String NOTIFICATION_KEY_CONVERSATION_ID = "conversationId";
+	public static final String NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON = "authenticationFailedReason";// type: AuthenticationFailedReason
 	public static final String NOTIFICATION_KEY_PAYLOAD = "payload";
 	public static final String NOTIFICATION_KEY_RESPONSE_CODE = "responseCode";
 	public static final String NOTIFICATION_KEY_RESPONSE_DATA = "responseData";

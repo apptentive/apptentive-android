@@ -10,11 +10,15 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
 
 /**
  * Class responsible for a serial payload sending (one at a time)
@@ -105,6 +109,7 @@ class PayloadSender {
 					final JSONObject responseData = new JSONObject(request.getResponseData());
 					handleFinishSendingPayload(payload, false, null, request.getResponseCode(), responseData);
 				} catch (Exception e) {
+					// TODO: Stop assuming the response is JSON. In fact, just send bytes back, and whatever part of the SDK needs it can try to convert it to the desired format.
 					ApptentiveLog.e(PAYLOADS, "Exception while handling payload send response");
 					handleFinishSendingPayload(payload, false, null, -1, null);
 				}
@@ -117,6 +122,9 @@ class PayloadSender {
 
 			@Override
 			public void onFail(HttpRequest request, String reason) {
+				if (request.isAuthenticationFailure()) {
+					ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_AUTHENTICATION_FAILED, NOTIFICATION_KEY_CONVERSATION_ID, payload.getConversationId(), NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON, request.getAuthenticationFailedReason());
+				}
 				handleFinishSendingPayload(payload, false, reason, request.getResponseCode(), null);
 			}
 		});

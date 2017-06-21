@@ -12,6 +12,7 @@ import com.apptentive.android.sdk.util.StringUtils;
 public class PayloadData {
 	private final PayloadType type;
 	private final String nonce;
+	private final String conversationId;
 	private final byte[] data;
 	private final String authToken;
 	private final String contentType;
@@ -20,13 +21,17 @@ public class PayloadData {
 	private final boolean encrypted;
 
 
-	public PayloadData(PayloadType type, String nonce, byte[] data, String authToken, String contentType, String httpRequestPath, HttpRequestMethod httpRequestMethod, boolean encrypted) {
+	public PayloadData(PayloadType type, String nonce, String conversationId, byte[] data, String authToken, String contentType, String httpRequestPath, HttpRequestMethod httpRequestMethod, boolean encrypted) {
 		if (type == null) {
 			throw new IllegalArgumentException("Payload type is null");
 		}
 
 		if (nonce == null) {
 			throw new IllegalArgumentException("Nonce is null");
+		}
+
+		if (conversationId == null) {
+			throw new IllegalArgumentException("Conversation ID is null");
 		}
 
 		if (data == null) {
@@ -47,6 +52,7 @@ public class PayloadData {
 
 		this.type = type;
 		this.nonce = nonce;
+		this.conversationId = conversationId;
 		this.data = data;
 		this.authToken = authToken;
 		this.contentType = contentType;
@@ -59,7 +65,7 @@ public class PayloadData {
 
 	@Override
 	public String toString() {
-		return StringUtils.format("type=%s nonce=%s authToken=%s httpRequestPath=%s", type, nonce, authToken, httpRequestPath);
+		return StringUtils.format("type=%s nonce=%s conversationId=%s authToken=%s httpRequestPath=%s", type, nonce, conversationId, authToken, httpRequestPath);
 	}
 
 	//endregion
@@ -72,6 +78,10 @@ public class PayloadData {
 
 	public String getNonce() {
 		return nonce;
+	}
+
+	public String getConversationId() {
+		return conversationId;
 	}
 
 	public byte[] getData() {

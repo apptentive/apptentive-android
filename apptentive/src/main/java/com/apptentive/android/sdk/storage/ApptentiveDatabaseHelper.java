@@ -574,7 +574,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
-				return new PayloadData(payloadType, nonce, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
+				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
 			}
 			return null;
 		} catch (Exception e) {

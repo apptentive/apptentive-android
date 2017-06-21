@@ -1167,6 +1167,62 @@ public class Apptentive {
 		}
 	}
 
+	public static void addAuthenticationFailureListener(AuthenticationFailedListener listener) {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return;
+			}
+			ApptentiveInternal.getInstance().setAuthenticationFailureListener(listener);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.addUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	public interface AuthenticationFailedListener {
+		void onAuthenticationFailed(AuthenticationFailedReason reason);
+	}
+
+	public enum AuthenticationFailedReason {
+		UNKNOWN,
+		INVALID_ALGORITHM,
+		MALFORMED_TOKEN,
+		INVALID_TOKEN,
+		MISSING_SUB_CLAIM,
+		MISMATCHED_SUB_CLAIM,
+		INVALID_SUB_CLAIM,
+		EXPIRED_TOKEN,
+		REVOKED_TOKEN,
+		MISSING_APP_KEY,
+		MISSING_APP_SIGNATURE,
+		INVALID_KEY_SIGNATURE_PAIR;
+
+		private String error;
+
+		public String message() {
+			return error;
+		}
+
+		public static AuthenticationFailedReason parse(String errorType, String error) {
+			try {
+				AuthenticationFailedReason ret = AuthenticationFailedReason.valueOf(errorType);
+				ret.error = error;
+				return ret;
+			} catch (IllegalArgumentException e) {
+				ApptentiveLog.w("Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
+			}
+			return UNKNOWN;
+		}
+
+		@Override
+		public String toString() {
+			return "AuthenticationFailedReason{" +
+				       "error='" + error + '\'' +
+				       "errorType='" + name() + '\'' +
+				       '}';
+		}
+	}
+
 	//endregion
 
 	/**
