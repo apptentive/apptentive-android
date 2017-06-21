@@ -257,7 +257,7 @@ public class HttpRequest {
 			connection.setConnectTimeout(connectTimeout);
 			connection.setReadTimeout(readTimeout);
 
-			if (!Util.isNetworkConnectionPresent()) {
+			if (!isNetworkConnectionPresent()) {
 				ApptentiveLog.d("No network connection present. Cancelling request.");
 				cancel();
 			}
@@ -318,6 +318,10 @@ public class HttpRequest {
 		} finally {
 			closeConnection();
 		}
+	}
+
+	protected boolean isNetworkConnectionPresent() {
+		return Util.isNetworkConnectionPresent();
 	}
 
 	//region Retry
