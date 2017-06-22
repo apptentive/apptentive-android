@@ -56,7 +56,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	//region Payload SQL
 
 	static final class PayloadEntry {
-		static final String TABLE_NAME = "pending_payload";
+		static final String TABLE_NAME = "payload";
 		static final DatabaseColumn COLUMN_PRIMARY_KEY = new DatabaseColumn(0, "_id");
 		static final DatabaseColumn COLUMN_PAYLOAD_TYPE = new DatabaseColumn(1, "payloadType");
 		static final DatabaseColumn COLUMN_IDENTIFIER = new DatabaseColumn(2, "identifier");
@@ -70,11 +70,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	static final class LegacyPayloadEntry {
-		static final String TABLE_NAME = "payload";
+		static final String TABLE_NAME = "legacy_payload";
 		static final DatabaseColumn PAYLOAD_KEY_DB_ID = new DatabaseColumn(0, "_id");
 		static final DatabaseColumn PAYLOAD_KEY_BASE_TYPE = new DatabaseColumn(1, "base_type");
 		static final DatabaseColumn PAYLOAD_KEY_JSON = new DatabaseColumn(2, "json");
 	}
+
+	private static final String BACKUP_LEGACY_PAYLOAD_TABLE = String.format("ALTER TABLE %s RENAME TO %s;", PayloadEntry.TABLE_NAME, LegacyPayloadEntry.TABLE_NAME);
+	private static final String DELETE_LEGACY_PAYLOAD_TABLE = String.format("DROP TABLE %s;", LegacyPayloadEntry.TABLE_NAME);
 
 	private static final String TABLE_CREATE_PAYLOAD =
 		"CREATE TABLE " + PayloadEntry.TABLE_NAME +
@@ -116,10 +119,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region Message SQL (region)
+	//region Message SQL
 
 	private static final String TABLE_MESSAGE = "message";
-
 	private static final String MESSAGE_KEY_DB_ID = "_id";                           // 0
 	private static final String MESSAGE_KEY_ID = "id";                               // 1
 	private static final String MESSAGE_KEY_CLIENT_CREATED_AT = "client_created_at"; // 2
@@ -232,15 +234,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
 		switch (oldVersion) {
 			case 1:
-				upgradeVersion1to3(db);
+				upgradeVersion1to2(db);
 			case 2:
 				upgradeVersion2to3(db);
 		}
 	}
 
-	private void upgradeVersion1to3(SQLiteDatabase db) {
-		ApptentiveLog.i(DATABASE, "Upgrading Database from v1 to v2");
-		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
+	private void upgradeVersion1to2(SQLiteDatabase db) {
 		Cursor cursor = null;
 		// Migrate legacy stored files to compound message associated files
 		try {
@@ -372,20 +372,46 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
+	/**
+	 * 1. Rename payload table to legacy_payload
+	 * 2. Create new payload table with new columns
+	 * 2. select all payloads in temp_payload
+	 * 3.   load each into a the new payload object format
+	 * 4.   Save each into the new payload table
+	 * 5. Drop temp_payload
+	 * @param db
+	 */
 	private void upgradeVersion2to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
 
 		Cursor cursor = null;
 		try {
+			db.beginTransaction();
+
+			// 1. Rename existing "payload" table to "legacy_payload"
+			ApptentiveLog.vv(DATABASE, "\t1. Backing up \"payloads\" database to \"legacy_payloads\"");
+			db.execSQL(BACKUP_LEGACY_PAYLOAD_TABLE);
+
+			// 2. Create new Payload table as "payload"
+			ApptentiveLog.vv(DATABASE, "\t2. Creating new \"payloads\" database.");
+			db.execSQL(TABLE_CREATE_PAYLOAD);
+
+			// 3. Load legacy payloads
+			ApptentiveLog.vv(DATABASE, "\t3. Loading legacy payloads.");
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST_LEGACY, null);
 			List<Payload> payloads = new ArrayList<>(cursor.getCount());
 
+			ApptentiveLog.vv(DATABASE, "4. Save payloads into new table.");
 			JsonPayload payload;
 			while (cursor.moveToNext()) {
 				PayloadType payloadType = PayloadType.parse(cursor.getString(1));
 				String json = cursor.getString(LegacyPayloadEntry.PAYLOAD_KEY_JSON.index);
 
 				payload = LegacyPayloadFactory.createPayload(payloadType, json);
+				if (payload == null) {
+					ApptentiveLog.d(DATABASE, "Unable to construct payload of type %s. Continuing.", payloadType.name());
+					continue;
+				}
 
 				// the legacy payload format didn't store 'nonce' in the database so we need to extract if from json
 				String nonce = payload.optString("nonce", null);
@@ -394,15 +420,42 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				}
 				payload.setNonce(nonce);
 
-				payloads.add(payload);
+				// 4. Save each payload in the new table.
+				ApptentiveLog.vv(DATABASE, "Payload of type %s:, %s", payload.getPayloadType().name(), payload);
+				ContentValues values = new ContentValues();
+				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
+				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
+				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
+				// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
+				if (!payload.hasEncryptionKey()) {
+					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
+				}
+				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
+				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
+				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
+					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
+				);
+
+				File dest = getPayloadBodyFile(payload.getNonce());
+				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
+				Util.writeBytes(dest, payload.renderData());
+
+				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
+
+				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
 
-			addPayload(payloads.toArray(new Payload[payloads.size()]));
-
+			// 5. Finally, delete the temporary legacy table
+			ApptentiveLog.vv(DATABASE, "\t5. Delete temporary \"legacy_payloads\" database.");
+			db.execSQL(DELETE_LEGACY_PAYLOAD_TABLE);
+			db.setTransactionSuccessful();
 		} catch (Exception e) {
-			ApptentiveLog.e(DATABASE, "upgradeVersion2to3 EXCEPTION: " + e.getMessage());
+			ApptentiveLog.e(DATABASE, e, "Error in upgradeVersion2to3()");
 		} finally {
 			ensureClosed(cursor);
+			if (db != null) {
+				db.endTransaction();
+			}
 		}
 	}
 
@@ -415,7 +468,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * a new message is added.
 	 */
 	void addPayload(Payload... payloads) {
-		SQLiteDatabase db;
+		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
@@ -444,9 +497,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
 			db.setTransactionSuccessful();
-			db.endTransaction();
-		} catch (Exception sqe) {
-			ApptentiveLog.e(DATABASE, "addPayload EXCEPTION: " + sqe.getMessage());
+		} catch (Exception e) {
+			ApptentiveLog.e(DATABASE, e, "Error adding payload.");
+		} finally {
+			if (db != null) {
+				db.endTransaction();
+			}
 		}
 	}
 
@@ -518,7 +574,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
-				return new PayloadData(payloadType, nonce, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
+				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
 			}
 			return null;
 		} catch (Exception e) {

@@ -30,11 +30,8 @@ public class ApptentiveClient {
 
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
-	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
-
 	// Active API
-	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&after_id=%s&before_id=%s";
+	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&starts_after=%s&before_id=%s";
 	private static final String ENDPOINT_CONFIGURATION = "/conversations/%s/configuration";
 
 	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
@@ -124,8 +121,8 @@ public class ApptentiveClient {
 
 			connection.setRequestProperty("User-Agent", getUserAgentString());
 			connection.setRequestProperty("Connection", "Keep-Alive");
-			connection.setConnectTimeout(DEFAULT_HTTP_CONNECT_TIMEOUT);
-			connection.setReadTimeout(DEFAULT_HTTP_SOCKET_TIMEOUT);
+			connection.setConnectTimeout(Constants.DEFAULT_CONNECT_TIMEOUT_MILLIS);
+			connection.setReadTimeout(Constants.DEFAULT_READ_TIMEOUT_MILLIS);
 			if (bearer) {
 				connection.setRequestProperty("Authorization", "Bearer " + authToken);
 			} else {
@@ -137,6 +134,8 @@ public class ApptentiveClient {
 			connection.setRequestProperty("APPTENTIVE-KEY", notNull(ApptentiveInternal.getInstance().getApptentiveKey()));
 			connection.setRequestProperty("APPTENTIVE-SIGNATURE", notNull(ApptentiveInternal.getInstance().getApptentiveSignature()));
 
+
+			ApptentiveLog.vv("Headers: %s", connection.getRequestProperties());
 			switch (method) {
 				case GET:
 					connection.setRequestMethod("GET");

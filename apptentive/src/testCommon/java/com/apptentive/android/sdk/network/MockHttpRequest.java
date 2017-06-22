@@ -60,6 +60,11 @@ public class MockHttpRequest extends HttpRequest {
 	}
 
 	@Override
+	protected boolean isNetworkConnectionPresent() {
+		return true;
+	}
+
+	@Override
 	public String toString() {
 		return getName();
 	}

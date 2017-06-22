@@ -1,10 +1,17 @@
 package com.apptentive.android.sdk.network;
 
+import android.util.Base64;
+
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,6 +26,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 
@@ -26,16 +34,6 @@ import static com.apptentive.android.sdk.debug.Assert.*;
  * Class representing async HTTP request
  */
 public class HttpRequest {
-
-	/**
-	 * Default connection timeout
-	 */
-	private static final long DEFAULT_CONNECT_TIMEOUT_MILLIS = 45 * 1000L;
-
-	/**
-	 * Default read timeout
-	 */
-	private static final long DEFAULT_READ_TIMEOUT_MILLIS = 45 * 1000L;
 
 	/**
 	 * Default retry policy (used if a custom one is not specified)
@@ -90,12 +88,12 @@ public class HttpRequest {
 	/**
 	 * Connection timeout in milliseconds
 	 */
-	private long connectTimeout = DEFAULT_CONNECT_TIMEOUT_MILLIS;
+	private int connectTimeout = Constants.DEFAULT_CONNECT_TIMEOUT_MILLIS;
 
 	/**
 	 * Read timeout in milliseconds
 	 */
-	private long readTimeout = DEFAULT_READ_TIMEOUT_MILLIS;
+	private int readTimeout = Constants.DEFAULT_READ_TIMEOUT_MILLIS;
 
 	/**
 	 * The status code from an HTTP response
@@ -166,7 +164,7 @@ public class HttpRequest {
 					try {
 						listener.onFinish(this);
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception in request finish listener");
+						ApptentiveLog.e(e, "Exception in request onFinish() listener");
 					}
 				}
 			} else if (isCancelled()) {
@@ -174,7 +172,7 @@ public class HttpRequest {
 					try {
 						listener.onCancel(this);
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception in request finish listener");
+						ApptentiveLog.e(e, "Exception in request onCancel() listener");
 					}
 				}
 			} else {
@@ -182,7 +180,7 @@ public class HttpRequest {
 					try {
 						listener.onFail(this, errorMessage);
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception in request finish listener");
+						ApptentiveLog.e(e, "Exception in request onFail() listener");
 					}
 				}
 			}
@@ -218,6 +216,8 @@ public class HttpRequest {
 		} catch (Exception e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
+			ApptentiveLog.e(e, "Unable to perform request");
+			ApptentiveLog.e("Cancelled? %b", isCancelled());
 			if (!isCancelled()) {
 				ApptentiveLog.e(e, "Unable to perform request");
 			}
@@ -247,13 +247,20 @@ public class HttpRequest {
 		try {
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s %s", method, url);
-
+			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+				ApptentiveLog.vv(NETWORK, "%s", toString());
+			}
 			retrying = false;
 
 			connection = openConnection(url);
 			connection.setRequestMethod(method.toString());
-			connection.setConnectTimeout((int) connectTimeout);
-			connection.setReadTimeout((int) readTimeout);
+			connection.setConnectTimeout(connectTimeout);
+			connection.setReadTimeout(readTimeout);
+
+			if (!isNetworkConnectionPresent()) {
+				ApptentiveLog.d("No network connection present. Cancelling request.");
+				cancel();
+			}
 
 			if (isCancelled()) {
 				return;
@@ -299,7 +306,7 @@ public class HttpRequest {
 			} else {
 				errorMessage = StringUtils.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseData = readResponse(connection.getErrorStream(), gzipped);
-				ApptentiveLog.w(NETWORK, "Response data: %s", responseData);
+				ApptentiveLog.w(NETWORK, "Error response data: %s", responseData);
 			}
 
 			if (isCancelled()) {
@@ -311,6 +318,10 @@ public class HttpRequest {
 		} finally {
 			closeConnection();
 		}
+	}
+
+	protected boolean isNetworkConnectionPresent() {
+		return Util.isNetworkConnectionPresent();
 	}
 
 	//region Retry
@@ -440,6 +451,14 @@ public class HttpRequest {
 
 	public String toString() {
 		try {
+			byte[] requestData = createRequestData();
+			String requestString;
+			String contentType = requestProperties.get("Content-Type").toString();
+			if (contentType.contains("application/octet-stream") || contentType.contains("multipart/encrypted")) {
+				requestString = "Base64 encoded binary request: " + Base64.encodeToString(requestData, Base64.NO_WRAP);
+			} else {
+				requestString = new String(requestData);
+			}
 			return String.format(
 				"\n" +
 					"Request:\n" +
@@ -453,7 +472,7 @@ public class HttpRequest {
 				/* Request */
 				method.name(), urlString,
 				requestProperties,
-				new String(createRequestData()),
+				requestString,
 				/* Response */
 				responseCode,
 				responseData,
@@ -476,11 +495,11 @@ public class HttpRequest {
 		this.method = method;
 	}
 
-	public void setConnectTimeout(long connectTimeout) {
+	public void setConnectTimeout(int connectTimeout) {
 		this.connectTimeout = connectTimeout;
 	}
 
-	public void setReadTimeout(long readTimeout) {
+	public void setReadTimeout(int readTimeout) {
 		this.readTimeout = readTimeout;
 	}
 
@@ -534,6 +553,24 @@ public class HttpRequest {
 
 	public int getResponseCode() {
 		return responseCode;
+	}
+
+	public boolean isAuthenticationFailure() {
+		return responseCode == 401;
+	}
+
+	public Apptentive.AuthenticationFailedReason getAuthenticationFailedReason() {
+		if (responseData != null) {
+			try {
+				JSONObject errorObject = new JSONObject(responseData);
+				String error = errorObject.optString("error", null);
+				String errorType = errorObject.optString("error_type", null);
+				return Apptentive.AuthenticationFailedReason.parse(errorType, error);
+			} catch (JSONException e) {
+				ApptentiveLog.w(e, "Error parsing authentication failure object.");
+			}
+		}
+		return Apptentive.AuthenticationFailedReason.UNKNOWN;
 	}
 
 	public HttpRequest setRetryPolicy(HttpRequestRetryPolicy retryPolicy) {

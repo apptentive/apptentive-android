@@ -32,9 +32,12 @@ public final class LegacyPayloadFactory {
 			case device:
 				return new DevicePayload(json);
 			case sdk:
-				return new SdkPayload(json);
+				//return new SdkPayload(json);
+				// TODO: FIXME
+				return null;
 			case app_release:
-				return new AppReleasePayload(json);
+				//return new AppReleasePayload(json);
+				return null;
 			case person:
 				return new PersonPayload(json);
 			case survey:

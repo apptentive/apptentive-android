@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.migration;
 import android.content.Context;
 import android.content.SharedPreferences;
 
+import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.migration.v4_0_0.CodePointStore;
@@ -31,6 +32,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -106,7 +108,12 @@ public class Migrator {
 					Iterator it = customDataOld.keys();
 					while (it.hasNext()) {
 						String key = (String) it.next();
-						customData.put(key, customDataOld.get(key));
+						Object value = customDataOld.get(key);
+						if (value instanceof JSONObject) {
+							customData.put(key, jsonObjectToSerializableType((JSONObject) value));
+						} else {
+							customData.put(key, (Serializable) value);
+						}
 					}
 					device.setCustomData(customData);
 				}
@@ -117,22 +124,18 @@ public class Migrator {
 					Iterator it = integrationConfigOld.keys();
 					while (it.hasNext()) {
 						String key = (String) it.next();
-						IntegrationConfigItem item = new IntegrationConfigItem();
+						IntegrationConfigItem item = new IntegrationConfigItem(integrationConfigOld);
 						switch (key) {
 							case INTEGRATION_APPTENTIVE_PUSH:
-								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
 								integrationConfig.setApptentive(item);
 								break;
 							case INTEGRATION_PARSE:
-								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
 								integrationConfig.setParse(item);
 								break;
 							case INTEGRATION_URBAN_AIRSHIP:
-								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
 								integrationConfig.setUrbanAirship(item);
 								break;
 							case INTEGRATION_AWS_SNS:
-								item.put(INTEGRATION_PUSH_TOKEN, integrationConfigOld.get(key));
 								integrationConfig.setAmazonAwsSns(item);
 								break;
 						}
@@ -212,7 +215,12 @@ public class Migrator {
 					Iterator it = customDataOld.keys();
 					while (it.hasNext()) {
 						String key = (String) it.next();
-						customData.put(key, customDataOld.get(key));
+						Object value = customDataOld.get(key);
+						if (value instanceof JSONObject) {
+							customData.put(key, jsonObjectToSerializableType((JSONObject) value));
+						} else {
+							customData.put(key, (Serializable) value);
+						}
 					}
 					person.setCustomData(customData);
 				}
@@ -262,5 +270,24 @@ public class Migrator {
 		} catch (Exception e) {
 			ApptentiveLog.w("Error migrating Event Data.", e);
 		}
+	}
+
+	/**
+	 * Takes a legacy Apptentive Custom Data object base on JSON, and returns the modern serializable version
+	 */
+	private static Serializable jsonObjectToSerializableType(JSONObject input) {
+		String type = input.optString(Apptentive.Version.KEY_TYPE, null);
+		try {
+			if (type != null) {
+				if (type.equals(Apptentive.Version.TYPE)) {
+					return new Apptentive.Version(input);
+				} else if (type.equals(Apptentive.DateTime.TYPE)) {
+					return new Apptentive.DateTime(input);
+				}
+			}
+		} catch (JSONException e) {
+			ApptentiveLog.e(e, "Error migrating JSONObject.");
+		}
+		return null;
 	}
 }

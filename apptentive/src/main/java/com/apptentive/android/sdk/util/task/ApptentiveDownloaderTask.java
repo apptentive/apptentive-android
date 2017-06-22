@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -29,9 +29,6 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
-/**
- * @author Barry Li
- */
 public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, ApptentiveHttpResponse> {
 
 	private static boolean FILE_DOWNLOAD_REDIRECTION_ENABLED = false;
@@ -140,8 +137,8 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 					connection.setRequestProperty("Cookie", cookies);
 				}
 
-				connection.setConnectTimeout(ApptentiveClient.DEFAULT_HTTP_CONNECT_TIMEOUT);
-				connection.setReadTimeout(ApptentiveClient.DEFAULT_HTTP_SOCKET_TIMEOUT);
+				connection.setConnectTimeout(Constants.DEFAULT_CONNECT_TIMEOUT_MILLIS);
+				connection.setReadTimeout(Constants.DEFAULT_READ_TIMEOUT_MILLIS);
 				connection.setRequestProperty("Accept-Encoding", "gzip");
 				connection.setRequestProperty("Accept", "application/json");
 

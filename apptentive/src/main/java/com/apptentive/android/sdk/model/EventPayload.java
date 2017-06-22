@@ -74,7 +74,7 @@ public class EventPayload extends ConversationItem {
 			if (extendedData != null && extendedData.length != 0) {
 				for (ExtendedData currentExtendedData : extendedData) {
 					if (currentExtendedData != null) {
-						put(currentExtendedData.getTypeName(), currentExtendedData);
+						put(currentExtendedData.getTypeName(), currentExtendedData.toJsonObject());
 					}
 				}
 			}

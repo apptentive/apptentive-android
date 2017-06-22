@@ -87,9 +87,9 @@ public class ClauseParser {
 			if (typeName != null) {
 				try {
 					if (Apptentive.Version.TYPE.equals(typeName)) {
-						return new Apptentive.Version(jsonObject.toString());
+						return new Apptentive.Version(jsonObject);
 					} else if (Apptentive.DateTime.TYPE.equals(typeName)) {
-						return new Apptentive.DateTime(jsonObject.toString());
+						return new Apptentive.DateTime(jsonObject);
 					} else {
 						throw new RuntimeException(String.format("Error parsing complex parameter with unrecognized name: \"%s\"", typeName));
 					}

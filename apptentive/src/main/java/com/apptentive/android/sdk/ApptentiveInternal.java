@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -72,9 +72,13 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AC
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
+import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
@@ -116,6 +120,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	private WeakReference<OnSurveyFinishedListener> onSurveyFinishedListener;
 
 	private final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
+
+	private WeakReference<Apptentive.AuthenticationFailedListener> authenticationFailedListenerRef = null;
 
 	private final ExecutorService cachedExecutor;
 
@@ -176,14 +182,16 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
-		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, "conversations", true));
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
 		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
-		ApptentiveNotificationCenter.defaultCenter().addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this);
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this)
+			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -522,7 +530,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			// if (featureEverUsed) {
 			// 	messageManager.init();
 			// }
-			activeConversation.setInteractionManager(new InteractionManager(activeConversation));
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
@@ -746,6 +753,23 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	public void removeInteractionUpdateListener(InteractionManager.InteractionUpdateListener listener) {
 		interactionUpdateListeners.remove(listener);
+	}
+
+	public void setAuthenticationFailureListener(Apptentive.AuthenticationFailedListener listener) {
+		authenticationFailedListenerRef = new WeakReference<>(listener);
+	}
+
+	public void notifyAuthenticationFailedListener(Apptentive.AuthenticationFailedReason reason, String conversationIdOfFailedRequest) {
+		if (isConversationActive()) {
+			String activeConversationId = getConversation().getConversationId();
+			if (activeConversationId.equals(conversationIdOfFailedRequest)) {
+				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef.get();
+				if (listener != null) {
+					listener.onAuthenticationFailed(reason);
+				}
+				return;
+			}
+		}
 	}
 
 	/**
@@ -1025,6 +1049,10 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
 			getApptentiveTaskManager().addPayload(new LogoutPayload());
+		} else if (notification.hasName(NOTIFICATION_AUTHENTICATION_FAILED)) {
+			String conversationIdOfFailedRequest = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION_ID, String.class);
+			Apptentive.AuthenticationFailedReason authenticationFailedReason = notification.getUserInfo(NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON, Apptentive.AuthenticationFailedReason.class);
+			notifyAuthenticationFailedListener(authenticationFailedReason, conversationIdOfFailedRequest);
 		}
 	}
 }

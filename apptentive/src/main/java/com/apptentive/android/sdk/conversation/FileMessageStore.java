@@ -26,7 +26,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.util.Util.readNullableBoolean;
+import static com.apptentive.android.sdk.util.Util.readNullableDouble;
 import static com.apptentive.android.sdk.util.Util.readNullableUTF;
+import static com.apptentive.android.sdk.util.Util.writeNullableBoolean;
+import static com.apptentive.android.sdk.util.Util.writeNullableDouble;
 import static com.apptentive.android.sdk.util.Util.writeNullableUTF;
 
 class FileMessageStore implements MessageStore {
@@ -35,11 +39,23 @@ class FileMessageStore implements MessageStore {
 	 */
 	private static final byte VERSION = 1;
 
+	private final String currentPersonId;
 	private final File file;
 	private final List<MessageEntry> messageEntries;
 	private boolean shouldFetchFromFile;
 
+	FileMessageStore(String currentPersonId, File file) {
+		this.currentPersonId = currentPersonId;
+		this.file = file;
+		this.messageEntries = new ArrayList<>(); // we need a random access
+		this.shouldFetchFromFile = true; // we would lazily read it from a file later
+	}
+
+	/**
+	 * Only use this constructor from a test where you don't care about knowing whether a message is outgoing or incoming.
+	 */
 	FileMessageStore(File file) {
+		this.currentPersonId = null;
 		this.file = file;
 		this.messageEntries = new ArrayList<>(); // we need a random access
 		this.shouldFetchFromFile = true; // we would lazily read it from a file later
@@ -101,7 +117,7 @@ class FileMessageStore implements MessageStore {
 
 		List<ApptentiveMessage> apptentiveMessages = new ArrayList<>();
 		for (MessageEntry entry : messageEntries) {
-			ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(entry.json);
+			ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(entry.json, currentPersonId);
 			if (apptentiveMessage == null) {
 				ApptentiveLog.e("Error parsing Record json from database: %s", entry.json);
 				continue;
@@ -166,7 +182,7 @@ class FileMessageStore implements MessageStore {
 		for (int i = 0; i < messageEntries.size(); ++i) {
 			final MessageEntry messageEntry = messageEntries.get(i);
 			if (StringUtils.equal(nonce, messageEntry.nonce)) {
-				return MessageFactory.fromJson(messageEntry.json);
+				return MessageFactory.fromJson(messageEntry.json, currentPersonId);
 			}
 		}
 
@@ -262,10 +278,10 @@ class FileMessageStore implements MessageStore {
 
 	private static class MessageEntry implements SerializableObject {
 		String id;
-		double clientCreatedAt;
+		Double clientCreatedAt;
 		String nonce;
 		String state;
-		boolean isRead;
+		Boolean isRead;
 		String json;
 
 		MessageEntry() {
@@ -273,20 +289,20 @@ class FileMessageStore implements MessageStore {
 
 		MessageEntry(DataInput in) throws IOException {
 			id = readNullableUTF(in);
-			clientCreatedAt = in.readDouble();
+			clientCreatedAt = readNullableDouble(in);
 			nonce = readNullableUTF(in);
 			state = readNullableUTF(in);
-			isRead = in.readBoolean();
+			isRead = readNullableBoolean(in);
 			json = readNullableUTF(in);
 		}
 
 		@Override
 		public void writeExternal(DataOutput out) throws IOException {
 			writeNullableUTF(out, id);
-			out.writeDouble(clientCreatedAt);
+			writeNullableDouble(out, clientCreatedAt);
 			writeNullableUTF(out, nonce);
 			writeNullableUTF(out, state);
-			out.writeBoolean(isRead);
+			writeNullableBoolean(out, isRead);
 			writeNullableUTF(out, json);
 		}
 	}

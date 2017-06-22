@@ -39,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -65,7 +66,7 @@ public class ConversationManager {
 	/**
 	 * A basic directory for storing conversation-related data.
 	 */
-	private final File storageDir;
+	private final File apptentiveConversationsStorageDir;
 
 	/**
 	 * Current state of conversation metadata.
@@ -74,13 +75,13 @@ public class ConversationManager {
 
 	private Conversation activeConversation;
 
-	public ConversationManager(Context context, File storageDir) {
+	public ConversationManager(Context context, File apptentiveConversationsStorageDir) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
-		this.storageDir = storageDir;
+		this.apptentiveConversationsStorageDir = apptentiveConversationsStorageDir;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -169,8 +170,8 @@ public class ConversationManager {
 
 		// no conversation available: create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
-		File dataFile = new File(storageDir, Util.generateRandomFilename());
-		File messagesFile = new File(storageDir, Util.generateRandomFilename());
+		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
 		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
 
 		// If there is a Legacy Conversation, migrate it into the new Conversation object.
@@ -257,9 +258,8 @@ public class ConversationManager {
 
 						// set conversation data
 						conversation.setState(ANONYMOUS);
-						conversation.setConversationToken(conversationToken);
+						conversation.setConversationToken(conversationJWT);
 						conversation.setConversationId(conversationId);
-						conversation.setJWT(conversationJWT);
 
 						// handle state change
 						handleConversationStateChange(conversation);
@@ -289,7 +289,7 @@ public class ConversationManager {
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
-		conversation.setJWT(item.getJWT());
+		conversation.setConversationToken(item.getConversationToken());
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -486,7 +486,7 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
-		item.JWT = conversation.getJWT(); // TODO: can it be null for active conversations?
+		item.conversationToken = conversation.getConversationToken(); // TODO: can it be null for active conversations?
 
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {
@@ -504,7 +504,7 @@ public class ConversationManager {
 
 	private ConversationMetadata resolveMetadata() {
 		try {
-			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			if (metaFile.exists()) {
 				ApptentiveLog.v(CONVERSATION, "Loading meta file: " + metaFile);
 				final ConversationMetadata metadata = ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
@@ -523,8 +523,11 @@ public class ConversationManager {
 
 	private void saveMetadata() {
 		try {
+			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+				ApptentiveLog.vv(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
+			}
 			long start = System.currentTimeMillis();
-			File metaFile = new File(storageDir, CONVERSATION_METADATA_PATH);
+			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			ObjectSerialization.serialize(metaFile, conversationMetadata);
 			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {
@@ -573,7 +576,7 @@ public class ConversationManager {
 			userId = jwt.getPayload().getString("sub");
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error while extracting user id: Missing field \"sub\"");
-			callback.onLoginFail(e.getMessage());
+			callback.onLoginFail("Error while extracting user id: Missing field \"sub\"");
 			return;
 		}
 
@@ -590,8 +593,8 @@ public class ConversationManager {
 			});
 
 			if (conversationItem == null) {
-				ApptentiveLog.e("Unable to find an existing conversation with for user: '" + userId + "'");
-				callback.onLoginFail("No previous conversation found");
+				ApptentiveLog.e("No conversation found matching user: '%s'. Logging in as new user.", userId);
+				sendLoginRequest(null, userId, token, callback);
 				return;
 			}
 
@@ -666,7 +669,8 @@ public class ConversationManager {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
 					final String encryptionKey = responseObject.getString("encryption_key");
-					handleLoginFinished(userId, token, encryptionKey);
+					final String incomingConversationId = responseObject.getString("id");
+					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -683,7 +687,7 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String userId, final String token, final String encryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 					@Override
 					protected void execute() {
@@ -701,16 +705,20 @@ public class ConversationManager {
 									}
 								});
 
-								if (conversationItem == null) {
-									handleLoginFailed("Unable to find an existing conversation with for user: '" + userId + "'");
-									return;
+								if (conversationItem != null) {
+									conversationItem.encryptionKey = encryptionKey;
+									activeConversation = loadConversation(conversationItem);
+								} else {
+									ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
+									File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+									File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+									activeConversation = new Conversation(dataFile, messagesFile);
 								}
-
-								activeConversation = loadConversation(conversationItem);
 							}
 
 							activeConversation.setEncryptionKey(encryptionKey);
 							activeConversation.setConversationToken(token);
+							activeConversation.setConversationId(conversationId);
 							activeConversation.setUserId(userId);
 							activeConversation.setState(LOGGED_IN);
 							handleConversationStateChange(activeConversation);
@@ -757,6 +765,7 @@ public class ConversationManager {
 					ApptentiveLog.d("Ending active conversation.");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
+					activeConversation.destroy();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
 					activeConversation = null;

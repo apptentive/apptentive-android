@@ -23,7 +23,7 @@ public class IntegrationConfig implements Saveable {
 	private IntegrationConfigItem urbanAirship;
 	private IntegrationConfigItem parse;
 
-	private DataChangedListener listener;
+	private transient DataChangedListener listener;
 
 
 	//region Listeners

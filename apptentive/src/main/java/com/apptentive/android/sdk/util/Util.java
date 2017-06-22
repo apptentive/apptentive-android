@@ -25,6 +25,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -92,7 +93,13 @@ public class Util {
 
 	public static boolean isNetworkConnectionPresent() {
 		ConnectivityManager cm = (ConnectivityManager) ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-		return cm != null && cm.getActiveNetworkInfo() != null;
+		if (cm != null) {
+			NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+			if (activeNetwork != null) {
+				return activeNetwork.isConnectedOrConnecting();
+			}
+		}
+		return false;
 	}
 
 	public static void ensureClosed(Closeable stream) {
@@ -745,6 +752,31 @@ public class Util {
 		boolean notNull = in.readBoolean();
 		return notNull ? in.readUTF() : null;
 	}
+
+	public static void writeNullableBoolean(DataOutput out, Boolean value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeBoolean(value);
+		}
+	}
+
+	public static Boolean readNullableBoolean(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readBoolean() : null;
+	}
+
+	public static void writeNullableDouble(DataOutput out, Double value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeDouble(value);
+		}
+	}
+
+	public static Double readNullableDouble(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readDouble() : null;
+	}
+
 
 	public static boolean isMimeTypeImage(String mimeType) {
 		if (TextUtils.isEmpty(mimeType)) {

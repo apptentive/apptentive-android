@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -65,6 +66,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
+	private final Conversation conversation;
+
 	private final MessageStore messageStore;
 
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
@@ -95,14 +98,18 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	};
 
-	public MessageManager(MessageStore messageStore) {
+	public MessageManager(Conversation conversation, MessageStore messageStore) {
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
 		if (messageStore == null) {
 			throw new IllegalArgumentException("Message store is null");
 		}
 
+		this.conversation = conversation;
 		this.messageStore = messageStore;
 		this.pollingWorker = new MessagePollingWorker(this);
-		// conversation.setMessageCenterFeatureUsed(true); FIXME: figure out what to do with this call
 
 		registerNotifications();
 	}
@@ -227,6 +234,11 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	private List<ApptentiveMessage> fetchMessages(String afterId) {
 		ApptentiveLog.d("Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
 
+		if (!Util.isNetworkConnectionPresent()) {
+			ApptentiveLog.v("No internet present. Cancelling request.");
+			return null;
+		}
+		// TODO: Use the new ApptentiveHttpClient for this.
 		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
@@ -254,7 +266,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
-				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
+				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json, conversation.getPerson().getId());
 				// Since these came back from the server, mark them saved before updating them in the DB.
 				if (apptentiveMessage != null) {
 					apptentiveMessage.setState(ApptentiveMessage.State.saved);
@@ -281,7 +293,6 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
 		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
-		assertNotNull(responseJson, "Missing required responseJson.");
 		if (apptentiveMessage == null) {
 			return; // should not happen but we want to stay safe
 		}
@@ -308,6 +319,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 
 		if (isSuccessful) {
+			assertNotNull(responseJson, "Missing required responseJson.");
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
 				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
@@ -315,9 +327,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				return;
 			}
 			try {
-				// TODO: update the database with these values
 				apptentiveMessage.setState(ApptentiveMessage.State.sent);
-
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {

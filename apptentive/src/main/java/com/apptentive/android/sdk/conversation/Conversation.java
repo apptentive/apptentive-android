@@ -14,7 +14,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -45,8 +45,6 @@ import org.json.JSONException;
 import java.io.File;
 
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
-import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
-import static com.apptentive.android.sdk.debug.Assert.assertNull;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -84,8 +82,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 */
 	private final File conversationMessagesFile;
 
-	// TODO: remove this class
-	private InteractionManager interactionManager;
+	/**
+	 * Internal flag to turn interaction polling on and off fir testing.
+	 */
+	private Boolean pollForInteractions;
 
 	private ConversationState state = ConversationState.UNDEFINED;
 
@@ -136,8 +136,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 		conversationData = new ConversationData();
 		conversationData.setDataChangedListener(this);
 
-		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
-		messageManager = new MessageManager(messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
+		FileMessageStore messageStore = new FileMessageStore(getPerson().getId(), conversationMessagesFile);
+		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
 	//region Interactions
@@ -182,7 +182,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
 		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(conversationId);
 
-		// TODO: Move this to global config
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		boolean updateSuccessful = true;
 
@@ -226,6 +225,39 @@ public class Conversation implements DataChangedListener, Destroyable {
 		return updateSuccessful;
 	}
 
+	public boolean isPollForInteractions() {
+		if (pollForInteractions == null) {
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+			pollForInteractions = prefs.getBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, true);
+		}
+		return pollForInteractions;
+	}
+
+	public void setPollForInteractions(boolean pollForInteractions) {
+		this.pollForInteractions = pollForInteractions;
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		prefs.edit().putBoolean(Constants.PREF_KEY_POLL_FOR_INTERACTIONS, pollForInteractions).apply();
+	}
+
+	/**
+	 * Made public for testing. There is no other reason to use this method directly.
+	 */
+	public void storeInteractionManifest(String interactionManifest) {
+		try {
+			InteractionManifest payload = new InteractionManifest(interactionManifest);
+			Interactions interactions = payload.getInteractions();
+			Targets targets = payload.getTargets();
+			if (interactions != null && targets != null) {
+				setTargets(targets.toString());
+				setInteractions(interactions.toString());
+			} else {
+				ApptentiveLog.e("Unable to save InteractionManifest.");
+			}
+		} catch (JSONException e) {
+			ApptentiveLog.w("Invalid InteractionManifest received.");
+		}
+	}
+
 	//endregion
 
 	//region Saving
@@ -235,33 +267,31 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		ApptentiveLog.d(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
-		ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString()); // TODO: remove
+		ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+		ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
 
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer;
-		if (hasState(LOGGED_IN)) {
-			assertNotNull(encryptionKey, "Missing encryption key");
+		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
+			Assert.assertFalse(hasState(ANONYMOUS, ANONYMOUS_PENDING));
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
-			assertNull(encryptionKey, "Encryption key should be null");
+			Assert.assertTrue(hasState(ANONYMOUS, ANONYMOUS_PENDING));
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
 		serializer.serialize(conversationData);
-		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
+		ApptentiveLog.vv(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer;
-		if (hasState(LOGGED_IN)) {
-			assertNotNull(encryptionKey, "Missing encryption key");
+		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
-			assertNull(encryptionKey, "Encryption key should be null");
 			serializer = new FileSerializer(conversationDataFile);
 		}
 
@@ -481,14 +511,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 		return messageManager;
 	}
 
-	public InteractionManager getInteractionManager() {
-		return interactionManager;
-	}
-
-	public void setInteractionManager(InteractionManager interactionManager) {
-		this.interactionManager = interactionManager;
-	}
-
 	synchronized File getConversationDataFile() {
 		return conversationDataFile;
 	}
@@ -513,19 +535,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.userId = userId;
 	}
 
-	String getJWT() {
-		return JWT;
-	}
-
-	void setJWT(String JWT) {
-		this.JWT = JWT;
-	}
-
 	public void setPushIntegration(int pushProvider, String token) {
 		ApptentiveLog.v(CONVERSATION, "Setting push provider: %d with token %s", pushProvider, token);
 		IntegrationConfig integrationConfig = getDevice().getIntegrationConfig();
 		IntegrationConfigItem item = new IntegrationConfigItem();
-		item.put(Apptentive.INTEGRATION_PUSH_TOKEN, token);
+		item.setToken(token);
 		switch (pushProvider) {
 			case Apptentive.PUSH_PROVIDER_APPTENTIVE:
 				integrationConfig.setApptentive(item);
@@ -561,10 +575,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 				}
 				break;
 			default:
-				if (!StringUtils.isNullOrEmpty(encryptionKey)) {
-					assertFail("Encryption key should be null");
-					throw new IllegalStateException("Encryption key should be null");
-				}
 				break;
 		}
 	}
