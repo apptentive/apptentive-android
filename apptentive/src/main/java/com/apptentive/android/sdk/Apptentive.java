@@ -1110,7 +1110,13 @@ public class Apptentive {
 	//region Login/Logout
 
 	/**
-	 * Starts login process asynchronously. This call returns immediately.
+	 * Starts login process asynchronously. This call returns immediately. Using this method requires
+	 * you to implement JWT generation on your server. Please read about it in Apptentive's Android
+	 * Integration Reference Guide.
+	 *
+	 * @param token A JWT signed by your server using the secret from your app's Apptentive settings.
+	 * @param callback A LoginCallback, which will be called asynchronously when the login succeeds
+	 *                  or fails.
 	 */
 	public static void login(String token, LoginCallback callback) {
 		try {
@@ -1137,7 +1143,7 @@ public class Apptentive {
 	}
 
 	/**
-	 * Callback interface for an async login process.
+	 * Callback interface login().
 	 */
 	public interface LoginCallback {
 		/**
@@ -1146,7 +1152,8 @@ public class Apptentive {
 		void onLoginFinish();
 
 		/**
-		 * Called when a login attempt has failed.
+		 * Called when a login attempt has failed. May be called synchronously, for example, if your JWT
+		 * is missing the "sub" claim.
 		 *
 		 * @param errorMessage failure cause message
 		 */
@@ -1167,34 +1174,109 @@ public class Apptentive {
 		}
 	}
 
-	public static void addAuthenticationFailureListener(AuthenticationFailedListener listener) {
+	/**
+	 * Registers your listener with Apptentive. This listener is stored with a WeakReference, which
+	 * means that you must store a static reference to the listener as long as you want it to live.
+	 * One possible way to do this is to implement this listener with your Application class, or store
+	 * one on your Application.
+	 *
+	 * This listener will alert you to authentication failures, so that you can either recover from
+	 * expired or revoked JWTs, or fix your authentication implementation.
+	 * @param listener A listener that will be called when there is an authentication failure other
+	 *                 for the current logged in conversation. If the failure is for another
+	 *                 conversation, or there is no active conversation, the listener is not called.
+	 */
+	public static void setAuthenticationFailureListener(AuthenticationFailedListener listener) {
 		try {
 			if (!ApptentiveInternal.checkRegistered()) {
 				return;
 			}
 			ApptentiveInternal.getInstance().setAuthenticationFailureListener(listener);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.addUnreadMessagesListener()", e);
+			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
 
+	public static void clearAuthenticationFailureListener() {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return;
+			}
+			ApptentiveInternal.getInstance().setAuthenticationFailureListener(null);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.clearUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	/**
+	 * A Listener you can register globally for the app, that will be called when requests other than
+	 * login fail for the active conversation. This includes failure to send queued data to
+	 * Apptentive, and failure to fetch app configuration from Apptentive.
+	 */
 	public interface AuthenticationFailedListener {
 		void onAuthenticationFailed(AuthenticationFailedReason reason);
 	}
 
+	/**
+	 * A list of error codes you will encounter when a JWT failure for logged in conversations occurs.
+	 */
 	public enum AuthenticationFailedReason {
+		/**
+		 * This should not happen.
+		 */
 		UNKNOWN,
+		/**
+		 * Currently only the HS512 signature algorithm is supported.
+		 */
 		INVALID_ALGORITHM,
+		/**
+		 * The JWT structure is constructed improperly (missing a part, etc.)
+		 */
 		MALFORMED_TOKEN,
+		/**
+		 * The token is not signed properly, or can't be decoded.
+		 */
 		INVALID_TOKEN,
+		/**
+		 * There is no "sub" property in the JWT claims. The "sub" is required, and should be an
+		 * immutable, unique id for your user.
+		 */
 		MISSING_SUB_CLAIM,
+		/**
+		 * The JWT "sub" claim does not match the one previously registered to the internal Apptentive
+		 * conversation. Internal use only.
+		 */
 		MISMATCHED_SUB_CLAIM,
+		/**
+		 * Internal use only.
+		 */
 		INVALID_SUB_CLAIM,
+		/**
+		 * The expiration "exp" claim is expired. The "exp" claim is a UNIX timestamp in milliseconds.
+		 * The JWT will receive this authentication failure when the "exp" time has elapsed.
+		 */
 		EXPIRED_TOKEN,
+		/**
+		 * The JWT has been revoked. This happens after a successful logout. In such cases, you will
+		 * need a new JWT to login.
+		 */
 		REVOKED_TOKEN,
+		/**
+		 * The Apptentive Key field was not specified during registration. You can get this from your app's Apptentive
+		 * settings.
+		 */
 		MISSING_APP_KEY,
+		/**
+		 * The Apptentive Signature field was not specified during registration. You can get this from your app's Apptentive
+		 * settings.
+		 */
 		MISSING_APP_SIGNATURE,
+		/**
+		 * The Apptentive Key and Apptentive Signature fields do not match. Make sure you got them from
+		 * the same app's Apptentive settings page.
+		 */
 		INVALID_KEY_SIGNATURE_PAIR;
 
 		private String error;
