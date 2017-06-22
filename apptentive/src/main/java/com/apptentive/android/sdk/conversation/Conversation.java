@@ -140,12 +140,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
-	public void teardown() {
-		if (messageManager != null) {
-			messageManager.teardown();
-		}
-	}
-
 	//region Interactions
 
 	/**

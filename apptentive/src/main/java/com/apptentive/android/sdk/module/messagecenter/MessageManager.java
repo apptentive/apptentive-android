@@ -589,8 +589,4 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	//endregion
-
-	public void teardown() {
-		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
-	}
 }

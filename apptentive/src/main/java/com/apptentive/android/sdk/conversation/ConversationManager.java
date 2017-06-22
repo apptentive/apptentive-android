@@ -765,7 +765,7 @@ public class ConversationManager {
 					ApptentiveLog.d("Ending active conversation.");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
-					activeConversation.teardown();
+					activeConversation.destroy();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
 					activeConversation = null;
