@@ -1028,11 +1028,29 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	//region Login/Logout
 
-	void login(String token, LoginCallback callback) {
-		conversationManager.login(token, callback);
+	void login(String token, final LoginCallback callback) {
+		LoginCallback wrapperCallback = new LoginCallback() {
+			@Override
+			public void onLoginFinish() {
+				EngagementModule.engageInternal(getApplicationContext(), "login");
+				if (callback != null) {
+					callback.onLoginFinish();
+				}
+			}
+
+			@Override
+			public void onLoginFail(String errorMessage) {
+				if (callback != null) {
+					callback.onLoginFail(errorMessage);
+				}
+			}
+		};
+
+		conversationManager.login(token, wrapperCallback);
 	}
 
 	void logout() {
+		EngagementModule.engageInternal(getApplicationContext(), "logout");
 		conversationManager.logout();
 	}
 
