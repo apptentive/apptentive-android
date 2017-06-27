@@ -550,6 +550,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		pollingWorker.appWentToBackground();
 	}
 
+	Conversation getConversation() {
+		return conversation;
+	}
+
 	//region Message Dispatch Task
 
 	private abstract static class MessageDispatchTask extends DispatchTask {

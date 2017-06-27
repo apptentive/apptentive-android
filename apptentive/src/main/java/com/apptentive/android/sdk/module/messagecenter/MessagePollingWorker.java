@@ -7,8 +7,9 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 
-import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
@@ -79,7 +80,7 @@ public class MessagePollingWorker {
 						return;
 					}
 					long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
-					if (Apptentive.canShowMessageCenter()) {
+					if (ApptentiveInternal.getInstance().canShowMessageCenterInternal(getConversation())) {
 						ApptentiveLog.v(MESSAGES, "Checking server for new messages every %d seconds", pollingInterval / 1000);
 						manager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 					}
@@ -144,5 +145,9 @@ public class MessagePollingWorker {
 			// with fetching with shorter interval
 			wakeUp();
 		}
+	}
+
+	private Conversation getConversation() {
+		return manager.getConversation();
 	}
 }

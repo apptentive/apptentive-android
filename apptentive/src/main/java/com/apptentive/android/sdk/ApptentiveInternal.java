@@ -959,8 +959,14 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		EngagementModule.launchMessageCenterErrorActivity(context);
 	}
 
+	// FIXME: remove this method
 	public boolean canShowMessageCenterInternal() {
-		return EngagementModule.canShowInteraction("com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+		Conversation conversation = getConversation();
+		return conversation != null && canShowMessageCenterInternal(conversation);
+	}
+
+	public boolean canShowMessageCenterInternal(Conversation conversation) {
+		return EngagementModule.canShowInteraction(conversation, "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME, "com.apptentive");
 	}
 
 	public Map<String, Object> getAndClearCustomData() {

@@ -121,13 +121,17 @@ public class EngagementModule {
 		}
 	}
 
-	public static boolean canShowInteraction(String vendor, String interaction, String eventName) {
+	public static boolean canShowInteraction(Conversation conversation, String interaction, String eventName, String vendor) {
 		String eventLabel = generateEventLabel(vendor, interaction, eventName);
-		return canShowInteraction(eventLabel);
+		return canShowInteraction(conversation, eventLabel);
 	}
 
-	private static boolean canShowInteraction(String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getConversation().getApplicableInteraction(eventLabel);
+	private static boolean canShowInteraction(Conversation conversation, String eventLabel) {
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		Interaction interaction = conversation.getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 

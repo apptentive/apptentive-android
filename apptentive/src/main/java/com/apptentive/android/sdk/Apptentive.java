@@ -745,7 +745,7 @@ public class Apptentive {
 				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
 				return false;
 			}
-			return ApptentiveInternal.getInstance().canShowMessageCenterInternal();
+			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
 		} catch (Exception e) {
 			ApptentiveLog.w("Error in Apptentive.canShowMessageCenter()", e);
 			MetricModule.sendError(e, null, null);
@@ -1077,7 +1077,7 @@ public class Apptentive {
 	public static synchronized boolean canShowInteraction(String event) {
 		try {
 			if (ApptentiveInternal.isConversationActive()) {
-				return EngagementModule.canShowInteraction("local", "app", event);
+				return EngagementModule.canShowInteraction(ApptentiveInternal.getInstance().getConversation(), "app", event, "local");
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w("Error in Apptentive.canShowInteraction()", e);
