@@ -1032,7 +1032,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		LoginCallback wrapperCallback = new LoginCallback() {
 			@Override
 			public void onLoginFinish() {
-				Apptentive.engage(getApplicationContext(), "login");
+				EngagementModule.engageInternal(getApplicationContext(), "login");
 				if (callback != null) {
 					callback.onLoginFinish();
 				}
@@ -1050,7 +1050,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	void logout() {
-		Apptentive.engage(getApplicationContext(), "logout");
+		EngagementModule.engageInternal(getApplicationContext(), "logout");
 		conversationManager.logout();
 	}
 
