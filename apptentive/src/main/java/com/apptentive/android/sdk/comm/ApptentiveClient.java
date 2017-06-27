@@ -85,12 +85,16 @@ public class ApptentiveClient {
 		return performHttpRequest(conversationToken, true, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse getInteractions(String conversationId) {
-		if (conversationId == null) {
-			throw new IllegalArgumentException("Conversation id is null");
+	public static ApptentiveHttpResponse getInteractions(String conversationToken, String conversationId) {
+		if (StringUtils.isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
 		final String endPoint = StringUtils.format(ENDPOINT_INTERACTIONS, conversationId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), true, endPoint, Method.GET, null);
+		return performHttpRequest(conversationToken, true, endPoint, Method.GET, null);
 	}
 
 	/**

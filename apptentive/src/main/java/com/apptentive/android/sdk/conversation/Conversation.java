@@ -95,7 +95,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
 		@Override
 		protected void execute() {
-			final boolean updateSuccessful = fetchInteractionsSync(getConversationId());
+			final boolean updateSuccessful = fetchInteractionsSync();
 			dispatchDebugEvent(EVT_CONVERSATION_FETCH_INTERACTIONS, updateSuccessful);
 
 			// Update pending state on UI thread after finishing the task
@@ -178,9 +178,9 @@ public class Conversation implements DataChangedListener, Destroyable {
 	/**
 	 * Fetches interaction synchronously. Returns <code>true</code> if succeed.
 	 */
-	private boolean fetchInteractionsSync(String conversationId) {
+	private boolean fetchInteractionsSync() {
 		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
-		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(conversationId);
+		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(getConversationToken(), getConversationId());
 
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		boolean updateSuccessful = true;
