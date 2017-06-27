@@ -65,8 +65,7 @@ public class ApptentiveClient {
 	 *
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
-	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
-		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+	public static ApptentiveHttpResponse getMessages(Conversation conversation, String afterId, String beforeId, Integer count) {
 		if (conversation == null) {
 			throw new IllegalStateException("Conversation is null");
 		}

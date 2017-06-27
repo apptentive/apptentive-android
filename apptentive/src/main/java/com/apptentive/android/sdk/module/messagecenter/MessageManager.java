@@ -239,7 +239,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			return null;
 		}
 		// TODO: Use the new ApptentiveHttpClient for this.
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(conversation, afterId, null, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
 		if (!response.isSuccessful()) {
