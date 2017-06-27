@@ -111,7 +111,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 								} catch (JSONException e) {
 									ApptentiveLog.e("Error creating Event data object.", e);
 								}
-								EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
+								engageInternal(TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
 								transit();
 							}
 						});
@@ -157,7 +157,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 									ApptentiveLog.e("Error creating Event data object.", e);
 								}
 
-								EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
+								engageInternal(TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
 								if (invokedInteraction != null) {
 									EngagementModule.launchInteraction(getActivity(), invokedInteraction);
 								}
@@ -177,7 +177,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 	@Override
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
-		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
+		engageInternal(TextModalInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 }

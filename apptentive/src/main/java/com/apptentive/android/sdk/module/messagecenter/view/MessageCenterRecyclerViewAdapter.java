@@ -15,15 +15,14 @@ import android.view.ViewGroup;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
-import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.Composer;
-import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterGreeting;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
@@ -252,7 +251,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(fragment.getContext(), interaction, MessageCenterInteraction.EVENT_NAME_READ, data.toString());
+			fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
 			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
 			if (mgr != null) {

@@ -31,6 +31,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -1019,7 +1020,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, null, (ExtendedData[]) null);
+		return engage(context, event, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1039,7 +1040,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, (ExtendedData[]) null);
+		return engage(context, event, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1063,7 +1064,25 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, extendedData);
+		if (StringUtils.isNullOrEmpty(event)) {
+			ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
+			return false;
+		}
+		if (context == null) {
+			ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
+			return false;
+		}
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
+			return false;
+		}
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation == null) {
+			ApptentiveLog.e("Unable to engage '%s' event: no active conversation", event);
+			return false;
+		}
+
+		return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
 	}
 
 	/**

@@ -99,7 +99,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
 						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
 						if (eventName != null) {
-							EngagementModule.engageInternal(this, eventName);
+							ApptentiveInternal.engageInternal(this, eventName);
 						}
 					}
 					finish();

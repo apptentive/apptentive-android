@@ -33,9 +33,11 @@ import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventPayload;
+import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LogoutPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -78,6 +80,8 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_IN
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
+import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 
 /**
@@ -409,11 +413,11 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
+		engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 	}
 
 	public void onAppExit(final Context appContext) {
-		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+		engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
 	}
 
 	public void onActivityStarted(Activity activity) {
@@ -947,7 +951,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 				}
 			}
 			this.customData = customData;
-			interactionShown = EngagementModule.engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			interactionShown = engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
 				this.customData = null;
 			}
@@ -1040,7 +1044,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		LoginCallback wrapperCallback = new LoginCallback() {
 			@Override
 			public void onLoginFinish() {
-				EngagementModule.engageInternal(getApplicationContext(), "login");
+				engageInternal(getApplicationContext(), "login");
 				if (callback != null) {
 					callback.onLoginFinish();
 				}
@@ -1058,7 +1062,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	void logout() {
-		EngagementModule.engageInternal(getApplicationContext(), "logout");
+		engageInternal(getApplicationContext(), "logout");
 		conversationManager.logout();
 	}
 
@@ -1081,4 +1085,29 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			notifyAuthenticationFailedListener(authenticationFailedReason, conversationIdOfFailedRequest);
 		}
 	}
+
+	//region Engagement
+
+	public static boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData[] extendedData) {
+		assertMainThread();
+		Conversation conversation = getInstance().getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation");
+		return conversation != null && EngagementModule.engage(context, conversation, vendor, interaction, interactionId, eventName, data, customData, extendedData);
+	}
+
+	public static boolean engageInternal(Context context, String eventName) {
+		assertMainThread();
+		Conversation conversation = getInstance().getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation");
+		return conversation != null && EngagementModule.engageInternal(context, conversation, eventName);
+	}
+
+	public static boolean engageInternal(Context context, Interaction interaction, String eventName, String data) {
+		assertMainThread();
+		Conversation conversation = getInstance().getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation");
+		return conversation != null && EngagementModule.engageInternal(context, conversation, interaction, eventName, data);
+	}
+
+	//endregion
 }

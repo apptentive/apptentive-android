@@ -43,12 +43,11 @@ import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.OnListviewItemActionListener;
-import com.apptentive.android.sdk.model.ApptentiveMessage;
-import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.ContextMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterStatus;
@@ -284,7 +283,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						}
 					}
 
-					EngagementModule.engageInternal(getActivity(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACH);
+					engageInternal(MessageCenterInteraction.EVENT_NAME_ATTACH);
 
 					String originalPath = Util.getRealFilePathFromUri(hostingActivity, uri);
 					if (originalPath != null) {
@@ -328,7 +327,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		 * abandoned the image picker without picking anything
 		 */
 		if (imagePickerStillOpen) {
-			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
+			engageInternal(MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
 			imagePickerStillOpen = false;
 		}
 	}
@@ -477,7 +476,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+			engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 
 			boolean whoCardDisplayedBefore = wasWhoCardAsPreviouslyDisplayed();
 			forceShowKeyboard = true;
@@ -515,11 +514,11 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			cleanup();
 			if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
-				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL);
+				engageInternal(MessageCenterInteraction.EVENT_NAME_CANCEL);
 			} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
-				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
+				engageInternal(MessageCenterInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
 			} else {
-				EngagementModule.engageInternal(hostingActivity, interaction, MessageCenterInteraction.EVENT_NAME_CLOSE, exitTypeToDataJson(exitType));
+				engageInternal(MessageCenterInteraction.EVENT_NAME_CLOSE, exitTypeToDataJson(exitType));
 			}
 		}
 		return false;
@@ -572,7 +571,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			} catch (JSONException e) {
 				//
 			}
-			EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+			engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 			return true;
 		}
 		return false;
@@ -678,7 +677,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void removeImageFromComposer(final int position) {
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
+		engageInternal(MessageCenterInteraction.EVENT_NAME_ATTACHMENT_DELETE);
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_REMOVE_ATTACHMENT, position, 0));
 		messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 	}
@@ -848,7 +847,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
+		engageInternal(MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_REMOVE_COMPOSER));
 		if (messageCenterRecyclerViewAdapter != null) {
 			addExpectationStatusIfNeeded();
@@ -898,7 +897,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
+		engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
 
 		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
@@ -920,7 +919,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (JSONException e) {
 			//
 		}
-		EngagementModule.engageInternal(hostingActivityRef.get(), interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
+		engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
 
 		setWhoCardAsPreviouslyDisplayed();
 		cleanupWhoCard();
@@ -1299,7 +1298,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 				case MSG_MESSAGE_ADD_COMPOSING: {
-					EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
+					fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_COMPOSE_OPEN);
 					fragment.listItems.add(fragment.interaction.getComposer());
 					fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 					fragment.messageCenterRecyclerView.setSelection(fragment.listItems.size() - 1);
@@ -1375,7 +1374,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						} catch (JSONException e) {
 							//
 						}
-						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
+						fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						fragment.forceShowKeyboard = true;
 						fragment.addWhoCard(true);
 					}
@@ -1455,7 +1454,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 								if (createdTime != null && createdTime > Double.MIN_VALUE) {
 									MessageCenterStatus status = fragment.interaction.getRegularStatus();
 									if (status != null) {
-										EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
+										fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_STATUS);
 										// Add expectation status message if the last is a sent
 										listItems.add(status);
 										fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(listItems.size() - 1);
@@ -1493,13 +1492,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					MessageCenterStatus status = null;
 					if (reason == MessageManager.SEND_PAUSE_REASON_NETWORK) {
 						status = fragment.interaction.getErrorStatusNetwork();
-						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
+						fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_MESSAGE_NETWORK_ERROR);
 					} else if (reason == MessageManager.SEND_PAUSE_REASON_SERVER) {
 						status = fragment.interaction.getErrorStatusServer();
-						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
+						fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_MESSAGE_HTTP_ERROR);
 					}
 					if (status != null) {
-						EngagementModule.engageInternal(fragment.hostingActivityRef.get(), fragment.interaction, MessageCenterInteraction.EVENT_NAME_STATUS);
+						fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_STATUS);
 						fragment.listItems.add(status);
 						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 					}

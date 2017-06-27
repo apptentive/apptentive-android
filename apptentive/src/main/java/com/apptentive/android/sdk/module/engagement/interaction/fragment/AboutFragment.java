@@ -17,7 +17,6 @@ import android.widget.Button;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -64,7 +63,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 		close.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
-				EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
+				engage("com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, null, null, (ExtendedData[]) null);
 				transit();
 			}
 		});
@@ -96,17 +95,17 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
+			engage("com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, null, null, (ExtendedData[]) null);
 		} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
+			engage("com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CANCEL, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		} else {
-			EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
+			engage("com.apptentive", INTERACTION_NAME, null, EVENT_NAME_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		}
 		return false;
 	}
 
 	@Override
 	protected void sendLaunchEvent(Activity activity) {
-		EngagementModule.engage(getActivity(), "com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
+		engage("com.apptentive", INTERACTION_NAME, null, EVENT_NAME_LAUNCH, null, null, (ExtendedData[]) null);
 	}
 }

@@ -10,7 +10,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
-
 import android.content.res.Resources;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
@@ -36,7 +35,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
@@ -47,6 +46,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
@@ -248,7 +248,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	 */
 	protected void sendLaunchEvent(Activity activity) {
 		if (interaction != null) {
-			EngagementModule.engageInternal(activity, interaction, EVENT_NAME_LAUNCH);
+			engageInternal(EVENT_NAME_LAUNCH);
 		}
 	}
 
@@ -513,5 +513,21 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	public static void removeFragment(FragmentManager fragmentManager, Fragment fragment) {
 		fragmentManager.beginTransaction().remove(fragment).commit();
 	}
+
+	//region Helpers
+
+	public boolean engage(String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+		return ApptentiveInternal.engage(getActivity(), vendor, interaction, interactionId, eventName, data, customData, extendedData);
+	}
+
+	public boolean engageInternal(String eventName) {
+		return engageInternal(eventName, null);
+	}
+
+	public boolean engageInternal(String eventName, String data) {
+		return ApptentiveInternal.engageInternal(getActivity(), interaction, eventName, data);
+	}
+
+	//endregion
 
 }
