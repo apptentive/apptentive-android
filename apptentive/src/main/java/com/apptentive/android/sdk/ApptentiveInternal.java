@@ -551,7 +551,10 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			checkSendVersionChanges();
+			Conversation conversation = getConversation();
+			if (conversation != null) {
+				checkSendVersionChanges(conversation);
+			}
 
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 
@@ -621,8 +624,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return bRet;
 	}
 
-	private void checkSendVersionChanges() {
-		final Conversation conversation = getConversation();
+	private void checkSendVersionChanges(Conversation conversation) {
 		if (conversation == null) {
 			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
 			return;
