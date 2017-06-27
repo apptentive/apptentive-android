@@ -52,7 +52,7 @@ public class ApptentiveDatabaseHelperTest {
 			new EventPayload("{\"nonce\":\"b9a91f27-87b4-4bd9-b9a0-5c605891824a\",\"client_created_at\":1.492737199856E9,\"client_created_at_utc_offset\":-25200,\"label\":\"com.apptentive#app#launch\"}"),
 			new DevicePayload("{\"device\":\"bullhead\",\"integration_config\":{},\"locale_country_code\":\"US\",\"carrier\":\"\",\"uuid\":\"6c0b74d07c064421\",\"build_type\":\"user\",\"cpu\":\"arm64-v8a\",\"os_build\":\"3687331\",\"manufacturer\":\"LGE\",\"radio_version\":\"M8994F-2.6.36.2.20\",\"os_name\":\"Android\",\"build_id\":\"N4F26T\",\"utc_offset\":\"-28800\",\"bootloader_version\":\"BHZ11h\",\"board\":\"bullhead\",\"os_api_level\":\"25\",\"current_carrier\":\"AT&T\",\"network_type\":\"LTE\",\"locale_raw\":\"en_US\",\"brand\":\"google\",\"os_version\":\"7.1.1\",\"product\":\"bullhead\",\"model\":\"Nexus 5X\",\"locale_language_code\":\"en\",\"custom_data\":{}}"),
 			new PersonPayload("{\"custom_data\":{}}"),
-			MessageFactory.fromJson("{\"nonce\":\"a68d606c-083a-4496-a5e0-f07bcdff52a4\",\"client_created_at\":1.492737257565E9,\"client_created_at_utc_offset\":-25200,\"type\":\"CompoundMessage\",\"body\":\"Test message\",\"text_only\":false}", null)
+			MessageFactory.fromJson("{\"nonce\":\"a68d606c-083a-4496-a5e0-f07bcdff52a4\",\"client_created_at\":1.492737257565E9,\"client_created_at_utc_offset\":-25200,\"type\":\"CompoundMessage\",\"body\":\"Test message\",\"text_only\":false}")
 		};
 	}
 

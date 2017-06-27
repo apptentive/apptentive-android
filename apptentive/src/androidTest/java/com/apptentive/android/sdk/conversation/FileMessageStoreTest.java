@@ -256,7 +256,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 		JSONObject object = new JSONObject();
 		object.put("nonce", nonce);
 		object.put("client_created_at", clientCreatedAt);
-		CompoundMessage message = new CompoundMessage(object.toString(), true);
+		CompoundMessage message = new CompoundMessage(object.toString());
 		message.setId(id);
 		message.setState(state);
 		message.setRead(read);

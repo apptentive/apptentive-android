@@ -42,8 +42,6 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	private boolean hasNoAttachments = true;
 
-	private boolean isOutgoing = true;
-
 	private final String boundary;
 
 	/* For incoming message, this array stores attachment Urls
@@ -56,20 +54,18 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	public CompoundMessage() {
 		super();
 		boundary = UUID.randomUUID().toString();
-		isOutgoing = true;
 	}
 
-	/* Constructing compound message when JSON is received from incoming, or repopulated from database
-	*
-	* @param json The JSON string of the message
-	* @param bOutgoing true if the message is originated from local
+	/**
+	 * Construct a CompoundMessage when JSON is fetched from server, or repopulated from database.
+	 *
+	 * @param json The message JSON
 	 */
-	public CompoundMessage(String json, boolean bOutgoing) throws JSONException {
+	public CompoundMessage(String json) throws JSONException {
 		super(json);
 		boundary = UUID.randomUUID().toString();
 		parseAttachmentsArray(json);
 		hasNoAttachments = getTextOnly();
-		isOutgoing = bOutgoing;
 	}
 
 	//region Http-request
@@ -123,7 +119,6 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	public void setTextOnly(boolean bVal) {
 		put(KEY_TEXT_ONLY, bVal);
 	}
-
 
 	private List<StoredFile> attachedFiles;
 
@@ -223,17 +218,12 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	@Override
 	public boolean isLastSent() {
-		return (isOutgoingMessage()) ? isLast : false;
+		return (isOutgoingMessage()) && isLast;
 	}
 
 	@Override
 	public void setLastSent(boolean bVal) {
 		isLast = bVal;
-	}
-
-	@Override
-	public boolean isOutgoingMessage() {
-		return isOutgoing;
 	}
 
 	public List<StoredFile> getRemoteAttachments() {
@@ -274,7 +264,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	public int getListItemType() {
 		if (isAutomatedMessage()) {
 			return MESSAGE_AUTO;
-		} else if (isOutgoing) {
+		} else if (isOutgoingMessage()) {
 			return MESSAGE_OUTGOING;
 		} else {
 			return MESSAGE_INCOMING;
