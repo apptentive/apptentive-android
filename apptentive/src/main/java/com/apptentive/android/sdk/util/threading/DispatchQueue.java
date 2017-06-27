@@ -88,6 +88,13 @@ public abstract class DispatchQueue {
 	}
 
 	/**
+	 * Returns <code>true</code> if code is executing on the main queue
+	 */
+	public static boolean isMainQueue() {
+		return Looper.getMainLooper() == Looper.myLooper(); // FIXME: make it configurable for Unit testing
+	}
+
+	/**
 	 * A global dispatch concurrent queue
 	 */
 	public static DispatchQueue backgroundQueue() {

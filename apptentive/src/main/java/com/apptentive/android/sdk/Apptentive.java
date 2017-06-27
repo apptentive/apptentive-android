@@ -19,6 +19,7 @@ import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -26,12 +27,13 @@ import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -374,8 +376,20 @@ public class Apptentive {
 	 *                     <dd>The GCM Registration ID, which you can <a href="http://docs.aws.amazon.com/sns/latest/dg/mobile-push-gcm.html#registration-id-gcm">access like this</a>.</dd>
 	 *                     </dl>
 	 */
-	public static void setPushNotificationIntegration(int pushProvider, String token) {
+	public static void setPushNotificationIntegration(final int pushProvider, final String token) {
+		// we only access the active conversation on the main thread to avoid concurrency issues
+		if (!DispatchQueue.isMainQueue()) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					setPushNotificationIntegration(pushProvider, token);
+				}
+			});
+			return;
+		}
+
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
 			return;
 		}
 		// Store the push stuff globally

@@ -551,7 +551,7 @@ public class ConversationManager {
 
 	public void login(final String token, final LoginCallback callback) {
 		// we only deal with an active conversation on the main thread
-		if (Looper.getMainLooper() == Looper.myLooper()) {
+		if (DispatchQueue.isMainQueue()) {
 			requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
 		} else {
 			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
@@ -746,7 +746,7 @@ public class ConversationManager {
 
 	public void logout() {
 		// we only deal with an active conversation on the main thread
-		if (Looper.myLooper() != Looper.getMainLooper()) {
+		if (!DispatchQueue.isMainQueue()) {
 			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 				@Override
 				protected void execute() {
