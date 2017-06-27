@@ -438,7 +438,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
 				Util.writeBytes(dest, payload.renderData());
 
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
+				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
 
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
@@ -490,7 +490,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
 				Util.writeBytes(dest, payload.renderData());
 
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
+				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
 
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
@@ -571,7 +571,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				byte[] data = Util.readBytes(file);
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
-				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
+				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == TRUE;
 				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
 			}
 			return null;
