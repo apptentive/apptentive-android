@@ -65,8 +65,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(5, "conversationId");
 		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
 		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
-		static final DatabaseColumn COLUMN_DATA = new DatabaseColumn(8, "data");
-		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(9, "encrypted");
+		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(8, "encrypted");
 	}
 
 	static final class LegacyPayloadEntry {
@@ -90,7 +89,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_CONVERSATION_ID + " TEXT," +
 			PayloadEntry.COLUMN_REQUEST_METHOD + " TEXT," +
 			PayloadEntry.COLUMN_PATH + " TEXT," +
-			PayloadEntry.COLUMN_DATA + " BLOB," +
 			PayloadEntry.COLUMN_ENCRYPTED + " INTEGER" +
 			");";
 
