@@ -92,6 +92,7 @@ public class ConversationManager {
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
+					assertMainThread();
 					if (activeConversation != null && activeConversation.hasActiveState()) {
 						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch interactions...");
 						final Context context = getContext();
@@ -117,6 +118,8 @@ public class ConversationManager {
 		}
 
 		try {
+			assertMainThread();
+
 			// resolving metadata
 			conversationMetadata = resolveMetadata();
 
@@ -585,6 +588,8 @@ public class ConversationManager {
 			return;
 		}
 
+		assertMainThread();
+
 		// Check if there is an active conversation
 		if (activeConversation == null) {
 			ApptentiveLog.d(CONVERSATION, "No active conversation. Performing login...");
@@ -598,7 +603,7 @@ public class ConversationManager {
 			});
 
 			if (conversationItem == null) {
-				ApptentiveLog.e("No conversation found matching user: '%s'. Logging in as new user.", userId);
+				ApptentiveLog.w("No conversation found matching user: '%s'. Logging in as new user.", userId);
 				sendLoginRequest(null, userId, token, callback);
 				return;
 			}
@@ -624,6 +629,7 @@ public class ConversationManager {
 					fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
 						@Override
 						public void onFinish(HttpRequest request) {
+							assertMainThread();
 							assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
 
 							if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
@@ -698,6 +704,7 @@ public class ConversationManager {
 					protected void execute() {
 						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+						assertMainThread();
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
@@ -764,6 +771,7 @@ public class ConversationManager {
 	}
 
 	private void doLogout() {
+		assertMainThread();
 		if (activeConversation != null) {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
@@ -791,6 +799,7 @@ public class ConversationManager {
 	//region Getters/Setters
 
 	public Conversation getActiveConversation() {
+		assertMainThread();
 		return activeConversation;
 	}
 
