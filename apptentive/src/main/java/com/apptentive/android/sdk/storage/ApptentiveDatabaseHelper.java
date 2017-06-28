@@ -460,35 +460,33 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	void addPayload(Payload... payloads) {
+	void addPayload(Payload payload) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
 
-			for (Payload payload : payloads) {
-				ContentValues values = new ContentValues();
-				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
-				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
-				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
-				// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
-				if (!payload.hasEncryptionKey()) {
-					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
-				}
-				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
-				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
-				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
-					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
-				);
-
-				File dest = getPayloadBodyFile(payload.getNonce());
-				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
-				Util.writeBytes(dest, payload.renderData());
-
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
-
-				db.insert(PayloadEntry.TABLE_NAME, null, values);
+			ContentValues values = new ContentValues();
+			values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
+			values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
+			values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
+			// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
+			if (!payload.hasEncryptionKey()) {
+				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
 			}
+			values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
+			values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
+			values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
+				StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
+			);
+
+			File dest = getPayloadBodyFile(payload.getNonce());
+			ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
+			Util.writeBytes(dest, payload.renderData());
+
+			values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
+
+			db.insert(PayloadEntry.TABLE_NAME, null, values);
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
 			ApptentiveLog.e(DATABASE, e, "Error adding payload.");

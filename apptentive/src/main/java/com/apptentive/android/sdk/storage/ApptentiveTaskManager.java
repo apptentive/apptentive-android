@@ -103,24 +103,22 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	public void addPayload(final Payload... payloads) {
+	public void addPayload(final Payload payload) {
 
 		// Provide each payload with the information it will need to send itself to the server securely.
-		for (Payload payload : payloads) {
-			if (currentConversationId != null) {
-				payload.setConversationId(currentConversationId);
-			}
-			if (currentConversationToken != null) {
-				payload.setToken(currentConversationToken);
-			}
-			if (conversationEncryptionKey != null) {
-				payload.setEncryptionKey(conversationEncryptionKey);
-			}
+		if (currentConversationId != null) {
+			payload.setConversationId(currentConversationId);
+		}
+		if (currentConversationToken != null) {
+			payload.setToken(currentConversationToken);
+		}
+		if (conversationEncryptionKey != null) {
+			payload.setEncryptionKey(conversationEncryptionKey);
 		}
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				dbHelper.addPayload(payloads);
+				dbHelper.addPayload(payload);
 				sendNextPayloadSync();
 			}
 		});
