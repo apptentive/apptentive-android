@@ -15,7 +15,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
-import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -68,7 +67,7 @@ public class EngagementModule {
 			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 			int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
 			conversation.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
-			EventManager.sendEvent(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
+			conversation.addPayload(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(conversation, context, eventLabel);
 		} catch (Exception e) {
 			ApptentiveLog.w("Error in engage()", e);

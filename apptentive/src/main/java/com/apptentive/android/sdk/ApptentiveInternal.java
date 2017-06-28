@@ -79,6 +79,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CO
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
 import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
@@ -677,7 +678,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 
 		if (appReleaseChanged || sdkChanged) {
-			taskManager.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
+			conversation.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
 			invalidateCaches();
 		}
 	}
@@ -1077,7 +1078,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
-			getApptentiveTaskManager().addPayload(new LogoutPayload());
+			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
+			conversation.addPayload(new LogoutPayload());
 		} else if (notification.hasName(NOTIFICATION_AUTHENTICATION_FAILED)) {
 			String conversationIdOfFailedRequest = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION_ID, String.class);
 			Apptentive.AuthenticationFailedReason authenticationFailedReason = notification.getUserInfo(NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON, Apptentive.AuthenticationFailedReason.class);

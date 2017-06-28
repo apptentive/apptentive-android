@@ -35,6 +35,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -526,6 +527,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	public boolean engageInternal(String eventName, String data) {
 		return ApptentiveInternal.engageInternal(getActivity(), interaction, eventName, data);
+	}
+
+	protected Conversation getConversation() {
+		return ApptentiveInternal.getInstance().getConversation(); // FIXME: don't use singleton
 	}
 
 	//endregion

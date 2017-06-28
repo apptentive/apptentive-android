@@ -6,11 +6,13 @@
 
 package com.apptentive.android.sdk.module.metric;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventPayload;
-import com.apptentive.android.sdk.model.EventManager;
 import com.apptentive.android.sdk.util.Util;
+
 import org.json.JSONObject;
 
 import java.util.Map;
@@ -36,7 +38,7 @@ public class MetricModule {
 			ApptentiveLog.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			EventPayload event = new EventPayload(type.getLabelName(), trigger);
 			event.putData(data);
-			EventManager.sendEvent(event);
+			sendEvent(event);
 		}
 	}
 
@@ -68,12 +70,21 @@ public class MetricModule {
 			if (config.isMetricsEnabled()) {
 				ApptentiveLog.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
 				EventPayload event = new EventPayload(type.getLabelName(), data);
-				EventManager.sendEvent(event);
+				sendEvent(event);
 			}
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to
 			// prevent the app from crashing.
 			ApptentiveLog.w("Error creating Error Metric. Nothing we can do but log this.", e);
+		}
+	}
+
+	private static void sendEvent(EventPayload event) {
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation != null) {
+			conversation.addPayload(event);
+		} else {
+			ApptentiveLog.w("Unable to send event '%s': no active conversation");
 		}
 	}
 }

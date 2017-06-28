@@ -220,7 +220,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	public void sendMessage(ApptentiveMessage apptentiveMessage) {
 		messageStore.addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(apptentiveMessage);
+		conversation.addPayload(apptentiveMessage);
 	}
 
 	/**

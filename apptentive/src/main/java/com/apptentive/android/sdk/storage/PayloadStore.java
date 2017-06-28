@@ -2,7 +2,7 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.model.Payload;
 
-public interface PayloadStore {
+interface PayloadStore {
 
 	void addPayload(Payload payloads);
 

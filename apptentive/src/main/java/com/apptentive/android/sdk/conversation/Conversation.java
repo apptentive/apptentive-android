@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -43,6 +44,7 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import org.json.JSONException;
 
 import java.io.File;
+import java.util.UUID;
 
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
@@ -51,6 +53,9 @@ import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
 public class Conversation implements DataChangedListener, Destroyable {
+
+	/** Conversation 'local' identifier */
+	private final String localIdentifier;
 
 	/**
 	 * Conversation data for this class to manage
@@ -130,6 +135,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 			throw new IllegalArgumentException("Messages file is null");
 		}
 
+		this.localIdentifier = UUID.randomUUID().toString();
 		this.conversationDataFile = conversationDataFile;
 		this.conversationMessagesFile = conversationMessagesFile;
 
@@ -139,6 +145,20 @@ public class Conversation implements DataChangedListener, Destroyable {
 		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
+
+	//region Payloads
+
+	public void addPayload(Payload payload) {
+		payload.setLocalConversationIdentifier(getLocalIdentifier());
+		payload.setConversationId(getConversationId());
+		payload.setToken(getConversationToken());
+		payload.setEncryptionKey(getEncryptionKey());
+
+		// FIXME: don't use singleton here
+		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(payload);
+	}
+
+	//endregion
 
 	//region Interactions
 
@@ -329,6 +349,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 	//endregion
 
 	//region Getters & Setters
+
+	public String getLocalIdentifier() {
+		return localIdentifier;
+	}
 
 	public ConversationState getState() {
 		return state;

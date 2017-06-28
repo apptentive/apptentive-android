@@ -120,7 +120,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 					engageInternal(EVENT_SUBMIT);
 
-					ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(new SurveyResponsePayload(interaction, answers));
+					getConversation().addPayload(new SurveyResponsePayload(interaction, answers));
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {
