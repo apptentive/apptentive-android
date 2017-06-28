@@ -65,11 +65,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(5, "conversationId");
 		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
 		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
-		static final DatabaseColumn COLUMN_DATA = new DatabaseColumn(8, "data");
-		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(9, "encrypted");
+		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(8, "encrypted");
 	}
 
-	static final class LegacyPayloadEntry {
+	private static final class LegacyPayloadEntry {
 		static final String TABLE_NAME = "legacy_payload";
 		static final DatabaseColumn PAYLOAD_KEY_DB_ID = new DatabaseColumn(0, "_id");
 		static final DatabaseColumn PAYLOAD_KEY_BASE_TYPE = new DatabaseColumn(1, "base_type");
@@ -90,7 +89,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_CONVERSATION_ID + " TEXT," +
 			PayloadEntry.COLUMN_REQUEST_METHOD + " TEXT," +
 			PayloadEntry.COLUMN_PATH + " TEXT," +
-			PayloadEntry.COLUMN_DATA + " BLOB," +
 			PayloadEntry.COLUMN_ENCRYPTED + " INTEGER" +
 			");";
 
@@ -119,7 +117,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	//endregion
 
-	//region Message SQL
+	//region Message SQL (Deprecated: Used for migration only)
 
 	private static final String TABLE_MESSAGE = "message";
 	private static final String MESSAGE_KEY_DB_ID = "_id";                           // 0
@@ -142,15 +140,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			MESSAGE_KEY_JSON + " TEXT" +
 			");";
 
-	private static final String QUERY_MESSAGE_GET_BY_NONCE = "SELECT * FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_NONCE + " = ?";
 	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
 	private static final String QUERY_MESSAGE_GET_ALL_IN_ORDER = "SELECT * FROM " + TABLE_MESSAGE + " ORDER BY COALESCE(" + MESSAGE_KEY_ID + ", 'z') ASC";
-	private static final String QUERY_MESSAGE_GET_LAST_ID = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_STATE + " = '" + ApptentiveMessage.State.saved + "' AND " + MESSAGE_KEY_ID + " NOTNULL ORDER BY " + MESSAGE_KEY_ID + " DESC LIMIT 1";
-	private static final String QUERY_MESSAGE_UNREAD = "SELECT " + MESSAGE_KEY_ID + " FROM " + TABLE_MESSAGE + " WHERE " + MESSAGE_KEY_READ + " = " + FALSE + " AND " + MESSAGE_KEY_ID + " NOTNULL";
 
 	//endregion
 
-	//region File SQL (legacy)
+	//region File SQL  (Deprecated: Used for migration only)
 
 	private static final String TABLE_FILESTORE = "file_store";
 	private static final String FILESTORE_KEY_ID = "id";                         // 0
@@ -219,7 +214,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onCreate(db)");
 		db.execSQL(TABLE_CREATE_PAYLOAD);
 
-		// TODO: remove legacy tables
+		// Leave legacy tables in place for now.
 		db.execSQL(TABLE_CREATE_MESSAGE);
 		db.execSQL(TABLE_CREATE_FILESTORE);
 		db.execSQL(TABLE_CREATE_COMPOUND_FILESTORE);
@@ -379,7 +374,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * 3.   load each into a the new payload object format
 	 * 4.   Save each into the new payload table
 	 * 5. Drop temp_payload
-	 * @param db
 	 */
 	private void upgradeVersion2to3(SQLiteDatabase db) {
 		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
@@ -399,7 +393,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			// 3. Load legacy payloads
 			ApptentiveLog.vv(DATABASE, "\t3. Loading legacy payloads.");
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST_LEGACY, null);
-			List<Payload> payloads = new ArrayList<>(cursor.getCount());
 
 			ApptentiveLog.vv(DATABASE, "4. Save payloads into new table.");
 			JsonPayload payload;
@@ -440,7 +433,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
 				Util.writeBytes(dest, payload.renderData());
 
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
+				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
 
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
@@ -492,7 +485,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
 				Util.writeBytes(dest, payload.renderData());
 
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? 1 : 0);
+				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
 
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
@@ -528,7 +521,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		ApptentiveLog.v(DATABASE, "Deleted payload \"%s\" data file successfully? %b", payloadIdentifier, dest.delete());
 	}
 
-	public void deleteAllPayloads() {
+	void deleteAllPayloads() {
 		// FIXME: Delete files too.
 		SQLiteDatabase db;
 		try {
@@ -539,7 +532,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public PayloadData getOldestUnsentPayload() {
+	PayloadData getOldestUnsentPayload() {
 
 		SQLiteDatabase db;
 		Cursor cursor = null;
@@ -573,7 +566,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				byte[] data = Util.readBytes(file);
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
-				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == 1;
+				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == TRUE;
 				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
 			}
 			return null;
@@ -589,7 +582,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		return path.replace("${conversationId}", conversationId);
 	}
 
-	public void updateIncompletePayloads(String conversationId, String authToken) {
+	void updateIncompletePayloads(String conversationId, String authToken) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
@@ -685,9 +678,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.endTransaction();
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
-		} finally {
-			return ret != -1;
 		}
+		return ret != -1;
 	}
 
 	//endregion
@@ -708,11 +700,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	public void reset(Context context) {
-		/**
-		 * The following ONLY be used during development and testing. It will delete the database, including all saved
-		 * payloads, messages, and files.
-		 */
+	/**
+	 * The following shall ONLY be used during development and testing. It will delete the database,
+	 * including all saved payloads, messages, and files.
+	 */
+	void reset(Context context) {
 		context.deleteDatabase(DATABASE_NAME);
 	}
 
@@ -722,7 +714,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	private static final class DatabaseColumn {
 		public final String name;
-		public final int index;
+		final int index;
 
 		DatabaseColumn(int index, String name) {
 			this.index = index;

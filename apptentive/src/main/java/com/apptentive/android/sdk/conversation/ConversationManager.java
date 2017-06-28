@@ -1,16 +1,21 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Looper;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
+import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -162,13 +167,13 @@ public class ConversationManager {
 			return conversation;
 		}
 
-		// seems like we only have 'logged-out' conversations
+		// Check for only LOGGED_OUT Conversations
 		if (conversationMetadata.hasItems()) {
 			ApptentiveLog.v(CONVERSATION, "Can't load conversation: only 'logged-out' conversations available");
 			return null;
 		}
 
-		// no conversation available: create a new one
+		// No conversation exists: Create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
 		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
 		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
@@ -763,6 +768,7 @@ public class ConversationManager {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
 					ApptentiveLog.d("Ending active conversation.");
+					ApptentiveInternal.engageInternal(getContext(), "logout");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
 					activeConversation.destroy();

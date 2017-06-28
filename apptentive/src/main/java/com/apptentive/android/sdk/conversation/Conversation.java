@@ -136,7 +136,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		conversationData = new ConversationData();
 		conversationData.setDataChangedListener(this);
 
-		FileMessageStore messageStore = new FileMessageStore(getPerson().getId(), conversationMessagesFile);
+		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
@@ -267,9 +267,11 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
-		ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
-
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+			ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
+			ApptentiveLog.vv(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
+		}
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer;

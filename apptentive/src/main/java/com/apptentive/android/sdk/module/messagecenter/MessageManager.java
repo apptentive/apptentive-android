@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -266,7 +266,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
-				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json, conversation.getPerson().getId());
+				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
 				// Since these came back from the server, mark them saved before updating them in the DB.
 				if (apptentiveMessage != null) {
 					apptentiveMessage.setState(ApptentiveMessage.State.saved);
@@ -552,6 +552,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	Conversation getConversation() {
 		return conversation;
+	}
+
+	public MessageStore getMessageStore() {
+		return messageStore;
 	}
 
 	//region Message Dispatch Task

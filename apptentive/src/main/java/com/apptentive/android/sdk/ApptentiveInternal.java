@@ -1062,7 +1062,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	void logout() {
-		engageInternal(getApplicationContext(), "logout");
 		conversationManager.logout();
 	}
 
