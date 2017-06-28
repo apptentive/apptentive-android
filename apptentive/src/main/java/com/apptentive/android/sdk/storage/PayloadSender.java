@@ -106,11 +106,12 @@ class PayloadSender {
 			@Override
 			public void onFinish(HttpRequest request) {
 				try {
-					final JSONObject responseData = new JSONObject(request.getResponseData());
+					String json = StringUtils.isNullOrEmpty(request.getResponseData()) ? "{}" : request.getResponseData();
+					final JSONObject responseData = new JSONObject(json);
 					handleFinishSendingPayload(payload, false, null, request.getResponseCode(), responseData);
 				} catch (Exception e) {
 					// TODO: Stop assuming the response is JSON. In fact, just send bytes back, and whatever part of the SDK needs it can try to convert it to the desired format.
-					ApptentiveLog.e(PAYLOADS, "Exception while handling payload send response");
+					ApptentiveLog.e(PAYLOADS, e, "Exception while handling payload send response");
 					handleFinishSendingPayload(payload, false, null, -1, null);
 				}
 			}
