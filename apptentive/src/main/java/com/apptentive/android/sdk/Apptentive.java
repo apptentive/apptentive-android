@@ -844,7 +844,7 @@ public class Apptentive {
 	public static void sendAttachmentText(String text) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
@@ -874,7 +874,7 @@ public class Apptentive {
 	public static void sendAttachmentFile(String uri) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			if (TextUtils.isEmpty(uri)) {
@@ -966,7 +966,7 @@ public class Apptentive {
 	public static void sendAttachmentFile(InputStream is, String mimeType) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			if (is == null) {
@@ -1078,7 +1078,7 @@ public class Apptentive {
 		}
 		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 		if (conversation == null) {
-			ApptentiveLog.e("Unable to engage '%s' event: no active conversation", event);
+			ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
 			return false;
 		}
 

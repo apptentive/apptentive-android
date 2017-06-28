@@ -414,11 +414,15 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
+		if (getConversation() != null) {
+			engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
+		}
 	}
 
 	public void onAppExit(final Context appContext) {
-		engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+		if (getConversation() != null) {
+			engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+		}
 	}
 
 	public void onActivityStarted(Activity activity) {
