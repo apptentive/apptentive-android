@@ -401,6 +401,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	@Override
 	public void destroy() {
 		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
+		pollingWorker.destroy();
 	}
 
 	//endregion
