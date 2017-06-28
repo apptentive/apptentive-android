@@ -15,15 +15,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MessageFactory {
-	/**
-	 * Only use this method if you don't need to know whether the resulting Message is outgoing or
-	 * incoming. Use {@link #fromJson(String, String)} otherwise.
-	 */
-	public static ApptentiveMessage fromJson(String json) {
-		return fromJson(json, null);
-	}
 
-	public static ApptentiveMessage fromJson(String json, String personId) {
+	public static ApptentiveMessage fromJson(String json) {
 		try {
 			// If KEY_TYPE is set to CompoundMessage or not set, treat them as CompoundMessage
 			ApptentiveMessage.Type type = ApptentiveMessage.Type.CompoundMessage;
@@ -36,19 +29,7 @@ public class MessageFactory {
 			}
 			switch (type) {
 				case CompoundMessage:
-					String senderId = null;
-					try {
-						if (!root.isNull(ApptentiveMessage.KEY_SENDER)) {
-							JSONObject sender = root.getJSONObject(ApptentiveMessage.KEY_SENDER);
-							if (!sender.isNull((ApptentiveMessage.KEY_SENDER_ID))) {
-								senderId = sender.getString(ApptentiveMessage.KEY_SENDER_ID);
-							}
-						}
-					} catch (JSONException e) {
-						// Ignore, senderId would be null
-					}
-					// If senderId is null or same as the locally stored id, construct message as outgoing
-					return new CompoundMessage(json, (senderId == null || (personId != null && senderId.equals(personId))));
+					return new CompoundMessage(json);
 				case unknown:
 					break;
 				default:

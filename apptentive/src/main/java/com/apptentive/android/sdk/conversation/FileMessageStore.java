@@ -39,23 +39,11 @@ class FileMessageStore implements MessageStore {
 	 */
 	private static final byte VERSION = 1;
 
-	private final String currentPersonId;
 	private final File file;
 	private final List<MessageEntry> messageEntries;
 	private boolean shouldFetchFromFile;
 
-	FileMessageStore(String currentPersonId, File file) {
-		this.currentPersonId = currentPersonId;
-		this.file = file;
-		this.messageEntries = new ArrayList<>(); // we need a random access
-		this.shouldFetchFromFile = true; // we would lazily read it from a file later
-	}
-
-	/**
-	 * Only use this constructor from a test where you don't care about knowing whether a message is outgoing or incoming.
-	 */
 	FileMessageStore(File file) {
-		this.currentPersonId = null;
 		this.file = file;
 		this.messageEntries = new ArrayList<>(); // we need a random access
 		this.shouldFetchFromFile = true; // we would lazily read it from a file later
@@ -117,7 +105,7 @@ class FileMessageStore implements MessageStore {
 
 		List<ApptentiveMessage> apptentiveMessages = new ArrayList<>();
 		for (MessageEntry entry : messageEntries) {
-			ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(entry.json, currentPersonId);
+			ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(entry.json);
 			if (apptentiveMessage == null) {
 				ApptentiveLog.e("Error parsing Record json from database: %s", entry.json);
 				continue;
@@ -182,7 +170,7 @@ class FileMessageStore implements MessageStore {
 		for (int i = 0; i < messageEntries.size(); ++i) {
 			final MessageEntry messageEntry = messageEntries.get(i);
 			if (StringUtils.equal(nonce, messageEntry.nonce)) {
-				return MessageFactory.fromJson(messageEntry.json, currentPersonId);
+				return MessageFactory.fromJson(messageEntry.json);
 			}
 		}
 
@@ -305,7 +293,28 @@ class FileMessageStore implements MessageStore {
 			writeNullableBoolean(out, isRead);
 			writeNullableUTF(out, json);
 		}
+
+		@Override
+		public String toString() {
+			return "MessageEntry{" +
+				       "id='" + id + '\'' +
+				       ", clientCreatedAt=" + clientCreatedAt +
+				       ", nonce='" + nonce + '\'' +
+				       ", state='" + state + '\'' +
+				       ", isRead=" + isRead +
+				       ", json='" + json + '\'' +
+				       '}';
+		}
 	}
 
 	//endregion
+
+	@Override
+	public String toString() {
+		return "FileMessageStore{" +
+			       "file=" + file +
+			       ", messageEntries=" + messageEntries +
+			       ", shouldFetchFromFile=" + shouldFetchFromFile +
+			       '}';
+	}
 }

@@ -162,13 +162,13 @@ public class ConversationManager {
 			return conversation;
 		}
 
-		// seems like we only have 'logged-out' conversations
+		// Check for only LOGGED_OUT Conversations
 		if (conversationMetadata.hasItems()) {
 			ApptentiveLog.v(CONVERSATION, "Can't load conversation: only 'logged-out' conversations available");
 			return null;
 		}
 
-		// no conversation available: create a new one
+		// No conversation exists: Create a new one
 		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
 		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
 		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());

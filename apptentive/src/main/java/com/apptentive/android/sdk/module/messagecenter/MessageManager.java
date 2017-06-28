@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -66,8 +65,6 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
-	private final Conversation conversation;
-
 	private final MessageStore messageStore;
 
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
@@ -98,16 +95,11 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	};
 
-	public MessageManager(Conversation conversation, MessageStore messageStore) {
-		if (conversation == null) {
-			throw new IllegalArgumentException("Conversation is null");
-		}
-
+	public MessageManager(MessageStore messageStore) {
 		if (messageStore == null) {
 			throw new IllegalArgumentException("Message store is null");
 		}
 
-		this.conversation = conversation;
 		this.messageStore = messageStore;
 		this.pollingWorker = new MessagePollingWorker(this);
 
@@ -266,7 +258,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
-				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json, conversation.getPerson().getId());
+				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
 				// Since these came back from the server, mark them saved before updating them in the DB.
 				if (apptentiveMessage != null) {
 					apptentiveMessage.setState(ApptentiveMessage.State.saved);
@@ -587,6 +579,9 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			return this;
 		}
 	}
-
 	//endregion
+
+	public MessageStore getMessageStore() {
+		return messageStore;
+	}
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -20,10 +20,14 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	public static final String KEY_CREATED_AT = "created_at";
 	public static final String KEY_TYPE = "type";
 	public static final String KEY_HIDDEN = "hidden";
+	/** inbound here means inbound to the server. When this is true, the message is outgoing */
+	public static final String KEY_INBOUND = "inbound";
 	public static final String KEY_CUSTOM_DATA = "custom_data";
 	public static final String KEY_AUTOMATED = "automated";
 	public static final String KEY_SENDER = "sender";
 	public static final String KEY_SENDER_ID = "id";
+	private static final String KEY_SENDER_NAME = "name";
+	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
 
 	// State and Read are not stored in JSON, only in DB.
 	private State state = State.unknown;
@@ -32,8 +36,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 	// datestamp is only stored in memory, due to how we selectively apply date labeling in the view.
 	private String datestamp;
 
-	private static final String KEY_SENDER_NAME = "name";
-	private static final String KEY_SENDER_PROFILE_PHOTO = "profile_photo";
 
 
 	protected ApptentiveMessage() {
@@ -85,6 +87,11 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 
 	public void setHidden(boolean hidden) {
 		put(KEY_HIDDEN, hidden);
+	}
+
+	public boolean isOutgoingMessage() {
+		// Default is true because this field is only set from the server.
+		return getBoolean(KEY_INBOUND, true);
 	}
 
 	public void setCustomData(Map<String, Object> customData) {
@@ -208,8 +215,6 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			return false;
 		}
 	}
-
-	public abstract boolean isOutgoingMessage();
 
 	public boolean isAutomatedMessage() {
 		return getAutomated();
