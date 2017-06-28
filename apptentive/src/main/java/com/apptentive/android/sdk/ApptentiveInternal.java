@@ -1092,21 +1092,21 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	public static boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData[] extendedData) {
 		assertMainThread();
 		Conversation conversation = getInstance().getConversation();
-		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation");
+		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation", eventName);
 		return conversation != null && EngagementModule.engage(context, conversation, vendor, interaction, interactionId, eventName, data, customData, extendedData);
 	}
 
 	public static boolean engageInternal(Context context, String eventName) {
 		assertMainThread();
 		Conversation conversation = getInstance().getConversation();
-		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation");
+		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation", eventName);
 		return conversation != null && EngagementModule.engageInternal(context, conversation, eventName);
 	}
 
 	public static boolean engageInternal(Context context, Interaction interaction, String eventName, String data) {
 		assertMainThread();
 		Conversation conversation = getInstance().getConversation();
-		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation");
+		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation", eventName);
 		return conversation != null && EngagementModule.engageInternal(context, conversation, interaction, eventName, data);
 	}
 
