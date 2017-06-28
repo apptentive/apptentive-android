@@ -14,11 +14,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
-
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -27,7 +26,6 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
-import com.apptentive.android.sdk.conversation.Conversation;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -133,7 +131,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
-									Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+									Conversation conversation = getConversation();
 									if (conversation != null) {
 										String interactionsString = conversation.getInteractions();
 										if (interactionsString != null) {

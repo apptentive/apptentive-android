@@ -433,7 +433,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		// Retrieve any saved attachments
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		if (conversation != null && conversation.getMessageCenterPendingAttachments() != null) {
 			String pendingAttachmentsString = conversation.getMessageCenterPendingAttachments();
 			JSONArray savedAttachmentsJsonArray = null;
@@ -746,7 +746,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		this.composer = composer;
 		this.composerEditText = composerEditText;
 
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			if (this.composerEditText != null) {
@@ -873,7 +873,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
 			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));
 
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			Conversation conversation = getConversation();
 			if (conversation != null && conversation.hasActiveState()) {
 				compoundMessage.setSenderId(conversation.getPerson().getId());
 			}
@@ -999,7 +999,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setWhoCardAsPreviouslyDisplayed() {
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		if (conversation == null) {
 			return;
 		}
@@ -1007,7 +1007,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private boolean wasWhoCardAsPreviouslyDisplayed() {
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		if (conversation == null) {
 			return false;
 		}
@@ -1024,7 +1024,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		if (conversation == null) {
 			return;
 		}
@@ -1051,7 +1051,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * will clear the pending composing message previously saved in shared preference
 	 */
 	public void clearPendingComposingMessage() {
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		Conversation conversation = getConversation();
 		if (conversation != null) {
 			conversation.setMessageCenterPendingMessage(null);
 			conversation.setMessageCenterPendingAttachments(null);
