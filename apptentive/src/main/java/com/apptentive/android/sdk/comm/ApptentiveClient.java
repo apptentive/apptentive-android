@@ -40,26 +40,6 @@ public class ApptentiveClient {
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
-	public static ApptentiveHttpResponse getAppConfiguration() {
-		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-		if (conversation == null) {
-			throw new IllegalStateException("Conversation is null");
-		}
-
-		final String conversationId = conversation.getConversationId();
-		if (conversationId == null) {
-			throw new IllegalStateException("Conversation id is null");
-		}
-
-		final String conversationToken = conversation.getConversationToken();
-		if (conversationToken == null) {
-			throw new IllegalStateException("Conversation token is null");
-		}
-
-		final String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
-		return performHttpRequest(conversationToken, true, endPoint, Method.GET, null);
-	}
-
 	/**
 	 * Gets all messages since the message specified by GUID was sent.
 	 *

@@ -25,9 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
@@ -698,30 +696,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();
-	}
-
-	/**
-	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
-	 */
-	private void fetchAppConfiguration() { // FIXME: remove unused method
-		ApptentiveLog.i("Fetching new Configuration task started.");
-		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
-		try {
-			Map<String, String> headers = response.getHeaders();
-			if (headers != null) {
-				String cacheControl = headers.get("Cache-Control");
-				Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-				if (cacheSeconds == null) {
-					cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-				}
-				ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
-				Configuration config = new Configuration(response.getContent());
-				config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-				config.save();
-			}
-		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing app configuration from server.", e);
-		}
 	}
 
 	public IRatingProvider getRatingProvider() {
