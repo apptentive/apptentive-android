@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.network;
 
 import android.util.Base64;
@@ -213,10 +219,14 @@ public class HttpRequest {
 
 		try {
 			sendRequestSync();
+		} catch (NetworkUnavailableException e) {
+			responseCode = -1; // indicates failure
+			errorMessage = e.getMessage();
+			ApptentiveLog.w(e.getMessage());
+			ApptentiveLog.w("Cancelled? %b", isCancelled());
 		} catch (Exception e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
-			ApptentiveLog.e(e, "Unable to perform request");
 			ApptentiveLog.e("Cancelled? %b", isCancelled());
 			if (!isCancelled()) {
 				ApptentiveLog.e(e, "Unable to perform request");
@@ -258,8 +268,8 @@ public class HttpRequest {
 			connection.setReadTimeout(readTimeout);
 
 			if (!isNetworkConnectionPresent()) {
-				ApptentiveLog.d("No network connection present. Cancelling request.");
-				cancel();
+				ApptentiveLog.d("No network connection present. Request will fail.");
+				throw new NetworkUnavailableException("The network is not currently active.");
 			}
 
 			if (isCancelled()) {
@@ -617,4 +627,10 @@ public class HttpRequest {
 	}
 
 	//endregion
+
+	private class NetworkUnavailableException extends IOException {
+		NetworkUnavailableException(String message) {
+			super(message);
+		}
+	}
 }
