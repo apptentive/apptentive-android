@@ -414,13 +414,13 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		if (getConversation() != null) {
+		if (isConversationActive()) {
 			engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 		}
 	}
 
 	public void onAppExit(final Context appContext) {
-		if (getConversation() != null) {
+		if (isConversationActive()) {
 			engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
 		}
 	}
@@ -897,7 +897,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 					// do we have a conversation right now?
 					if (conversation == null) {
-						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: no active conversation");
+						ApptentiveLog.w("Can't generate pending intent from Apptentive push data: no active conversation");
 						return null;
 					}
 
