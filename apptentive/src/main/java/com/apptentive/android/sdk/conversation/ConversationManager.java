@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
 import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
@@ -776,7 +777,7 @@ public class ConversationManager {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
 					ApptentiveLog.d("Ending active conversation.");
-					ApptentiveInternal.engageInternal(getContext(), "logout");
+					EngagementModule.engageInternal(getContext(), activeConversation, "logout");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
 					activeConversation.destroy();

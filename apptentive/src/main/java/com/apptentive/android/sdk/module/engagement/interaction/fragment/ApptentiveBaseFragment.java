@@ -37,6 +37,7 @@ import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ExtendedData;
+import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
@@ -48,6 +49,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
@@ -73,6 +76,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	protected boolean hasLaunched;
 	protected String sectionTitle;
 
+	private Conversation conversation;
 	private OnFragmentTransitionListener onTransitionListener;
 
 	public interface OnFragmentTransitionListener {
@@ -518,7 +522,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	//region Helpers
 
 	public boolean engage(String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		return ApptentiveInternal.engage(getActivity(), vendor, interaction, interactionId, eventName, data, customData, extendedData);
+		Conversation conversation = getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation", eventName);
+		return conversation != null && EngagementModule.engage(getActivity(), conversation, vendor, interaction, interactionId, eventName, data, customData, extendedData);
 	}
 
 	public boolean engageInternal(String eventName) {
@@ -526,11 +532,17 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	public boolean engageInternal(String eventName, String data) {
-		return ApptentiveInternal.engageInternal(getActivity(), interaction, eventName, data);
+		Conversation conversation = getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation", eventName);
+		return conversation != null && EngagementModule.engageInternal(getActivity(), conversation, interaction, eventName, data);
 	}
 
 	protected Conversation getConversation() {
-		return ApptentiveInternal.getInstance().getConversation(); // FIXME: don't use singleton
+		return conversation;
+	}
+
+	public void setConversation(Conversation conversation) {
+		this.conversation = conversation;
 	}
 
 	//endregion
