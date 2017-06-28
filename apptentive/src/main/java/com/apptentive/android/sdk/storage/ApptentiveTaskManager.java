@@ -203,11 +203,18 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			if (appInBackground) {
 				ApptentiveLog.v(PAYLOADS, "The app went to the background so we won't remove the payload from the queue");
 				return;
+			} else if (responseCode == -1) {
+				ApptentiveLog.v(PAYLOADS, "Payload failed to send due to a connection error.");
+				return;
+			} else if (responseCode > 500) {
+				ApptentiveLog.v(PAYLOADS, "Payload failed to send due to a server error.");
+				return;
 			}
 		} else {
 			ApptentiveLog.v(PAYLOADS, "Payload was successfully sent: %s", payload);
 		}
 
+		// Only let the payload be deleted if it was successfully sent, or got an unrecoverable client error.
 		deletePayload(payload.getNonce());
 	}
 
