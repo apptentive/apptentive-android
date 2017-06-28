@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.notifications;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -22,7 +21,7 @@ public class ApptentiveNotificationCenterTest extends TestCaseBase {
 	@Before
 	public void setUp() {
 		super.setUp();
-		notificationCenter = new ApptentiveNotificationCenter(new MockDispatchQueue(true));
+		notificationCenter = new ApptentiveNotificationCenter();
 	}
 
 	@After
@@ -99,35 +98,6 @@ public class ApptentiveNotificationCenterTest extends TestCaseBase {
 
 		notificationCenter.postNotification("notification3");
 		assertResult();
-	}
-
-	@Test
-	public void testPostNotificationsSync() {
-		final Observer observer1 = new Observer("observer1");
-		final Observer observer3 = new Observer("observer3");
-		final Observer observer2 = new Observer("observer2") {
-			@Override
-			public void onReceiveNotification(ApptentiveNotification notification) {
-				super.onReceiveNotification(notification);
-				notificationCenter.removeObserver(observer3);
-			}
-		};
-		notificationCenter.addObserver("notification", observer1);
-		notificationCenter.addObserver("notification", observer2);
-		notificationCenter.addObserver("notification", observer3);
-		notificationCenter.postNotificationSync("notification", ObjectUtils.toMap("key", "value"));
-
-		assertResult(
-			"observer1: notification {'key':'value'}",
-			"observer2: notification {'key':'value'}",
-			"observer3: notification {'key':'value'}"
-		);
-
-		notificationCenter.postNotificationSync("notification", ObjectUtils.toMap("key", "value"));
-		assertResult(
-			"observer1: notification {'key':'value'}",
-			"observer2: notification {'key':'value'}"
-		);
 	}
 
 	private class Observer implements ApptentiveNotificationObserver {

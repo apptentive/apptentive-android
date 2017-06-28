@@ -420,7 +420,7 @@ public class ConversationManager {
 				"conversation_identifier", conversation.getConversationId());
 
 			ApptentiveNotificationCenter.defaultCenter()
-				.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+				.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
 					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 			if (conversation.hasActiveState()) {
@@ -770,7 +770,7 @@ public class ConversationManager {
 					ApptentiveLog.d("Ending active conversation.");
 					ApptentiveInternal.engageInternal(getContext(), "logout");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
-					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
+					ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
 					activeConversation.destroy();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);

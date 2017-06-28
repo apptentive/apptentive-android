@@ -8,8 +8,6 @@ package com.apptentive.android.sdk.notifications;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.ObjectUtils;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -34,18 +32,8 @@ public class ApptentiveNotificationCenter {
 	 */
 	private final Map<String, ApptentiveNotificationObserverList> observerListLookup;
 
-	/**
-	 * Dispatch queue for posting notifications.
-	 */
-	private final DispatchQueue notificationQueue;
-
-	ApptentiveNotificationCenter(DispatchQueue notificationQueue) {
-		if (notificationQueue == null) {
-			throw new IllegalArgumentException("Notification queue is not defined");
-		}
-
+	ApptentiveNotificationCenter() {
 		this.observerListLookup = new HashMap<>();
-		this.notificationQueue = notificationQueue;
 	}
 
 	//region Observers
@@ -109,25 +97,6 @@ public class ApptentiveNotificationCenter {
 	 * Creates a notification with a given name and user info and posts it to the receiver.
 	 */
 	public synchronized void postNotification(final String name, final Map<String, Object> userInfo) {
-		notificationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				postNotificationSync(name, userInfo);
-			}
-		});
-	}
-
-	/**
-	 * Creates a notification with a given name and information and posts it to the receiver synchronously.
-	 */
-	public synchronized void postNotificationSync(String name) {
-		postNotificationSync(name, EMPTY_USER_INFO);
-	}
-
-	/**
-	 * Creates a notification with a given name and information and posts it to the receiver synchronously.
-	 */
-	public synchronized void postNotificationSync(String name, Map<String, Object> userInfo) {
 		final ApptentiveNotification notification = new ApptentiveNotification(name, userInfo);
 		ApptentiveLog.v(NOTIFICATIONS, "Post notification: %s", notification);
 
@@ -177,7 +146,7 @@ public class ApptentiveNotificationCenter {
 	 * Thread-safe initialization trick
 	 */
 	private static class Holder {
-		static final ApptentiveNotificationCenter INSTANCE = new ApptentiveNotificationCenter(DispatchQueue.mainQueue());
+		static final ApptentiveNotificationCenter INSTANCE = new ApptentiveNotificationCenter();
 	}
 
 	//endregion
