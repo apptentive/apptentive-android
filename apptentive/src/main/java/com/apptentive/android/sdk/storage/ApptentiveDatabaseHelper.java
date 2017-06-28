@@ -108,7 +108,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " = ? " +
 			"WHERE " +
-			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " = ? AND" +
+			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " = ? AND " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
 
