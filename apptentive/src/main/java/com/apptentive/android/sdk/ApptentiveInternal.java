@@ -1064,8 +1064,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	//region Engagement
 
-	private static boolean engageInternal(Context context, String eventName) {
-		Conversation conversation = getInstance().getConversation();
+	private boolean engageInternal(Context context, String eventName) {
+		Conversation conversation = getConversation();
 		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation", eventName);
 		return conversation != null && EngagementModule.engageInternal(context, conversation, eventName);
 	}
