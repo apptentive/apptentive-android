@@ -1064,25 +1064,30 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		if (StringUtils.isNullOrEmpty(event)) {
-			ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
-			return false;
-		}
-		if (context == null) {
-			ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
-			return false;
-		}
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
-			return false;
-		}
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-		if (conversation == null) {
-			ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
-			return false;
-		}
+		try {
+			if (StringUtils.isNullOrEmpty(event)) {
+				ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (context == null) {
+				ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (!ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
+				return false;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation == null) {
+				ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
+				return false;
+			}
 
-		return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+			return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while engaging '%s' event", event);
+			return false;
+		}
 	}
 
 	/**
