@@ -122,9 +122,11 @@ public class ConversationManager {
 			assertMainThread();
 
 			// resolving metadata
+			ApptentiveLog.vv(CONVERSATION, "Resolving metadata...");
 			conversationMetadata = resolveMetadata();
 
 			// attempt to load existing conversation
+			ApptentiveLog.vv(CONVERSATION, "Loading active conversation...");
 			activeConversation = loadActiveConversationGuarded();
 
 			if (activeConversation != null) {
@@ -203,6 +205,7 @@ public class ConversationManager {
 				anonymousConversation.setState(LEGACY_PENDING);
 				anonymousConversation.setConversationToken(legacyConversationToken);
 
+				ApptentiveLog.v("Fetching legacy conversation...");
 				fetchLegacyConversation(anonymousConversation)
 					// remove legacy key when request is finished
 					.addListener(new HttpRequest.Adapter<HttpRequest>() {

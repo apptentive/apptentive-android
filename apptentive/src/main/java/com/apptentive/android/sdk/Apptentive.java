@@ -737,7 +737,7 @@ public class Apptentive {
 	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
 				return false;
 			}
 			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
@@ -757,7 +757,7 @@ public class Apptentive {
 	public static boolean canShowMessageCenter() {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
 				return false;
 			}
 			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
@@ -782,7 +782,7 @@ public class Apptentive {
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to set unread messages listener: no active conversation.");
 				return;
 			}
 			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
@@ -802,7 +802,7 @@ public class Apptentive {
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to add unread messages listener: no active conversation.");
 				return;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
@@ -823,7 +823,7 @@ public class Apptentive {
 	public static int getUnreadMessageCount() {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to get unread message count: no active conversation.");
 				return 0;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
