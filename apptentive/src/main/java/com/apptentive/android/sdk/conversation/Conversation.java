@@ -44,18 +44,15 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import org.json.JSONException;
 
 import java.io.File;
-import java.util.UUID;
 
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
+import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
 public class Conversation implements DataChangedListener, Destroyable {
-
-	/** Conversation 'local' identifier */
-	private final String localIdentifier;
 
 	/**
 	 * Conversation data for this class to manage
@@ -135,7 +132,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 			throw new IllegalArgumentException("Messages file is null");
 		}
 
-		this.localIdentifier = UUID.randomUUID().toString();
 		this.conversationDataFile = conversationDataFile;
 		this.conversationMessagesFile = conversationMessagesFile;
 
@@ -149,7 +145,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	//region Payloads
 
 	public void addPayload(Payload payload) {
-		payload.setLocalConversationIdentifier(getLocalIdentifier());
+		payload.setLocalConversationIdentifier(notNull(getLocalIdentifier()));
 		payload.setConversationId(getConversationId());
 		payload.setToken(getConversationToken());
 		payload.setEncryptionKey(getEncryptionKey());
@@ -351,7 +347,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	//region Getters & Setters
 
 	public String getLocalIdentifier() {
-		return localIdentifier;
+		return conversationData.getLocalIdentifier();
 	}
 
 	public ConversationState getState() {

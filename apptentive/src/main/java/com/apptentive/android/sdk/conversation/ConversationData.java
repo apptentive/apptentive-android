@@ -17,10 +17,12 @@ import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import java.util.UUID;
+
 public class ConversationData implements Saveable, DataChangedListener {
 
 	private static final long serialVersionUID = 1L;
-
+	private String localIdentifier;
 	private String conversationToken;
 	private String conversationId;
 	private Device device;
@@ -41,6 +43,7 @@ public class ConversationData implements Saveable, DataChangedListener {
 	private double interactionExpiration;
 
 	public ConversationData() {
+		this.localIdentifier = UUID.randomUUID().toString();
 		this.device = new Device();
 		this.person = new Person();
 		this.sdk = new Sdk();
@@ -76,6 +79,10 @@ public class ConversationData implements Saveable, DataChangedListener {
 	//endregion
 
 	//region Getters & Setters
+
+	public String getLocalIdentifier() {
+		return localIdentifier;
+	}
 
 	public String getConversationToken() {
 		return conversationToken;
