@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -65,6 +66,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
+	private final Conversation conversation;
+
 	private final MessageStore messageStore;
 
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
@@ -95,11 +98,16 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	};
 
-	public MessageManager(MessageStore messageStore) {
+	public MessageManager(Conversation conversation, MessageStore messageStore) {
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
 		if (messageStore == null) {
 			throw new IllegalArgumentException("Message store is null");
 		}
 
+		this.conversation = conversation;
 		this.messageStore = messageStore;
 		this.pollingWorker = new MessagePollingWorker(this);
 
@@ -212,7 +220,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	public void sendMessage(ApptentiveMessage apptentiveMessage) {
 		messageStore.addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(apptentiveMessage);
+		conversation.addPayload(apptentiveMessage);
 	}
 
 	/**
@@ -231,7 +239,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			return null;
 		}
 		// TODO: Use the new ApptentiveHttpClient for this.
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(conversation, afterId, null, null);
 
 		List<ApptentiveMessage> ret = new ArrayList<>();
 		if (!response.isSuccessful()) {
@@ -393,6 +401,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	@Override
 	public void destroy() {
 		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
+		pollingWorker.destroy();
 	}
 
 	//endregion
@@ -542,6 +551,14 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		pollingWorker.appWentToBackground();
 	}
 
+	Conversation getConversation() {
+		return conversation;
+	}
+
+	public MessageStore getMessageStore() {
+		return messageStore;
+	}
+
 	//region Message Dispatch Task
 
 	private abstract static class MessageDispatchTask extends DispatchTask {
@@ -579,9 +596,6 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			return this;
 		}
 	}
-	//endregion
 
-	public MessageStore getMessageStore() {
-		return messageStore;
-	}
+	//endregion
 }

@@ -19,6 +19,7 @@ import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -26,12 +27,14 @@ import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -374,8 +377,20 @@ public class Apptentive {
 	 *                     <dd>The GCM Registration ID, which you can <a href="http://docs.aws.amazon.com/sns/latest/dg/mobile-push-gcm.html#registration-id-gcm">access like this</a>.</dd>
 	 *                     </dl>
 	 */
-	public static void setPushNotificationIntegration(int pushProvider, String token) {
+	public static void setPushNotificationIntegration(final int pushProvider, final String token) {
+		// we only access the active conversation on the main thread to avoid concurrency issues
+		if (!DispatchQueue.isMainQueue()) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					setPushNotificationIntegration(pushProvider, token);
+				}
+			});
+			return;
+		}
+
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
 			return;
 		}
 		// Store the push stuff globally
@@ -722,7 +737,7 @@ public class Apptentive {
 	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
 				return false;
 			}
 			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
@@ -742,10 +757,10 @@ public class Apptentive {
 	public static boolean canShowMessageCenter() {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
 				return false;
 			}
-			return ApptentiveInternal.getInstance().canShowMessageCenterInternal();
+			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
 		} catch (Exception e) {
 			ApptentiveLog.w("Error in Apptentive.canShowMessageCenter()", e);
 			MetricModule.sendError(e, null, null);
@@ -767,7 +782,7 @@ public class Apptentive {
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to set unread messages listener: no active conversation.");
 				return;
 			}
 			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
@@ -787,7 +802,7 @@ public class Apptentive {
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to add unread messages listener: no active conversation.");
 				return;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
@@ -808,7 +823,7 @@ public class Apptentive {
 	public static int getUnreadMessageCount() {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "No active Conversation.");
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to get unread message count: no active conversation.");
 				return 0;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
@@ -829,7 +844,7 @@ public class Apptentive {
 	public static void sendAttachmentText(String text) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
@@ -859,7 +874,7 @@ public class Apptentive {
 	public static void sendAttachmentFile(String uri) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			if (TextUtils.isEmpty(uri)) {
@@ -951,7 +966,7 @@ public class Apptentive {
 	public static void sendAttachmentFile(InputStream is, String mimeType) {
 		try {
 			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
 			if (is == null) {
@@ -1005,7 +1020,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, null, (ExtendedData[]) null);
+		return engage(context, event, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1025,7 +1040,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, (ExtendedData[]) null);
+		return engage(context, event, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1049,7 +1064,30 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, extendedData);
+		try {
+			if (StringUtils.isNullOrEmpty(event)) {
+				ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (context == null) {
+				ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (!ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
+				return false;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation == null) {
+				ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
+				return false;
+			}
+
+			return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while engaging '%s' event", event);
+			return false;
+		}
 	}
 
 	/**
@@ -1077,7 +1115,7 @@ public class Apptentive {
 	public static synchronized boolean canShowInteraction(String event) {
 		try {
 			if (ApptentiveInternal.isConversationActive()) {
-				return EngagementModule.canShowInteraction("local", "app", event);
+				return EngagementModule.canShowInteraction(ApptentiveInternal.getInstance().getConversation(), "app", event, "local");
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w("Error in Apptentive.canShowInteraction()", e);

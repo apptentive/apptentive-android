@@ -7,18 +7,20 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 
-import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Destroyable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 
-public class MessagePollingWorker {
+public class MessagePollingWorker implements Destroyable {
 
-	private MessagePollingThread sPollingThread;
+	private MessagePollingThread pollingThread;
 
 	// The following booleans will be accessed by both ui thread and worker thread
 	public AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
@@ -34,11 +36,11 @@ public class MessagePollingWorker {
 	public synchronized MessagePollingThread getAndSetMessagePollingThread(boolean expect,
 																		   boolean create) {
 		if (expect && create) {
-			sPollingThread = createPollingThread();
+			pollingThread = createPollingThread();
 		} else if (!expect) {
-			sPollingThread = null;
+			pollingThread = null;
 		}
-		return sPollingThread;
+		return pollingThread;
 	}
 
 	private MessagePollingThread createPollingThread() {
@@ -56,6 +58,12 @@ public class MessagePollingWorker {
 		return newThread;
 	}
 
+	@Override
+	public void destroy() {
+		if (pollingThread != null) {
+			pollingThread.interrupt();
+		}
+	}
 
 	private class MessagePollingThread extends Thread {
 
@@ -73,31 +81,34 @@ public class MessagePollingWorker {
 			try {
 				ApptentiveLog.v(MESSAGES, "Started %s", toString());
 
-				while (manager.appInForeground.get()) {
+				while (manager.appInForeground.get() && !Thread.currentThread().isInterrupted()) {
 					MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
 					if (thread != null && thread != MessagePollingThread.this) {
 						return;
 					}
 					long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
-					if (Apptentive.canShowMessageCenter()) {
+					if (ApptentiveInternal.getInstance().canShowMessageCenterInternal(getConversation())) {
 						ApptentiveLog.v(MESSAGES, "Checking server for new messages every %d seconds", pollingInterval / 1000);
 						manager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
 					}
-					goToSleep(pollingInterval);
+					if (!goToSleep(pollingInterval)) {
+						break;
+					}
 				}
 			} finally {
 				threadRunning.set(false);
-				sPollingThread = null;
+				pollingThread = null;
 				ApptentiveLog.v(MESSAGES, "Stopping MessagePollingThread.");
 			}
 		}
 	}
 
-	private void goToSleep(long millis) {
+	private boolean goToSleep(long millis) {
 		try {
 			Thread.sleep(millis);
+			return true;
 		} catch (InterruptedException e) {
-			// This is normal and happens whenever we wake the thread with an interrupt.
+			return false;
 		}
 	}
 
@@ -144,5 +155,9 @@ public class MessagePollingWorker {
 			// with fetching with shorter interval
 			wakeUp();
 		}
+	}
+
+	private Conversation getConversation() {
+		return manager.getConversation();
 	}
 }

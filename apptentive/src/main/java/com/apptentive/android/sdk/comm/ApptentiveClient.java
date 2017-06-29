@@ -40,33 +40,12 @@ public class ApptentiveClient {
 	// private static final String ENDPOINT_RECORDS = ENDPOINT_BASE + "/records";
 	// private static final String ENDPOINT_SURVEYS_FETCH = ENDPOINT_BASE + "/surveys";
 
-	public static ApptentiveHttpResponse getAppConfiguration() {
-		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-		if (conversation == null) {
-			throw new IllegalStateException("Conversation is null");
-		}
-
-		final String conversationId = conversation.getConversationId();
-		if (conversationId == null) {
-			throw new IllegalStateException("Conversation id is null");
-		}
-
-		final String conversationToken = conversation.getConversationToken();
-		if (conversationToken == null) {
-			throw new IllegalStateException("Conversation token is null");
-		}
-
-		final String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
-		return performHttpRequest(conversationToken, true, endPoint, Method.GET, null);
-	}
-
 	/**
 	 * Gets all messages since the message specified by GUID was sent.
 	 *
 	 * @return An ApptentiveHttpResponse object with the HTTP response code, reason, and content.
 	 */
-	public static ApptentiveHttpResponse getMessages(Integer count, String afterId, String beforeId) {
-		final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+	public static ApptentiveHttpResponse getMessages(Conversation conversation, String afterId, String beforeId, Integer count) {
 		if (conversation == null) {
 			throw new IllegalStateException("Conversation is null");
 		}
@@ -85,12 +64,16 @@ public class ApptentiveClient {
 		return performHttpRequest(conversationToken, true, uri, Method.GET, null);
 	}
 
-	public static ApptentiveHttpResponse getInteractions(String conversationId) {
-		if (conversationId == null) {
-			throw new IllegalArgumentException("Conversation id is null");
+	public static ApptentiveHttpResponse getInteractions(String conversationToken, String conversationId) {
+		if (StringUtils.isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
 		final String endPoint = StringUtils.format(ENDPOINT_INTERACTIONS, conversationId);
-		return performHttpRequest(ApptentiveInternal.getInstance().getConversation().getConversationToken(), true, endPoint, Method.GET, null);
+		return performHttpRequest(conversationToken, true, endPoint, Method.GET, null);
 	}
 
 	/**

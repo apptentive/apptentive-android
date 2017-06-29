@@ -8,15 +8,14 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.os.Looper;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
+import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -94,6 +93,7 @@ public class ConversationManager {
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
+					assertMainThread();
 					if (activeConversation != null && activeConversation.hasActiveState()) {
 						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch interactions...");
 						final Context context = getContext();
@@ -119,10 +119,14 @@ public class ConversationManager {
 		}
 
 		try {
+			assertMainThread();
+
 			// resolving metadata
+			ApptentiveLog.vv(CONVERSATION, "Resolving metadata...");
 			conversationMetadata = resolveMetadata();
 
 			// attempt to load existing conversation
+			ApptentiveLog.vv(CONVERSATION, "Loading active conversation...");
 			activeConversation = loadActiveConversationGuarded();
 
 			if (activeConversation != null) {
@@ -201,6 +205,7 @@ public class ConversationManager {
 				anonymousConversation.setState(LEGACY_PENDING);
 				anonymousConversation.setConversationToken(legacyConversationToken);
 
+				ApptentiveLog.v("Fetching legacy conversation...");
 				fetchLegacyConversation(anonymousConversation)
 					// remove legacy key when request is finished
 					.addListener(new HttpRequest.Adapter<HttpRequest>() {
@@ -422,7 +427,7 @@ public class ConversationManager {
 				"conversation_identifier", conversation.getConversationId());
 
 			ApptentiveNotificationCenter.defaultCenter()
-				.postNotificationSync(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
+				.postNotification(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE,
 					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 			if (conversation.hasActiveState()) {
@@ -558,7 +563,7 @@ public class ConversationManager {
 
 	public void login(final String token, final LoginCallback callback) {
 		// we only deal with an active conversation on the main thread
-		if (Looper.getMainLooper() == Looper.myLooper()) {
+		if (DispatchQueue.isMainQueue()) {
 			requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
 		} else {
 			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
@@ -587,6 +592,8 @@ public class ConversationManager {
 			return;
 		}
 
+		assertMainThread();
+
 		// Check if there is an active conversation
 		if (activeConversation == null) {
 			ApptentiveLog.d(CONVERSATION, "No active conversation. Performing login...");
@@ -600,7 +607,7 @@ public class ConversationManager {
 			});
 
 			if (conversationItem == null) {
-				ApptentiveLog.e("No conversation found matching user: '%s'. Logging in as new user.", userId);
+				ApptentiveLog.w("No conversation found matching user: '%s'. Logging in as new user.", userId);
 				sendLoginRequest(null, userId, token, callback);
 				return;
 			}
@@ -626,6 +633,7 @@ public class ConversationManager {
 					fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
 						@Override
 						public void onFinish(HttpRequest request) {
+							assertMainThread();
 							assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
 
 							if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
@@ -700,6 +708,7 @@ public class ConversationManager {
 					protected void execute() {
 						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+						assertMainThread();
 
 						try {
 							// if we were previously logged out we might end up with no active conversation
@@ -753,7 +762,7 @@ public class ConversationManager {
 
 	public void logout() {
 		// we only deal with an active conversation on the main thread
-		if (Looper.myLooper() != Looper.getMainLooper()) {
+		if (!DispatchQueue.isMainQueue()) {
 			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 				@Override
 				protected void execute() {
@@ -766,13 +775,14 @@ public class ConversationManager {
 	}
 
 	private void doLogout() {
+		assertMainThread();
 		if (activeConversation != null) {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
 					ApptentiveLog.d("Ending active conversation.");
-					EngagementModule.engageInternal(getContext(), "logout");
+					EngagementModule.engageInternal(getContext(), activeConversation, "logout");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
-					ApptentiveNotificationCenter.defaultCenter().postNotificationSync(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
+					ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
 					activeConversation.destroy();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
@@ -793,6 +803,7 @@ public class ConversationManager {
 	//region Getters/Setters
 
 	public Conversation getActiveConversation() {
+		assertMainThread();
 		return activeConversation;
 	}
 

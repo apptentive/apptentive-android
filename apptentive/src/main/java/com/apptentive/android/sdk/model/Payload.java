@@ -30,6 +30,8 @@ public abstract class Payload {
 	 */
 	protected String token;
 
+	private String localConversationIdentifier;
+
 	private List<Object> attachments; // TODO: Figure out attachment handling
 
 	protected Payload(PayloadType type) {
@@ -108,6 +110,14 @@ public abstract class Payload {
 
 	public void setAttachments(List<Object> attachments) {
 		this.attachments = attachments;
+	}
+
+	public String getLocalConversationIdentifier() {
+		return localConversationIdentifier;
+	}
+
+	public void setLocalConversationIdentifier(String localConversationIdentifier) {
+		this.localConversationIdentifier = localConversationIdentifier;
 	}
 
 	//endregion

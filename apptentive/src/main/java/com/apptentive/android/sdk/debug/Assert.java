@@ -1,9 +1,8 @@
 package com.apptentive.android.sdk.debug;
 
-import android.os.Looper;
-
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
 
 /**
  * A set of assertion methods useful for writing 'runtime' tests. These methods can be used directly:
@@ -162,7 +161,7 @@ public class Assert {
 	 * Asserts that code executes on the main thread.
 	 */
 	public static void assertMainThread() {
-		if (imp != null && Looper.myLooper() != Looper.getMainLooper()) {
+		if (imp != null && !DispatchQueue.isMainQueue()) {
 			imp.assertFailed(StringUtils.format("Expected 'main' thread but was '%s'", Thread.currentThread().getName()));
 		}
 	}
@@ -171,7 +170,7 @@ public class Assert {
 	 * Asserts that code executes on the main thread.
 	 */
 	public static void assertBackgroundThread() {
-		if (imp != null && Looper.myLooper() == Looper.getMainLooper()) {
+		if (imp != null && DispatchQueue.isMainQueue()) {
 			imp.assertFailed("Expected background thread but was 'main'");
 		}
 	}

@@ -25,9 +25,7 @@ import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
@@ -77,7 +75,9 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CO
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 
 /**
@@ -409,11 +409,15 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppLaunch(final Context appContext) {
-		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
+		if (isConversationActive()) {
+			engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
+		}
 	}
 
 	public void onAppExit(final Context appContext) {
-		EngagementModule.engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+		if (isConversationActive()) {
+			engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+		}
 	}
 
 	public void onActivityStarted(Activity activity) {
@@ -551,7 +555,10 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
 
-			checkSendVersionChanges();
+			Conversation conversation = getConversation();
+			if (conversation != null) {
+				checkSendVersionChanges(conversation);
+			}
 
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 
@@ -621,8 +628,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return bRet;
 	}
 
-	private void checkSendVersionChanges() {
-		final Conversation conversation = getConversation();
+	private void checkSendVersionChanges(Conversation conversation) {
 		if (conversation == null) {
 			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
 			return;
@@ -671,7 +677,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 
 		if (appReleaseChanged || sdkChanged) {
-			taskManager.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
+			conversation.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
 			invalidateCaches();
 		}
 	}
@@ -687,30 +693,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();
-	}
-
-	/**
-	 * Fetches the global app configuration from the server and stores the keys into our SharedPreferences.
-	 */
-	private void fetchAppConfiguration() { // FIXME: remove unused method
-		ApptentiveLog.i("Fetching new Configuration task started.");
-		ApptentiveHttpResponse response = ApptentiveClient.getAppConfiguration();
-		try {
-			Map<String, String> headers = response.getHeaders();
-			if (headers != null) {
-				String cacheControl = headers.get("Cache-Control");
-				Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-				if (cacheSeconds == null) {
-					cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-				}
-				ApptentiveLog.d("Caching configuration for %d seconds.", cacheSeconds);
-				Configuration config = new Configuration(response.getContent());
-				config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-				config.save();
-			}
-		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing app configuration from server.", e);
-		}
 	}
 
 	public IRatingProvider getRatingProvider() {
@@ -886,7 +868,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 					// do we have a conversation right now?
 					if (conversation == null) {
-						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: no active conversation");
+						ApptentiveLog.w("Can't generate pending intent from Apptentive push data: no active conversation");
 						return null;
 					}
 
@@ -945,7 +927,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 				}
 			}
 			this.customData = customData;
-			interactionShown = EngagementModule.engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+			interactionShown = engageInternal(context, MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
 			if (!interactionShown) {
 				this.customData = null;
 			}
@@ -959,8 +941,14 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		EngagementModule.launchMessageCenterErrorActivity(context);
 	}
 
+	// FIXME: remove this method
 	public boolean canShowMessageCenterInternal() {
-		return EngagementModule.canShowInteraction("com.apptentive", "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME);
+		Conversation conversation = getConversation();
+		return conversation != null && canShowMessageCenterInternal(conversation);
+	}
+
+	public boolean canShowMessageCenterInternal(Conversation conversation) {
+		return EngagementModule.canShowInteraction(conversation, "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME, "com.apptentive");
 	}
 
 	public Map<String, Object> getAndClearCustomData() {
@@ -1032,7 +1020,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		LoginCallback wrapperCallback = new LoginCallback() {
 			@Override
 			public void onLoginFinish() {
-				EngagementModule.engageInternal(getApplicationContext(), "login");
+				engageInternal(getApplicationContext(), "login");
 				if (callback != null) {
 					callback.onLoginFinish();
 				}
@@ -1065,11 +1053,22 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
-			getApptentiveTaskManager().addPayload(new LogoutPayload());
+			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
+			conversation.addPayload(new LogoutPayload());
 		} else if (notification.hasName(NOTIFICATION_AUTHENTICATION_FAILED)) {
 			String conversationIdOfFailedRequest = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION_ID, String.class);
 			Apptentive.AuthenticationFailedReason authenticationFailedReason = notification.getUserInfo(NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON, Apptentive.AuthenticationFailedReason.class);
 			notifyAuthenticationFailedListener(authenticationFailedReason, conversationIdOfFailedRequest);
 		}
 	}
+
+	//region Engagement
+
+	private boolean engageInternal(Context context, String eventName) {
+		Conversation conversation = getConversation();
+		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation", eventName);
+		return conversation != null && EngagementModule.engageInternal(context, conversation, eventName);
+	}
+
+	//endregion
 }

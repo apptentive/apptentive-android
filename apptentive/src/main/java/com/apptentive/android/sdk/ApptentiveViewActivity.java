@@ -41,6 +41,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.debug.Assert.notNull;
 
 
 public class ApptentiveViewActivity extends ApptentiveBaseActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
@@ -60,6 +61,12 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Conversation conversation = notNull(ApptentiveInternal.getInstance().getConversation());
+		if (conversation == null) {
+			finish();
+			return;
+		}
 
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
 		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
@@ -99,7 +106,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
 						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
 						if (eventName != null) {
-							EngagementModule.engageInternal(this, eventName);
+							EngagementModule.engageInternal(this, conversation, eventName);
 						}
 					}
 					finish();
@@ -146,6 +153,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		//current_tab = extra.getInt(SELECTED_TAB_EXTRA_KEY, 0);
 		current_tab = 0;
 
+		newFragment.setConversation(conversation);
 		addFragmentToAdapter(newFragment, newFragment.getTitle());
 
 		// Get the ViewPager and set it's PagerAdapter so that it can display items

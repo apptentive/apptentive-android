@@ -66,6 +66,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
 		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
 		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(8, "encrypted");
+		static final DatabaseColumn COLUMN_LOCAL_CONVERSATION_ID = new DatabaseColumn(9, "localConversationId");
 	}
 
 	private static final class LegacyPayloadEntry {
@@ -89,7 +90,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_CONVERSATION_ID + " TEXT," +
 			PayloadEntry.COLUMN_REQUEST_METHOD + " TEXT," +
 			PayloadEntry.COLUMN_PATH + " TEXT," +
-			PayloadEntry.COLUMN_ENCRYPTED + " INTEGER" +
+			PayloadEntry.COLUMN_ENCRYPTED + " INTEGER," +
+			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " TEXT" +
 			");";
 
 	private static final String SQL_QUERY_PAYLOAD_LIST_LEGACY =
@@ -105,6 +107,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " = ? " +
+			"WHERE " +
+			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " = ? AND " +
+			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
+			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
+
+	private static final String SQL_QUERY_REMOVE_INCOMPLETE_PAYLOADS =
+		"DELETE FROM " + PayloadEntry.TABLE_NAME + " " +
 			"WHERE " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL OR " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
@@ -460,35 +469,34 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	void addPayload(Payload... payloads) {
+	void addPayload(Payload payload) {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
 			db.beginTransaction();
 
-			for (Payload payload : payloads) {
-				ContentValues values = new ContentValues();
-				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
-				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
-				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
-				// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
-				if (!payload.hasEncryptionKey()) {
-					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
-				}
-				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
-				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
-				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
-					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
-				);
-
-				File dest = getPayloadBodyFile(payload.getNonce());
-				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
-				Util.writeBytes(dest, payload.renderData());
-
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
-
-				db.insert(PayloadEntry.TABLE_NAME, null, values);
+			ContentValues values = new ContentValues();
+			values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
+			values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
+			values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
+			// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
+			if (!payload.hasEncryptionKey()) {
+				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
 			}
+			values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
+			values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
+			values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
+				StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
+			);
+
+			File dest = getPayloadBodyFile(payload.getNonce());
+			ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
+			Util.writeBytes(dest, payload.renderData());
+
+			values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
+			values.put(PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID.name, notNull(payload.getLocalConversationIdentifier()));
+
+			db.insert(PayloadEntry.TABLE_NAME, null, values);
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
 			ApptentiveLog.e(DATABASE, e, "Error adding payload.");
@@ -582,7 +590,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		return path.replace("${conversationId}", conversationId);
 	}
 
-	void updateIncompletePayloads(String conversationId, String authToken) {
+	void updateIncompletePayloads(String conversationId, String authToken, String localConversationId) {
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
@@ -592,13 +600,30 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[]{
-				authToken, conversationId
+			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] {
+				authToken, conversationId, localConversationId
 			});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
 		} catch (SQLException e) {
 			ApptentiveLog.e(e, "Exception while updating missing conversation ids");
+		} finally {
+			ensureClosed(cursor);
+		}
+
+		// remove incomplete payloads which don't belong to an active conversation
+		removeCorruptedPayloads();
+	}
+
+	private void removeCorruptedPayloads() {
+		Cursor cursor = null;
+		try {
+			SQLiteDatabase db = getWritableDatabase();
+			cursor = db.rawQuery(SQL_QUERY_REMOVE_INCOMPLETE_PAYLOADS, null);
+			cursor.moveToFirst(); // we need to move a cursor in order to update database
+			ApptentiveLog.v(DATABASE, "Removed incomplete payloads");
+		} catch (SQLException e) {
+			ApptentiveLog.e(e, "Exception while removing incomplete payloads");
 		} finally {
 			ensureClosed(cursor);
 		}
