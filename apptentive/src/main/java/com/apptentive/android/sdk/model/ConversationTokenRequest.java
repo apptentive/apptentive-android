@@ -12,40 +12,38 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class ConversationTokenRequest extends JSONObject {
-
-
 	public ConversationTokenRequest() {
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(DevicePayload device) {
 		try {
-			put(Device.KEY, device);
+			put(DevicePayload.KEY, device == null ? null : device.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Device.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
 		}
 	}
 
-	public void setSdk(Sdk sdk) {
+	public void setSdk(SdkPayload sdk) {
 		try {
-			put(Sdk.KEY, sdk);
+			put(SdkPayload.KEY, sdk == null ? null : sdk.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
 		}
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(PersonPayload person) {
 		try {
-			put(Person.KEY, person);
+			put(PersonPayload.KEY, person == null ? null : person.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Person.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
 		}
 	}
 
-	public void setAppRelease(AppRelease appRelease) {
+	public void setAppRelease(AppReleasePayload appRelease) {
 		try {
-			put(appRelease.getBaseType().name(), appRelease);
+			put(AppReleasePayload.KEY, appRelease == null ? null : appRelease.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getBaseType().name());
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", AppReleasePayload.KEY);
 		}
 	}
 }

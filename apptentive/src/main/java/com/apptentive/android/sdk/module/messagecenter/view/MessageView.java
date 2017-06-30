@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.messagecenter.view;
 import android.content.Context;
 import android.widget.LinearLayout;
 
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
 
 /**
  * @author Sky Kelsey

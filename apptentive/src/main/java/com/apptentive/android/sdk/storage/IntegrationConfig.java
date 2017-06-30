@@ -23,10 +23,11 @@ public class IntegrationConfig implements Saveable {
 	private IntegrationConfigItem urbanAirship;
 	private IntegrationConfigItem parse;
 
-	private DataChangedListener listener;
+	private transient DataChangedListener listener;
 
 
 	//region Listeners
+
 	@Override
 	public void setDataChangedListener(DataChangedListener listener) {
 		this.listener = listener;
@@ -38,6 +39,7 @@ public class IntegrationConfig implements Saveable {
 			listener.onDataChanged();
 		}
 	}
+
 	//endregion
 
 	//region Getters & Setters

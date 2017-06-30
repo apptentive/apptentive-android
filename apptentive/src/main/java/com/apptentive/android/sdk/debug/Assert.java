@@ -1,27 +1,8 @@
-//
-//  Assert.java
-//
-//  Lunar Unity Mobile Console
-//  https://github.com/SpaceMadness/lunar-unity-console
-//
-//  Copyright 2017 Alex Lementuev, SpaceMadness.
-//
-//  Licensed under the Apache License, Version 2.0 (the "License");
-//  you may not use this file except in compliance with the License.
-//  You may obtain a copy of the License at
-//
-//      http://www.apache.org/licenses/LICENSE-2.0
-//
-//  Unless required by applicable law or agreed to in writing, software
-//  distributed under the License is distributed on an "AS IS" BASIS,
-//  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//  See the License for the specific language governing permissions and
-//  limitations under the License.
-//
-
 package com.apptentive.android.sdk.debug;
 
-import java.util.Collection;
+import com.apptentive.android.sdk.util.ObjectUtils;
+import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
 
 /**
  * A set of assertion methods useful for writing 'runtime' tests. These methods can be used directly:
@@ -34,152 +15,182 @@ import java.util.Collection;
  */
 public class Assert {
 
+	private static AssertImp imp;
+
+	//region Booleans
+
 	/**
 	 * Asserts that condition is <code>true</code>
 	 */
 	public static void assertTrue(boolean condition) {
-		// FIXME: implement me
+		if (imp != null && !condition) {
+			imp.assertFailed("Expected 'true' but was 'false'");
+		}
 	}
 
 	/**
 	 * Asserts that condition is <code>true</code>
 	 */
 	public static void assertTrue(boolean condition, String message) {
-		// FIXME: implement me
+		if (imp != null && !condition) {
+			imp.assertFailed(message);
+		}
 	}
 
 	/**
 	 * Asserts that condition is <code>true</code>
 	 */
 	public static void assertTrue(boolean condition, String format, Object... args) {
-		// FIXME: implement me
+		if (imp != null && !condition) {
+			imp.assertFailed(StringUtils.format(format, args));
+		}
 	}
 
 	/**
 	 * Asserts that condition is <code>false</code>
 	 */
 	public static void assertFalse(boolean condition) {
-		// FIXME: implement me
+		if (imp != null && condition) {
+			imp.assertFailed("Expected 'false' but was 'true'");
+		}
 	}
 
 	/**
 	 * Asserts that condition is <code>false</code>
 	 */
 	public static void assertFalse(boolean condition, String message) {
-		// FIXME: implement me
+		if (imp != null && condition) {
+			imp.assertFailed(message);
+		}
 	}
 
 	/**
 	 * Asserts that condition is <code>false</code>
 	 */
 	public static void assertFalse(boolean condition, String format, Object... args) {
-		// FIXME: implement me
+		if (imp != null && condition) {
+			imp.assertFailed(StringUtils.format(format, args));
+		}
+	}
+
+	//endregion
+
+	//region Nullability
+
+	/** Helper function for getting non-null references */
+	public static <T> T notNull(T reference) {
+		assertNotNull(reference);
+		return reference;
 	}
 
 	/**
-	 * Asserts that an object is null
-	 */
-	public static void assertNull(Object object) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that an object is null
-	 */
-	public static void assertNull(Object object, String message) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that an object is null
-	 */
-	public static void assertNull(Object object, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that an object isn't null
+	 * Asserts that an object isn't <code>null</code>
 	 */
 	public static void assertNotNull(Object object) {
-		// FIXME: implement me
+		if (imp != null && object == null) {
+			imp.assertFailed("Not-null expected");
+		}
 	}
 
 	/**
-	 * Asserts that an object isn't null
+	 * Asserts that an object isn't <code>null</code>
 	 */
 	public static void assertNotNull(Object object, String message) {
-		// FIXME: implement me
+		if (imp != null && object == null) {
+			imp.assertFailed(message);
+		}
 	}
 
 	/**
-	 * Asserts that an object isn't null
+	 * Asserts that an object isn't <code>null</code>
 	 */
 	public static void assertNotNull(Object object, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual, String message) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that <code>executed</code> is not equal to <code>actual</code> */
-	public static void assertNotEquals(int expected, int actual, String format, Object... args) {
-		// FIXME: implement me
+		if (imp != null && object == null) {
+			imp.assertFailed(String.format(format, args));
+		}
 	}
 
 	/**
-	 * Asserts that collection isRegistered an object
+	 * Asserts that an object is <code>null</code>
 	 */
-	public static void assertContains(Collection<?> collection, Object object) {
-		// FIXME: implement me
+	public static void assertNull(Object object) {
+		if (imp != null && object != null) {
+			imp.assertFailed(StringUtils.format("Expected 'null' but was '%s'", object));
+		}
 	}
 
 	/**
-	 * Asserts that collection isRegistered an object
+	 * Asserts that an object is <code>null</code>
 	 */
-	public static void assertContains(Collection<?> collection, Object object, String message) {
-		// FIXME: implement me
+	public static void assertNull(Object object, String message) {
+		if (imp != null && object != null) {
+			imp.assertFailed(message);
+		}
 	}
 
 	/**
-	 * Asserts that collection isRegistered an object
+	 * Asserts that an object is <code>null</code>
 	 */
-	public static void assertContains(Collection<?> collection, Object object, String format, Object... args) {
-		// FIXME: implement me
+	public static void assertNull(Object object, String format, Object... args) {
+		if (imp != null && object != null) {
+			imp.assertFailed(String.format(format, args));
+		}
 	}
+
+	//endregion
+
+	//region Equality
+
+	public static void assertEquals(Object expected, Object actual) {
+		if (imp != null && !ObjectUtils.equal(expected, actual)) {
+			imp.assertFailed(StringUtils.format("Expected '%s' but was '%s'", expected, actual));
+		}
+	}
+
+	public static void assertNotEquals(Object first, Object second) {
+		if (imp != null && ObjectUtils.equal(first, second)) {
+			imp.assertFailed(StringUtils.format("Expected '%s' and '%s' to differ, but they are the same.", first, second));
+		}
+	}
+
+	//endregion
+
+	//region Threading
 
 	/**
-	 * Asserts that collection doesn't contain an object
+	 * Asserts that code executes on the main thread.
 	 */
-	public static void assertNotContains(Collection<?> collection, Object object) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection doesn't contain an object
-	 */
-	public static void assertNotContains(Collection<?> collection, Object object, String message) {
-		// FIXME: implement me
-	}
-
-	/**
-	 * Asserts that collection doesn't contain an object
-	 */
-	public static void assertNotContains(Collection<?> collection, Object object, String format, Object... args) {
-		// FIXME: implement me
-	}
-
-	/** Asserts that code is executed on the main thread */
 	public static void assertMainThread() {
+		if (imp != null && !DispatchQueue.isMainQueue()) {
+			imp.assertFailed(StringUtils.format("Expected 'main' thread but was '%s'", Thread.currentThread().getName()));
+		}
 	}
 
-	/** Asserts that code is not executed on the main thread */
-	public static void assertNotMainThread() {
+	/**
+	 * Asserts that code executes on the main thread.
+	 */
+	public static void assertBackgroundThread() {
+		if (imp != null && DispatchQueue.isMainQueue()) {
+			imp.assertFailed("Expected background thread but was 'main'");
+		}
+	}
+
+	//endregion
+
+	//region Failure
+
+	/**
+	 * General failure with a message
+	 */
+	public static void assertFail(String message) {
+		if (imp != null) {
+			imp.assertFailed(message);
+		}
+	}
+
+	//endregion
+
+	public static void setImp(AssertImp imp) {
+		Assert.imp = imp;
 	}
 }

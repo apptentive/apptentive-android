@@ -6,14 +6,16 @@
 
 package com.apptentive.android.sdk.storage;
 
+import com.apptentive.android.sdk.model.PersonPayload;
+
 public class PersonManager {
 
-	public static com.apptentive.android.sdk.model.Person getDiffPayload(com.apptentive.android.sdk.storage.Person oldPerson, com.apptentive.android.sdk.storage.Person newPerson) {
+	public static PersonPayload getDiffPayload(com.apptentive.android.sdk.storage.Person oldPerson, com.apptentive.android.sdk.storage.Person newPerson) {
 		if (newPerson == null) {
 			return null;
 		}
 
-		com.apptentive.android.sdk.model.Person ret = new com.apptentive.android.sdk.model.Person();
+		PersonPayload ret = new PersonPayload();
 
 		if (oldPerson == null || !oldPerson.getId().equals(newPerson.getId())) {
 			ret.setId(newPerson.getId());

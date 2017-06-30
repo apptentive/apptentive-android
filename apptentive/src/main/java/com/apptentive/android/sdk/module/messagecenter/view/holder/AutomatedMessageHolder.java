@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 
 public class AutomatedMessageHolder extends RecyclerView.ViewHolder {
 	public TextView body;

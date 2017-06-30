@@ -56,7 +56,7 @@ class ConcurrentDispatchQueue extends DispatchQueue implements ThreadFactory {
 
 	@Override
 	public Thread newThread(Runnable r) {
-		return new Thread(r, name + "-thread-" + threadNumber.getAndIncrement());
+		return new Thread(r, name + " (thread-" + threadNumber.getAndIncrement() + ")");
 	}
 
 	//endregion

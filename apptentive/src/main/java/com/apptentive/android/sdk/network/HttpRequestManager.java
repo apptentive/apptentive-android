@@ -1,5 +1,6 @@
 package com.apptentive.android.sdk.network;
 
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchQueueType;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -7,7 +8,7 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.apptentive.android.sdk.debug.Assert.assertTrue;
+import static com.apptentive.android.sdk.debug.Assert.*;
 
 /**
  * Class for asynchronous HTTP requests handling.
@@ -35,7 +36,7 @@ public class HttpRequestManager {
 	/**
 	 * Creates a request manager with custom network dispatch queue
 	 *
-	 * @param networkQueue  - dispatch queue for blocking network operations
+	 * @param networkQueue - dispatch queue for blocking network operations
 	 * @throws IllegalArgumentException if queue is null
 	 */
 	public HttpRequestManager(DispatchQueue networkQueue) {
@@ -57,21 +58,22 @@ public class HttpRequestManager {
 		}
 
 		registerRequest(request);
-
-		networkQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				try {
-					request.dispatchSync();
-				} finally {
-					unregisterRequest(request);
-				}
-			}
-		});
-
+		dispatchRequest(request);
 		notifyRequestStarted(request);
 
 		return request;
+	}
+
+	/**
+	 * Handles request synchronously
+	 */
+	void dispatchRequest(final HttpRequest request) {
+		networkQueue.dispatchAsync(new DispatchTask() {
+			@Override
+			protected void execute() {
+				request.dispatchSync(networkQueue);
+			}
+		});
 	}
 
 	/**
@@ -91,6 +93,8 @@ public class HttpRequestManager {
 	 * Register active request
 	 */
 	synchronized void registerRequest(HttpRequest request) {
+		assertNull(request.requestManager);
+		request.requestManager = this;
 		activeRequests.add(request);
 	}
 
@@ -102,8 +106,21 @@ public class HttpRequestManager {
 		assertTrue(removed, "Attempted to unregister missing request: %s", request);
 
 		if (removed) {
+			request.requestManager = null;
 			notifyRequestFinished(request);
 		}
+	}
+
+	/**
+	 * Returns a request with a specified tag or <code>null</code> is not found
+	 */
+	public synchronized HttpRequest findRequest(String tag) {
+		for (HttpRequest request : activeRequests) {
+			if (StringUtils.equal(request.getTag(), tag)) {
+				return request;
+			}
+		}
+		return null;
 	}
 
 	//endregion
@@ -111,21 +128,21 @@ public class HttpRequestManager {
 	//region Listener callbacks
 
 	private void notifyRequestStarted(final HttpRequest request) {
-			if (listener != null) {
-				listener.onRequestStart(HttpRequestManager.this, request);
-			}
+		if (listener != null) {
+			listener.onRequestStart(HttpRequestManager.this, request);
+		}
 	}
 
 	private void notifyRequestFinished(final HttpRequest request) {
-			if (listener != null) {
-				listener.onRequestFinish(HttpRequestManager.this, request);
-			}
+		if (listener != null) {
+			listener.onRequestFinish(HttpRequestManager.this, request);
+		}
 	}
 
 	private void notifyCancelledAllRequests() {
-			if (listener != null) {
-				listener.onRequestsCancel(HttpRequestManager.this);
-			}
+		if (listener != null) {
+			listener.onRequestsCancel(HttpRequestManager.this);
+		}
 	}
 
 	//endregion

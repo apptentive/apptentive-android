@@ -159,6 +159,13 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Safely checks if two strings are equal (any argument can be null)
+	 */
+	public static boolean equal(String str1, String str2) {
+		return str1 != null && str2 != null && str1.equals(str2);
+	}
+
+	/**
 	 * Creates a simple json string from key and value
 	 */
 	public static String asJson(String key, Object value) {
@@ -170,5 +177,17 @@ public final class StringUtils {
 			ApptentiveLog.e(e, "Exception while creating json-string { %s:%s }", key, value);
 			return null;
 		}
+	}
+
+	/**
+	 * Converts a hex String to a byte array.
+	 */
+	public static byte[] hexToBytes(String hex) {
+		int length = hex.length();
+		byte[] ret = new byte[length / 2];
+		for (int i = 0; i < length; i += 2) {
+			ret[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
+		}
+		return ret;
 	}
 }

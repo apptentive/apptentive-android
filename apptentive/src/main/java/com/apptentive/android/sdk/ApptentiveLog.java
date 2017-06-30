@@ -20,7 +20,7 @@ public class ApptentiveLog {
 		ApptentiveLog.logLevel = level;
 	}
 
-	private static void doLog(Level level, Throwable throwable, String message, Object... args){
+	private static void doLog(Level level, ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
 		if(canLog(level) && message != null){
 			if(args.length > 0){
 				try{
@@ -30,17 +30,34 @@ public class ApptentiveLog {
 					level = Level.ERROR;
 				}
 			}
+
+			String extra = null;
+
 			// add thread name if logging of the UI-thread
 			if (Looper.getMainLooper() != null && Looper.getMainLooper().getThread() != Thread.currentThread()) {
-				message = String.format("[%s] %s", Thread.currentThread().getName(), message);
+				extra = '[' + Thread.currentThread().getName() + ']';
 			}
-			android.util.Log.println(level.getLevel(), TAG, message);
+
+			// custom tag
+			if (tag != null) {
+				if (extra == null) {
+					extra = '[' + tag.toString() + ']';
+				} else {
+					extra += " [" + tag.toString() + ']';
+				}
+			}
+
+			if (extra != null) {
+				message = extra + " " + message;
+			}
+
+			android.util.Log.println(level.getAndroidLevel(), TAG, message);
 			if(throwable != null){
 				if(throwable.getMessage() != null){
-					android.util.Log.println(level.getLevel(), TAG, throwable.getMessage());
+					android.util.Log.println(level.getAndroidLevel(), TAG, throwable.getMessage());
 				}
 				while(throwable != null) {
-					android.util.Log.println(level.getLevel(), TAG, android.util.Log.getStackTraceString(throwable));
+					android.util.Log.println(level.getAndroidLevel(), TAG, android.util.Log.getStackTraceString(throwable));
 					throwable = throwable.getCause();
 				}
 			}
@@ -51,86 +68,170 @@ public class ApptentiveLog {
 		return logLevel.canLog(level);
 	}
 
-	public static void v(ApptentiveLogTag tag, String message, Object... args) {
+	public static void vv(ApptentiveLogTag tag, String message, Object... args) {
 		if (tag.enabled) {
-			doLog(Level.VERBOSE, null, message, args);
+			doLog(Level.VERY_VERBOSE, tag, null, message, args);
 		}
 	}
-
-	public static void v(String message, Object... args){
-		doLog(Level.VERBOSE, null, message, args);
+	public static void vv(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.VERY_VERBOSE, tag, throwable, message, args);
+		}
 	}
-	public static void v(String message, Throwable throwable, Object... args){
-		doLog(Level.VERBOSE, throwable, message, args);
+	public static void vv(String message, Object... args){
+		doLog(Level.VERY_VERBOSE, null, null, message, args);
+	}
+	public static void vv(Throwable throwable, String message, Object... args){
+		doLog(Level.VERY_VERBOSE, null, throwable, message, args);
+	}
+
+	public static void v(ApptentiveLogTag tag, String message, Object... args) {
+		if (tag.enabled) {
+			doLog(Level.VERBOSE, tag, null, message, args);
+		}
+	}
+	public static void v(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.VERBOSE, tag, throwable, message, args);
+		}
+	}
+	public static void v(String message, Object... args){
+		doLog(Level.VERBOSE, null, null, message, args);
+	}
+	public static void v(Throwable throwable, String message, Object... args){
+		doLog(Level.VERBOSE, null, throwable, message, args);
 	}
 
 	public static void d(ApptentiveLogTag tag, String message, Object... args){
 		if (tag.enabled) {
-			doLog(Level.DEBUG, null, message, args);
+			doLog(Level.DEBUG, tag, null, message, args);
 		}
 	}
-
-	public static void d(String message, Object... args){
-		doLog(Level.DEBUG, null, message, args);
+	public static void d(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.DEBUG, tag, throwable, message, args);
+		}
 	}
-	public static void d(String message, Throwable throwable, Object... args){
-		doLog(Level.DEBUG, throwable, message, args);
+	public static void d(String message, Object... args){
+		doLog(Level.DEBUG, null, null, message, args);
+	}
+	public static void d(Throwable throwable, String message, Object... args){
+		doLog(Level.DEBUG, null, throwable, message, args);
 	}
 
 	public static void i(ApptentiveLogTag tag, String message, Object... args){
 		if (tag.enabled) {
-			doLog(Level.INFO, null, message, args);
+			doLog(Level.INFO, tag, null, message, args);
+		}
+	}
+	public static void i(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.INFO, tag, throwable, message, args);
 		}
 	}
 	public static void i(String message, Object... args){
-		doLog(Level.INFO, null, message, args);
+		doLog(Level.INFO, null, null, message, args);
 	}
-	public static void i(String message, Throwable throwable, Object... args){
-		doLog(Level.INFO, throwable, message, args);
+	public static void i(Throwable throwable, String message, Object... args){
+		doLog(Level.INFO, null, throwable, message, args);
 	}
 
 	public static void w(ApptentiveLogTag tag, String message, Object... args){
 		if (tag.enabled) {
-			doLog(Level.WARN, null, message, args);
+			doLog(Level.WARN, tag, null, message, args);
+		}
+	}
+	public static void w(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.WARN, tag, throwable, message, args);
 		}
 	}
 	public static void w(String message, Object... args){
-		doLog(Level.WARN, null, message, args);
+		doLog(Level.WARN, null, null, message, args);
 	}
-	public static void w(String message, Throwable throwable, Object... args){
-		doLog(Level.WARN, throwable, message, args);
+	public static void w(Throwable throwable, String message, Object... args){
+		doLog(Level.WARN, null, throwable, message, args);
 	}
 
-	public static void e(String message, Object... args){
-		doLog(Level.ERROR, null, message, args);
+	public static void e(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.ERROR, tag, null, message, args);
+		}
 	}
-	public static void e(String message, Throwable throwable, Object... args){
-		doLog(Level.ERROR, throwable, message, args);
+	public static void e(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.ERROR, tag, throwable, message, args);
+		}
+	}
+	public static void e(String message, Object... args){
+		doLog(Level.ERROR, null, null, message, args);
 	}
 	public static void e(Throwable throwable, String message, Object... args){
-		doLog(Level.ERROR, throwable, message, args);
+		doLog(Level.ERROR, null, throwable, message, args);
 	}
 
+	public static void a(ApptentiveLogTag tag, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.ASSERT, tag, null, message, args);
+		}
+	}
+	public static void a(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
+		if (tag.enabled) {
+			doLog(Level.ASSERT, tag, throwable, message, args);
+		}
+	}
 	public static void a(String message, Object... args){
-		doLog(Level.ASSERT, null, message, args);
+		doLog(Level.ASSERT, null, null, message, args);
+	}
+	public static void a(Throwable throwable, String message, Object... args){
+		doLog(Level.ASSERT, null, throwable, message, args);
+	}
+
+	//region TODO: Delete these:
+	public static void vv(String message, Throwable throwable, Object... args){
+		doLog(Level.VERY_VERBOSE, null, throwable, message, args);
+	}
+
+	public static void v(String message, Throwable throwable, Object... args){
+		doLog(Level.VERBOSE, null, throwable, message, args);
+	}
+	public static void d(String message, Throwable throwable, Object... args){
+		doLog(Level.DEBUG, null, throwable, message, args);
+	}
+	public static void i(String message, Throwable throwable, Object... args){
+		doLog(Level.INFO, null, throwable, message, args);
+	}
+	public static void w(String message, Throwable throwable, Object... args){
+		doLog(Level.WARN, null, throwable, message, args);
+	}
+	public static void e(String message, Throwable throwable, Object... args){
+		doLog(Level.ERROR, null, throwable, message, args);
 	}
 	public static void a(String message, Throwable throwable, Object... args){
-		doLog(Level.ASSERT, throwable, message, args);
+		doLog(Level.ASSERT, null, throwable, message, args);
 	}
+	//endregion
 
 	public enum Level {
-		VERBOSE(Log.VERBOSE),
-		DEBUG(Log.DEBUG),
-		INFO(Log.INFO),
-		WARN(Log.WARN),
-		ERROR(Log.ERROR),
-		ASSERT(Log.ASSERT),
-		DEFAULT(Log.INFO);
+		VERY_VERBOSE(1, Log.VERBOSE),
+		VERBOSE(Log.VERBOSE, Log.VERBOSE),
+		DEBUG(Log.DEBUG, Log.DEBUG),
+		INFO(Log.INFO, Log.INFO),
+		WARN(Log.WARN, Log.WARN),
+		ERROR(Log.ERROR, Log.ERROR),
+		ASSERT(Log.ASSERT, Log.ASSERT),
+		DEFAULT(Log.INFO, Log.INFO);
 
 		private int level;
+		private int androidLevel;
 
-		private Level(int level) {
+		private Level(int level, int androidLevel) {
 			this.level = level;
+			this.androidLevel = androidLevel;
+		}
+
+		public int getAndroidLevel() {
+			return androidLevel;
 		}
 
 		public int getLevel() {
@@ -151,7 +252,7 @@ public class ApptentiveLog {
 		 * @return true if "level" can be logged.
 		 */
 		public boolean canLog(Level level) {
-			return level.getLevel() >= getLevel();
+			return level.level >= this.level;
 		}
 	}
 }

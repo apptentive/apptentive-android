@@ -42,6 +42,7 @@ public class VersionHistory implements Saveable {
 			listener.onDataChanged();
 		}
 	}
+
 	//endregion
 
 	public void updateVersionHistory(double timestamp, Integer newVersionCode, String newVersionName) {

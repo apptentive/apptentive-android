@@ -59,8 +59,8 @@ public class AppReleaseManager {
 		return appRelease;
 	}
 
-	public static com.apptentive.android.sdk.model.AppRelease getPayload(AppRelease appRelease) {
-		com.apptentive.android.sdk.model.AppRelease ret = new com.apptentive.android.sdk.model.AppRelease();
+	public static AppReleasePayload getPayload(AppRelease appRelease) {
+		AppReleasePayload ret = new AppReleasePayload();
 		if (appRelease == null) {
 			return ret;
 		}

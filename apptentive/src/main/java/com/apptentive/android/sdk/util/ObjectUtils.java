@@ -21,8 +21,6 @@
 
 package com.apptentive.android.sdk.util;
 
-import static com.apptentive.android.sdk.debug.Assert.*;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,11 +37,6 @@ public final class ObjectUtils {
 		return cls.isInstance(object) ? (T) object : null;
 	}
 
-	public static <T> T notNull(T object, String message) {
-		assertNotNull(object, message);
-		return object;
-	}
-
 	public static Map<String, Object> toMap(Object... args) {
 		if (args.length % 2 != 0) {
 			throw new IllegalArgumentException("Invalid args");
@@ -55,5 +48,9 @@ public final class ObjectUtils {
 		}
 
 		return map;
+	}
+
+	public static boolean equal(Object expected, Object actual) {
+		return expected != null && actual != null && expected.equals(actual);
 	}
 }

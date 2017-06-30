@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,9 +10,10 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-/**
- * @author Sky Kelsey
- */
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 public class CommerceExtendedData extends ExtendedData {
 
 	private static final String KEY_ID = "id";
@@ -25,9 +26,17 @@ public class CommerceExtendedData extends ExtendedData {
 
 	private static final int VERSION = 1;
 
+	private Object id;
+	private String affiliation;
+	private double revenue;
+	private double shipping;
+	private double tax;
+	private String currency;
+	private List<Item> items;
 
 	@Override
 	protected void init() {
+		items = new ArrayList<>();
 		setType(Type.commerce);
 		setVersion(VERSION);
 	}
@@ -36,11 +45,7 @@ public class CommerceExtendedData extends ExtendedData {
 		super();
 	}
 
-	public CommerceExtendedData(String json) throws JSONException {
-		super(json);
-	}
-
-	public CommerceExtendedData(Object id, Object affiliation, Number revenue, Number shipping, Number tax, String currency) throws JSONException {
+	public CommerceExtendedData(Object id, String affiliation, double revenue, double shipping, double tax, String currency) throws JSONException {
 		setId(id);
 		setAffiliation(affiliation);
 		setRevenue(revenue);
@@ -49,33 +54,45 @@ public class CommerceExtendedData extends ExtendedData {
 		setCurrency(currency);
 	}
 
+	public CommerceExtendedData(String json) throws JSONException {
+		super(json);
+		JSONObject jsonObject = new JSONObject(json);
+		setId(jsonObject.opt(KEY_ID));
+		setAffiliation(jsonObject.optString(KEY_AFFILIATION, null));
+		setRevenue(jsonObject.optDouble(KEY_REVENUE, 0));
+		setShipping(jsonObject.optDouble(KEY_SHIPPING, 0));
+		setTax(jsonObject.optDouble(KEY_TAX, 0));
+		setCurrency(jsonObject.optString(KEY_CURRENCY, null));
+		setItems(jsonObject.optJSONArray(KEY_ITEMS));
+	}
+
 	public CommerceExtendedData setId(Object id) throws JSONException {
-		put(KEY_ID, id);
+		this.id = id;
 		return this;
 	}
 
-	public CommerceExtendedData setAffiliation(Object affiliation) throws JSONException {
-		put(KEY_AFFILIATION, affiliation);
+	public CommerceExtendedData setAffiliation(String affiliation) throws JSONException {
+		this.affiliation = affiliation;
 		return this;
 	}
 
-	public CommerceExtendedData setRevenue(Number revenue) throws JSONException {
-		put(KEY_REVENUE, revenue);
+	public CommerceExtendedData setRevenue(double revenue) throws JSONException {
+		this.revenue = revenue;
 		return this;
 	}
 
-	public CommerceExtendedData setShipping(Number shipping) throws JSONException {
-		put(KEY_SHIPPING, shipping);
+	public CommerceExtendedData setShipping(double shipping) throws JSONException {
+		this.shipping = shipping;
 		return this;
 	}
 
-	public CommerceExtendedData setTax(Number tax) throws JSONException {
-		put(KEY_TAX, tax);
+	public CommerceExtendedData setTax(double tax) throws JSONException {
+		this.tax = tax;
 		return this;
 	}
 
 	public CommerceExtendedData setCurrency(String currency) throws JSONException {
-		put(KEY_CURRENCY, currency);
+		this.currency = currency;
 		return this;
 	}
 
@@ -87,18 +104,41 @@ public class CommerceExtendedData extends ExtendedData {
 	 * @throws JSONException if item can't be added.
 	 */
 	public CommerceExtendedData addItem(Item item) throws JSONException {
-		JSONArray items;
-		if (isNull(KEY_ITEMS)) {
-			items = new JSONArray();
-			put(KEY_ITEMS, items);
-		} else {
-			items = getJSONArray(KEY_ITEMS);
+		if (this.items == null) {
+			this.items = new ArrayList<>();
 		}
-		items.put(item);
+		items.add(item);
 		return this;
 	}
 
-	public static class Item extends JSONObject {
+	public CommerceExtendedData setItems(JSONArray items) throws JSONException {
+		if (items != null) {
+			for (int i = 0; i < items.length(); i++) {
+				Item item = (Item) items.get(i);
+				addItem(item);
+			}
+		}
+		return this;
+	}
+
+	@Override
+	public JSONObject toJsonObject() throws JSONException {
+		JSONObject ret = super.toJsonObject();
+		ret.put(KEY_ID, id);
+		ret.put(KEY_AFFILIATION, affiliation);
+		ret.put(KEY_REVENUE, revenue);
+		ret.put(KEY_SHIPPING, shipping);
+		ret.put(KEY_TAX, tax);
+		ret.put(KEY_CURRENCY, currency);
+		JSONArray itemsArray = new JSONArray();
+		for (Item item : items) {
+			itemsArray.put(item.toJsonObject());
+		}
+		ret.put(KEY_ITEMS, itemsArray);
+		return ret;
+	}
+
+	public static class Item implements Serializable {
 
 		private static final String KEY_ID = "id";
 		private static final String KEY_NAME = "name";
@@ -107,12 +147,24 @@ public class CommerceExtendedData extends ExtendedData {
 		private static final String KEY_QUANTITY = "quantity";
 		private static final String KEY_CURRENCY = "currency";
 
+		private Object id;
+		private String name;
+		private String category;
+		private double price;
+		private double quantity;
+		private String currency;
+
 		public Item() {
-			super();
 		}
 
 		public Item(String json) throws JSONException {
-			super(json);
+			JSONObject jsonObject = new JSONObject(json);
+			this.id = jsonObject.opt(KEY_ID);
+			this.name = jsonObject.optString(KEY_NAME, null);
+			this.category = jsonObject.optString(KEY_CATEGORY, null);
+			this.price = jsonObject.optDouble(KEY_PRICE, 0);
+			this.quantity = jsonObject.optDouble(KEY_QUANTITY, 0);
+			this.currency = jsonObject.optString(KEY_CURRENCY, null);
 		}
 
 		/**
@@ -126,7 +178,7 @@ public class CommerceExtendedData extends ExtendedData {
 		 * @param currency The currency code for the currency used in this transaction. Ignored if null.
 		 * @throws JSONException if values cannot be set.
 		 */
-		public Item(Object id, Object name, String category, Number price, Number quantity, String currency) throws JSONException {
+		public Item(Object id, String name, String category, double price, double quantity, String currency) throws JSONException {
 			super();
 			if (id != null) {
 				setId(id);
@@ -137,45 +189,52 @@ public class CommerceExtendedData extends ExtendedData {
 			if (category != null) {
 				setCategory(category);
 			}
-			if (price != null) {
-				setPrice(price);
-			}
-			if (quantity != null) {
-				setQuantity(quantity);
-			}
+			setPrice(price);
+			setQuantity(quantity);
 			if (currency != null) {
 				setCurrency(currency);
 			}
 		}
 
 		public Item setId(Object id) throws JSONException {
-			put(KEY_ID, id);
+			this.id = id;
 			return this;
 		}
 
-		public Item setName(Object name) throws JSONException {
-			put(KEY_NAME, name);
+		public Item setName(String name) throws JSONException {
+			this.name = name;
 			return this;
 		}
 
 		public Item setCategory(String category) throws JSONException {
-			put(KEY_CATEGORY, category);
+			this.category = category;
 			return this;
 		}
 
-		public Item setPrice(Number price) throws JSONException {
-			put(KEY_PRICE, price);
+		public Item setPrice(double price) throws JSONException {
+			this.price = price;
 			return this;
 		}
 
-		public Item setQuantity(Number quantity) throws JSONException {
-			put(KEY_QUANTITY, quantity);
+		public Item setQuantity(double quantity) throws JSONException {
+			this.quantity = quantity;
 			return this;
 		}
 
 		public Item setCurrency(String currency) throws JSONException {
-			put(KEY_CURRENCY, currency);
+			this.currency = currency;
 			return this;
+		}
+
+		public JSONObject toJsonObject() throws JSONException {
+			JSONObject ret = new JSONObject();
+			ret.put(KEY_ID, id);
+			ret.put(KEY_NAME, name);
+			ret.put(KEY_CATEGORY, category);
+			ret.put(KEY_PRICE, price);
+			ret.put(KEY_QUANTITY, quantity);
+			ret.put(KEY_CURRENCY, currency);
+			return ret;
 		}
 	}
 }

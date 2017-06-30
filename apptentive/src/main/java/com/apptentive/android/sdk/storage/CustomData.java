@@ -8,11 +8,12 @@ package com.apptentive.android.sdk.storage;
 
 import org.json.JSONException;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class CustomData extends HashMap<String, Object> implements Saveable {
+public class CustomData extends HashMap<String, Serializable> implements Saveable {
 
 	private static final long serialVersionUID = 1L;
 
@@ -30,26 +31,27 @@ public class CustomData extends HashMap<String, Object> implements Saveable {
 			listener.onDataChanged();
 		}
 	}
+
 	//endregion
 
 
 	//region Saving when modified
 	@Override
-	public Object put(String key, Object value) {
-		Object ret = super.put(key, value);
+	public Serializable put(String key, Serializable value) {
+		Serializable ret = super.put(key, value);
 		notifyDataChanged();
 		return ret;
 	}
 
 	@Override
-	public void putAll(Map<? extends String, ?> m) {
+	public void putAll(Map<? extends String, ? extends Serializable> m) {
 		super.putAll(m);
 		notifyDataChanged();
 	}
 
 	@Override
-	public Object remove(Object key) {
-		Object ret = super.remove(key);
+	public Serializable remove(Object key) {
+		Serializable ret = super.remove(key);
 		notifyDataChanged();
 		return ret;
 	}

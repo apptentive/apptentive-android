@@ -1,100 +1,124 @@
 /*
- * Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import java.util.List;
 
-/**
- * @author Sky Kelsey
- */
-public abstract class Payload extends JSONObject {
-
-	// These two are not stored in the JSON, only the DB.
-	private Long databaseId;
-	private BaseType baseType;
-
-	public Payload() {
-		initBaseType();
-	}
-
-	public Payload(String json) throws JSONException {
-		super(json);
-		initBaseType();
-	}
+public abstract class Payload {
+	private final PayloadType payloadType;
 
 	/**
-	 * Each subclass must set its type in this method.
+	 * If set, this payload should be encrypted in renderData().
 	 */
-	protected abstract void initBaseType();
+	protected String encryptionKey;
 
 	/**
-	 * Subclasses should override this method if there is any peculiarity in how they present or wrap json before sending.
-	 *
-	 * @return A wrapper object containing the name of the object type, the value of which is the contents of this Object.
+	 * The Conversation ID of the payload, if known at this time.
 	 */
-	public String marshallForSending() {
-		JSONObject wrapper = new JSONObject();
-		try {
-			wrapper.put(getBaseType().name(), this);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error wrapping Payload in JSONObject.", e);
-			return null;
-		}
-		return wrapper.toString();
-	}
+	protected String conversationId;
 
-	public long getDatabaseId() {
-		return databaseId;
-	}
+	/**
+	 * Encrypted Payloads need to include the Conversation JWT inside them so that the server can
+	 * authenticate each payload after it is decrypted.
+	 */
+	protected String token;
 
-	public void setDatabaseId(long databaseId) {
-		this.databaseId = databaseId;
-	}
+	private String localConversationIdentifier;
 
-	public BaseType getBaseType() {
-		return baseType;
-	}
+	private List<Object> attachments; // TODO: Figure out attachment handling
 
-	protected void setBaseType(BaseType baseType) {
-		this.baseType = baseType;
-	}
-
-	public enum BaseType {
-		message,
-		event,
-		device,
-		sdk,
-		app_release,
-		sdk_and_app_release,
-		person,
-		unknown,
-		// Legacy
-		survey;
-
-		public static BaseType parse(String type) {
-			try {
-				return BaseType.valueOf(type);
-			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Payload.BaseType: " + type);
-			}
-			return unknown;
+	protected Payload(PayloadType type) {
+		if (type == null) {
+			throw new IllegalArgumentException("Payload type is null");
 		}
 
+		this.payloadType = type;
 	}
 
+	//region Data
+
 	/**
-	 * @deprecated Do not use this method to check for key existence. Instead us !isNull(KEY_NAME), as this works better
-	 *             with keys with null values.
+	 * Binary data to be stored in database
 	 */
-	@Override
-	public boolean has(String key) {
-		return super.has(key);
+	public abstract byte[] renderData();
+
+	//region
+
+	//region Http-request
+
+	/**
+	 * Http endpoint for sending this payload
+	 */
+	public abstract String getHttpEndPoint(String conversationId);
+
+	/**
+	 * Http request method for sending this payload
+	 */
+	public abstract HttpRequestMethod getHttpRequestMethod();
+
+	/**
+	 * Http content type for sending this payload
+	 */
+	public abstract String getHttpRequestContentType();
+
+	//endregion
+
+	//region Getters/Setters
+
+	public PayloadType getPayloadType() {
+		return payloadType;
 	}
+
+	public void setEncryptionKey(String encryptionKey) {
+		this.encryptionKey = encryptionKey;
+	}
+
+	public boolean hasEncryptionKey() {
+		return !StringUtils.isNullOrEmpty(encryptionKey);
+	}
+
+	public String getConversationId() {
+		return conversationId;
+	}
+
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
+	}
+
+	public String getToken() {
+		return token;
+	}
+
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public abstract String getNonce();
+
+	public abstract void setNonce(String nonce);
+
+	public List<Object> getAttachments() {
+		return attachments;
+	}
+
+	public void setAttachments(List<Object> attachments) {
+		this.attachments = attachments;
+	}
+
+	public String getLocalConversationIdentifier() {
+		return localConversationIdentifier;
+	}
+
+	public void setLocalConversationIdentifier(String localConversationIdentifier) {
+		this.localConversationIdentifier = localConversationIdentifier;
+	}
+
+	//endregion
 }

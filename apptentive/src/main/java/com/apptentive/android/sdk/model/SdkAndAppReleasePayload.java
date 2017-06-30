@@ -14,30 +14,19 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
-import org.json.JSONException;
-
 /**
- * A combined payload of {@link Sdk} and {@link AppRelease} payloads.
- *
- * This class effectively contains the source code from both {@link Sdk}
- * and {@link AppRelease} payloads (which still kept for backward compatibility
+ * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
+ * <p>
+ * This class effectively contains the source code from both {@link SdkPayload}
+ * and {@link AppReleasePayload} payloads (which still kept for backward compatibility
  * purposes).
  */
-public class SdkAndAppReleasePayload extends Payload {
+public class SdkAndAppReleasePayload extends JsonPayload {
 
-	//region Sdk payload keys
-	private static final String KEY_VERSION = "version";
-	private static final String KEY_PROGRAMMING_LANGUAGE = "programming_language";
-	private static final String KEY_AUTHOR_NAME = "author_name";
-	private static final String KEY_AUTHOR_EMAIL = "author_email";
-	private static final String KEY_PLATFORM = "platform";
-	private static final String KEY_DISTRIBUTION = "distribution";
-	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
-	//endregion
-
-	//region AppRelease keys
 	private static final String KEY_TYPE = "type";
 	private static final String KEY_VERSION_NAME = "version_name";
 	private static final String KEY_VERSION_CODE = "version_code";
@@ -47,300 +36,165 @@ public class SdkAndAppReleasePayload extends Payload {
 	private static final String KEY_STYLE_INHERIT = "inheriting_styles";
 	private static final String KEY_STYLE_OVERRIDE = "overriding_styles";
 	private static final String KEY_DEBUG = "debug";
-	//endregion
 
-	public static SdkAndAppReleasePayload fromJson(String json) {
-		try {
-			return new SdkAndAppReleasePayload(json);
-		} catch (JSONException e) {
-			ApptentiveLog.v("Error parsing json as SdkAndAppReleasePayload: %s", e, json);
-		} catch (IllegalArgumentException e) {
-			// Unknown unknown #rumsfeld
-		}
-		return null;
-	}
-
-	public SdkAndAppReleasePayload(String json) throws JSONException {
-		super(json);
-	}
+	private static final String KEY_SDK_VERSION = "sdk_version";
+	private static final String KEY_SDK_PROGRAMMING_LANGUAGE = "sdk_programming_language";
+	private static final String KEY_SDK_AUTHOR_NAME = "sdk_author_name";
+	private static final String KEY_SDK_AUTHOR_EMAIL = "sdk_author_email";
+	private static final String KEY_SDK_PLATFORM = "sdk_platform";
+	private static final String KEY_SDK_DISTRIBUTION = "sdk_distribution";
+	private static final String KEY_SDK_DISTRIBUTION_VERSION = "sdk_distribution_version";
 
 	public SdkAndAppReleasePayload() {
-		super();
+		super(PayloadType.sdk_and_app_release);
 	}
 
-	//region Inheritance
-	public void initBaseType() {
-		setBaseType(BaseType.sdk_and_app_release);
+	//region Http-request
+
+	@Override
+	public String getHttpEndPoint(String conversationId) {
+		return StringUtils.format("/conversations/%s/app_release", conversationId);
 	}
+
 	//endregion
 
 	//region Sdk getters/setters
 	public String getVersion() {
-		try {
-			if(!isNull(KEY_VERSION)) {
-				return getString(KEY_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_VERSION, null);
 	}
 
 	public void setVersion(String version) {
-		try {
-			put(KEY_VERSION, version);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_VERSION);
-		}
+		put(KEY_SDK_VERSION, version);
 	}
 
 	public String getProgrammingLanguage() {
-		try {
-			if(!isNull(KEY_PROGRAMMING_LANGUAGE)) {
-				return getString(KEY_PROGRAMMING_LANGUAGE);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_PROGRAMMING_LANGUAGE, null);
 	}
 
 	public void setProgrammingLanguage(String programmingLanguage) {
-		try {
-			put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
-		}
+		put(KEY_SDK_PROGRAMMING_LANGUAGE, programmingLanguage);
 	}
 
 	public String getAuthorName() {
-		try {
-			if(!isNull(KEY_AUTHOR_NAME)) {
-				return getString(KEY_AUTHOR_NAME);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_AUTHOR_NAME, null);
 	}
 
 	public void setAuthorName(String authorName) {
-		try {
-			put(KEY_AUTHOR_NAME, authorName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_NAME);
-		}
+		put(KEY_SDK_AUTHOR_NAME, authorName);
 	}
 
 	public String getAuthorEmail() {
-		try {
-			if(!isNull(KEY_AUTHOR_EMAIL)) {
-				return getString(KEY_AUTHOR_EMAIL);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_AUTHOR_EMAIL, null);
 	}
 
 	public void setAuthorEmail(String authorEmail) {
-		try {
-			put(KEY_AUTHOR_EMAIL, authorEmail);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
-		}
+		put(KEY_SDK_AUTHOR_EMAIL, authorEmail);
 	}
 
 	public String getPlatform() {
-		try {
-			if(!isNull(KEY_PLATFORM)) {
-				return getString(KEY_PLATFORM);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_PLATFORM, null);
 	}
 
 	public void setPlatform(String platform) {
-		try {
-			put(KEY_PLATFORM, platform);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_PLATFORM);
-		}
+		put(KEY_SDK_PLATFORM, platform);
 	}
 
 	public String getDistribution() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION)) {
-				return getString(KEY_DISTRIBUTION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_DISTRIBUTION, null);
 	}
 
 	public void setDistribution(String distribution) {
-		try {
-			put(KEY_DISTRIBUTION, distribution);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION);
-		}
+		put(KEY_SDK_DISTRIBUTION, distribution);
 	}
 
 	public String getDistributionVersion() {
-		try {
-			if(!isNull(KEY_DISTRIBUTION_VERSION)) {
-				return getString(KEY_DISTRIBUTION_VERSION);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return null;
+		return optString(KEY_SDK_DISTRIBUTION_VERSION, null);
 	}
 
 	public void setDistributionVersion(String distributionVersion) {
-		try {
-			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
-		}
+		put(KEY_SDK_DISTRIBUTION_VERSION, distributionVersion);
 	}
 	//endregion
 
 	//region AppRelease getters/setters
+
 	public String getType() {
-		if (!isNull(KEY_TYPE)) {
-			return optString(KEY_TYPE, null);
-		}
-		return null;
+		return optString(KEY_TYPE, null);
 	}
 
 	public void setType(String type) {
-		try {
-			put(KEY_TYPE, type);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TYPE);
-		}
+		put(KEY_TYPE, type);
 	}
 
 	public String getVersionName() {
-		if (!isNull(KEY_VERSION_NAME)) {
-			return optString(KEY_VERSION_NAME, null);
-		}
-		return null;
+		return optString(KEY_VERSION_NAME, null);
 	}
 
 	public void setVersionName(String versionName) {
-		try {
-			put(KEY_VERSION_NAME, versionName);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_NAME);
-		}
+		put(KEY_VERSION_NAME, versionName);
 	}
 
 	public int getVersionCode() {
-		if (!isNull(KEY_VERSION_CODE)) {
-			return optInt(KEY_VERSION_CODE, -1);
-		}
-		return -1;
+		return optInt(KEY_VERSION_CODE, -1);
 	}
 
 	public void setVersionCode(int versionCode) {
-		try {
-			put(KEY_VERSION_CODE, versionCode);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_VERSION_CODE);
-		}
+		put(KEY_VERSION_CODE, versionCode);
 	}
 
 	public String getIdentifier() {
-		if (!isNull(KEY_IDENTIFIER)) {
-			return optString(KEY_IDENTIFIER, null);
-		}
-		return null;
+		return optString(KEY_IDENTIFIER, null);
 	}
 
 	public void setIdentifier(String identifier) {
-		try {
-			put(KEY_IDENTIFIER, identifier);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_IDENTIFIER);
-		}
+		put(KEY_IDENTIFIER, identifier);
 	}
 
 	public String getTargetSdkVersion() {
-		if (!isNull(KEY_TARGET_SDK_VERSION)) {
-			return optString(KEY_TARGET_SDK_VERSION);
-		}
-		return null;
+		return optString(KEY_TARGET_SDK_VERSION, null);
 	}
 
 	public void setTargetSdkVersion(String targetSdkVersion) {
-		try {
-			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
-		}
+		put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
 	}
 
 	public String getAppStore() {
-		if (!isNull(KEY_APP_STORE)) {
-			return optString(KEY_APP_STORE, null);
-		}
-		return null;
+		return optString(KEY_APP_STORE, null);
 	}
 
 	public void setAppStore(String appStore) {
-		try {
-			put(KEY_APP_STORE, appStore);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_APP_STORE);
-		}
+		put(KEY_APP_STORE, appStore);
 	}
 
 	// Flag for whether the apptentive is inheriting styles from the host app
 	public boolean getInheritStyle() {
-		return optBoolean(KEY_STYLE_INHERIT);
+		return getBoolean(KEY_STYLE_INHERIT);
 	}
 
 	public void setInheritStyle(boolean inheritStyle) {
-		try {
-			put(KEY_STYLE_INHERIT, inheritStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
-		}
+		put(KEY_STYLE_INHERIT, inheritStyle);
 	}
 
 	// Flag for whether the app is overriding any Apptentive Styles
 	public boolean getOverrideStyle() {
-		return optBoolean(KEY_STYLE_OVERRIDE);
+		return getBoolean(KEY_STYLE_OVERRIDE);
 	}
 
 	public void setOverrideStyle(boolean overrideStyle) {
-		try {
-			put(KEY_STYLE_OVERRIDE, overrideStyle);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
-		}
+		put(KEY_STYLE_OVERRIDE, overrideStyle);
 	}
 
 	public boolean getDebug() {
-		return optBoolean(KEY_DEBUG);
+		return getBoolean(KEY_DEBUG);
 	}
 
 	public void setDebug(boolean debug) {
-		try {
-			put(KEY_DEBUG, debug);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to AppRelease.", KEY_DEBUG);
-		}
+		put(KEY_DEBUG, debug);
 	}
 
-	public static AppRelease generateCurrentAppRelease(Context context) {
+	public static AppReleasePayload generateCurrentAppRelease(Context context) {
 
-		AppRelease appRelease = new AppRelease();
+		AppReleasePayload appRelease = new AppReleasePayload();
 
 		String appPackageName = context.getPackageName();
 		PackageManager packageManager = context.getPackageManager();

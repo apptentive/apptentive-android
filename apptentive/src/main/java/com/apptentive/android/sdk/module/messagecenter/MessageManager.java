@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,27 +10,29 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.os.AsyncTask;
-import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
-import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveMessage;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.PayloadData;
+import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.notifications.ApptentiveNotification;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.storage.MessageStore;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,10 +42,22 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public class MessageManager {
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_DATA;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+
+public class MessageManager implements Destroyable, ApptentiveNotificationObserver {
 
 	// The reason of pause message sending
 	public static int SEND_PAUSE_REASON_ACTIVITY_PAUSE = 0;
@@ -52,68 +66,52 @@ public class MessageManager {
 
 	private static int TOAST_TYPE_UNREAD_MESSAGE = 1;
 
-	private static final int UI_THREAD_MESSAGE_ON_UNREAD_HOST = 1;
-	private static final int UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL = 2;
-	private static final int UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION = 3;
+	private final Conversation conversation;
+
+	private final MessageStore messageStore;
 
 	private WeakReference<Activity> currentForegroundApptentiveActivity;
 
 	private WeakReference<AfterSendMessageListener> afterSendMessageListener;
 
-	private final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<WeakReference<OnNewIncomingMessagesListener>>();
-
+	private final List<WeakReference<OnNewIncomingMessagesListener>> internalNewMessagesListeners = new ArrayList<>();
 
 	/* UnreadMessagesListener is set by external hosting app, and its lifecycle is managed by the app.
 	 * Use WeakReference to prevent memory leak
 	 */
-	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<WeakReference<UnreadMessagesListener>>();
+	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<>();
 
-	AtomicBoolean appInForeground = new AtomicBoolean(false);
-	private Handler uiHandler;
-	private MessagePollingWorker pollingWorker;
+	final AtomicBoolean appInForeground = new AtomicBoolean(false); // FIXME: get rid of that
+	private final MessagePollingWorker pollingWorker;
 
-
-	public MessageManager() {
-
-	}
-
-	// init() will start polling worker.
-	public void init() {
-		if (uiHandler == null) {
-			uiHandler = new Handler(Looper.getMainLooper()) {
-				@Override
-				public void handleMessage(android.os.Message msg) {
-					switch (msg.what) {
-						case UI_THREAD_MESSAGE_ON_UNREAD_HOST:
-							notifyHostUnreadMessagesListeners(msg.arg1);
-							break;
-						case UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL: {
-							// Notify internal listeners such as Message Center
-							CompoundMessage msgToAdd = (CompoundMessage) msg.obj;
-							notifyInternalNewMessagesListeners(msgToAdd);
-							break;
-						}
-						case UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION: {
-							CompoundMessage msgToShow = (CompoundMessage) msg.obj;
-							showUnreadMessageToastNotification(msgToShow);
-							break;
-						}
-						default:
-							super.handleMessage(msg);
-					}
-				}
-			};
+	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {
+		@Override
+		protected void execute(CompoundMessage message) {
+			showUnreadMessageToastNotification(message);
 		}
-		if (pollingWorker == null) {
-			pollingWorker = new MessagePollingWorker(this);
-			/* Set SharePreference to indicate Message Center feature is desired. It will always be checked
-			 * during Apptentive initialization.
-			 */
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.setMessageCenterFeatureUsed(true);
-			}
+	};
+
+	private final MessageCountDispatchTask hostMessageNotifierTask = new MessageCountDispatchTask() {
+		@Override
+		protected void execute(int messageCount) {
+			notifyHostUnreadMessagesListeners(messageCount);
 		}
+	};
+
+	public MessageManager(Conversation conversation, MessageStore messageStore) {
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		if (messageStore == null) {
+			throw new IllegalArgumentException("Message store is null");
+		}
+
+		this.conversation = conversation;
+		this.messageStore = messageStore;
+		this.pollingWorker = new MessagePollingWorker(this);
+
+		registerNotifications();
 	}
 
 	/*
@@ -121,36 +119,23 @@ public class MessageManager {
 	 * when push is received on the device.
 	 */
 	public void startMessagePreFetchTask() {
-		// Defer message polling thread creation, if not created yet and host app receives a new message push
-		init();
-		AsyncTask<Object, Void, Void> task = new AsyncTask<Object, Void, Void>() {
-			private Exception e = null;
-
+		final boolean updateMC = isMessageCenterInForeground();
+		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
 			@Override
-			protected Void doInBackground(Object... params) {
-				boolean updateMC = (Boolean) params[0];
+			protected void execute() {
 				try {
 					fetchAndStoreMessages(updateMC, false);
-				} catch (Exception e) {
-					this.e = e;
-				}
-				return null;
-			}
-
-			@Override
-			protected void onPostExecute(Void v) {
-				if (e != null) {
-					ApptentiveLog.w("Unhandled Exception thrown from fetching new message asyncTask", e);
-					MetricModule.sendError(e, null, null);
+				} catch (final Exception e) {
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							ApptentiveLog.w("Unhandled Exception thrown from fetching new message task", e);
+							MetricModule.sendError(e, null, null);
+						}
+					});
 				}
 			}
-		};
-
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			task.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, isMessageCenterInForeground());
-		} else {
-			task.execute(isMessageCenterInForeground());
-		}
+		});
 	}
 
 	/**
@@ -159,11 +144,7 @@ public class MessageManager {
 	 *
 	 * @return true if messages were returned, else false.
 	 */
-	public synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
-		if (ApptentiveInternal.getInstance().getSessionData().getConversationToken() == null) {
-			ApptentiveLog.d("Can't fetch messages because the conversation has not yet been initialized.");
-			return false;
-		}
+	synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
 		if (!Util.isNetworkConnectionPresent()) {
 			ApptentiveLog.d("Can't fetch messages because a network connection is not present.");
 			return false;
@@ -172,8 +153,8 @@ public class MessageManager {
 		// Fetch the messages.
 		List<ApptentiveMessage> messagesToSave = null;
 		try {
-			Future<String> future = getMessageStore().getLastReceivedMessageId();
-			messagesToSave = fetchMessages(future.get());
+			String lastMessageId = messageStore.getLastReceivedMessageId();
+			messagesToSave = fetchMessages(lastMessageId);
 		} catch (Exception e) {
 			ApptentiveLog.e("Error retrieving last received message id from worker thread");
 		}
@@ -184,36 +165,36 @@ public class MessageManager {
 			// Also get the count of incoming unread messages.
 			int incomingUnreadMessages = 0;
 			// Mark messages from server where sender is the app user as read.
-			for (ApptentiveMessage apptentiveMessage : messagesToSave) {
+			for (final ApptentiveMessage apptentiveMessage : messagesToSave) {
 				if (apptentiveMessage.isOutgoingMessage()) {
 					apptentiveMessage.setRead(true);
 				} else {
 					if (messageOnToast == null) {
-						if (apptentiveMessage.getType() == ApptentiveMessage.Type.CompoundMessage) {
+						if (apptentiveMessage.getMessageType() == ApptentiveMessage.Type.CompoundMessage) {
 							messageOnToast = (CompoundMessage) apptentiveMessage;
 						}
 					}
 					incomingUnreadMessages++;
+
 					// for every new message received, notify Message Center
-					Message msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_INTERNAL, apptentiveMessage);
-					msg.sendToTarget();
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							notifyInternalNewMessagesListeners((CompoundMessage) apptentiveMessage);
+						}
+					});
 				}
 			}
-			getMessageStore().addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
-			Message msg;
+			messageStore.addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
 			if (incomingUnreadMessages > 0) {
 				// Show toast notification only if the foreground activity is not already message center activity
 				if (!isMessageCenterForeground && showToast) {
-					msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION, messageOnToast);
-					// Only show the latest new message on toast
-					uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_TOAST_NOTIFICATION);
-					msg.sendToTarget();
+					DispatchQueue.mainQueue().dispatchAsyncOnce(toastMessageNotifierTask.setMessage(messageOnToast));
 				}
 			}
+
 			// Send message to notify host app, such as unread message badge
-			msg = uiHandler.obtainMessage(UI_THREAD_MESSAGE_ON_UNREAD_HOST, getUnreadMessageCount(), 0);
-			uiHandler.removeMessages(UI_THREAD_MESSAGE_ON_UNREAD_HOST);
-			msg.sendToTarget();
+			DispatchQueue.mainQueue().dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
 
 			return incomingUnreadMessages > 0;
 		}
@@ -221,9 +202,9 @@ public class MessageManager {
 	}
 
 	public List<MessageCenterListItem> getMessageCenterListItems() {
-		List<MessageCenterListItem> messagesToShow = new ArrayList<MessageCenterListItem>();
+		List<MessageCenterListItem> messagesToShow = new ArrayList<>();
 		try {
-			List<ApptentiveMessage> messagesAll = getMessageStore().getAllMessages().get();
+			List<ApptentiveMessage> messagesAll = messageStore.getAllMessages();
 			// Do not display hidden messages on Message Center
 			for (ApptentiveMessage message : messagesAll) {
 				if (!message.isHidden()) {
@@ -238,8 +219,8 @@ public class MessageManager {
 	}
 
 	public void sendMessage(ApptentiveMessage apptentiveMessage) {
-		getMessageStore().addOrUpdateMessages(apptentiveMessage);
-		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(apptentiveMessage);
+		messageStore.addOrUpdateMessages(apptentiveMessage);
+		conversation.addPayload(apptentiveMessage);
 	}
 
 	/**
@@ -247,15 +228,20 @@ public class MessageManager {
 	 */
 	public void deleteAllMessages(Context context) {
 		ApptentiveLog.d("Deleting all messages.");
-		getMessageStore().deleteAllMessages();
+		messageStore.deleteAllMessages();
 	}
 
 	private List<ApptentiveMessage> fetchMessages(String afterId) {
 		ApptentiveLog.d("Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
 
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(null, afterId, null);
+		if (!Util.isNetworkConnectionPresent()) {
+			ApptentiveLog.v("No internet present. Cancelling request.");
+			return null;
+		}
+		// TODO: Use the new ApptentiveHttpClient for this.
+		ApptentiveHttpResponse response = ApptentiveClient.getMessages(conversation, afterId, null, null);
 
-		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
+		List<ApptentiveMessage> ret = new ArrayList<>();
 		if (!response.isSuccessful()) {
 			return ret;
 		}
@@ -270,14 +256,14 @@ public class MessageManager {
 	}
 
 	public void updateMessage(ApptentiveMessage apptentiveMessage) {
-		getMessageStore().updateMessage(apptentiveMessage);
+		messageStore.updateMessage(apptentiveMessage);
 	}
 
-	public List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
-		List<ApptentiveMessage> ret = new ArrayList<ApptentiveMessage>();
+	private List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
+		List<ApptentiveMessage> ret = new ArrayList<>();
 		JSONObject root = new JSONObject(messageString);
-		if (!root.isNull("items")) {
-			JSONArray items = root.getJSONArray("items");
+		if (!root.isNull("messages")) {
+			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
 				String json = items.getJSONObject(i).toString();
 				ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(json);
@@ -303,68 +289,127 @@ public class MessageManager {
 		}
 	}
 
-	public void onSentMessage(ApptentiveMessage apptentiveMessage, ApptentiveHttpResponse response) {
+	public void onSentMessage(String nonce, int responseCode, JSONObject responseJson) {
 
-		if (response.isRejectedPermanently() || response.isBadPayload()) {
+		final ApptentiveMessage apptentiveMessage = messageStore.findMessage(nonce);
+		assertNotNull(apptentiveMessage, "Can't find a message with nonce: %s", nonce);
+		if (apptentiveMessage == null) {
+			return; // should not happen but we want to stay safe
+		}
+
+		final boolean isRejectedPermanently = responseCode >= 400 && responseCode < 500;
+		final boolean isSuccessful = responseCode >= 200 && responseCode < 300;
+		final boolean isRejectedTemporarily = !(isSuccessful || isRejectedPermanently);
+
+		if (isRejectedPermanently || responseCode == -1) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
-				getMessageStore().updateMessage(apptentiveMessage);
+				messageStore.updateMessage(apptentiveMessage);
 				if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-					afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+					afterSendMessageListener.get().onMessageSent(responseCode, apptentiveMessage);
 				}
 
 			}
 			return;
 		}
 
-		if (response.isRejectedTemporarily()) {
+		if (isRejectedTemporarily) {
 			pauseSending(SEND_PAUSE_REASON_SERVER);
 			return;
 		}
 
-		if (response.isSuccessful()) {
+		if (isSuccessful) {
+			assertNotNull(responseJson, "Missing required responseJson.");
 			// Don't store hidden messages once sent. Delete them.
 			if (apptentiveMessage.isHidden()) {
 				((CompoundMessage) apptentiveMessage).deleteAssociatedFiles();
-				getMessageStore().deleteMessage(apptentiveMessage.getNonce());
+				messageStore.deleteMessage(apptentiveMessage.getNonce());
 				return;
 			}
 			try {
-				JSONObject responseJson = new JSONObject(response.getContent());
-
 				apptentiveMessage.setState(ApptentiveMessage.State.sent);
-
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
 				ApptentiveLog.e("Error parsing sent apptentiveMessage response.", e);
 			}
-			getMessageStore().updateMessage(apptentiveMessage);
+			messageStore.updateMessage(apptentiveMessage);
 
 			if (afterSendMessageListener != null && afterSendMessageListener.get() != null) {
-				afterSendMessageListener.get().onMessageSent(response, apptentiveMessage);
+				afterSendMessageListener.get().onMessageSent(responseCode, apptentiveMessage);
 			}
 		}
-	}
-
-	private MessageStore getMessageStore() {
-		return ApptentiveInternal.getInstance().getApptentiveTaskManager();
 	}
 
 	public int getUnreadMessageCount() {
 		int msgCount = 0;
 		try {
-			msgCount = getMessageStore().getUnreadMessageCount().get();
+			msgCount = messageStore.getUnreadMessageCount();
 		} catch (Exception e) {
 			ApptentiveLog.e("Error getting unread messages count in worker thread");
 		}
 		return msgCount;
 	}
 
+	//region Notifications
+
+	private void registerNotifications() {
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_ACTIVITY_STARTED, this)
+			.addObserver(NOTIFICATION_ACTIVITY_RESUMED, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, this)
+			.addObserver(NOTIFICATION_PAYLOAD_WILL_START_SEND, this)
+			.addObserver(NOTIFICATION_PAYLOAD_DID_FINISH_SEND, this);
+	}
+
+	//endregion
+
+	//region Notification Observer
+
+	@Override
+	public void onReceiveNotification(ApptentiveNotification notification) {
+		if (notification.hasName(NOTIFICATION_ACTIVITY_STARTED) ||
+			notification.hasName(NOTIFICATION_ACTIVITY_RESUMED)) {
+			final Activity activity = notification.getRequiredUserInfo(NOTIFICATION_KEY_ACTIVITY, Activity.class);
+			setCurrentForegroundActivity(activity);
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
+			appWentToForeground();
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_BACKGROUND)) {
+			setCurrentForegroundActivity(null);
+			appWentToBackground();
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_WILL_START_SEND)) {
+			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
+			if (payload.getType().equals(PayloadType.message)) {
+				resumeSending();
+			}
+		} else if (notification.hasName(NOTIFICATION_PAYLOAD_DID_FINISH_SEND)) {
+			final boolean successful = notification.getRequiredUserInfo(NOTIFICATION_KEY_SUCCESSFUL, Boolean.class);
+			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
+			final Integer responseCode = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_CODE, Integer.class);
+			final JSONObject responseData = successful ? notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_DATA, JSONObject.class) : null;
+			if (payload.getType().equals(PayloadType.message)) {
+				onSentMessage(payload.getNonce(), responseCode, responseData);
+			}
+		}
+	}
+
+	//endregion
+
+	//region Destroyable
+
+	@Override
+	public void destroy() {
+		ApptentiveNotificationCenter.defaultCenter().removeObserver(this);
+		pollingWorker.destroy();
+	}
+
+	//endregion
+
 
 	// Listeners
 	public interface AfterSendMessageListener {
-		void onMessageSent(ApptentiveHttpResponse response, ApptentiveMessage apptentiveMessage);
+		void onMessageSent(int responseCode, ApptentiveMessage apptentiveMessage);
 
 		void onPauseSending(int reason);
 
@@ -377,7 +422,7 @@ public class MessageManager {
 
 	public void setAfterSendMessageListener(AfterSendMessageListener listener) {
 		if (listener != null) {
-			afterSendMessageListener = new WeakReference<AfterSendMessageListener>(listener);
+			afterSendMessageListener = new WeakReference<>(listener);
 		} else {
 			afterSendMessageListener = null;
 		}
@@ -386,7 +431,6 @@ public class MessageManager {
 
 	public void addInternalOnMessagesUpdatedListener(OnNewIncomingMessagesListener newlistener) {
 		if (newlistener != null) {
-			init();
 			for (Iterator<WeakReference<OnNewIncomingMessagesListener>> iterator = internalNewMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<OnNewIncomingMessagesListener> listenerRef = iterator.next();
 				OnNewIncomingMessagesListener listener = listenerRef.get();
@@ -396,7 +440,7 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			internalNewMessagesListeners.add(new WeakReference<OnNewIncomingMessagesListener>(newlistener));
+			internalNewMessagesListeners.add(new WeakReference<>(newlistener));
 		}
 	}
 
@@ -404,7 +448,7 @@ public class MessageManager {
 		internalNewMessagesListeners.clear();
 	}
 
-	public void notifyInternalNewMessagesListeners(final CompoundMessage apptentiveMsg) {
+	private void notifyInternalNewMessagesListeners(final CompoundMessage apptentiveMsg) {
 		for (WeakReference<OnNewIncomingMessagesListener> listenerRef : internalNewMessagesListeners) {
 			OnNewIncomingMessagesListener listener = listenerRef.get();
 			if (listener != null) {
@@ -417,14 +461,13 @@ public class MessageManager {
 	public void setHostUnreadMessagesListener(UnreadMessagesListener listener) {
 		clearHostUnreadMessagesListeners();
 		if (listener != null) {
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(listener));
+			hostUnreadMessagesListeners.add(new WeakReference<>(listener));
 		}
 	}
 
 	public void addHostUnreadMessagesListener(UnreadMessagesListener newListener) {
 		if (newListener != null) {
-			// Defer message polling thread creation, if not created yet, and host app adds an unread message listener
-			init();
+			// Defer message polling thread creation, if not created yet, and host app adds an unread message listenerinit();
 			for (Iterator<WeakReference<UnreadMessagesListener>> iterator = hostUnreadMessagesListeners.iterator(); iterator.hasNext(); ) {
 				WeakReference<UnreadMessagesListener> listenerRef = iterator.next();
 				UnreadMessagesListener listener = listenerRef.get();
@@ -434,11 +477,11 @@ public class MessageManager {
 					iterator.remove();
 				}
 			}
-			hostUnreadMessagesListeners.add(new WeakReference<UnreadMessagesListener>(newListener));
+			hostUnreadMessagesListeners.add(new WeakReference<>(newListener));
 		}
 	}
 
-	public void clearHostUnreadMessagesListeners() {
+	private void clearHostUnreadMessagesListeners() {
 		hostUnreadMessagesListeners.clear();
 	}
 
@@ -452,9 +495,9 @@ public class MessageManager {
 	}
 
 	// Set when Activity.onStart() and onStop() are called
-	public void setCurrentForegroundActivity(Activity activity) {
+	private void setCurrentForegroundActivity(Activity activity) {
 		if (activity != null) {
-			currentForegroundApptentiveActivity = new WeakReference<Activity>(activity);
+			currentForegroundApptentiveActivity = new WeakReference<>(activity);
 		} else {
 			ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(null, false);
 			if (manager != null) {
@@ -468,7 +511,7 @@ public class MessageManager {
 		pollingWorker.setMessageCenterInForeground(bInForeground);
 	}
 
-	public boolean isMessageCenterInForeground() {
+	private boolean isMessageCenterInForeground() {
 		return pollingWorker.messageCenterInForeground.get();
 	}
 
@@ -498,17 +541,61 @@ public class MessageManager {
 		}
 	}
 
-	public void appWentToForeground() {
+	private void appWentToForeground() {
 		appInForeground.set(true);
-		if (pollingWorker != null) {
-			pollingWorker.appWentToForeground();
+		pollingWorker.appWentToForeground();
+	}
+
+	private void appWentToBackground() {
+		appInForeground.set(false);
+		pollingWorker.appWentToBackground();
+	}
+
+	Conversation getConversation() {
+		return conversation;
+	}
+
+	public MessageStore getMessageStore() {
+		return messageStore;
+	}
+
+	//region Message Dispatch Task
+
+	private abstract static class MessageDispatchTask extends DispatchTask {
+		private CompoundMessage message;
+
+		protected abstract void execute(CompoundMessage message);
+
+		@Override
+		protected void execute() {
+			try {
+				execute(message);
+			} finally {
+				message = null;
+			}
+		}
+
+		MessageDispatchTask setMessage(CompoundMessage message) {
+			this.message = message;
+			return this;
 		}
 	}
 
-	public void appWentToBackground() {
-		appInForeground.set(false);
-		if (pollingWorker != null) {
-			pollingWorker.appWentToBackground();
+	private abstract static class MessageCountDispatchTask extends DispatchTask {
+		private int messageCount;
+
+		protected abstract void execute(int messageCount);
+
+		@Override
+		protected void execute() {
+			execute(messageCount);
+		}
+
+		MessageCountDispatchTask setMessageCount(int messageCount) {
+			this.messageCount = messageCount;
+			return this;
 		}
 	}
+
+	//endregion
 }

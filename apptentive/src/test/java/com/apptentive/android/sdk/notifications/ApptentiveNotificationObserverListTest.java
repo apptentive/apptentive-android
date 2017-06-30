@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.notifications;
 
 import com.apptentive.android.sdk.TestCaseBase;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
@@ -17,6 +19,16 @@ public class ApptentiveNotificationObserverListTest extends TestCaseBase {
 
 	private static final boolean WEAK_REFERENCE = true;
 	private static final boolean STRONG_REFERENCE = false;
+
+	@Before
+	public void setUp() {
+		super.setUp();
+	}
+
+	@After
+	public void tearDown() {
+		super.tearDown();
+	}
 
 	@Test
 	public void testAddObservers() {

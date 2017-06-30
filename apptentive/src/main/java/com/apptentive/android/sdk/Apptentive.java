@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -10,13 +10,16 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -24,28 +27,28 @@ import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.IntegrationConfig;
-import com.apptentive.android.sdk.storage.IntegrationConfigItem;
-import com.apptentive.android.sdk.storage.SessionData;
+import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * This class contains the complete API for accessing Apptentive features from within your app.
+ * This class contains the complete public API for accessing Apptentive features from within your app.
  */
 public class Apptentive {
-
 
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
@@ -53,18 +56,19 @@ public class Apptentive {
 	 * @param application The {@link Application} object for this app.
 	 */
 	public static void register(Application application) {
-		Apptentive.register(application, null);
+		Apptentive.register(application, null, null);
 	}
 
-	public static void register(Application application, String apptentiveApiKey) {
+	public static void register(Application application, String apptentiveKey, String apptentiveSignature) {
+		register(application, apptentiveKey, apptentiveSignature, null);
+	}
+
+	private static void register(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
 		ApptentiveLog.i("Registering Apptentive.");
-		ApptentiveInternal.createInstance(application, apptentiveApiKey);
-		ApptentiveInternal.setLifeCycleCallback();
+		ApptentiveInternal.createInstance(application, apptentiveKey, apptentiveSignature, serverUrl);
 	}
 
-	// ****************************************************************************************
-	// GLOBAL DATA METHODS
-	// ****************************************************************************************
+	//region Global Data Methods
 
 	/**
 	 * Sets the user's email address. This email address will be sent to the Apptentive server to allow out of app
@@ -77,10 +81,10 @@ public class Apptentive {
 	 */
 	public static void setPersonEmail(String email) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				sessionData.setPersonEmail(email);
+				conversation.getPerson().setEmail(email);
 			}
 		}
 	}
@@ -93,9 +97,9 @@ public class Apptentive {
 	 */
 	public static String getPersonEmail() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				return sessionData.getPersonEmail();
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				return conversation.getPerson().getEmail();
 			}
 		}
 		return null;
@@ -112,10 +116,10 @@ public class Apptentive {
 	 */
 	public static void setPersonName(String name) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
 				// FIXME: Make sure Person object diff is sent.
-				sessionData.setPersonName(name);
+				conversation.getPerson().setName(name);
 			}
 		}
 	}
@@ -128,9 +132,9 @@ public class Apptentive {
 	 */
 	public static String getPersonName() {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				return sessionData.getPersonName();
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				return conversation.getPerson().getName();
 			}
 		}
 		return null;
@@ -149,9 +153,9 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -166,9 +170,9 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -183,27 +187,27 @@ public class Apptentive {
 	 */
 	public static void addCustomDeviceData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, value);
 			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, version);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, version);
 			}
 		}
 	}
 
 	private static void addCustomDeviceData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().put(key, dateTime);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().put(key, dateTime);
 			}
 		}
 	}
@@ -215,9 +219,9 @@ public class Apptentive {
 	 */
 	public static void removeCustomDeviceData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getDevice().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getDevice().getCustomData().remove(key);
 			}
 		}
 	}
@@ -235,9 +239,9 @@ public class Apptentive {
 			if (value != null) {
 				value = value.trim();
 			}
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -252,9 +256,9 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Number value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
@@ -269,27 +273,27 @@ public class Apptentive {
 	 */
 	public static void addCustomPersonData(String key, Boolean value) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, value);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, value);
 			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, Version version) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().put(key, version);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().put(key, version);
 			}
 		}
 	}
 
 	private static void addCustomPersonData(String key, DateTime dateTime) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().remove(key);
 			}
 		}
 	}
@@ -301,19 +305,21 @@ public class Apptentive {
 	 */
 	public static void removeCustomPersonData(String key) {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
-			SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-			if (sessionData != null) {
-				sessionData.getPerson().getCustomData().remove(key);
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getPerson().getCustomData().remove(key);
 			}
 		}
 	}
 
+	//endregion
 
-	// ****************************************************************************************
-	// THIRD PARTY INTEGRATIONS
-	// ****************************************************************************************
+	//region Third Party Integrations
 
-	private static final String INTEGRATION_PUSH_TOKEN = "token";
+	/**
+	 * For internal use only.
+	 */
+	public static final String INTEGRATION_PUSH_TOKEN = "token";
 
 	/**
 	 * Call {@link #setPushNotificationIntegration(int, String)} with this value to allow Apptentive to send pushes
@@ -371,38 +377,38 @@ public class Apptentive {
 	 *                     <dd>The GCM Registration ID, which you can <a href="http://docs.aws.amazon.com/sns/latest/dg/mobile-push-gcm.html#registration-id-gcm">access like this</a>.</dd>
 	 *                     </dl>
 	 */
-	public static void setPushNotificationIntegration(int pushProvider, String token) {
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
+	public static void setPushNotificationIntegration(final int pushProvider, final String token) {
+		// we only access the active conversation on the main thread to avoid concurrency issues
+		if (!DispatchQueue.isMainQueue()) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					setPushNotificationIntegration(pushProvider, token);
+				}
+			});
 			return;
 		}
-		SessionData sessionData = ApptentiveInternal.getInstance().getSessionData();
-		if (sessionData != null) {
-			IntegrationConfig integrationConfig = ApptentiveInternal.getInstance().getSessionData().getDevice().getIntegrationConfig();
-			IntegrationConfigItem item = new IntegrationConfigItem();
-			item.put(INTEGRATION_PUSH_TOKEN, token);
-			switch (pushProvider) {
-				case PUSH_PROVIDER_APPTENTIVE:
-					integrationConfig.setApptentive(item);
-					break;
-				case PUSH_PROVIDER_PARSE:
-					integrationConfig.setParse(item);
-					break;
-				case PUSH_PROVIDER_URBAN_AIRSHIP:
-					integrationConfig.setUrbanAirship(item);
-					break;
-				case PUSH_PROVIDER_AMAZON_AWS_SNS:
-					integrationConfig.setAmazonAwsSns(item);
-					break;
-				default:
-					ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
-					return;
-			}
+
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
+			return;
+		}
+		// Store the push stuff globally
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+		prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
+			.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
+			.apply();
+
+		// Also set it on the active Conversation, if there is one.
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+		if (conversation != null) {
+			conversation.setPushIntegration(pushProvider, token);
 		}
 	}
 
-	// ****************************************************************************************
-	// PUSH NOTIFICATIONS
-	// ****************************************************************************************
+	//endregion
+
+	//region Push Notifications
 
 	/**
 	 * Determines whether this Intent is a push notification sent from Apptentive.
@@ -671,9 +677,9 @@ public class Apptentive {
 		return data.get(ApptentiveInternal.BODY_DEFAULT);
 	}
 
-	// ****************************************************************************************
-	// RATINGS
-	// ****************************************************************************************
+	//endregion
+
+	//region Rating
 
 	/**
 	 * Use this to choose where to send the user when they are prompted to rate the app. This should be the same place
@@ -701,10 +707,9 @@ public class Apptentive {
 		}
 	}
 
-	// ****************************************************************************************
-	// MESSAGE CENTER
-	// ****************************************************************************************
+	//endregion
 
+	//region Message Center
 
 	/**
 	 * Opens the Apptentive Message Center UI Activity
@@ -731,11 +736,13 @@ public class Apptentive {
 	 */
 	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
 		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
+				return false;
 			}
+			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error starting Apptentive Activity.", e);
+			ApptentiveLog.w("Error in Apptentive.showMessageCenter()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -748,8 +755,15 @@ public class Apptentive {
 	 * @return true if a call to {@link #showMessageCenter(Context)} will display Message Center, else false.
 	 */
 	public static boolean canShowMessageCenter() {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			return ApptentiveInternal.getInstance().canShowMessageCenterInternal();
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
+				return false;
+			}
+			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.canShowMessageCenter()", e);
+			MetricModule.sendError(e, null, null);
 		}
 		return false;
 	}
@@ -766,8 +780,15 @@ public class Apptentive {
 	 */
 	@Deprecated
 	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to set unread messages listener: no active conversation.");
+				return;
+			}
 			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -779,8 +800,18 @@ public class Apptentive {
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().getMessageManager().addHostUnreadMessagesListener(listener);
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to add unread messages listener: no active conversation.");
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.getMessageManager().addHostUnreadMessagesListener(listener);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.addUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -791,10 +822,14 @@ public class Apptentive {
 	 */
 	public static int getUnreadMessageCount() {
 		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				return ApptentiveInternal.getInstance().getMessageManager().getUnreadMessageCount();
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to get unread message count: no active conversation.");
+				return 0;
 			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			return conversation.getMessageManager().getUnreadMessageCount();
 		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.getUnreadMessageCount()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return 0;
@@ -807,22 +842,25 @@ public class Apptentive {
 	 * @param text The message you wish to send.
 	 */
 	public static void sendAttachmentText(String text) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			try {
-				CompoundMessage message = new CompoundMessage();
-				message.setBody(text);
-				message.setRead(true);
-				message.setHidden(true);
-				message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
-				message.setAssociatedFiles(null);
-				MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-				if (mgr != null) {
-					mgr.sendMessage(message);
-				}
-			} catch (Exception e) {
-				ApptentiveLog.w("Error sending attachment text.", e);
-				MetricModule.sendError(e, null, null);
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				return;
 			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			CompoundMessage message = new CompoundMessage();
+			message.setBody(text);
+			message.setRead(true);
+			message.setHidden(true);
+			message.setSenderId(conversation.getPerson().getId());
+			message.setAssociatedFiles(null);
+			MessageManager mgr = conversation.getMessageManager();
+			if (mgr != null) {
+				mgr.sendMessage(message);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentText(String)", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -835,16 +873,20 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(String uri) {
 		try {
-			if (TextUtils.isEmpty(uri) || !ApptentiveInternal.isApptentiveRegistered()) {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
-
+			if (TextUtils.isEmpty(uri)) {
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
@@ -880,9 +922,8 @@ public class Apptentive {
 			if (mgr != null) {
 				mgr.sendMessage(message);
 			}
-
 		} catch (Exception e) {
-			ApptentiveLog.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(String)", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -896,7 +937,11 @@ public class Apptentive {
 	 * @param mimeType The mime type of the file.
 	 */
 	public static void sendAttachmentFile(byte[] content, String mimeType) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
+		try {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
+				return;
+			}
 			ByteArrayInputStream is = null;
 			try {
 				is = new ByteArrayInputStream(content);
@@ -904,6 +949,9 @@ public class Apptentive {
 			} finally {
 				Util.ensureClosed(is);
 			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(byte[], String)", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
 
@@ -917,16 +965,20 @@ public class Apptentive {
 	 */
 	public static void sendAttachmentFile(InputStream is, String mimeType) {
 		try {
-			if (is == null || !ApptentiveInternal.isApptentiveRegistered()) {
+			if (!ApptentiveInternal.isConversationActive()) {
+				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
 				return;
 			}
-
+			if (is == null) {
+				return;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			CompoundMessage message = new CompoundMessage();
 			// No body, just attachment
 			message.setBody(null);
 			message.setRead(true);
 			message.setHidden(true);
-			message.setSenderId(ApptentiveInternal.getInstance().getPersonId());
+			message.setSenderId(conversation.getPerson().getId());
 
 			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
@@ -946,10 +998,12 @@ public class Apptentive {
 			message.setAssociatedFiles(attachmentStoredFiles);
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error sending attachment file.", e);
+			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(InputStream, String)", e);
 			MetricModule.sendError(e, null, null);
 		}
 	}
+
+	//endregion
 
 	/**
 	 * This method takes a unique event string, stores a record of that event having been visited, determines
@@ -966,7 +1020,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, null, (ExtendedData[]) null);
+		return engage(context, event, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -986,7 +1040,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, (ExtendedData[]) null);
+		return engage(context, event, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1010,7 +1064,30 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		return EngagementModule.engage(context, "local", "app", null, event, null, customData, extendedData);
+		try {
+			if (StringUtils.isNullOrEmpty(event)) {
+				ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (context == null) {
+				ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
+				return false;
+			}
+			if (!ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
+				return false;
+			}
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation == null) {
+				ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
+				return false;
+			}
+
+			return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while engaging '%s' event", event);
+			return false;
+		}
 	}
 
 	/**
@@ -1037,8 +1114,11 @@ public class Apptentive {
 	 */
 	public static synchronized boolean canShowInteraction(String event) {
 		try {
-			return EngagementModule.canShowInteraction("local", "app", event);
+			if (ApptentiveInternal.isConversationActive()) {
+				return EngagementModule.canShowInteraction(ApptentiveInternal.getInstance().getConversation(), "app", event, "local");
+			}
 		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.canShowInteraction()", e);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -1054,11 +1134,216 @@ public class Apptentive {
 	 *                 to call when the survey is finished.
 	 */
 	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
-		ApptentiveInternal internal = ApptentiveInternal.getInstance();
-		if (internal != null) {
-			internal.setOnSurveyFinishedListener(listener);
+		try {
+			ApptentiveInternal internal = ApptentiveInternal.getInstance();
+			if (internal != null) {
+				internal.setOnSurveyFinishedListener(listener);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.setOnSurveyFinishedListener()", e);
+			MetricModule.sendError(e, null, null);
 		}
 	}
+
+	//region Login/Logout
+
+	/**
+	 * Starts login process asynchronously. This call returns immediately. Using this method requires
+	 * you to implement JWT generation on your server. Please read about it in Apptentive's Android
+	 * Integration Reference Guide.
+	 *
+	 * @param token A JWT signed by your server using the secret from your app's Apptentive settings.
+	 * @param callback A LoginCallback, which will be called asynchronously when the login succeeds
+	 *                  or fails.
+	 */
+	public static void login(String token, LoginCallback callback) {
+		try {
+			if (token == null) {
+				if (callback != null) {
+					callback.onLoginFail("token is null");
+				}
+				return;
+			}
+
+			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+			if (instance == null) {
+				ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+				if (callback != null) {
+					callback.onLoginFail("Apptentive instance is not properly initialized");
+				}
+			} else {
+				ApptentiveInternal.getInstance().login(token, callback);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.login()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	/**
+	 * Callback interface login().
+	 */
+	public interface LoginCallback {
+		/**
+		 * Called when a login attempt has completed successfully.
+		 */
+		void onLoginFinish();
+
+		/**
+		 * Called when a login attempt has failed. May be called synchronously, for example, if your JWT
+		 * is missing the "sub" claim.
+		 *
+		 * @param errorMessage failure cause message
+		 */
+		void onLoginFail(String errorMessage);
+	}
+
+	public static void logout() {
+		try {
+			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
+			if (instance == null) {
+				ApptentiveLog.e("Unable to logout: Apptentive instance is not properly initialized");
+			} else {
+				instance.logout();
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception in Apptentive.logout()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	/**
+	 * Registers your listener with Apptentive. This listener is stored with a WeakReference, which
+	 * means that you must store a static reference to the listener as long as you want it to live.
+	 * One possible way to do this is to implement this listener with your Application class, or store
+	 * one on your Application.
+	 *
+	 * This listener will alert you to authentication failures, so that you can either recover from
+	 * expired or revoked JWTs, or fix your authentication implementation.
+	 * @param listener A listener that will be called when there is an authentication failure other
+	 *                 for the current logged in conversation. If the failure is for another
+	 *                 conversation, or there is no active conversation, the listener is not called.
+	 */
+	public static void setAuthenticationFailureListener(AuthenticationFailedListener listener) {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return;
+			}
+			ApptentiveInternal.getInstance().setAuthenticationFailureListener(listener);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	public static void clearAuthenticationFailureListener() {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return;
+			}
+			ApptentiveInternal.getInstance().setAuthenticationFailureListener(null);
+		} catch (Exception e) {
+			ApptentiveLog.w("Error in Apptentive.clearUnreadMessagesListener()", e);
+			MetricModule.sendError(e, null, null);
+		}
+	}
+
+	/**
+	 * A Listener you can register globally for the app, that will be called when requests other than
+	 * login fail for the active conversation. This includes failure to send queued data to
+	 * Apptentive, and failure to fetch app configuration from Apptentive.
+	 */
+	public interface AuthenticationFailedListener {
+		void onAuthenticationFailed(AuthenticationFailedReason reason);
+	}
+
+	/**
+	 * A list of error codes you will encounter when a JWT failure for logged in conversations occurs.
+	 */
+	public enum AuthenticationFailedReason {
+		/**
+		 * This should not happen.
+		 */
+		UNKNOWN,
+		/**
+		 * Currently only the HS512 signature algorithm is supported.
+		 */
+		INVALID_ALGORITHM,
+		/**
+		 * The JWT structure is constructed improperly (missing a part, etc.)
+		 */
+		MALFORMED_TOKEN,
+		/**
+		 * The token is not signed properly, or can't be decoded.
+		 */
+		INVALID_TOKEN,
+		/**
+		 * There is no "sub" property in the JWT claims. The "sub" is required, and should be an
+		 * immutable, unique id for your user.
+		 */
+		MISSING_SUB_CLAIM,
+		/**
+		 * The JWT "sub" claim does not match the one previously registered to the internal Apptentive
+		 * conversation. Internal use only.
+		 */
+		MISMATCHED_SUB_CLAIM,
+		/**
+		 * Internal use only.
+		 */
+		INVALID_SUB_CLAIM,
+		/**
+		 * The expiration "exp" claim is expired. The "exp" claim is a UNIX timestamp in milliseconds.
+		 * The JWT will receive this authentication failure when the "exp" time has elapsed.
+		 */
+		EXPIRED_TOKEN,
+		/**
+		 * The JWT has been revoked. This happens after a successful logout. In such cases, you will
+		 * need a new JWT to login.
+		 */
+		REVOKED_TOKEN,
+		/**
+		 * The Apptentive Key field was not specified during registration. You can get this from your app's Apptentive
+		 * settings.
+		 */
+		MISSING_APP_KEY,
+		/**
+		 * The Apptentive Signature field was not specified during registration. You can get this from your app's Apptentive
+		 * settings.
+		 */
+		MISSING_APP_SIGNATURE,
+		/**
+		 * The Apptentive Key and Apptentive Signature fields do not match. Make sure you got them from
+		 * the same app's Apptentive settings page.
+		 */
+		INVALID_KEY_SIGNATURE_PAIR;
+
+		private String error;
+
+		public String error() {
+			return error;
+		}
+
+		public static AuthenticationFailedReason parse(String errorType, String error) {
+			try {
+				AuthenticationFailedReason ret = AuthenticationFailedReason.valueOf(errorType);
+				ret.error = error;
+				return ret;
+			} catch (IllegalArgumentException e) {
+				ApptentiveLog.w("Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
+			}
+			return UNKNOWN;
+		}
+
+		@Override
+		public String toString() {
+			return "AuthenticationFailedReason{" +
+				       "error='" + error + '\'' +
+				       "errorType='" + name() + '\'' +
+				       '}';
+		}
+	}
+
+	//endregion
 
 	/**
 	 * <p>This type represents a <a href="http://semver.org/">semantic version</a>. It can be initialized
@@ -1085,29 +1370,28 @@ public class Apptentive {
 	 * <li>FF01</li>
 	 * </ul>
 	 */
-	public static class Version extends JSONObject implements Comparable<Version> {
+	public static class Version implements Serializable, Comparable<Version> {
+
+		private static final long serialVersionUID = 1L;
+
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "version";
+
+		private String version;
 
 		public Version() {
 		}
 
-		public Version(String json) throws JSONException {
-			super(json);
+		public Version(JSONObject json) throws JSONException {
+			this.version = json.optString(TYPE, null);
 		}
 
 		public Version(long version) {
-			super();
-			setVersion(version);
+			this.version = Long.toString(version);
 		}
 
 		public void setVersion(String version) {
-			try {
-				put(KEY_TYPE, TYPE);
-				put(TYPE, version);
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.Version.", e);
-			}
+			this.version = version;
 		}
 
 		public void setVersion(long version) {
@@ -1115,7 +1399,17 @@ public class Apptentive {
 		}
 
 		public String getVersion() {
-			return optString(TYPE, null);
+			return version;
+		}
+
+		public void toJsonObject() {
+			JSONObject ret = new JSONObject();
+			try {
+				ret.put(KEY_TYPE, TYPE);
+				ret.put(TYPE, version);
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error creating Apptentive.Version.", e);
+			}
 		}
 
 		@Override
@@ -1162,31 +1456,38 @@ public class Apptentive {
 		}
 	}
 
-	public static class DateTime extends JSONObject implements Comparable<DateTime> {
+	public static class DateTime implements Serializable, Comparable<DateTime> {
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "datetime";
 		public static final String SEC = "sec";
 
-		public DateTime(String json) throws JSONException {
-			super(json);
+		private String sec;
+
+		public DateTime(JSONObject json) throws JSONException {
+			this.sec = json.optString(SEC);
 		}
 
 		public DateTime(double dateTime) {
-			super();
 			setDateTime(dateTime);
 		}
 
 		public void setDateTime(double dateTime) {
-			try {
-				put(KEY_TYPE, TYPE);
-				put(SEC, dateTime);
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
-			}
+			sec = String.valueOf(dateTime);
 		}
 
 		public double getDateTime() {
-			return optDouble(SEC);
+			return Double.valueOf(sec);
+		}
+
+		public JSONObject toJSONObject() {
+			JSONObject ret = new JSONObject();
+			try {
+				ret.put(KEY_TYPE, TYPE);
+				ret.put(SEC, sec);
+			} catch (JSONException e) {
+				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
+			}
+			return ret;
 		}
 
 		@Override

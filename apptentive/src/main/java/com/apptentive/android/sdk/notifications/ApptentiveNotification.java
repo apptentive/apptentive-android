@@ -1,5 +1,13 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.notifications;
 
+import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.Map;
@@ -27,12 +35,27 @@ public class ApptentiveNotification {
 		return name;
 	}
 
+	public boolean hasName(String name) {
+		return StringUtils.equal(this.name, name);
+	}
+
+	public <T> T getRequiredUserInfo(String key, Class<? extends T> valueClass) {
+		final T userInfo = getUserInfo(key, valueClass);
+		// FIXME: Why was this assert here? Not all requests will have response data.
+		//Assert.assertNotNull(userInfo, "Missing required user info '%s' for '%s' notification", key, name);
+		return userInfo;
+	}
+
+	public <T> T getUserInfo(String key, Class<? extends T> valueClass) {
+		return userInfo != null ? ObjectUtils.as(userInfo.get(key), valueClass) : null;
+	}
+
 	public Map<String, Object> getUserInfo() {
 		return userInfo;
 	}
 
 	@Override
 	public String toString() {
-		return String.format("[%s] name=%s userInfo=%s", name, StringUtils.toString(userInfo));
+		return String.format("name=%s userInfo={%s}", name, StringUtils.toString(userInfo));
 	}
 }

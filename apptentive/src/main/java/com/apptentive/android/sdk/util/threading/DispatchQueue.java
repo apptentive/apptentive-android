@@ -84,7 +84,21 @@ public abstract class DispatchQueue {
 	 * A global dispatch queue associated with main thread
 	 */
 	public static DispatchQueue mainQueue() {
-		return Holder.INSTANCE;
+		return Holder.MAIN_QUEUE;
+	}
+
+	/**
+	 * Returns <code>true</code> if code is executing on the main queue
+	 */
+	public static boolean isMainQueue() {
+		return Looper.getMainLooper() == Looper.myLooper(); // FIXME: make it configurable for Unit testing
+	}
+
+	/**
+	 * A global dispatch concurrent queue
+	 */
+	public static DispatchQueue backgroundQueue() {
+		return Holder.BACKGROUND_QUEUE;
 	}
 
 	/**
@@ -105,7 +119,8 @@ public abstract class DispatchQueue {
 	 * Thread safe singleton trick
 	 */
 	private static class Holder {
-		private static final DispatchQueue INSTANCE = createMainQueue();
+		private static final DispatchQueue MAIN_QUEUE = createMainQueue();
+		private static final DispatchQueue BACKGROUND_QUEUE = createBackgroundQueue();
 
 		private static DispatchQueue createMainQueue() {
 			try {
@@ -115,6 +130,10 @@ public abstract class DispatchQueue {
 			} catch (Exception e) {
 				return null;
 			}
+		}
+
+		private static DispatchQueue createBackgroundQueue() {
+			return new ConcurrentDispatchQueue("Apptentive Background Queue");
 		}
 	}
 }
