@@ -58,6 +58,11 @@ public class ApptentiveNotifications {
 	 */
 	public static final String NOTIFICATION_AUTHENTICATION_FAILED = "NOTIFICATION_AUTHENTICATION_FAILED"; // { conversationId : String, authenticationFailedReason: AuthenticationFailedReason }
 
+	/**
+	 * Sent when interactions are fetched for any conversation. Used right now so espresso tests know when they can run.
+	 */
+	public static final String NOTIFICATION_INTERACTIONS_FETCHED = "NOTIFICATION_INTERACTIONS_FETCHED";
+
 	// keys
 	public static final String NOTIFICATION_KEY_SUCCESSFUL = "successful";
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
