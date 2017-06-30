@@ -35,7 +35,7 @@ before_script:
 script:
   - ./gradlew :apptentive:test -i
 after_script:
-  - ./gradlew :apptentive:uploadArchives
+  - if [ $TRAVIS_BRANCH = 'develop' ]; ./gradlew :apptentive:uploadArchives; fi
 notifications:
   slack:
     secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=
