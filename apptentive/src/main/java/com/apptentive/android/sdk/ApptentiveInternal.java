@@ -72,6 +72,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AP
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_FETCHED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
@@ -963,6 +964,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_FETCHED);
 		Iterator it = interactionUpdateListeners.iterator();
 
 		while (it.hasNext()) {
