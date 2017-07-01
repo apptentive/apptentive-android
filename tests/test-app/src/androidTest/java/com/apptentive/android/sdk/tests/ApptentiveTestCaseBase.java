@@ -69,7 +69,7 @@ public abstract class ApptentiveTestCaseBase {
 			}
 			return builder.toString();
 		} catch (IOException e) {
-			ApptentiveLog.e("Error reading from raw resource with ID \"%d\"", e, resourceId);
+			ApptentiveLog.e(e, "Error reading from raw resource with ID \"%d\"", resourceId);
 		} finally {
 			Util.ensureClosed(reader);
 		}
@@ -94,7 +94,7 @@ public abstract class ApptentiveTestCaseBase {
 			}
 			return builder.toString();
 		} catch (IOException e) {
-			ApptentiveLog.e("Error reading from file \"%s\"", e, path);
+			ApptentiveLog.e(e, "Error reading from file \"%s\"", path);
 		} finally {
 			Util.ensureClosed(reader);
 		}

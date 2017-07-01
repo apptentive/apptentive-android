@@ -42,7 +42,7 @@ public class WhitespaceTrimmingTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 	}

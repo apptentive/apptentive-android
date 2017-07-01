@@ -35,7 +35,7 @@ public class CriteriaParsingTest extends ApptentiveTestCaseBase {
 			Clause criteria = ClauseParser.parse(json);
 			assertNotNull("Criteria was null, but it shouldn't be.", criteria);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNotNull(e);
 		}
 	}
