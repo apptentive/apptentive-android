@@ -324,7 +324,7 @@ public class FieldManager {
 				try {
 					return QueryPart.valueOf(name);
 				} catch (IllegalArgumentException e) {
-					ApptentiveLog.d(String.format("Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name), e);
+					ApptentiveLog.d(e, "Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name);
 				}
 			}
 			return other;

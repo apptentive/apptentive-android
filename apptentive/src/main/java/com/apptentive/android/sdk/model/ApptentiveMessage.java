@@ -108,7 +108,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			}
 			put(KEY_CUSTOM_DATA, customDataJson);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_CUSTOM_DATA);
+			ApptentiveLog.e(e, "Exception setting ApptentiveMessage's %s field.", KEY_CUSTOM_DATA);
 		}
 	}
 
@@ -143,7 +143,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			}
 			sender.put(KEY_SENDER_ID, senderId);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Exception setting ApptentiveMessage's %s field.", e, KEY_SENDER_ID);
+			ApptentiveLog.e(e, "Exception setting ApptentiveMessage's %s field.", KEY_SENDER_ID);
 		}
 	}
 

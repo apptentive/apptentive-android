@@ -70,7 +70,7 @@ public class EngagementModule {
 			conversation.addPayload(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(conversation, context, eventLabel);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in engage()", e);
+			ApptentiveLog.w(e, "Error in engage()");
 			MetricModule.sendError(e, null, null);
 		}
 		return false;

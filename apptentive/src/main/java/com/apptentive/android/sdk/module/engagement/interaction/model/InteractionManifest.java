@@ -42,7 +42,7 @@ public class InteractionManifest extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Unable to load Interactions from InteractionManifest.", e);
+			ApptentiveLog.w(e, "Unable to load Interactions from InteractionManifest.");
 		}
 		return null;
 	}
@@ -54,7 +54,7 @@ public class InteractionManifest extends JSONObject {
 				return new Targets(targets.toString());
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Unable to load Targets from InteractionManifest.", e);
+			ApptentiveLog.w(e, "Unable to load Targets from InteractionManifest.");
 		}
 		return null;
 	}

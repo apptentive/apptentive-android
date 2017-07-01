@@ -579,7 +579,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 			return null;
 		} catch (Exception e) {
-			ApptentiveLog.e("Error getting oldest unsent payload.", e);
+			ApptentiveLog.e(e, "Error getting oldest unsent payload.");
 			return null;
 		} finally {
 			ensureClosed(cursor);

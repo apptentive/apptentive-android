@@ -32,7 +32,7 @@ public class Actions extends JSONArray {
 				}
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Exception parsing interactions array.", e);
+			ApptentiveLog.w(e, "Exception parsing interactions array.");
 		}
 		return ret;
 	}

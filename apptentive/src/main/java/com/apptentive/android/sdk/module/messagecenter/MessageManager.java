@@ -129,7 +129,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 						@Override
 						protected void execute() {
-							ApptentiveLog.w("Unhandled Exception thrown from fetching new message task", e);
+							ApptentiveLog.w(e, "Unhandled Exception thrown from fetching new message task");
 							MetricModule.sendError(e, null, null);
 						}
 					});
@@ -248,9 +248,9 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		try {
 			ret = parseMessagesString(response.getContent());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing messages JSON.", e);
+			ApptentiveLog.e(e, "Error parsing messages JSON.");
 		} catch (Exception e) {
-			ApptentiveLog.e("Unexpected error parsing messages JSON.", e);
+			ApptentiveLog.e(e, "Unexpected error parsing messages JSON.");
 		}
 		return ret;
 	}
@@ -331,7 +331,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing sent apptentiveMessage response.", e);
+				ApptentiveLog.e(e, "Error parsing sent apptentiveMessage response.");
 			}
 			messageStore.updateMessage(apptentiveMessage);
 

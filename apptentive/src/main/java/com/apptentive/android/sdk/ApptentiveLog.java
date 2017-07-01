@@ -187,31 +187,6 @@ public class ApptentiveLog {
 		doLog(Level.ASSERT, null, throwable, message, args);
 	}
 
-	//region TODO: Delete these:
-	public static void vv(String message, Throwable throwable, Object... args){
-		doLog(Level.VERY_VERBOSE, null, throwable, message, args);
-	}
-
-	public static void v(String message, Throwable throwable, Object... args){
-		doLog(Level.VERBOSE, null, throwable, message, args);
-	}
-	public static void d(String message, Throwable throwable, Object... args){
-		doLog(Level.DEBUG, null, throwable, message, args);
-	}
-	public static void i(String message, Throwable throwable, Object... args){
-		doLog(Level.INFO, null, throwable, message, args);
-	}
-	public static void w(String message, Throwable throwable, Object... args){
-		doLog(Level.WARN, null, throwable, message, args);
-	}
-	public static void e(String message, Throwable throwable, Object... args){
-		doLog(Level.ERROR, null, throwable, message, args);
-	}
-	public static void a(String message, Throwable throwable, Object... args){
-		doLog(Level.ASSERT, null, throwable, message, args);
-	}
-	//endregion
-
 	public enum Level {
 		VERY_VERBOSE(1, Log.VERBOSE),
 		VERBOSE(Log.VERBOSE, Log.VERBOSE),

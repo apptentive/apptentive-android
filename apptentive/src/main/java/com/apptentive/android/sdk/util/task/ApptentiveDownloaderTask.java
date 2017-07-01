@@ -66,7 +66,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		try {
 			finished = downloadBitmap((String) params[0], (String) params[1], (String) params[2]);
 		} catch (Exception e) {
-			ApptentiveLog.d("Error downloading bitmap", e);
+			ApptentiveLog.d(e, "Error downloading bitmap");
 		}
 		return finished;
 	}
@@ -224,18 +224,18 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			ApptentiveLog.w("Error communicating with server.", e);
+			ApptentiveLog.w(e, "Error communicating with server.");
 		} catch (SocketTimeoutException e) {
-			ApptentiveLog.w("Timeout communicating with server.", e);
+			ApptentiveLog.w(e, "Timeout communicating with server.");
 		} catch (final MalformedURLException e) {
-			ApptentiveLog.w("ClientProtocolException", e);
+			ApptentiveLog.w(e, "ClientProtocolException");
 		} catch (final IOException e) {
-			ApptentiveLog.w("ClientProtocolException", e);
+			ApptentiveLog.w(e, "ClientProtocolException");
 			// Read the error response.
 			try {
 				ret.setContent(ApptentiveClient.getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
-				ApptentiveLog.w("Can't read error stream.", ex);
+				ApptentiveLog.w(ex, "Can't read error stream.");
 			}
 		}
 

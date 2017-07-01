@@ -145,7 +145,7 @@ public class Util {
 							Integer ret = Integer.parseInt(expiration);
 							return ret;
 						} catch (NumberFormatException e) {
-							ApptentiveLog.e("Error parsing cache expiration as number: %s", e, expiration);
+							ApptentiveLog.e(e, "Error parsing cache expiration as number: %s", expiration);
 						}
 					}
 				}
@@ -208,7 +208,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Error getting app version name.", e);
+			ApptentiveLog.e(e, "Error getting app version name.");
 		}
 		return null;
 	}
@@ -219,7 +219,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Error getting app version code.", e);
+			ApptentiveLog.e(e, "Error getting app version code.");
 		}
 		return -1;
 	}
@@ -279,7 +279,7 @@ public class Util {
 				return Integer.parseInt(parts[0]);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error getting major OS version", e);
+			ApptentiveLog.w(e, "Error getting major OS version");
 		}
 		return -1;
 	}
@@ -630,7 +630,7 @@ public class Util {
 					context.startActivity(intent);
 					return true;
 				} catch (ActivityNotFoundException e) {
-					ApptentiveLog.e("Activity not found to open attachment: ", e);
+					ApptentiveLog.e(e, "Activity not found to open attachment: ");
 				}
 			}
 		} else {
@@ -920,9 +920,9 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newMap);
 				} catch (NoSuchFieldException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				} catch (IllegalAccessException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				}
 			}
 		} else {
@@ -940,9 +940,9 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newTypeface);
 				} catch (NoSuchFieldException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				} catch (IllegalAccessException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				}
 			}
 		}
@@ -1000,7 +1000,7 @@ public class Util {
 				return Util.trim(metaData.getString(key));
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
+			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
 		}
 
 		return null;
