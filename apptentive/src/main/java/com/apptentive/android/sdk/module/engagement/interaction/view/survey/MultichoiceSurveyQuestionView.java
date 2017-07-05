@@ -153,7 +153,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 				}
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error getting survey answer.", e);
+			ApptentiveLog.e(e, "Error getting survey answer.");
 		}
 		return null;
 	}

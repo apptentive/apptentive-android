@@ -154,7 +154,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 				updateHosts(getFragmentManager(), (FragmentHostCallback) hostField.get(getFragmentManager()));
 			} catch (Exception e) {
-				ApptentiveLog.w(e.getMessage(), e);
+				ApptentiveLog.w(e, e.getMessage());
 			}
 		} else {
 			//If the child fragment manager has not been retained yet
@@ -179,7 +179,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 						mHostField.setAccessible(true);
 						mHostField.set(fragment, currentHost);
 					} catch (Exception e) {
-						ApptentiveLog.w(e.getMessage(), e);
+						ApptentiveLog.w(e, e.getMessage());
 					}
 					if (fragment.getChildFragmentManager() != null) {
 						updateHosts(fragment.getChildFragmentManager(), currentHost);

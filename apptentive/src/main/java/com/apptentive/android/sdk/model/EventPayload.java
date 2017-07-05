@@ -51,7 +51,7 @@ public class EventPayload extends ConversationItem {
 				put(KEY_DATA, dataObject);
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to construct Event.", e);
+			ApptentiveLog.e(e, "Unable to construct Event.");
 		}
 	}
 
@@ -79,7 +79,7 @@ public class EventPayload extends ConversationItem {
 				}
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to construct Event.", e);
+			ApptentiveLog.e(e, "Unable to construct Event.");
 		}
 	}
 
@@ -140,7 +140,7 @@ public class EventPayload extends ConversationItem {
 				dataObject.put(key, data.get(key));
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to add data to Event.", e);
+			ApptentiveLog.e(e, "Unable to add data to Event.");
 		}
 	}
 

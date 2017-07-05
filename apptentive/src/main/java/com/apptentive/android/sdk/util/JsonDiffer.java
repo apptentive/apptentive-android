@@ -59,7 +59,7 @@ public class JsonDiffer {
 					// Do nothing.
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.w("Error diffing object with key %s", e, key);
+				ApptentiveLog.w(e, "Error diffing object with key %s", key);
 			} finally {
 				it.remove();
 			}
@@ -105,7 +105,7 @@ public class JsonDiffer {
 						return false;
 					}
 				} catch (JSONException e) {
-					ApptentiveLog.w("Error comparing JSONObjects", e);
+					ApptentiveLog.w(e, "Error comparing JSONObjects");
 					return false;
 				}
 			}
@@ -123,7 +123,7 @@ public class JsonDiffer {
 					}
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.e("", e);
+				ApptentiveLog.e(e, "");
 				return false;
 			}
 			return true;

@@ -33,7 +33,7 @@ public class SurveyResponsePayload extends ConversationItem {
 
 			put(KEY_SURVEY_ANSWERS, answersJson);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Unable to construct survey payload.", e);
+			ApptentiveLog.e(e, "Unable to construct survey payload.");
 		}
 	}
 

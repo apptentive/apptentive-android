@@ -75,7 +75,7 @@ public class MetricModule {
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to
 			// prevent the app from crashing.
-			ApptentiveLog.w("Error creating Error Metric. Nothing we can do but log this.", e);
+			ApptentiveLog.w(e, "Error creating Error Metric. Nothing we can do but log this.");
 		}
 	}
 

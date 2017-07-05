@@ -693,7 +693,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				ApptentiveLog.d("Cannot open file attachment");
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error loading attachment", e);
+			ApptentiveLog.e(e, "Error loading attachment");
 		}
 	}
 
@@ -717,7 +717,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			dialog.show(ft, DIALOG_IMAGE_PREVIEW);
 
 		} catch (Exception e) {
-			ApptentiveLog.e("Error loading attachment preview.", e);
+			ApptentiveLog.e(e, "Error loading attachment preview.");
 		}
 	}
 

@@ -36,7 +36,7 @@ public class MessageFactory {
 					break;
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.v("Error parsing json as Message: %s", e, json);
+			ApptentiveLog.v(e, "Error parsing json as Message: %s", json);
 		} catch (IllegalArgumentException e) {
 			// Exception treated as unknown type
 		}

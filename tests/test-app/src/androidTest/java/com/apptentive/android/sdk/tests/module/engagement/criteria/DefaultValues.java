@@ -39,7 +39,7 @@ public class DefaultValues extends ApptentiveTestCaseBase {
 			boolean result = criteria.evaluate();
 			assertTrue(result);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 	}

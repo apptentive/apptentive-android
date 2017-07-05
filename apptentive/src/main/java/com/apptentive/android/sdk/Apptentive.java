@@ -742,7 +742,7 @@ public class Apptentive {
 			}
 			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.showMessageCenter()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.showMessageCenter()");
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -762,7 +762,7 @@ public class Apptentive {
 			}
 			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.canShowMessageCenter()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.canShowMessageCenter()");
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -787,7 +787,7 @@ public class Apptentive {
 			}
 			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.setUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -810,7 +810,7 @@ public class Apptentive {
 				conversation.getMessageManager().addHostUnreadMessagesListener(listener);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.addUnreadMessagesListener()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.addUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -829,7 +829,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			return conversation.getMessageManager().getUnreadMessageCount();
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.getUnreadMessageCount()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.getUnreadMessageCount()");
 			MetricModule.sendError(e, null, null);
 		}
 		return 0;
@@ -859,7 +859,7 @@ public class Apptentive {
 				mgr.sendMessage(message);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.sendAttachmentText(String)", e);
+			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentText(String)");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -923,7 +923,7 @@ public class Apptentive {
 				mgr.sendMessage(message);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(String)", e);
+			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(String)");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -950,7 +950,7 @@ public class Apptentive {
 				Util.ensureClosed(is);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(byte[], String)", e);
+			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(byte[], String)");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -998,7 +998,7 @@ public class Apptentive {
 			message.setAssociatedFiles(attachmentStoredFiles);
 			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.sendAttachmentFile(InputStream, String)", e);
+			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(InputStream, String)");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1118,7 +1118,7 @@ public class Apptentive {
 				return EngagementModule.canShowInteraction(ApptentiveInternal.getInstance().getConversation(), "app", event, "local");
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.canShowInteraction()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.canShowInteraction()");
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -1140,7 +1140,7 @@ public class Apptentive {
 				internal.setOnSurveyFinishedListener(listener);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.setOnSurveyFinishedListener()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.setOnSurveyFinishedListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1175,7 +1175,7 @@ public class Apptentive {
 				ApptentiveInternal.getInstance().login(token, callback);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.login()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.login()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1207,7 +1207,7 @@ public class Apptentive {
 				instance.logout();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Exception in Apptentive.logout()", e);
+			ApptentiveLog.e(e, "Exception in Apptentive.logout()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1231,7 +1231,7 @@ public class Apptentive {
 			}
 			ApptentiveInternal.getInstance().setAuthenticationFailureListener(listener);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.setUnreadMessagesListener()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.setUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1243,7 +1243,7 @@ public class Apptentive {
 			}
 			ApptentiveInternal.getInstance().setAuthenticationFailureListener(null);
 		} catch (Exception e) {
-			ApptentiveLog.w("Error in Apptentive.clearUnreadMessagesListener()", e);
+			ApptentiveLog.w(e, "Error in Apptentive.clearUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1408,7 +1408,7 @@ public class Apptentive {
 				ret.put(KEY_TYPE, TYPE);
 				ret.put(TYPE, version);
 			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.Version.", e);
+				ApptentiveLog.e(e, "Error creating Apptentive.Version.");
 			}
 		}
 
@@ -1485,7 +1485,7 @@ public class Apptentive {
 				ret.put(KEY_TYPE, TYPE);
 				ret.put(SEC, sec);
 			} catch (JSONException e) {
-				ApptentiveLog.e("Error creating Apptentive.DateTime.", e);
+				ApptentiveLog.e(e, "Error creating Apptentive.DateTime.");
 			}
 			return ret;
 		}

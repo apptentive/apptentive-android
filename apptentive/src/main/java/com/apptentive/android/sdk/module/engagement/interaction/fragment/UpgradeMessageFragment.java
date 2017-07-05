@@ -76,7 +76,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 			PackageInfo pi = pm.getPackageInfo(context.getPackageName(), 0);
 			return ContextCompat.getDrawable(getContext(), pi.applicationInfo.icon);
 		} catch (Exception e) {
-			ApptentiveLog.e("Error loading app icon.", e);
+			ApptentiveLog.e(e, "Error loading app icon.");
 		}
 		return null;
 	}

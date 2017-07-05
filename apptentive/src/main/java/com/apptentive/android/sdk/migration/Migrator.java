@@ -145,7 +145,7 @@ public class Migrator {
 				conversation.setDevice(device);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error migrating Device.", e);
+			ApptentiveLog.e(e, "Error migrating Device.");
 		}
 	}
 
@@ -164,7 +164,7 @@ public class Migrator {
 				sdk.setAuthorEmail(sdkOld.getAuthorEmail());
 				conversation.setSdk(sdk);
 			} catch (Exception e) {
-				ApptentiveLog.e("Error migrating Sdk.", e);
+				ApptentiveLog.e(e, "Error migrating Sdk.");
 			}
 		}
 	}
@@ -186,7 +186,7 @@ public class Migrator {
 				appRelease.setVersionName(appReleaseOld.getVersionName());
 				conversation.setAppRelease(appRelease);
 			} catch (Exception e) {
-				ApptentiveLog.e("Error migrating AppRelease.", e);
+				ApptentiveLog.e(e, "Error migrating AppRelease.");
 			}
 		}
 	}
@@ -226,7 +226,7 @@ public class Migrator {
 				}
 				conversation.setPerson(person);
 			} catch (Exception e) {
-				ApptentiveLog.e("Error migrating Person.", e);
+				ApptentiveLog.e(e, "Error migrating Person.");
 			}
 		}
 	}
@@ -250,7 +250,7 @@ public class Migrator {
 				}
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error migrating VersionHistory entries V2 to V3.", e);
+			ApptentiveLog.w(e, "Error migrating VersionHistory entries V2 to V3.");
 		}
 	}
 
@@ -268,7 +268,7 @@ public class Migrator {
 				eventData.setInteractions(migratedInteractions);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error migrating Event Data.", e);
+			ApptentiveLog.w(e, "Error migrating Event Data.");
 		}
 	}
 

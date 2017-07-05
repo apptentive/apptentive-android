@@ -157,19 +157,19 @@ public class ApptentiveClient {
 				ApptentiveLog.w("Response: %s", ret.getContent());
 			}
 		} catch (IllegalArgumentException e) {
-			ApptentiveLog.w("Error communicating with server.", e);
+			ApptentiveLog.w(e, "Error communicating with server.");
 		} catch (SocketTimeoutException e) {
-			ApptentiveLog.w("Timeout communicating with server.", e);
+			ApptentiveLog.w(e, "Timeout communicating with server.");
 		} catch (final MalformedURLException e) {
-			ApptentiveLog.w("MalformedUrlException", e);
+			ApptentiveLog.w(e, "MalformedUrlException");
 		} catch (final IOException e) {
-			ApptentiveLog.w("IOException", e);
+			ApptentiveLog.w(e, "IOException");
 			// Read the error response.
 			try {
 				ret.setContent(getErrorResponse(connection, ret.isZipped()));
 				ApptentiveLog.w("Response: " + ret.getContent());
 			} catch (IOException ex) {
-				ApptentiveLog.w("Can't read error stream.", ex);
+				ApptentiveLog.w(ex, "Can't read error stream.");
 			}
 		}
 		return ret;

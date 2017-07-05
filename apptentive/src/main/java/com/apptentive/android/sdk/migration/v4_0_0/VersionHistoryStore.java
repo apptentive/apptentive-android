@@ -55,7 +55,7 @@ public class VersionHistoryStore {
 					versionHistoryEntries.add(entry);
 				}
 			} catch (Exception e) {
-				ApptentiveLog.w("Error loading VersionHistoryStore.", e);
+				ApptentiveLog.w(e, "Error loading VersionHistoryStore.");
 			}
 		}
 	}
@@ -87,7 +87,7 @@ public class VersionHistoryStore {
 				save();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error updating VersionHistoryStore.", e);
+			ApptentiveLog.w(e, "Error updating VersionHistoryStore.");
 		}
 	}
 

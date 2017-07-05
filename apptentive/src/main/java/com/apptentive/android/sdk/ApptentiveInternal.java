@@ -575,7 +575,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			}
 
 		} catch (Exception e) {
-			ApptentiveLog.e("Unexpected error while reading application or package info.", e);
+			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
 			bRet = false;
 		}
 
@@ -898,7 +898,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.e("Error parsing JSON from push notification.", e);
+				ApptentiveLog.e(e, "Error parsing JSON from push notification.");
 				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
 			}
 		}

@@ -115,7 +115,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error creating ApptentiveViewActivity.", e);
+			ApptentiveLog.e(e, "Error creating ApptentiveViewActivity.");
 			MetricModule.sendError(e, null, null);
 		}
 
@@ -298,7 +298,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 				setTaskDescription(taskDes);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error apply Apptentive Theme.", e);
+			ApptentiveLog.e(e, "Error apply Apptentive Theme.");
 		}
 	}
 

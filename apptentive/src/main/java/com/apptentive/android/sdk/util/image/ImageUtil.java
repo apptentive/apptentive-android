@@ -289,10 +289,10 @@ public class ImageUtil {
 			smaller.recycle();
 			System.gc();
 		} catch (FileNotFoundException e) {
-			ApptentiveLog.e("File not found while storing image.", e);
+			ApptentiveLog.e(e, "File not found while storing image.");
 			return false;
 		} catch (Exception e) {
-			ApptentiveLog.a("Error storing image.", e);
+			ApptentiveLog.a(e, "Error storing image.");
 			return false;
 		} finally {
 			Util.ensureClosed(cos);
@@ -322,7 +322,7 @@ public class ImageUtil {
 			smaller.recycle();
 			return true;
 		} catch (Exception e) {
-			ApptentiveLog.a("Error storing image.", e);
+			ApptentiveLog.a(e, "Error storing image.");
 			return false;
 		} finally {
 			Util.ensureClosed(cos);
