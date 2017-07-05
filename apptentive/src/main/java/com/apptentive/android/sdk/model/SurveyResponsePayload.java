@@ -18,6 +18,8 @@ import java.util.Map;
 
 public class SurveyResponsePayload extends ConversationItem {
 
+	private static final String KEY_RESPONSE = "response";
+
 	private static final String KEY_SURVEY_ID = "id";
 
 	private static final String KEY_SURVEY_ANSWERS = "answers";
@@ -41,11 +43,22 @@ public class SurveyResponsePayload extends ConversationItem {
 		super(PayloadType.survey, json);
 	}
 
+	@Override
+	protected JSONObject marshallForSending() {
+		JSONObject object = new JSONObject();
+		try {
+			object.put(KEY_RESPONSE, super.marshallForSending());
+		} catch (JSONException e) {
+			ApptentiveLog.e(e, "Error creating survey response object");
+		}
+		return object;
+	}
+
 	//region Http-request
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {
-		return StringUtils.format("/conversations/%s/surveys/%s/respond", conversationId, getId());
+		return StringUtils.format("/conversations/%s/surveys/%s/responses", conversationId, getId());
 	}
 
 	@Override
