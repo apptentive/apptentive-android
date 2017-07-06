@@ -64,7 +64,7 @@ class FileMessageStore implements MessageStore {
 				if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
 					existing.isRead = true;
 				}
-				existing.json = apptentiveMessage.toString();
+				existing.json = apptentiveMessage.getJsonObject().toString();
 			} else {
 				// Insert
 				MessageEntry entry = new MessageEntry();
@@ -73,7 +73,7 @@ class FileMessageStore implements MessageStore {
 				entry.nonce = apptentiveMessage.getNonce();
 				entry.state = apptentiveMessage.getState().name();
 				entry.isRead = apptentiveMessage.isRead();
-				entry.json = apptentiveMessage.toString();
+				entry.json = apptentiveMessage.getJsonObject().toString();
 				messageEntries.add(entry);
 			}
 		}
