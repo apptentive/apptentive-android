@@ -99,7 +99,7 @@ class PayloadSender {
 	 * @param payload
 	 */
 	private synchronized void sendPayloadRequest(final PayloadData payload) {
-		ApptentiveLog.v(PAYLOADS, "Sending payload: %s", payload.getClass().getName());
+		ApptentiveLog.v(PAYLOADS, "Sending payload: %s", payload);
 
 		// create request object
 		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {

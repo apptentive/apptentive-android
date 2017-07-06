@@ -99,6 +99,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	 * a new message is added.
 	 */
 	public void addPayload(final Payload payload) {
+		ApptentiveLog.v(PAYLOADS, "Adding payload: %s", payload);
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {

@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,7 +40,6 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] renderData() {
 		if (encryptionKey != null) {
-			ApptentiveLog.v(PAYLOADS, "Getting data for encrypted payload.");
 			byte[] bytes = marshallForSending().toString().getBytes();
 			Encryptor encryptor = new Encryptor(encryptionKey);
 			try {
@@ -49,7 +49,6 @@ public abstract class JsonPayload extends Payload {
 			}
 			return null;
 		} else {
-			ApptentiveLog.v(PAYLOADS, "Getting data for plaintext payload.");
 			return marshallForSending().toString().getBytes();
 		}
 	}
@@ -148,9 +147,8 @@ public abstract class JsonPayload extends Payload {
 
 	@Override
 	public String toString() {
-		return jsonObject.toString();
+		return StringUtils.format("%s %s", getClass().getSimpleName(), jsonObject);
 	}
-
 
 	//endregion
 
