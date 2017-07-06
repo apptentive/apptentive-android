@@ -233,7 +233,6 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		}
 
 		if (payload == null) {
-			ApptentiveLog.v(PAYLOADS, "Can't send the next payload: no unsent payloads found");
 			return;
 		}
 

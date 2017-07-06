@@ -84,7 +84,7 @@ public class MetricModule {
 		if (conversation != null) {
 			conversation.addPayload(event);
 		} else {
-			ApptentiveLog.w("Unable to send event '%s': no active conversation");
+			ApptentiveLog.w("Unable to send event '%s': no active conversation", event);
 		}
 	}
 }

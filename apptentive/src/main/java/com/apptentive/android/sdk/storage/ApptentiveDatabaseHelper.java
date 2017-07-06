@@ -37,6 +37,8 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.debug.Assert.assertFalse;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
@@ -550,18 +552,22 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			while(cursor.moveToNext()) {
 				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
 				if (conversationId == null) {
+					ApptentiveLog.d(PAYLOADS, "Oldest unsent payload is missing a conversation id");
 					return null;
 				}
 
 				final String authToken = cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index);
+				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
 
 				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
+				assertFalse(PayloadType.unknown.equals(payloadType), "Oldest unsent payload has unknown type");
+
 				if (PayloadType.unknown.equals(payloadType)) {
-					return null;
+					deletePayload(nonce);
+					continue;
 				}
 
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
-				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
 
 				// TODO: We need a migration for existing payload bodies to put them into files.
 
