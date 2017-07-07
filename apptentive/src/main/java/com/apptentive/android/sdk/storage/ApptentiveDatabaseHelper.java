@@ -507,6 +507,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				db.endTransaction();
 			}
 		}
+
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			printPayloadTable("Added payload");
+		}
 	}
 
 	void deletePayload(String payloadIdentifier) {
@@ -529,6 +533,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// Then delete the data file
 		File dest = getPayloadBodyFile(payloadIdentifier);
 		ApptentiveLog.v(DATABASE, "Deleted payload \"%s\" data file successfully? %b", payloadIdentifier, dest.delete());
+
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			printPayloadTable("Deleted payload");
+		}
 	}
 
 	void deleteAllPayloads() {
@@ -543,12 +551,18 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	PayloadData getOldestUnsentPayload() {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			printPayloadTable("getOldestUnsentPayload");
+		}
 
 		SQLiteDatabase db;
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
+			int count = cursor.getCount();
+			ApptentiveLog.v(PAYLOADS, "Unsent payloads count: %d", count);
+
 			while(cursor.moveToNext()) {
 				final String conversationId = cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index);
 				if (conversationId == null) {
@@ -597,6 +611,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	void updateIncompletePayloads(String conversationId, String authToken, String localConversationId) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			printPayloadTable("updateIncompletePayloads BEFORE");
+		}
+
 		if (StringUtils.isNullOrEmpty(conversationId)) {
 			throw new IllegalArgumentException("Conversation id is null or empty");
 		}
@@ -619,6 +637,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 		// remove incomplete payloads which don't belong to an active conversation
 		removeCorruptedPayloads();
+
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+			printPayloadTable("updateIncompletePayloads AFTER");
+		}
 	}
 
 	private void removeCorruptedPayloads() {
@@ -755,6 +777,60 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		@Override
 		public String toString() {
 			return name;
+		}
+	}
+
+	//endregion
+
+	//region Debug
+
+	private void printPayloadTable(String title) {
+		SQLiteDatabase db;
+		Cursor cursor = null;
+		try {
+			db = getWritableDatabase();
+			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
+			int payloadCount = cursor.getCount();
+			if (payloadCount == 0) {
+				ApptentiveLog.vv(PAYLOADS, "%s (%d payload(s))", title, payloadCount);
+				return;
+			}
+
+			Object[][] rows = new Object[1 + payloadCount][];
+			rows[0] = new Object[] {
+					PayloadEntry.COLUMN_PRIMARY_KEY,
+					PayloadEntry.COLUMN_PAYLOAD_TYPE,
+					PayloadEntry.COLUMN_IDENTIFIER,
+					PayloadEntry.COLUMN_CONTENT_TYPE,
+					PayloadEntry.COLUMN_CONVERSATION_ID,
+					PayloadEntry.COLUMN_REQUEST_METHOD,
+					PayloadEntry.COLUMN_PATH,
+					PayloadEntry.COLUMN_ENCRYPTED,
+					PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID,
+					PayloadEntry.COLUMN_AUTH_TOKEN
+			};
+
+			int index = 1;
+			while(cursor.moveToNext()) {
+
+				rows[index++] = new Object[] {
+						cursor.getInt(PayloadEntry.COLUMN_PRIMARY_KEY.index),
+						cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index),
+						cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index),
+						cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index),
+						cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index),
+						cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index),
+						cursor.getString(PayloadEntry.COLUMN_PATH.index),
+						cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index),
+						cursor.getString(PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID.index),
+						cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index)
+				};
+			}
+			ApptentiveLog.vv(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));
+		} catch (Exception ignored) {
+			ignored.printStackTrace();
+		} finally {
+			ensureClosed(cursor);
 		}
 	}
 

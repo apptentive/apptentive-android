@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.migration.Migrator;
+import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -44,6 +45,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
+import java.util.List;
 
 import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
@@ -124,6 +126,9 @@ public class ConversationManager {
 			// resolving metadata
 			ApptentiveLog.vv(CONVERSATION, "Resolving metadata...");
 			conversationMetadata = resolveMetadata();
+			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+				printMetadata(conversationMetadata, "Loaded Metadata");
+			}
 
 			// attempt to load existing conversation
 			ApptentiveLog.vv(CONVERSATION, "Loading active conversation...");
@@ -443,6 +448,9 @@ public class ConversationManager {
 			}
 
 			updateMetadataItems(conversation);
+			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+				printMetadata(conversationMetadata, "Updated Metadata");
+			}
 		}
 	}
 
@@ -802,6 +810,43 @@ public class ConversationManager {
 			ApptentiveLog.w(CONVERSATION, "Attempted to logout(), but there was no Active Conversation.");
 		}
 		dispatchDebugEvent(EVT_LOGOUT);
+	}
+
+	//endregion
+
+	//region Debug
+
+	private void printMetadata(ConversationMetadata metadata, String title) {
+		List<ConversationMetadataItem> items = metadata.getItems();
+		if (items.isEmpty()) {
+			ApptentiveLog.vv(CONVERSATION, "%s (%d item(s))", title, items.size());
+			return;
+		}
+
+		Object[][] rows = new Object[1 + items.size()][];
+		rows[0] = new Object[] {
+			"state",
+			"conversationId",
+			"userId",
+			"dataFile",
+			"messagesFile",
+			"conversationToken",
+			"encryptionKey"
+		};
+		int index = 1;
+		for (ConversationMetadataItem item : items) {
+			rows[index++] = new Object[] {
+				item.state,
+				item.conversationId,
+				item.userId,
+				item.dataFile,
+				item.messagesFile,
+				item.conversationToken,
+				item.encryptionKey
+			};
+		}
+
+		ApptentiveLog.vv(CONVERSATION, "%s (%d item(s))\n%s", title, items.size(), StringUtils.table(rows));
 	}
 
 	//endregion

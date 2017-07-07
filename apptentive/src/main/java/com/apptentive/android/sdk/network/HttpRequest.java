@@ -149,6 +149,9 @@ public class HttpRequest {
 	 */
 	private DispatchQueue callbackQueue;
 
+	/** Optional injector for debugging purposes */
+	private Injector injector;
+
 	public HttpRequest(String urlString) {
 		if (urlString == null || urlString.length() == 0) {
 			throw new IllegalArgumentException("Invalid URL string '" + urlString + "'");
@@ -253,8 +256,12 @@ public class HttpRequest {
 		}
 	}
 
-	private void sendRequestSync() throws IOException {
+	private void sendRequestSync() throws Exception {
 		try {
+			if (injector != null) {
+				injector.onBeforeSend(this);
+			}
+
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s %s", method, url);
 			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
@@ -321,6 +328,10 @@ public class HttpRequest {
 
 			if (isCancelled()) {
 				return;
+			}
+
+			if (injector != null) {
+				injector.onAfterSend(this);
 			}
 
 			// optionally handle response data (should be overridden in a sub class)
@@ -596,6 +607,10 @@ public class HttpRequest {
 		responseCode = code;
 	}
 
+	public void setInjector(Injector injector) {
+		this.injector = injector;
+	}
+
 	//endregion
 
 	//region Listener
@@ -623,6 +638,18 @@ public class HttpRequest {
 		@Override
 		public void onFail(T request, String reason) {
 
+		}
+	}
+
+	//endregion
+
+	//region Debug
+
+	public static class Injector {
+		public void onBeforeSend(HttpRequest request) throws Exception {
+		}
+
+		public void onAfterSend(HttpRequest request) throws Exception {
 		}
 	}
 

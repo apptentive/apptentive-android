@@ -190,4 +190,44 @@ public final class StringUtils {
 		}
 		return ret;
 	}
+
+	public static String table(Object[][] rows) {
+		return table(rows, null);
+	}
+
+	public static String table(Object[][] rows, String title) {
+		int[] columnSizes = new int[rows[0].length];
+		for (Object[] row : rows) {
+			for (int i = 0; i < row.length; ++i) {
+				columnSizes[i] = Math.max(columnSizes[i], toString(row[i]).length());
+			}
+		}
+
+		StringBuilder line = new StringBuilder();
+		int totalSize = 0;
+		for (int i = 0; i < columnSizes.length; ++i) {
+			totalSize += columnSizes[i];
+		}
+		totalSize += columnSizes.length > 0 ? (columnSizes.length - 1) * " | ".length() : 0;
+		while (totalSize-- > 0) {
+			line.append('-');
+		}
+
+		StringBuilder result = new StringBuilder(line);
+
+		for (Object[] row : rows) {
+			result.append("\n");
+
+			for (int i = 0; i < row.length; ++i) {
+				if (i > 0) {
+					result.append(" | ");
+				}
+
+				result.append(String.format("%-" + columnSizes[i] + "s", row[i]));
+			}
+		}
+
+		result.append("\n").append(line);
+		return result.toString();
+	}
 }
