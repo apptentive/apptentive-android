@@ -292,10 +292,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		FileSerializer serializer;
 		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
-			Assert.assertFalse(hasState(ANONYMOUS, ANONYMOUS_PENDING));
+			Assert.assertFalse(hasState(ANONYMOUS, ANONYMOUS_PENDING, LEGACY_PENDING));
 			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		} else {
-			Assert.assertTrue(hasState(ANONYMOUS, ANONYMOUS_PENDING));
+			Assert.assertTrue(hasState(ANONYMOUS, ANONYMOUS_PENDING, LEGACY_PENDING), "Unexpected conversation state: %s", getState());
 			serializer = new FileSerializer(conversationDataFile);
 		}
 

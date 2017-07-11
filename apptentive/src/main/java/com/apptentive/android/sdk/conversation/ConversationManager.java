@@ -204,11 +204,11 @@ public class ConversationManager {
 			lastSeenVersion.setVersion(lastSeenVersionString);
 			if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
 
-				Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
-				migrator.migrate();
-
 				anonymousConversation.setState(LEGACY_PENDING);
 				anonymousConversation.setConversationToken(legacyConversationToken);
+
+				Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
+				migrator.migrate();
 
 				ApptentiveLog.v("Fetching legacy conversation...");
 				fetchLegacyConversation(anonymousConversation)
