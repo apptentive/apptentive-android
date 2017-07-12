@@ -495,9 +495,10 @@ public class ConversationManager {
 			}
 		}
 
-		// delete all existing encryption keys
+		// delete sensitive information
 		for (ConversationMetadataItem item : conversationMetadata) {
 			item.encryptionKey = null;
+			item.conversationToken = null;
 		}
 
 		// update the state of the corresponding item
@@ -507,7 +508,9 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();
-		item.conversationToken = conversation.getConversationToken(); // TODO: can it be null for active conversations?
+		if (conversation.hasActiveState()) {
+			item.conversationToken = conversation.getConversationToken();
+		}
 
 		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {
@@ -737,6 +740,7 @@ public class ConversationManager {
 								});
 
 								if (conversationItem != null) {
+									conversationItem.conversationToken = token;
 									conversationItem.encryptionKey = encryptionKey;
 									activeConversation = loadConversation(conversationItem);
 								} else {
