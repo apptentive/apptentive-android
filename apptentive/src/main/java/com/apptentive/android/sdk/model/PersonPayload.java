@@ -6,10 +6,12 @@
 
 package com.apptentive.android.sdk.model;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
+import org.json.JSONObject;
 
 public class PersonPayload extends JsonPayload {
 
@@ -36,6 +38,17 @@ public class PersonPayload extends JsonPayload {
 	}
 
 	//region Http-request
+
+	@Override
+	protected JSONObject marshallForSending() {
+		JSONObject object = new JSONObject();
+		try {
+			object.put(KEY, super.marshallForSending());
+		} catch (JSONException e) {
+			ApptentiveLog.e(e, "Error creating person object");
+		}
+		return object;
+	}
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {

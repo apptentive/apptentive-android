@@ -10,58 +10,74 @@ import com.apptentive.android.sdk.model.PersonPayload;
 
 public class PersonManager {
 
-	public static PersonPayload getDiffPayload(com.apptentive.android.sdk.storage.Person oldPerson, com.apptentive.android.sdk.storage.Person newPerson) {
+	public static PersonPayload getDiffPayload(Person oldPerson, Person newPerson) {
 		if (newPerson == null) {
 			return null;
 		}
 
 		PersonPayload ret = new PersonPayload();
+		boolean changed = false;
 
-		if (oldPerson == null || !oldPerson.getId().equals(newPerson.getId())) {
+		if (oldPerson == null || !equal(oldPerson.getId(), newPerson.getId())) {
 			ret.setId(newPerson.getId());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getEmail().equals(newPerson.getEmail())) {
+		if (oldPerson == null || !equal(oldPerson.getEmail(), newPerson.getEmail())) {
 			ret.setEmail(newPerson.getEmail());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getName().equals(newPerson.getName())) {
+		if (oldPerson == null || !equal(oldPerson.getName(), newPerson.getName())) {
 			ret.setName(newPerson.getName());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getFacebookId().equals(newPerson.getFacebookId())) {
+		if (oldPerson == null || !equal(oldPerson.getFacebookId(), newPerson.getFacebookId())) {
 			ret.setFacebookId(newPerson.getFacebookId());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getPhoneNumber().equals(newPerson.getPhoneNumber())) {
+		if (oldPerson == null || !equal(oldPerson.getPhoneNumber(), newPerson.getPhoneNumber())) {
 			ret.setPhoneNumber(newPerson.getPhoneNumber());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getStreet().equals(newPerson.getStreet())) {
+		if (oldPerson == null || !equal(oldPerson.getStreet(), newPerson.getStreet())) {
 			ret.setStreet(newPerson.getStreet());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getCity().equals(newPerson.getCity())) {
+		if (oldPerson == null || !equal(oldPerson.getCity(), newPerson.getCity())) {
 			ret.setCity(newPerson.getCity());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getZip().equals(newPerson.getZip())) {
+		if (oldPerson == null || !equal(oldPerson.getZip(), newPerson.getZip())) {
 			ret.setZip(newPerson.getZip());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getCountry().equals(newPerson.getCountry())) {
+		if (oldPerson == null || !equal(oldPerson.getCountry(), newPerson.getCountry())) {
 			ret.setCountry(newPerson.getCountry());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getBirthday().equals(newPerson.getBirthday())) {
+		if (oldPerson == null || !equal(oldPerson.getBirthday(), newPerson.getBirthday())) {
 			ret.setBirthday(newPerson.getBirthday());
+			changed = true;
 		}
 
-		if (oldPerson == null || !oldPerson.getCustomData().equals(newPerson.getCustomData())) {
+		if (oldPerson == null || !equal(oldPerson.getCustomData(), newPerson.getCustomData())) {
 			CustomData customData = newPerson.getCustomData();
 			ret.setCustomData(customData != null ? customData.toJson() : null);
+			changed = true;
 		}
 
-		return ret;
+		return changed ? ret : null;
+	}
+
+	private static boolean equal(Object a, Object b) {
+		return a == null && b == null || a != null && b != null && a.equals(b);
 	}
 }

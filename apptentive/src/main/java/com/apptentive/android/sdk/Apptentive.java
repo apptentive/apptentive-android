@@ -30,6 +30,7 @@ import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
+import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -83,8 +84,8 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				// FIXME: Make sure Person object diff is sent.
 				conversation.getPerson().setEmail(email);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -118,8 +119,8 @@ public class Apptentive {
 		if (ApptentiveInternal.isApptentiveRegistered()) {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
-				// FIXME: Make sure Person object diff is sent.
 				conversation.getPerson().setName(name);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -242,6 +243,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getPerson().getCustomData().put(key, value);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -276,6 +278,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getPerson().getCustomData().put(key, value);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -285,6 +288,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getPerson().getCustomData().put(key, version);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -294,6 +298,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getPerson().getCustomData().remove(key);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}
@@ -308,6 +313,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getPerson().getCustomData().remove(key);
+				conversation.schedulePersonUpdate();
 			}
 		}
 	}

@@ -173,4 +173,27 @@ public class Person implements Saveable, DataChangedListener {
 	}
 
 	//endregion
+	
+	//region Clone
+
+	public Person clone() {
+		Person person = new Person();
+		person.id = id;
+		person.email = email;
+		person.name = name;
+		person.facebookId = facebookId;
+		person.phoneNumber = phoneNumber;
+		person.street = street;
+		person.city = city;
+		person.zip = zip;
+		person.country = country;
+		person.birthday = birthday;
+		if (customData != null) {
+			person.customData.putAll(customData);
+		}
+		person.listener = listener;
+		return person;
+	}
+
+	//endregion
 }

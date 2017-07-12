@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.storage;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
 import org.json.JSONException;
 
 import java.io.Serializable;
@@ -70,8 +72,9 @@ public class CustomData extends HashMap<String, Serializable> implements Saveabl
 			for (String key : keys) {
 				ret.put(key, get(key));
 			}
+			return ret;
 		} catch (JSONException e) {
-			// This can't happen.
+			ApptentiveLog.e(e, "Exception while creating custom data");
 		}
 		return null;
 	}
