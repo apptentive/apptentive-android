@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.Payload;
+import com.apptentive.android.sdk.model.PersonPayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionManifest;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -30,6 +31,7 @@ import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
+import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.storage.VersionHistory;
@@ -46,6 +48,7 @@ import org.json.JSONException;
 import java.io.File;
 
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
@@ -340,6 +343,28 @@ public class Conversation implements DataChangedListener, Destroyable {
 	@Override
 	public void destroy() {
 		messageManager.destroy();
+	}
+
+	//endregion
+
+	//region Diffs & Updates
+
+	private final DispatchTask personUpdateTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			Person lastSentPerson = getLastSentPerson();
+			Person currentPerson = getPerson();
+			assertNotNull(currentPerson, "Current person object is null");
+			PersonPayload personPayload = PersonManager.getDiffPayload(lastSentPerson, currentPerson);
+			if (personPayload != null) {
+				addPayload(personPayload);
+				setLastSentPerson(currentPerson != null ? currentPerson.clone() : null);
+			}
+		}
+	};
+
+	public void schedulePersonUpdate() {
+		DispatchQueue.mainQueue().dispatchAsyncOnce(personUpdateTask);
 	}
 
 	//endregion
