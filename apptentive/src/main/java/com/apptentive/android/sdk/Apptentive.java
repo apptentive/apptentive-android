@@ -157,6 +157,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getDevice().getCustomData().put(key, value);
+				conversation.scheduleDeviceUpdate();
 			}
 		}
 	}
@@ -223,6 +224,7 @@ public class Apptentive {
 			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 			if (conversation != null) {
 				conversation.getDevice().getCustomData().remove(key);
+				conversation.scheduleDeviceUpdate();
 			}
 		}
 	}

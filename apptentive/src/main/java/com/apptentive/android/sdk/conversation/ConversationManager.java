@@ -383,7 +383,7 @@ public class ConversationManager {
 						conversation.setConversationToken(conversationToken);
 						conversation.setConversationId(conversationId);
 						conversation.setDevice(device);
-						conversation.setLastSentDevice(device);
+						conversation.setLastSentDevice(device.clone());
 						conversation.setAppRelease(appRelease);
 						conversation.setSdk(sdk);
 						conversation.setLastSeenSdkVersion(sdk.getVersion());

@@ -63,6 +63,39 @@ public class Device implements Saveable, DataChangedListener {
 	public void onDataChanged() {
 		notifyDataChanged();
 	}
+	
+	public Device clone() {
+		Device clone = new Device();
+		clone.uuid = uuid;
+		clone.osName = osName;
+		clone.osVersion = osVersion;
+		clone.osBuild = osBuild;
+		clone.osApiLevel = osApiLevel;
+		clone.manufacturer = manufacturer;
+		clone.model = model;
+		clone.board = board;
+		clone.product = product;
+		clone.brand = brand;
+		clone.cpu = cpu;
+		clone.device = device;
+		clone.carrier = carrier;
+		clone.currentCarrier = currentCarrier;
+		clone.networkType = networkType;
+		clone.buildType = buildType;
+		clone.buildId = buildId;
+		clone.bootloaderVersion = bootloaderVersion;
+		clone.radioVersion = radioVersion;
+		if (customData != null) {
+			clone.customData.putAll(customData);
+		}
+		clone.localeCountryCode = localeCountryCode;
+		clone.localeLanguageCode = localeLanguageCode;
+		clone.localeRaw = localeRaw;
+		clone.utcOffset = utcOffset;
+		clone.integrationConfig = integrationConfig; // TODO: make a deep clone
+		clone.listener = listener;
+		return clone;
+	}
 
 	//region Getters & Setters
 
@@ -339,6 +372,6 @@ public class Device implements Saveable, DataChangedListener {
 		notifyDataChanged();
 	}
 
-//endregion
+	//endregion
 
 }

@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PersonPayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -25,6 +26,7 @@ import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
@@ -363,8 +365,26 @@ public class Conversation implements DataChangedListener, Destroyable {
 		}
 	};
 
+	private final DispatchTask deviceUpdateTask = new DispatchTask() {
+		@Override
+		protected void execute() {
+			Device lastSentDevice = getLastSentDevice();
+			Device currentDevice = getDevice();
+			assertNotNull(currentDevice, "Current device object is null");
+			DevicePayload devicePayload = DeviceManager.getDiffPayload(lastSentDevice, currentDevice);
+			if (devicePayload != null) {
+				addPayload(devicePayload);
+				setLastSentDevice(currentDevice != null ? currentDevice.clone() : null);
+			}
+		}
+	};
+
 	public void schedulePersonUpdate() {
 		DispatchQueue.mainQueue().dispatchAsyncOnce(personUpdateTask);
+	}
+
+	public void scheduleDeviceUpdate() {
+		DispatchQueue.mainQueue().dispatchAsyncOnce(deviceUpdateTask);
 	}
 
 	//endregion
