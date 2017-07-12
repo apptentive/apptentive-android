@@ -437,6 +437,7 @@ public class ConversationManager {
 
 			if (conversation.hasActiveState()) {
 				conversation.fetchInteractions(getContext());
+				conversation.getMessageManager().startPollingMessages();
 
 				// Update conversation with push configuration changes that happened while it wasn't active.
 				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
