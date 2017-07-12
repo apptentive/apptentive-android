@@ -64,117 +64,144 @@ public class DeviceManager {
 		return device;
 	}
 
-	public static void onSentDeviceInfo() {
-	}
-
 	public static DevicePayload getDiffPayload(com.apptentive.android.sdk.storage.Device oldDevice, com.apptentive.android.sdk.storage.Device newDevice) {
 		if (newDevice == null) {
 			return null;
 		}
 
 		DevicePayload ret = new DevicePayload();
+		boolean changed = false;
 
-		if (oldDevice == null || !oldDevice.getUuid().equals(newDevice.getUuid())) {
+		if (oldDevice == null || !equal(oldDevice.getUuid(), newDevice.getUuid())) {
 			ret.setUuid(newDevice.getUuid());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getOsName().equals(newDevice.getOsName())) {
+		if (oldDevice == null || !equal(oldDevice.getOsName(), newDevice.getOsName())) {
 			ret.setOsName(newDevice.getOsName());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getOsVersion().equals(newDevice.getOsVersion())) {
+		if (oldDevice == null || !equal(oldDevice.getOsVersion(), newDevice.getOsVersion())) {
 			ret.setOsVersion(newDevice.getOsVersion());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getOsBuild().equals(newDevice.getOsBuild())) {
+		if (oldDevice == null || !equal(oldDevice.getOsBuild(), newDevice.getOsBuild())) {
 			ret.setOsBuild(newDevice.getOsBuild());
+			changed = true;
 		}
 
 		if (oldDevice == null || oldDevice.getOsApiLevel() != newDevice.getOsApiLevel()) {
 			ret.setOsApiLevel(String.valueOf(newDevice.getOsApiLevel()));
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getManufacturer().equals(newDevice.getManufacturer())) {
+		if (oldDevice == null || !equal(oldDevice.getManufacturer(), newDevice.getManufacturer())) {
 			ret.setManufacturer(newDevice.getManufacturer());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getModel().equals(newDevice.getModel())) {
+		if (oldDevice == null || !equal(oldDevice.getModel(), newDevice.getModel())) {
 			ret.setModel(newDevice.getModel());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getBoard().equals(newDevice.getBoard())) {
+		if (oldDevice == null || !equal(oldDevice.getBoard(), newDevice.getBoard())) {
 			ret.setBoard(newDevice.getBoard());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getProduct().equals(newDevice.getProduct())) {
+		if (oldDevice == null || !equal(oldDevice.getProduct(), newDevice.getProduct())) {
 			ret.setProduct(newDevice.getProduct());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getBrand().equals(newDevice.getBrand())) {
+		if (oldDevice == null || !equal(oldDevice.getBrand(), newDevice.getBrand())) {
 			ret.setBrand(newDevice.getBrand());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getCpu().equals(newDevice.getCpu())) {
+		if (oldDevice == null || !equal(oldDevice.getCpu(), newDevice.getCpu())) {
 			ret.setCpu(newDevice.getCpu());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getDevice().equals(newDevice.getDevice())) {
+		if (oldDevice == null || !equal(oldDevice.getDevice(), newDevice.getDevice())) {
 			ret.setDevice(newDevice.getDevice());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getCarrier().equals(newDevice.getCarrier())) {
+		if (oldDevice == null || !equal(oldDevice.getCarrier(), newDevice.getCarrier())) {
 			ret.setCarrier(newDevice.getCarrier());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getCurrentCarrier().equals(newDevice.getCurrentCarrier())) {
+		if (oldDevice == null || !equal(oldDevice.getCurrentCarrier(), newDevice.getCurrentCarrier())) {
 			ret.setCurrentCarrier(newDevice.getCurrentCarrier());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getNetworkType().equals(newDevice.getNetworkType())) {
+		if (oldDevice == null || !equal(oldDevice.getNetworkType(), newDevice.getNetworkType())) {
 			ret.setNetworkType(newDevice.getNetworkType());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getBuildType().equals(newDevice.getBuildType())) {
+		if (oldDevice == null || !equal(oldDevice.getBuildType(), newDevice.getBuildType())) {
 			ret.setBuildType(newDevice.getBuildType());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getBuildId().equals(newDevice.getBuildId())) {
+		if (oldDevice == null || !equal(oldDevice.getBuildId(), newDevice.getBuildId())) {
 			ret.setBuildId(newDevice.getBuildId());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getBootloaderVersion().equals(newDevice.getBootloaderVersion())) {
+		if (oldDevice == null || !equal(oldDevice.getBootloaderVersion(), newDevice.getBootloaderVersion())) {
 			ret.setBootloaderVersion(newDevice.getBootloaderVersion());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getRadioVersion().equals(newDevice.getRadioVersion())) {
+		if (oldDevice == null || !equal(oldDevice.getRadioVersion(), newDevice.getRadioVersion())) {
 			ret.setRadioVersion(newDevice.getRadioVersion());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getCustomData().equals(newDevice.getCustomData())) {
+		if (oldDevice == null || !equal(oldDevice.getCustomData(), newDevice.getCustomData())) {
 			CustomData customData = newDevice.getCustomData();
 			ret.setCustomData(customData != null ? customData.toJson() : null);
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getLocaleCountryCode().equals(newDevice.getLocaleCountryCode())) {
+		if (oldDevice == null || !equal(oldDevice.getLocaleCountryCode(), newDevice.getLocaleCountryCode())) {
 			ret.setLocaleCountryCode(newDevice.getLocaleCountryCode());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getLocaleLanguageCode().equals(newDevice.getLocaleLanguageCode())) {
+		if (oldDevice == null || !equal(oldDevice.getLocaleLanguageCode(), newDevice.getLocaleLanguageCode())) {
 			ret.setLocaleLanguageCode(newDevice.getLocaleLanguageCode());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getLocaleRaw().equals(newDevice.getLocaleRaw())) {
+		if (oldDevice == null || !equal(oldDevice.getLocaleRaw(), newDevice.getLocaleRaw())) {
 			ret.setLocaleRaw(newDevice.getLocaleRaw());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getUtcOffset().equals(newDevice.getUtcOffset())) {
+		if (oldDevice == null || !equal(oldDevice.getUtcOffset(), newDevice.getUtcOffset())) {
 			ret.setUtcOffset(newDevice.getUtcOffset());
+			changed = true;
 		}
 
-		if (oldDevice == null || !oldDevice.getIntegrationConfig().equals(newDevice.getIntegrationConfig())) {
+		if (oldDevice == null || !equal(oldDevice.getIntegrationConfig(), newDevice.getIntegrationConfig())) {
 			IntegrationConfig integrationConfig = newDevice.getIntegrationConfig();
 			ret.setIntegrationConfig(integrationConfig != null ? integrationConfig.toJson() : null);
+			changed = true;
 		}
-		return ret;
+		return changed ? ret : null;
+	}
+
+	private static boolean equal(Object a, Object b) {
+		return a == null && b == null || a != null && b != null && a.equals(b);
 	}
 }
