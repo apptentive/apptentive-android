@@ -806,6 +806,7 @@ public class ConversationManager {
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
 					activeConversation = null;
+					ApptentiveInternal.dismissAllInteractions();
 					break;
 				default:
 					ApptentiveLog.w(CONVERSATION, "Attempted to logout() from Conversation, but the Active Conversation was not in LOGGED_IN state.");
