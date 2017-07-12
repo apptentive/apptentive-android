@@ -350,8 +350,7 @@ public class ConversationManager {
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 
 		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
-		conversationTokenRequest.setSdk(SdkManager.getPayload(sdk));
-		conversationTokenRequest.setAppRelease(AppReleaseManager.getPayload(appRelease));
+		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
 
 		HttpRequest request = getHttpClient()
 			.getConversationToken(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
