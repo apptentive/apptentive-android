@@ -406,6 +406,17 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	//endregion
 
+	//region Polling
+
+	public void startPollingMessages() {
+		pollingWorker.startPolling();
+	}
+
+	public void stopPollingMessages() {
+		pollingWorker.stopPolling();
+	}
+
+	//endregion
 
 	// Listeners
 	public interface AfterSendMessageListener {
