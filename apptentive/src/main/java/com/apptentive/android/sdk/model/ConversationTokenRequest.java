@@ -7,9 +7,12 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 public class ConversationTokenRequest extends JSONObject {
 	public ConversationTokenRequest() {
@@ -39,11 +42,37 @@ public class ConversationTokenRequest extends JSONObject {
 		}
 	}
 
-	public void setAppRelease(AppReleasePayload appRelease) {
+	public void setSdkAndAppRelease(SdkPayload sdkPayload, AppReleasePayload appReleasePayload) {
+		JSONObject combinedJson = new JSONObject();
+
+		if (sdkPayload != null) {
+			Iterator<String> keys = sdkPayload.getJsonObject().keys();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				try {
+					combinedJson.put("sdk_" + key, sdkPayload.getJsonObject().opt(key));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+		if (appReleasePayload != null) {
+			Iterator<String> keys = appReleasePayload.getJsonObject().keys();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				try {
+					combinedJson.put(key, appReleasePayload.getJsonObject().opt(key));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 		try {
-			put(AppReleasePayload.KEY, appRelease == null ? null : appRelease.getJsonObject());
+			put("app_release", combinedJson);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", AppReleasePayload.KEY);
+			e.printStackTrace();
 		}
 	}
 }
