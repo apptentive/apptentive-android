@@ -16,8 +16,8 @@ public class EventData implements Saveable {
 
 	private static final long serialVersionUID = 1L;
 
-	private Map<String, EventRecord> events;
-	private Map<String, EventRecord> interactions;
+	private Map<String, EventRecord> events; // we need a synchronized access to the map to avoid concurrent modification exceptions
+	private Map<String, EventRecord> interactions; // we need a synchronized access to the map to avoid concurrent modification exceptions
 
 	public EventData() {
 		events = new HashMap<String, EventRecord>();
@@ -64,7 +64,7 @@ public class EventData implements Saveable {
 		notifyDataChanged();
 	}
 
-	public Long getEventCountTotal(String eventLabel) {
+	public synchronized Long getEventCountTotal(String eventLabel) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord == null) {
 			return 0L;
@@ -72,7 +72,7 @@ public class EventData implements Saveable {
 		return eventRecord.getTotal();
 	}
 
-	public Long getInteractionCountTotal(String interactionId) {
+	public synchronized Long getInteractionCountTotal(String interactionId) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord != null) {
 			return eventRecord.getTotal();
@@ -80,7 +80,7 @@ public class EventData implements Saveable {
 		return 0L;
 	}
 
-	public Double getTimeOfLastEventInvocation(String eventLabel) {
+	public synchronized Double getTimeOfLastEventInvocation(String eventLabel) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord != null) {
 			return eventRecord.getLast();
@@ -88,7 +88,7 @@ public class EventData implements Saveable {
 		return null;
 	}
 
-	public Double getTimeOfLastInteractionInvocation(String interactionId) {
+	public synchronized Double getTimeOfLastInteractionInvocation(String interactionId) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord != null) {
 			return eventRecord.getLast();
@@ -96,7 +96,7 @@ public class EventData implements Saveable {
 		return null;
 	}
 
-	public Long getEventCountForVersionCode(String eventLabel, Integer versionCode) {
+	public synchronized Long getEventCountForVersionCode(String eventLabel, Integer versionCode) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord != null) {
 			return eventRecord.getCountForVersionCode(versionCode);
@@ -104,7 +104,7 @@ public class EventData implements Saveable {
 		return 0L;
 	}
 
-	public Long getInteractionCountForVersionCode(String interactionId, Integer versionCode) {
+	public synchronized Long getInteractionCountForVersionCode(String interactionId, Integer versionCode) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord != null) {
 			return eventRecord.getCountForVersionCode(versionCode);
@@ -112,7 +112,7 @@ public class EventData implements Saveable {
 		return 0L;
 	}
 
-	public Long getEventCountForVersionName(String eventLabel, String versionName) {
+	public synchronized Long getEventCountForVersionName(String eventLabel, String versionName) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord != null) {
 			return eventRecord.getCountForVersionName(versionName);
@@ -120,7 +120,7 @@ public class EventData implements Saveable {
 		return 0L;
 	}
 
-	public Long getInteractionCountForVersionName(String interactionId, String versionName) {
+	public synchronized Long getInteractionCountForVersionName(String interactionId, String versionName) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord != null) {
 			return eventRecord.getCountForVersionName(versionName);
@@ -129,7 +129,7 @@ public class EventData implements Saveable {
 	}
 
 
-	public String toString() {
+	public synchronized String toString() {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Events: ");
 		for (String key : events.keySet()) {
@@ -147,7 +147,7 @@ public class EventData implements Saveable {
 	/**
 	 * Used for migration only.
 	 */
-	public void setEvents(Map<String, EventRecord> events) {
+	public synchronized void setEvents(Map<String, EventRecord> events) {
 		this.events = events;
 		notifyDataChanged();
 	}
@@ -155,7 +155,7 @@ public class EventData implements Saveable {
 	/**
 	 * Used for migration only.
 	 */
-	public void setInteractions(Map<String, EventRecord> interactions) {
+	public synchronized void setInteractions(Map<String, EventRecord> interactions) {
 		this.interactions = interactions;
 		notifyDataChanged();
 	}
