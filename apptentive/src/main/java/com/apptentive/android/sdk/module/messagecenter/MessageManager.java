@@ -223,6 +223,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		conversation.addPayload(apptentiveMessage);
 	}
 
+	public void addMessages(ApptentiveMessage[] messages) {
+		messageStore.addOrUpdateMessages(messages);
+	}
+
 	/**
 	 * This doesn't need to be run during normal program execution. Testing only.
 	 */

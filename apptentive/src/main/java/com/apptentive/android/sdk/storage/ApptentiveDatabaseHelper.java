@@ -14,6 +14,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
@@ -22,11 +23,15 @@ import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,6 +44,7 @@ import java.util.UUID;
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
@@ -449,8 +455,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				db.insert(PayloadEntry.TABLE_NAME, null, values);
 			}
 
-			// 5. Finally, delete the temporary legacy table
-			ApptentiveLog.vv(DATABASE, "\t5. Delete temporary \"legacy_payloads\" database.");
+			// 5. Migrate messages
+			ApptentiveLog.vv(DATABASE, "\t6. Migrating messages.");
+			migrateMessages(db);
+
+			// 6. Finally, delete the temporary legacy table
+			ApptentiveLog.vv(DATABASE, "\t6. Delete temporary \"legacy_payloads\" database.");
 			db.execSQL(DELETE_LEGACY_PAYLOAD_TABLE);
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
@@ -462,6 +472,50 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 		}
 	}
+
+	private void migrateMessages(SQLiteDatabase db) {
+		try {
+			final List<ApptentiveMessage> messages = getAllMessages(db);
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					MessageManager messageManager = ApptentiveInternal.getInstance().getMessageManager();
+					assertNotNull(messageManager, "Can't migrate messages: message manager is not initialized");
+					if (messageManager != null) {
+						messageManager.addMessages(messages.toArray(new ApptentiveMessage[messages.size()]));
+					}
+				}
+			});
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while trying to migrate messages");
+		}
+	}
+
+	private List<ApptentiveMessage> getAllMessages(SQLiteDatabase db) {
+		List<ApptentiveMessage> messages = new ArrayList<>();
+		Cursor cursor = null;
+		try {
+			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
+			while (cursor.moveToNext()) {
+				String json = cursor.getString(6);
+				ApptentiveMessage message = MessageFactory.fromJson(json);
+				if (message == null) {
+					ApptentiveLog.e("Error parsing Record json from database: %s", json);
+					continue;
+				}
+				message.setId(cursor.getString(1));
+				message.setCreatedAt(cursor.getDouble(2));
+				message.setNonce(cursor.getString(3));
+				message.setState(ApptentiveMessage.State.parse(cursor.getString(4)));
+				message.setRead(cursor.getInt(5) == TRUE);
+				messages.add(message);
+			}
+		} finally {
+			ensureClosed(cursor);
+		}
+		return messages;
+	}
+
 
 	//endregion
 
