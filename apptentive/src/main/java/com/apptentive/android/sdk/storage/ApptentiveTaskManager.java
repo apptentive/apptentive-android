@@ -185,12 +185,15 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
 			if (appInBackground) {
 				ApptentiveLog.v(PAYLOADS, "The app went to the background so we won't remove the payload from the queue");
+				retrySending(5000);
 				return;
 			} else if (responseCode == -1) {
 				ApptentiveLog.v(PAYLOADS, "Payload failed to send due to a connection error.");
+				retrySending(5000);
 				return;
 			} else if (responseCode > 500) {
 				ApptentiveLog.v(PAYLOADS, "Payload failed to send due to a server error.");
+				retrySending(5000);
 				return;
 			}
 		} else {
@@ -199,6 +202,22 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		// Only let the payload be deleted if it was successfully sent, or got an unrecoverable client error.
 		deletePayload(payload.getNonce());
+	}
+
+	private void retrySending(long delayMillis) {
+		ApptentiveLog.d(PAYLOADS, "Retry sending payloads in %d ms", delayMillis);
+		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
+			@Override
+			protected void execute() {
+				singleThreadExecutor.execute(new Runnable() {
+					@Override
+					public void run() {
+						ApptentiveLog.d(PAYLOADS, "Retrying sending payloads");
+						sendNextPayloadSync();
+					}
+				});
+			}
+		}, delayMillis);
 	}
 
 	//endregion
