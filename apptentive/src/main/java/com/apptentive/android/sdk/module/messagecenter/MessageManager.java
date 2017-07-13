@@ -305,6 +305,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		final boolean isSuccessful = responseCode >= 200 && responseCode < 300;
 		final boolean isRejectedTemporarily = !(isSuccessful || isRejectedPermanently);
 
+		if (responseCode == -1) {
+			pauseSending(SEND_PAUSE_REASON_NETWORK);
+		}
+
 		if (isRejectedPermanently || responseCode == -1) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
