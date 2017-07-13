@@ -173,8 +173,18 @@ public class ConversationManager {
 		// check if we have a 'pending' anonymous conversation
 		item = conversationMetadata.findItem(ANONYMOUS_PENDING);
 		if (item != null) {
+			ApptentiveLog.v(CONVERSATION, "Loading anonymous pending conversation...");
 			final Conversation conversation = loadConversation(item);
 			fetchConversationToken(conversation);
+			return conversation;
+		}
+
+		// check if we have a 'legacy pending' conversation
+		item = conversationMetadata.findItem(LEGACY_PENDING);
+		if (item != null) {
+			ApptentiveLog.v(CONVERSATION, "Loading legacy pending conversation...");
+			final Conversation conversation = loadConversation(item);
+			fetchLegacyConversation(conversation);
 			return conversation;
 		}
 
@@ -479,12 +489,6 @@ public class ConversationManager {
 	}
 
 	private void updateMetadataItems(Conversation conversation) {
-
-		if (conversation.hasState(ANONYMOUS_PENDING, LEGACY_PENDING)) {
-			ApptentiveLog.v(CONVERSATION, "Skipping updating metadata since conversation is %s", conversation.getState());
-			return;
-		}
-
 		// if the conversation is 'logged-in' we should not have any other 'logged-in' items in metadata
 		if (conversation.hasState(LOGGED_IN)) {
 			for (ConversationMetadataItem item : conversationMetadata) {

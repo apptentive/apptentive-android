@@ -1,6 +1,7 @@
 package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.serialization.SerializableObject;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -66,7 +67,7 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 		return findItem(new Filter() {
 			@Override
 			public boolean accept(ConversationMetadataItem item) {
-				return item.conversationId.equals(conversation.getConversationId());
+				return StringUtils.equal(item.conversationId, conversation.getConversationId());
 			}
 		});
 	}

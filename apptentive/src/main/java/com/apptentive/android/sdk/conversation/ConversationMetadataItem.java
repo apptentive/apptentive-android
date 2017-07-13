@@ -52,10 +52,6 @@ public class ConversationMetadataItem implements SerializableObject {
 	String userId;
 
 	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
-		if (StringUtils.isNullOrEmpty(conversationId)) {
-			throw new IllegalArgumentException("Conversation id is null or empty");
-		}
-
 		if (dataFile == null) {
 			throw new IllegalArgumentException("Data file is null");
 		}
@@ -70,7 +66,7 @@ public class ConversationMetadataItem implements SerializableObject {
 	}
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
-		conversationId = in.readUTF();
+		conversationId = readNullableUTF(in);
 		conversationToken = readNullableUTF(in);
 		dataFile = new File(in.readUTF());
 		messagesFile = new File(in.readUTF());
@@ -81,7 +77,7 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
-		out.writeUTF(conversationId);
+		writeNullableUTF(out, conversationId);
 		writeNullableUTF(out, conversationToken);
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
