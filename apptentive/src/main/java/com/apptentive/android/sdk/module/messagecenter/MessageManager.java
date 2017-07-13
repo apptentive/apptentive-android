@@ -305,10 +305,6 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		final boolean isSuccessful = responseCode >= 200 && responseCode < 300;
 		final boolean isRejectedTemporarily = !(isSuccessful || isRejectedPermanently);
 
-		if (responseCode == -1) {
-			pauseSending(SEND_PAUSE_REASON_NETWORK);
-		}
-
 		if (isRejectedPermanently || responseCode == -1) {
 			if (apptentiveMessage instanceof CompoundMessage) {
 				apptentiveMessage.setCreatedAt(Double.MIN_VALUE);
@@ -396,6 +392,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			final PayloadData payload = notification.getRequiredUserInfo(NOTIFICATION_KEY_PAYLOAD, PayloadData.class);
 			final Integer responseCode = notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_CODE, Integer.class);
 			final JSONObject responseData = successful ? notification.getRequiredUserInfo(NOTIFICATION_KEY_RESPONSE_DATA, JSONObject.class) : null;
+			if (responseCode == -1) {
+				pauseSending(SEND_PAUSE_REASON_NETWORK);
+			}
+
 			if (payload.getType().equals(PayloadType.message)) {
 				onSentMessage(payload.getNonce(), responseCode, responseData);
 			}
