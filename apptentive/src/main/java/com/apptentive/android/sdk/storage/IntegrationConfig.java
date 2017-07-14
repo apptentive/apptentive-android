@@ -95,10 +95,22 @@ public class IntegrationConfig implements Saveable {
 			if (parse != null) {
 				ret.put(INTEGRATION_PARSE, parse.toJson());
 			}
+			return ret;
 		} catch (JSONException e) {
 			// This can't happen.
 		}
 		return null;
+	}
+
+	// TODO: unit tests
+	public IntegrationConfig clone() {
+		IntegrationConfig clone = new IntegrationConfig();
+		clone.apptentive = apptentive != null ? apptentive.clone() : null;
+		clone.amazonAwsSns = amazonAwsSns != null ? amazonAwsSns.clone() : null;
+		clone.urbanAirship = urbanAirship != null ? urbanAirship.clone() : null;
+		clone.parse = parse != null ? parse.clone() : null;
+		clone.listener = listener;
+		return clone;
 	}
 
 }

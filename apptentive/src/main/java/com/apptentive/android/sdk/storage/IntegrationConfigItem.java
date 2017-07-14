@@ -40,9 +40,17 @@ public class IntegrationConfigItem implements Serializable {
 			for (String key : keys) {
 				ret.put(key, contents.get(key));
 			}
+			return ret;
 		} catch (JSONException e) {
 			// This can't happen.
 		}
 		return null;
+	}
+
+	// TODO: unit testing
+	public IntegrationConfigItem clone() {
+		IntegrationConfigItem clone = new IntegrationConfigItem();
+		clone.contents.putAll(contents);
+		return clone;
 	}
 }
