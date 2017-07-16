@@ -133,7 +133,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	private Map<String, Object> customData;
 
 	private static final String PUSH_ACTION = "action";
-	private static final String PUSH_CONVERSATION_ID = "conversationid";
+	private static final String PUSH_CONVERSATION_ID = "conversation_id";
 
 	private enum PushAction {
 		pmc,       // Present Message Center.
