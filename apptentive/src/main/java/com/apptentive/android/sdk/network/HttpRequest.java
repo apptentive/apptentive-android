@@ -587,7 +587,7 @@ public class HttpRequest {
 				String error = errorObject.optString("error", null);
 				String errorType = errorObject.optString("error_type", null);
 				return Apptentive.AuthenticationFailedReason.parse(errorType, error);
-			} catch (JSONException e) {
+			} catch (Exception e) {
 				ApptentiveLog.w(e, "Error parsing authentication failure object.");
 			}
 		}

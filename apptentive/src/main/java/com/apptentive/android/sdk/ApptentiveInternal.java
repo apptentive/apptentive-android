@@ -746,11 +746,10 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		if (isConversationActive()) {
 			String activeConversationId = getConversation().getConversationId();
 			if (activeConversationId.equals(conversationIdOfFailedRequest)) {
-				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef.get();
+				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
 				if (listener != null) {
-					listener.onAuthenticationFailed(reason);
-				}
-				return;
+                    listener.onAuthenticationFailed(reason);
+                }
 			}
 		}
 	}
