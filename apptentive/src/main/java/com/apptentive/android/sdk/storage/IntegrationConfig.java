@@ -95,10 +95,48 @@ public class IntegrationConfig implements Saveable {
 			if (parse != null) {
 				ret.put(INTEGRATION_PARSE, parse.toJson());
 			}
+			return ret;
 		} catch (JSONException e) {
 			// This can't happen.
 		}
 		return null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		IntegrationConfig that = (IntegrationConfig) o;
+
+		if (apptentive != null ? !apptentive.equals(that.apptentive) : that.apptentive != null)
+			return false;
+		if (amazonAwsSns != null ? !amazonAwsSns.equals(that.amazonAwsSns) : that.amazonAwsSns != null)
+			return false;
+		if (urbanAirship != null ? !urbanAirship.equals(that.urbanAirship) : that.urbanAirship != null)
+			return false;
+		return parse != null ? parse.equals(that.parse) : that.parse == null;
+
+	}
+
+	@Override
+	public int hashCode() {
+		int result = apptentive != null ? apptentive.hashCode() : 0;
+		result = 31 * result + (amazonAwsSns != null ? amazonAwsSns.hashCode() : 0);
+		result = 31 * result + (urbanAirship != null ? urbanAirship.hashCode() : 0);
+		result = 31 * result + (parse != null ? parse.hashCode() : 0);
+		return result;
+	}
+
+	// TODO: unit tests
+	public IntegrationConfig clone() {
+		IntegrationConfig clone = new IntegrationConfig();
+		clone.apptentive = apptentive != null ? apptentive.clone() : null;
+		clone.amazonAwsSns = amazonAwsSns != null ? amazonAwsSns.clone() : null;
+		clone.urbanAirship = urbanAirship != null ? urbanAirship.clone() : null;
+		clone.parse = parse != null ? parse.clone() : null;
+		clone.listener = listener;
+		return clone;
 	}
 
 }

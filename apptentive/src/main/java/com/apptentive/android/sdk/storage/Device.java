@@ -63,7 +63,8 @@ public class Device implements Saveable, DataChangedListener {
 	public void onDataChanged() {
 		notifyDataChanged();
 	}
-	
+
+	// TODO: unit tests
 	public Device clone() {
 		Device clone = new Device();
 		clone.uuid = uuid;
@@ -92,7 +93,9 @@ public class Device implements Saveable, DataChangedListener {
 		clone.localeLanguageCode = localeLanguageCode;
 		clone.localeRaw = localeRaw;
 		clone.utcOffset = utcOffset;
-		clone.integrationConfig = integrationConfig; // TODO: make a deep clone
+		if (integrationConfig != null) {
+			clone.integrationConfig = integrationConfig.clone();
+		}
 		clone.listener = listener;
 		return clone;
 	}
@@ -367,6 +370,9 @@ public class Device implements Saveable, DataChangedListener {
 	}
 
 	public void setIntegrationConfig(IntegrationConfig integrationConfig) {
+		if (integrationConfig == null) {
+			throw new IllegalArgumentException("Integration config is null");
+		}
 		this.integrationConfig = integrationConfig;
 		this.integrationConfig.setDataChangedListener(this);
 		notifyDataChanged();

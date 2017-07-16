@@ -624,6 +624,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 				break;
 		}
+		scheduleDeviceUpdate();
 	}
 
 	/**

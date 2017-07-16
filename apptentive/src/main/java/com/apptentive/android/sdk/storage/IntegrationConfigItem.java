@@ -40,9 +40,33 @@ public class IntegrationConfigItem implements Serializable {
 			for (String key : keys) {
 				ret.put(key, contents.get(key));
 			}
+			return ret;
 		} catch (JSONException e) {
 			// This can't happen.
 		}
 		return null;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (this == o) return true;
+		if (o == null || getClass() != o.getClass()) return false;
+
+		IntegrationConfigItem that = (IntegrationConfigItem) o;
+
+		return contents != null ? contents.equals(that.contents) : that.contents == null;
+
+	}
+
+	@Override
+	public int hashCode() {
+		return contents != null ? contents.hashCode() : 0;
+	}
+
+	// TODO: unit testing
+	public IntegrationConfigItem clone() {
+		IntegrationConfigItem clone = new IntegrationConfigItem();
+		clone.contents.putAll(contents);
+		return clone;
 	}
 }
