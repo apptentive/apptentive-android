@@ -58,7 +58,7 @@ class MessagePollingWorker implements Destroyable {
 					}
 
 					ApptentiveLog.v(MESSAGES, "Polling messages in %d sec", pollingInterval / 1000);
-					if (!goToSleep(pollingInterval)) {
+					if (Thread.currentThread().isInterrupted() || !goToSleep(pollingInterval)) {
 						break;
 					}
 				}
