@@ -1336,7 +1336,7 @@ public class Apptentive {
 				AuthenticationFailedReason ret = AuthenticationFailedReason.valueOf(errorType);
 				ret.error = error;
 				return ret;
-			} catch (IllegalArgumentException e) {
+			} catch (Exception e) {
 				ApptentiveLog.w("Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
 			}
 			return UNKNOWN;
