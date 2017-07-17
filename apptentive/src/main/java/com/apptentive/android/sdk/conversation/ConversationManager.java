@@ -301,7 +301,7 @@ public class ConversationManager {
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.w("Failed to fetch legacy conversation id: %s", reason);
+					ApptentiveLog.e("Failed to fetch legacy conversation id: %s", reason);
 				}
 			});
 
@@ -507,7 +507,7 @@ public class ConversationManager {
 		// update the state of the corresponding item
 		ConversationMetadataItem item = conversationMetadata.findItem(conversation);
 		if (item == null) {
-			item = new ConversationMetadataItem(conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
+			item = new ConversationMetadataItem(conversation.getLocalIdentifier(), conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		}
 		item.state = conversation.getState();

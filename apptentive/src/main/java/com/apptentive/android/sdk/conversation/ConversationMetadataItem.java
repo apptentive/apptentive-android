@@ -22,6 +22,11 @@ public class ConversationMetadataItem implements SerializableObject {
 	ConversationState state = ConversationState.UNDEFINED;
 
 	/**
+	 * Local conversation ID
+	 */
+	final String localConversationId;
+
+	/**
 	 * Conversation ID which was received from the backend
 	 */
 	final String conversationId;
@@ -51,7 +56,11 @@ public class ConversationMetadataItem implements SerializableObject {
 	 */
 	String userId;
 
-	public ConversationMetadataItem(String conversationId, File dataFile, File messagesFile) {
+	public ConversationMetadataItem(String localConversationId, String conversationId, File dataFile, File messagesFile) {
+		if (localConversationId == null) {
+			throw new IllegalArgumentException("Local conversation id is null");
+		}
+
 		if (dataFile == null) {
 			throw new IllegalArgumentException("Data file is null");
 		}
@@ -60,12 +69,14 @@ public class ConversationMetadataItem implements SerializableObject {
 			throw new IllegalArgumentException("Messages file is null");
 		}
 
+		this.localConversationId = localConversationId;
 		this.conversationId = conversationId;
 		this.dataFile = dataFile;
 		this.messagesFile = messagesFile;
 	}
 
 	public ConversationMetadataItem(DataInput in) throws IOException {
+		localConversationId = in.readUTF();
 		conversationId = readNullableUTF(in);
 		conversationToken = readNullableUTF(in);
 		dataFile = new File(in.readUTF());
@@ -77,6 +88,7 @@ public class ConversationMetadataItem implements SerializableObject {
 
 	@Override
 	public void writeExternal(DataOutput out) throws IOException {
+		out.writeUTF(localConversationId);
 		writeNullableUTF(out, conversationId);
 		writeNullableUTF(out, conversationToken);
 		out.writeUTF(dataFile.getAbsolutePath());
@@ -84,6 +96,10 @@ public class ConversationMetadataItem implements SerializableObject {
 		out.writeByte(state.ordinal());
 		writeNullableUTF(out, encryptionKey);
 		writeNullableUTF(out, userId);
+	}
+
+	public String getLocalConversationId() {
+		return localConversationId;
 	}
 
 	public String getConversationId() {
@@ -110,6 +126,7 @@ public class ConversationMetadataItem implements SerializableObject {
 	public String toString() {
 		return "ConversationMetadataItem{" +
 			       "state=" + state +
+			       ", localConversationId='" + localConversationId + '\'' +
 			       ", conversationId='" + conversationId + '\'' +
 			       ", conversationToken='" + conversationToken + '\'' +
 			       ", dataFile=" + dataFile +
