@@ -182,7 +182,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		}
 
 		if (errorMessage != null) {
-			ApptentiveLog.v(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
+			ApptentiveLog.e(PAYLOADS, "Payload sending failed: %s\n%s", payload, errorMessage);
 			if (appInBackground) {
 				ApptentiveLog.v(PAYLOADS, "The app went to the background so we won't remove the payload from the queue");
 				retrySending(5000);
