@@ -103,8 +103,12 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				dbHelper.addPayload(payload);
-				sendNextPayloadSync();
+				try {
+					dbHelper.addPayload(payload);
+					sendNextPayloadSync();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while adding a payload: %s", payload);
+				}
 			}
 		});
 	}
@@ -114,8 +118,12 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			singleThreadExecutor.execute(new Runnable() {
 				@Override
 				public void run() {
-					dbHelper.deletePayload(payloadIdentifier);
-					sendNextPayloadSync();
+					try {
+						dbHelper.deletePayload(payloadIdentifier);
+						sendNextPayloadSync();
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while deleting a payload: %s", payloadIdentifier);
+					}
 				}
 			});
 		}
@@ -125,7 +133,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				dbHelper.deleteAllPayloads();
+				try {
+					dbHelper.deleteAllPayloads();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while deleting all payloads");
+				}
 			}
 		});
 	}
@@ -138,7 +150,11 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		singleThreadExecutor.execute(new Runnable() {
 			@Override
 			public void run() {
-				dbHelper.deleteAssociatedFiles(messageNonce);
+				try {
+					dbHelper.deleteAssociatedFiles(messageNonce);
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while deleting associated file: %s", messageNonce);
+				}
 			}
 		});
 	}
@@ -212,8 +228,12 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				singleThreadExecutor.execute(new Runnable() {
 					@Override
 					public void run() {
-						ApptentiveLog.d(PAYLOADS, "Retrying sending payloads");
-						sendNextPayloadSync();
+						try {
+							ApptentiveLog.d(PAYLOADS, "Retrying sending payloads");
+							sendNextPayloadSync();
+						} catch (Exception e) {
+							ApptentiveLog.e(e, "Exception while trying to retry sending payloads");
+						}
 					}
 				});
 			}
@@ -285,8 +305,12 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					singleThreadExecutor.execute(new Runnable() {
 						@Override
 						public void run() {
-							dbHelper.updateIncompletePayloads(conversationId, conversationToken, conversationLocalIdentifier);
-							sendNextPayloadSync(); // after we've updated payloads - we need to send them
+							try {
+								dbHelper.updateIncompletePayloads(conversationId, conversationToken, conversationLocalIdentifier);
+								sendNextPayloadSync(); // after we've updated payloads - we need to send them
+							} catch (Exception e) {
+								ApptentiveLog.e(e, "Exception while trying to update incomplete payloads");
+							}
 						}
 					});
 				}
