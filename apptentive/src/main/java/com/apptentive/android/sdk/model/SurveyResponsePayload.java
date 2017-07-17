@@ -44,14 +44,8 @@ public class SurveyResponsePayload extends ConversationItem {
 	}
 
 	@Override
-	protected JSONObject marshallForSending() {
-		JSONObject object = new JSONObject();
-		try {
-			object.put(KEY_RESPONSE, super.marshallForSending());
-		} catch (JSONException e) {
-			ApptentiveLog.e(e, "Error creating survey response object");
-		}
-		return object;
+	protected String getJsonContainer() {
+		return KEY_RESPONSE;
 	}
 
 	//region Http-request

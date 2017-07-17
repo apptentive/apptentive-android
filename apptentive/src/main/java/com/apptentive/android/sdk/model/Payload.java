@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import org.json.JSONException;
+
 import java.util.List;
 
 public abstract class Payload {
@@ -47,7 +49,7 @@ public abstract class Payload {
 	/**
 	 * Binary data to be stored in database
 	 */
-	public abstract byte[] renderData();
+	public abstract byte[] renderData() throws JSONException;
 
 	//region
 

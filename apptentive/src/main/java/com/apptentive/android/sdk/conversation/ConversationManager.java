@@ -751,6 +751,11 @@ public class ConversationManager {
 									File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
 									File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
 									activeConversation = new Conversation(dataFile, messagesFile);
+
+									// FIXME: if we don't set these here - device payload would return 4xx error code
+									activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
+									activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
+									activeConversation.setSdk(SdkManager.generateCurrentSdk());
 								}
 							}
 

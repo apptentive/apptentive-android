@@ -286,26 +286,26 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	 */
 	@Override
 	public byte[] renderData() {
-		boolean encrypted = encryptionKey != null;
-		Encryptor encryptor = null;
-		if (encrypted) {
-			encryptor = new Encryptor(encryptionKey);
-		}
-		ByteArrayOutputStream data = new ByteArrayOutputStream();
-
-		// First write the message body out as the first "part".
-		StringBuilder header = new StringBuilder();
-		header.append(twoHyphens).append(boundary).append(lineEnd);
-
-		StringBuilder part = new StringBuilder();
-		part
-			.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
-			.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
-			.append(lineEnd)
-			.append(marshallForSending().toString()).append(lineEnd);
-		byte[] partBytes = part.toString().getBytes();
-
 		try {
+			boolean encrypted = encryptionKey != null;
+			Encryptor encryptor = null;
+			if (encrypted) {
+				encryptor = new Encryptor(encryptionKey);
+			}
+			ByteArrayOutputStream data = new ByteArrayOutputStream();
+
+			// First write the message body out as the first "part".
+			StringBuilder header = new StringBuilder();
+			header.append(twoHyphens).append(boundary).append(lineEnd);
+
+			StringBuilder part = new StringBuilder();
+			part
+				.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
+				.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
+				.append(lineEnd)
+				.append(marshallForSending().toString()).append(lineEnd);
+			byte[] partBytes = part.toString().getBytes();
+
 			if (encrypted) {
 				header
 					.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
@@ -374,11 +374,12 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 				}
 			}
 			data.write(("--" + boundary + "--").getBytes());
+
+			ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
+			return data.toByteArray();
 		} catch (Exception e) {
 			ApptentiveLog.e(PAYLOADS, "Error assembling Message Payload.", e);
 			return null;
 		}
-		ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
-		return data.toByteArray();
 	}
 }

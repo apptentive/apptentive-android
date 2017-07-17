@@ -39,15 +39,10 @@ public class PersonPayload extends JsonPayload {
 
 	//region Http-request
 
+
 	@Override
-	protected JSONObject marshallForSending() {
-		JSONObject object = new JSONObject();
-		try {
-			object.put(KEY, super.marshallForSending());
-		} catch (JSONException e) {
-			ApptentiveLog.e(e, "Error creating person object");
-		}
-		return object;
+	protected String getJsonContainer() {
+		return KEY;
 	}
 
 	@Override

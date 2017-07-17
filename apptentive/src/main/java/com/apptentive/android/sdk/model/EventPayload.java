@@ -109,6 +109,11 @@ public class EventPayload extends ConversationItem {
 		putData(data);
 	}
 
+	@Override
+	protected String getJsonContainer() {
+		return "event";
+	}
+
 	//region Http-request
 
 	@Override
