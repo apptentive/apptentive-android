@@ -38,9 +38,12 @@ public abstract class JsonPayload extends Payload {
 	//region Data
 
 	@Override
-	public byte[] renderData() {
+	public byte[] renderData() throws JSONException {
+		String jsonString = marshallForSending().toString();
+		ApptentiveLog.vv(PAYLOADS, jsonString);
+
 		if (encryptionKey != null) {
-			byte[] bytes = marshallForSending().toString().getBytes();
+			byte[] bytes = jsonString.getBytes();
 			Encryptor encryptor = new Encryptor(encryptionKey);
 			try {
 				return encryptor.encrypt(bytes);
@@ -49,7 +52,7 @@ public abstract class JsonPayload extends Payload {
 			}
 			return null;
 		} else {
-			return marshallForSending().toString().getBytes();
+			return jsonString.getBytes();
 		}
 	}
 
@@ -184,14 +187,24 @@ public abstract class JsonPayload extends Payload {
 
 	//endregion
 
-	protected JSONObject marshallForSending() {
-		try {
-			if (encryptionKey != null) {
-				jsonObject.put("token", token);
-			}
-		} catch (Exception e) {
-			// Can't happen.
+	protected final JSONObject marshallForSending() throws JSONException {
+		JSONObject result;
+		String container = getJsonContainer();
+		if (container != null) {
+			result = new JSONObject();
+			result.put(container, jsonObject);
+		} else {
+			result = jsonObject;
 		}
-		return jsonObject;
+
+		if (encryptionKey != null) {
+			result.put("token", token);
+		}
+
+		return result;
+	}
+
+	protected String getJsonContainer() {
+		return null;
 	}
 }

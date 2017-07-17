@@ -179,13 +179,7 @@ public class DevicePayload extends JsonPayload {
 	}
 
 	@Override
-	protected JSONObject marshallForSending() {
-		JSONObject jsonObject = new JSONObject();
-		try {
-			jsonObject.put("device", super.marshallForSending());
-		} catch (JSONException e) {
-			// This can't happen.
-		}
-		return jsonObject;
+	protected String getJsonContainer() {
+		return "device";
 	}
 }
