@@ -69,7 +69,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	public HttpJsonRequest createConversationTokenRequest(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
 		request.addListener(listener);
-		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
@@ -81,7 +80,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		HttpJsonRequest request = createJsonRequest(ENDPOINT_LEGACY_CONVERSATION, new JSONObject(), HttpRequestMethod.GET);
 		request.setRequestProperty("Authorization", "OAuth " + conversationToken);
 		request.addListener(listener);
-		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
@@ -105,7 +103,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);
 		request.addListener(listener);
-		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
@@ -128,7 +125,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 		HttpRequest request = createPayloadRequest(payload);
 		request.addListener(listener);
-		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
@@ -198,6 +194,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	}
 
 	private void setupRequestDefaults(HttpRequest request) {
+		request.setRequestManager(httpRequestManager);
 		request.setRequestProperty("User-Agent", userAgentString);
 		request.setRequestProperty("Connection", "Keep-Alive");
 		request.setRequestProperty("Accept-Encoding", "gzip");
