@@ -518,7 +518,8 @@ public class ConversationManager {
 			item = new ConversationMetadataItem(conversation.getLocalIdentifier(), conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		} else {
-			item.conversationId = notNull(conversation.getConversationId());
+			assertTrue(conversation.getConversationId() != null || conversation.hasState(ANONYMOUS_PENDING), "Missing conversation id for state: %s", conversation.getState());
+			item.conversationId = conversation.getConversationId();
 		}
 
 		item.state = conversation.getState();
