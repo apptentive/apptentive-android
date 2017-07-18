@@ -10,8 +10,8 @@ import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpRequest;
 
 /**
- * Class responsible for creating and sending an {@link HttpRequest} with a given payload
- * FIXME: this is a legacy workaround and would be removed soon
+ * Class responsible for creating a {@link HttpRequest} for a given payload
+ * FIXME: this is a legacy workaround and might be removed soon
  */
 public interface PayloadRequestSender {
 	/**
@@ -20,5 +20,5 @@ public interface PayloadRequestSender {
 	 * @param payload  to be sent
 	 * @param listener Http-request listener for the payload request
 	 */
-	HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener);
+	HttpRequest createPayloadSendRequest(PayloadData payload, HttpRequest.Listener<HttpRequest> listener);
 }

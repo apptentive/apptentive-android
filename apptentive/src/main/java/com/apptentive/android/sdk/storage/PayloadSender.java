@@ -102,7 +102,7 @@ class PayloadSender {
 		ApptentiveLog.v(PAYLOADS, "Sending payload: %s", payload);
 
 		// create request object
-		final HttpRequest payloadRequest = requestSender.sendPayload(payload, new HttpRequest.Listener<HttpRequest>() {
+		final HttpRequest payloadRequest = requestSender.createPayloadSendRequest(payload, new HttpRequest.Listener<HttpRequest>() {
 			@Override
 			public void onFinish(HttpRequest request) {
 				try {
@@ -132,6 +132,7 @@ class PayloadSender {
 
 		// set 'retry' policy
 		payloadRequest.setRetryPolicy(requestRetryPolicy);
+		payloadRequest.start();
 	}
 
 	//endregion

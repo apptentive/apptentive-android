@@ -66,14 +66,14 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	//region API Requests
 
-	public HttpJsonRequest getConversationToken(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
+	public HttpJsonRequest createConversationTokenRequest(ConversationTokenRequest conversationTokenRequest, HttpRequest.Listener<HttpJsonRequest> listener) {
 		HttpJsonRequest request = createJsonRequest(ENDPOINT_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
 		request.addListener(listener);
-		httpRequestManager.startRequest(request);
+		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
-	public HttpJsonRequest getLegacyConversationId(String conversationToken, HttpRequest.Listener<HttpJsonRequest> listener) {
+	public HttpJsonRequest createLegacyConversationIdRequest(String conversationToken, HttpRequest.Listener<HttpJsonRequest> listener) {
 		if (StringUtils.isNullOrEmpty(conversationToken)) {
 			throw new IllegalArgumentException("Conversation token is null or empty");
 		}
@@ -81,11 +81,11 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		HttpJsonRequest request = createJsonRequest(ENDPOINT_LEGACY_CONVERSATION, new JSONObject(), HttpRequestMethod.GET);
 		request.setRequestProperty("Authorization", "OAuth " + conversationToken);
 		request.addListener(listener);
-		httpRequestManager.startRequest(request);
+		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
-	public HttpJsonRequest login(String conversationId, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+	public HttpJsonRequest createLoginRequest(String conversationId, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
 		if (token == null) {
 			throw new IllegalArgumentException("Token is null");
 		}
@@ -105,7 +105,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		}
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);
 		request.addListener(listener);
-		httpRequestManager.startRequest(request);
+		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 
@@ -121,14 +121,14 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	//region PayloadRequestSender
 
 	@Override
-	public HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
+	public HttpRequest createPayloadSendRequest(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
 		if (payload == null) {
 			throw new IllegalArgumentException("Payload is null");
 		}
 
 		HttpRequest request = createPayloadRequest(payload);
 		request.addListener(listener);
-		httpRequestManager.startRequest(request);
+		request.setRequestManager(httpRequestManager);
 		return request;
 	}
 

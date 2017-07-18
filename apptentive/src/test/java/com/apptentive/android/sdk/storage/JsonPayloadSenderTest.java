@@ -129,11 +129,11 @@ public class JsonPayloadSenderTest extends TestCaseBase {
 		}
 
 		@Override
-		public HttpRequest sendPayload(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
+		public HttpRequest createPayloadSendRequest(PayloadData payload, HttpRequest.Listener<HttpRequest> listener) {
 			MockHttpRequest request = new MockHttpRequest("http://apptentive.com");
 			request.setMockResponseHandler(((MockPayload) payload).getResponseHandler());
 			request.addListener(listener);
-			requestManager.startRequest(request);
+			request.setRequestManager(requestManager);
 			return request;
 		}
 	}
