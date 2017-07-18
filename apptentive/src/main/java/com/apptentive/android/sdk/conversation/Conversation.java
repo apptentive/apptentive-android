@@ -392,7 +392,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	//region Getters & Setters
 
 	public String getLocalIdentifier() {
-		return conversationData.getLocalIdentifier();
+		return getConversationData().getLocalIdentifier();
 	}
 
 	public ConversationState getState() {
@@ -431,147 +431,153 @@ public class Conversation implements DataChangedListener, Destroyable {
 	}
 
 	public String getConversationToken() {
-		return conversationData.getConversationToken();
+		return getConversationData().getConversationToken();
 	}
 
 	public void setConversationToken(String conversationToken) {
-		conversationData.setConversationToken(conversationToken);
+		getConversationData().setConversationToken(conversationToken);
 	}
 
 	public String getConversationId() {
-		return conversationData.getConversationId();
+		return getConversationData().getConversationId();
 	}
 
 	public void setConversationId(String conversationId) {
-		conversationData.setConversationId(conversationId);
+		getConversationData().setConversationId(conversationId);
 	}
 
 	public Device getDevice() {
-		return conversationData.getDevice();
+		return getConversationData().getDevice();
 	}
 
 	public void setDevice(Device device) {
-		conversationData.setDevice(device);
+		getConversationData().setDevice(device);
 	}
 
 	public Device getLastSentDevice() {
-		return conversationData.getLastSentDevice();
+		return getConversationData().getLastSentDevice();
 	}
 
 	public void setLastSentDevice(Device lastSentDevice) {
-		conversationData.setLastSentDevice(lastSentDevice);
+		getConversationData().setLastSentDevice(lastSentDevice);
 	}
 
 	public Person getPerson() {
-		return conversationData.getPerson();
+		return getConversationData().getPerson();
 	}
 
 	public void setPerson(Person person) {
-		conversationData.setPerson(person);
+		getConversationData().setPerson(person);
 	}
 
 	public Person getLastSentPerson() {
-		return conversationData.getLastSentPerson();
+		return getConversationData().getLastSentPerson();
 	}
 
 	public void setLastSentPerson(Person lastSentPerson) {
-		conversationData.setLastSentPerson(lastSentPerson);
+		getConversationData().setLastSentPerson(lastSentPerson);
 	}
 
 	public Sdk getSdk() {
-		return conversationData.getSdk();
+		return getConversationData().getSdk();
 	}
 
 	public void setSdk(Sdk sdk) {
-		conversationData.setSdk(sdk);
+		getConversationData().setSdk(sdk);
 	}
 
 	public AppRelease getAppRelease() {
-		return conversationData.getAppRelease();
+		return getConversationData().getAppRelease();
 	}
 
 	public void setAppRelease(AppRelease appRelease) {
-		conversationData.setAppRelease(appRelease);
+		getConversationData().setAppRelease(appRelease);
 	}
 
 	public EventData getEventData() {
-		return conversationData.getEventData();
+		return getConversationData().getEventData();
 	}
 
 	public void setEventData(EventData eventData) {
-		conversationData.setEventData(eventData);
+		getConversationData().setEventData(eventData);
 	}
 
 	public String getLastSeenSdkVersion() {
-		return conversationData.getLastSeenSdkVersion();
+		return getConversationData().getLastSeenSdkVersion();
 	}
 
 	public void setLastSeenSdkVersion(String lastSeenSdkVersion) {
-		conversationData.setLastSeenSdkVersion(lastSeenSdkVersion);
+		getConversationData().setLastSeenSdkVersion(lastSeenSdkVersion);
 	}
 
 	public VersionHistory getVersionHistory() {
-		return conversationData.getVersionHistory();
+		return getConversationData().getVersionHistory();
 	}
 
 	public void setVersionHistory(VersionHistory versionHistory) {
-		conversationData.setVersionHistory(versionHistory);
+		getConversationData().setVersionHistory(versionHistory);
 	}
 
 	public boolean isMessageCenterFeatureUsed() {
-		return conversationData.isMessageCenterFeatureUsed();
+		return getConversationData().isMessageCenterFeatureUsed();
 	}
 
 	public void setMessageCenterFeatureUsed(boolean messageCenterFeatureUsed) {
-		conversationData.setMessageCenterFeatureUsed(messageCenterFeatureUsed);
+		getConversationData().setMessageCenterFeatureUsed(messageCenterFeatureUsed);
 	}
 
 	public boolean isMessageCenterWhoCardPreviouslyDisplayed() {
-		return conversationData.isMessageCenterWhoCardPreviouslyDisplayed();
+		return getConversationData().isMessageCenterWhoCardPreviouslyDisplayed();
 	}
 
 	public void setMessageCenterWhoCardPreviouslyDisplayed(boolean messageCenterWhoCardPreviouslyDisplayed) {
-		conversationData.setMessageCenterWhoCardPreviouslyDisplayed(messageCenterWhoCardPreviouslyDisplayed);
+		getConversationData().setMessageCenterWhoCardPreviouslyDisplayed(messageCenterWhoCardPreviouslyDisplayed);
 	}
 
 	public String getMessageCenterPendingMessage() {
-		return conversationData.getMessageCenterPendingMessage();
+		return getConversationData().getMessageCenterPendingMessage();
 	}
 
 	public void setMessageCenterPendingMessage(String messageCenterPendingMessage) {
-		conversationData.setMessageCenterPendingMessage(messageCenterPendingMessage);
+		getConversationData().setMessageCenterPendingMessage(messageCenterPendingMessage);
 	}
 
 	public String getMessageCenterPendingAttachments() {
-		return conversationData.getMessageCenterPendingAttachments();
+		return getConversationData().getMessageCenterPendingAttachments();
 	}
 
 	public void setMessageCenterPendingAttachments(String messageCenterPendingAttachments) {
-		conversationData.setMessageCenterPendingAttachments(messageCenterPendingAttachments);
+		getConversationData().setMessageCenterPendingAttachments(messageCenterPendingAttachments);
 	}
 
 	public String getTargets() {
-		return conversationData.getTargets();
+		return getConversationData().getTargets();
 	}
 
 	public void setTargets(String targets) {
-		conversationData.setTargets(targets);
+		getConversationData().setTargets(targets);
 	}
 
 	public String getInteractions() {
-		return conversationData.getInteractions();
+		return getConversationData().getInteractions();
 	}
 
 	public void setInteractions(String interactions) {
-		conversationData.setInteractions(interactions);
+		getConversationData().setInteractions(interactions);
 	}
 
 	public double getInteractionExpiration() {
-		return conversationData.getInteractionExpiration();
+		return getConversationData().getInteractionExpiration();
 	}
 
 	public void setInteractionExpiration(double interactionExpiration) {
-		conversationData.setInteractionExpiration(interactionExpiration);
+		getConversationData().setInteractionExpiration(interactionExpiration);
+	}
+
+	// this is a synchronization hack: both save/load conversation data are synchronized so we can't
+	// modify conversation data while it's being serialized/deserialized
+	private synchronized ConversationData getConversationData() {
+		return conversationData;
 	}
 
 	public MessageManager getMessageManager() {
