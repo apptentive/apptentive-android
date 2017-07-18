@@ -515,10 +515,13 @@ public class ConversationManager {
 		if (item == null) {
 			item = new ConversationMetadataItem(conversation.getLocalIdentifier(), conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
+		} else {
+			item.conversationId = notNull(conversation.getConversationId());
 		}
+
 		item.state = conversation.getState();
 		if (conversation.hasActiveState()) {
-			item.conversationToken = conversation.getConversationToken();
+			item.conversationToken = notNull(conversation.getConversationToken());
 		}
 
 		// update encryption key (if necessary)
