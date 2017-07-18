@@ -741,7 +741,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	public void notifyAuthenticationFailedListener(Apptentive.AuthenticationFailedReason reason, String conversationIdOfFailedRequest) {
 		if (isConversationActive()) {
 			String activeConversationId = getConversation().getConversationId();
-			if (activeConversationId.equals(conversationIdOfFailedRequest)) {
+			if (StringUtils.equal(activeConversationId, conversationIdOfFailedRequest)) {
 				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
 				if (listener != null) {
                     listener.onAuthenticationFailed(reason);

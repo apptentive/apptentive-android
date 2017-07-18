@@ -29,7 +29,7 @@ public class ConversationMetadataItem implements SerializableObject {
 	/**
 	 * Conversation ID which was received from the backend
 	 */
-	final String conversationId;
+	String conversationId;
 
 	/**
 	 * The token for active conversations
