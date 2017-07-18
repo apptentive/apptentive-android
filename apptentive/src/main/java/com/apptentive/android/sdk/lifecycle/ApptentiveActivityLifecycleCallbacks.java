@@ -100,9 +100,13 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		delayedChecker.postDelayed(checkFgBgRoutine = new Runnable() {
 			@Override
 			public void run() {
-				if (foregroundActivities.get() == 0 && isAppForeground) {
-					appEnteredBackground();
-					isAppForeground = false;
+				try {
+					if (foregroundActivities.get() == 0 && isAppForeground) {
+						appEnteredBackground();
+						isAppForeground = false;
+					}
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception in delayed checking");
 				}
 			}
 		}, CHECK_DELAY_SHORT);

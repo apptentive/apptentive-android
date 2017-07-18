@@ -124,8 +124,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	private WeakReference<Apptentive.AuthenticationFailedListener> authenticationFailedListenerRef = null;
 
-	private final ExecutorService cachedExecutor;
-
 	// Holds reference to the current foreground activity of the host app
 	private WeakReference<Activity> currentTaskStackTopActivity;
 
@@ -162,7 +160,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		conversationManager = null;
 		appContext = null;
 		appRelease = null;
-		cachedExecutor = null;
 		lifecycleCallbacks = null;
 	}
 
@@ -187,7 +184,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
-		cachedExecutor = Executors.newCachedThreadPool();
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
 		ApptentiveNotificationCenter.defaultCenter()
@@ -745,7 +741,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	public void notifyAuthenticationFailedListener(Apptentive.AuthenticationFailedReason reason, String conversationIdOfFailedRequest) {
 		if (isConversationActive()) {
 			String activeConversationId = getConversation().getConversationId();
-			if (activeConversationId.equals(conversationIdOfFailedRequest)) {
+			if (StringUtils.equal(activeConversationId, conversationIdOfFailedRequest)) {
 				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
 				if (listener != null) {
                     listener.onAuthenticationFailed(reason);

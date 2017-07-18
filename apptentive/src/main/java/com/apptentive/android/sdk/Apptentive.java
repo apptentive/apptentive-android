@@ -57,7 +57,7 @@ public class Apptentive {
 	 * @param application The {@link Application} object for this app.
 	 */
 	public static void register(Application application) {
-		Apptentive.register(application, null, null);
+		register(application, null, null);
 	}
 
 	public static void register(Application application, String apptentiveKey, String apptentiveSignature) {
@@ -65,8 +65,12 @@ public class Apptentive {
 	}
 
 	private static void register(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
-		ApptentiveLog.i("Registering Apptentive.");
-		ApptentiveInternal.createInstance(application, apptentiveKey, apptentiveSignature, serverUrl);
+		try {
+			ApptentiveLog.i("Registering Apptentive.");
+			ApptentiveInternal.createInstance(application, apptentiveKey, apptentiveSignature, serverUrl);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while registering Apptentive");
+		}
 	}
 
 	//region Global Data Methods
@@ -81,12 +85,16 @@ public class Apptentive {
 	 * @param email The user's email address.
 	 */
 	public static void setPersonEmail(String email) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().setEmail(email);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().setEmail(email);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while setting person email");
 		}
 	}
 
@@ -97,11 +105,15 @@ public class Apptentive {
 	 * @return The person's email if set, else null.
 	 */
 	public static String getPersonEmail() {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				return conversation.getPerson().getEmail();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					return conversation.getPerson().getEmail();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while getting person email");
 		}
 		return null;
 	}
@@ -116,12 +128,16 @@ public class Apptentive {
 	 * @param name The user's name.
 	 */
 	public static void setPersonName(String name) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().setName(name);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().setName(name);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while setting person name");
 		}
 	}
 
@@ -132,11 +148,15 @@ public class Apptentive {
 	 * @return The person's name if set, else null.
 	 */
 	public static String getPersonName() {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				return conversation.getPerson().getName();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					return conversation.getPerson().getName();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while getting person name");
 		}
 		return null;
 	}
@@ -150,15 +170,19 @@ public class Apptentive {
 	 * @param value A String value.
 	 */
 	public static void addCustomDeviceData(String key, String value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			if (value != null) {
-				value = value.trim();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				if (value != null) {
+					value = value.trim();
+				}
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().put(key, value);
+					conversation.scheduleDeviceUpdate();
+				}
 			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().put(key, value);
-				conversation.scheduleDeviceUpdate();
-			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom device data");
 		}
 	}
 
@@ -171,11 +195,15 @@ public class Apptentive {
 	 * @param value A Number value.
 	 */
 	public static void addCustomDeviceData(String key, Number value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().put(key, value);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().put(key, value);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom device data");
 		}
 	}
 
@@ -188,29 +216,41 @@ public class Apptentive {
 	 * @param value A Boolean value.
 	 */
 	public static void addCustomDeviceData(String key, Boolean value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().put(key, value);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().put(key, value);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom device data");
 		}
 	}
 
 	private static void addCustomDeviceData(String key, Version version) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().put(key, version);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().put(key, version);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom device data");
 		}
 	}
 
 	private static void addCustomDeviceData(String key, DateTime dateTime) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().put(key, dateTime);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().put(key, dateTime);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom device data");
 		}
 	}
 
@@ -220,12 +260,16 @@ public class Apptentive {
 	 * @param key The key to remove.
 	 */
 	public static void removeCustomDeviceData(String key) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getDevice().getCustomData().remove(key);
-				conversation.scheduleDeviceUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getDevice().getCustomData().remove(key);
+					conversation.scheduleDeviceUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while removing custom device data");
 		}
 	}
 
@@ -238,15 +282,19 @@ public class Apptentive {
 	 * @param value A String value.
 	 */
 	public static void addCustomPersonData(String key, String value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			if (value != null) {
-				value = value.trim();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				if (value != null) {
+					value = value.trim();
+				}
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().put(key, value);
+					conversation.schedulePersonUpdate();
+				}
 			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().put(key, value);
-				conversation.schedulePersonUpdate();
-			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom person data");
 		}
 	}
 
@@ -259,11 +307,15 @@ public class Apptentive {
 	 * @param value A Number value.
 	 */
 	public static void addCustomPersonData(String key, Number value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().put(key, value);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().put(key, value);
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom person data");
 		}
 	}
 
@@ -276,32 +328,44 @@ public class Apptentive {
 	 * @param value A Boolean value.
 	 */
 	public static void addCustomPersonData(String key, Boolean value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().put(key, value);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().put(key, value);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom person data");
 		}
 	}
 
 	private static void addCustomPersonData(String key, Version version) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().put(key, version);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().put(key, version);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom person data");
 		}
 	}
 
 	private static void addCustomPersonData(String key, DateTime dateTime) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().remove(key);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().remove(key);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while adding custom person data");
 		}
 	}
 
@@ -311,12 +375,16 @@ public class Apptentive {
 	 * @param key The key to remove.
 	 */
 	public static void removeCustomPersonData(String key) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
-				conversation.getPerson().getCustomData().remove(key);
-				conversation.schedulePersonUpdate();
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				if (conversation != null) {
+					conversation.getPerson().getCustomData().remove(key);
+					conversation.schedulePersonUpdate();
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception while removing custom person data");
 		}
 	}
 
@@ -386,31 +454,35 @@ public class Apptentive {
 	 *                     </dl>
 	 */
 	public static void setPushNotificationIntegration(final int pushProvider, final String token) {
-		// we only access the active conversation on the main thread to avoid concurrency issues
-		if (!DispatchQueue.isMainQueue()) {
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-				@Override
-				protected void execute() {
-					setPushNotificationIntegration(pushProvider, token);
-				}
-			});
-			return;
-		}
+		try {
+			// we only access the active conversation on the main thread to avoid concurrency issues
+			if (!DispatchQueue.isMainQueue()) {
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						setPushNotificationIntegration(pushProvider, token);
+					}
+				});
+				return;
+			}
 
-		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
-			return;
-		}
-		// Store the push stuff globally
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
-			.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
-			.apply();
+			if (!ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
+				return;
+			}
+			// Store the push stuff globally
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+			prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
+					.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
+					.apply();
 
-		// Also set it on the active Conversation, if there is one.
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-		if (conversation != null) {
-			conversation.setPushIntegration(pushProvider, token);
+			// Also set it on the active Conversation, if there is one.
+			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+			if (conversation != null) {
+				conversation.setPushIntegration(pushProvider, token);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while setting push notification integration");
 		}
 	}
 
@@ -425,10 +497,15 @@ public class Apptentive {
 	 * @return True if the Intent came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Intent intent) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return false;
+			}
+			return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification intent");
 		}
-		return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
+		return false;
 	}
 
 	/**
@@ -439,10 +516,15 @@ public class Apptentive {
 	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Bundle bundle) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return false;
+			}
+			return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification bundle");
 		}
-		return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
+		return false;
 	}
 
 	/**
@@ -452,10 +534,15 @@ public class Apptentive {
 	 * @return True if the push came from, and should be handled by Apptentive.
 	 */
 	public static boolean isApptentivePushNotification(Map<String, String> data) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return false;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return false;
+			}
+			return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification data");
 		}
-		return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
+		return false;
 	}
 
 	/**
@@ -477,11 +564,16 @@ public class Apptentive {
 	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
 	 */
 	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Intent intent) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return null;
+			}
+			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(intent);
+			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while building pending intent from push notification");
 		}
-		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(intent);
-		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		return null;
 	}
 
 	/**
@@ -501,11 +593,16 @@ public class Apptentive {
 	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
 	 */
 	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Bundle bundle) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return null;
+			}
+			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while building pending intent form a push notification");
 		}
-		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(bundle);
-		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		return null;
 	}
 
 	/**
@@ -526,11 +623,16 @@ public class Apptentive {
 	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
 	 */
 	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Map<String, String> data) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return null;
+			}
+			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(data);
+			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while building pending intent form a push notification");
 		}
-		String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(data);
-		return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
+		return null;
 	}
 
 	/**
@@ -578,31 +680,35 @@ public class Apptentive {
 	 * @return a String value, or null.
 	 */
 	public static String getTitleFromApptentivePush(Bundle bundle) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
-		}
-		if (bundle == null) {
-			return null;
-		}
-		if (bundle.containsKey(ApptentiveInternal.TITLE_DEFAULT)) {
-			return bundle.getString(ApptentiveInternal.TITLE_DEFAULT);
-		}
-		if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
-			String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
-			if (parseDataString != null) {
-				try {
-					JSONObject parseJson = new JSONObject(parseDataString);
-					return parseJson.optString(ApptentiveInternal.TITLE_DEFAULT, null);
-				} catch (JSONException e) {
-					return null;
-				}
-			}
-		} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
-			Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
-			if (uaPushBundle == null) {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
 				return null;
 			}
-			return uaPushBundle.getString(ApptentiveInternal.TITLE_DEFAULT);
+			if (bundle == null) {
+				return null;
+			}
+			if (bundle.containsKey(ApptentiveInternal.TITLE_DEFAULT)) {
+				return bundle.getString(ApptentiveInternal.TITLE_DEFAULT);
+			}
+			if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
+				String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
+				if (parseDataString != null) {
+					try {
+						JSONObject parseJson = new JSONObject(parseDataString);
+						return parseJson.optString(ApptentiveInternal.TITLE_DEFAULT, null);
+					} catch (JSONException e) {
+						return null;
+					}
+				}
+			} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
+				Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
+				if (uaPushBundle == null) {
+					return null;
+				}
+				return uaPushBundle.getString(ApptentiveInternal.TITLE_DEFAULT);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting title from Apptentive push");
 		}
 		return null;
 	}
@@ -616,33 +722,37 @@ public class Apptentive {
 	 * @return a String value, or null.
 	 */
 	public static String getBodyFromApptentivePush(Bundle bundle) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
-		}
-		if (bundle == null) {
-			return null;
-		}
-		if (bundle.containsKey(ApptentiveInternal.BODY_DEFAULT)) {
-			return bundle.getString(ApptentiveInternal.BODY_DEFAULT);
-		}
-		if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
-			String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
-			if (parseDataString != null) {
-				try {
-					JSONObject parseJson = new JSONObject(parseDataString);
-					return parseJson.optString(ApptentiveInternal.BODY_PARSE, null);
-				} catch (JSONException e) {
-					return null;
-				}
-			}
-		} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
-			Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
-			if (uaPushBundle == null) {
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
 				return null;
 			}
-			return uaPushBundle.getString(ApptentiveInternal.BODY_UA);
-		} else if (bundle.containsKey(ApptentiveInternal.BODY_UA)) {
-			return bundle.getString(ApptentiveInternal.BODY_UA);
+			if (bundle == null) {
+				return null;
+			}
+			if (bundle.containsKey(ApptentiveInternal.BODY_DEFAULT)) {
+				return bundle.getString(ApptentiveInternal.BODY_DEFAULT);
+			}
+			if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE)) {
+				String parseDataString = bundle.getString(ApptentiveInternal.PUSH_EXTRA_KEY_PARSE);
+				if (parseDataString != null) {
+					try {
+						JSONObject parseJson = new JSONObject(parseDataString);
+						return parseJson.optString(ApptentiveInternal.BODY_PARSE, null);
+					} catch (JSONException e) {
+						return null;
+					}
+				}
+			} else if (bundle.containsKey(ApptentiveInternal.PUSH_EXTRA_KEY_UA)) {
+				Bundle uaPushBundle = bundle.getBundle(ApptentiveInternal.PUSH_EXTRA_KEY_UA);
+				if (uaPushBundle == null) {
+					return null;
+				}
+				return uaPushBundle.getString(ApptentiveInternal.BODY_UA);
+			} else if (bundle.containsKey(ApptentiveInternal.BODY_UA)) {
+				return bundle.getString(ApptentiveInternal.BODY_UA);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting body from Apptentive push");
 		}
 		return null;
 	}
@@ -657,13 +767,18 @@ public class Apptentive {
 	 * @return a String value, or null.
 	 */
 	public static String getTitleFromApptentivePush(Map<String, String> data) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return null;
+			}
+			if (data == null) {
+				return null;
+			}
+			return data.get(ApptentiveInternal.TITLE_DEFAULT);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting title from Apptentive push");
 		}
-		if (data == null) {
-			return null;
-		}
-		return data.get(ApptentiveInternal.TITLE_DEFAULT);
+		return null;
 	}
 
 	/**
@@ -676,13 +791,18 @@ public class Apptentive {
 	 * @return a String value, or null.
 	 */
 	public static String getBodyFromApptentivePush(Map<String, String> data) {
-		if (!ApptentiveInternal.checkRegistered()) {
-			return null;
+		try {
+			if (!ApptentiveInternal.checkRegistered()) {
+				return null;
+			}
+			if (data == null) {
+				return null;
+			}
+			return data.get(ApptentiveInternal.BODY_DEFAULT);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting body from Apptentive push");
 		}
-		if (data == null) {
-			return null;
-		}
-		return data.get(ApptentiveInternal.BODY_DEFAULT);
+		return null;
 	}
 
 	//endregion
@@ -697,8 +817,12 @@ public class Apptentive {
 	 */
 
 	public static void setRatingProvider(IRatingProvider ratingProvider) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().setRatingProvider(ratingProvider);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveInternal.getInstance().setRatingProvider(ratingProvider);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while setting rating provider");
 		}
 	}
 
@@ -710,8 +834,12 @@ public class Apptentive {
 	 * @param value A String
 	 */
 	public static void putRatingProviderArg(String key, String value) {
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveInternal.getInstance().putRatingProviderArg(key, value);
+		try {
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				ApptentiveInternal.getInstance().putRatingProviderArg(key, value);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while putting rating provider arg");
 		}
 	}
 

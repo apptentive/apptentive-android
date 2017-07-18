@@ -547,13 +547,14 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 						.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
 						.setContentIntent(pendingIntent)
 						.setFullScreenIntent(pendingIntent, false);
-					foreground.runOnUiThread(new Runnable() {
-																		 public void run() {
-																			 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
-																			 notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
-																			 manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);
-																		 }
-																	 }
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
+							 notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
+							 manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);
+						 }
+					 }
 					);
 				}
 			}
