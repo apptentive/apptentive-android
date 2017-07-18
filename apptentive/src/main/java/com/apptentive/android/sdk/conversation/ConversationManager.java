@@ -489,6 +489,12 @@ public class ConversationManager {
 	}
 
 	private void updateMetadataItems(Conversation conversation) {
+		ApptentiveLog.vv("Updating metadata: state=%s localId=%s conversationId=%s token=%s",
+				conversation.getState(),
+				conversation.getLocalIdentifier(),
+				conversation.getConversationId(),
+				conversation.getConversationToken());
+
 		// if the conversation is 'logged-in' we should not have any other 'logged-in' items in metadata
 		if (conversation.hasState(LOGGED_IN)) {
 			for (ConversationMetadataItem item : conversationMetadata) {
@@ -840,6 +846,7 @@ public class ConversationManager {
 		Object[][] rows = new Object[1 + items.size()][];
 		rows[0] = new Object[] {
 			"state",
+			"localId",
 			"conversationId",
 			"userId",
 			"dataFile",
@@ -851,6 +858,7 @@ public class ConversationManager {
 		for (ConversationMetadataItem item : items) {
 			rows[index++] = new Object[] {
 				item.state,
+				item.localConversationId,
 				item.conversationId,
 				item.userId,
 				item.dataFile,

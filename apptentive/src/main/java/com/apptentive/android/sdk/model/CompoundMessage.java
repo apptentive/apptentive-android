@@ -188,7 +188,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 		try {
 			Future<List<StoredFile>> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getAssociatedFiles(getNonce());
 			associatedFiles = future.get();
-		} catch (InterruptedException | ExecutionException e) {
+		} catch (Exception e) {
 			ApptentiveLog.e("Unable to get associated files in worker thread");
 		} finally {
 			return associatedFiles;
