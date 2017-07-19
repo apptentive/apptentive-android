@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.util.Util;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -37,12 +38,15 @@ public class FileSerializer implements Serializer {
 	}
 
 	protected void serialize(File file, Object object) throws SerializerException {
-		FileOutputStream fos = null;
+		ByteArrayOutputStream bos;
 		ObjectOutputStream oos = null;
+		FileOutputStream fos = null;
 		try {
-			fos = new FileOutputStream(file);
-			oos = new ObjectOutputStream(fos);
+			bos = new ByteArrayOutputStream();
+			oos = new ObjectOutputStream(bos);
 			oos.writeObject(object);
+			fos = new FileOutputStream(file);
+			fos.write(bos.toByteArray());
 		} catch (Exception e) {
 			throw new SerializerException(e);
 		} finally {
