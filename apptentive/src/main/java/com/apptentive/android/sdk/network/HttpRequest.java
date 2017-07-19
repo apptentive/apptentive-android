@@ -165,6 +165,13 @@ public class HttpRequest {
 	////////////////////////////////////////////////////////////////
 	// Lifecycle
 
+	public void start() {
+		assertNotNull(requestManager);
+		if (requestManager != null) {
+			requestManager.startRequest(this);
+		}
+	}
+
 	@SuppressWarnings("unchecked")
 	private void finishRequest() {
 		try {
@@ -508,6 +515,10 @@ public class HttpRequest {
 
 	//region Getters/Setters
 
+	public void setRequestManager(HttpRequestManager requestManager) {
+		this.requestManager = requestManager;
+	}
+
 	public void setMethod(HttpRequestMethod method) {
 		if (method == null) {
 			throw new IllegalArgumentException("Method is null");
@@ -655,8 +666,8 @@ public class HttpRequest {
 
 	//endregion
 
-	private class NetworkUnavailableException extends IOException {
-		NetworkUnavailableException(String message) {
+	public static class NetworkUnavailableException extends IOException {
+		public NetworkUnavailableException(String message) {
 			super(message);
 		}
 	}

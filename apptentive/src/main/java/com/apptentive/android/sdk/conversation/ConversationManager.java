@@ -260,7 +260,7 @@ public class ConversationManager {
 		}
 
 		HttpRequest request = getHttpClient()
-			.getLegacyConversationId(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
+			.createLegacyConversationIdRequest(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
 					assertMainThread();
@@ -307,6 +307,7 @@ public class ConversationManager {
 
 		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		request.start();
 		return request;
 	}
 
@@ -363,7 +364,7 @@ public class ConversationManager {
 		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
 
 		HttpRequest request = getHttpClient()
-			.getConversationToken(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
+			.createConversationTokenRequest(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
 					assertMainThread();
@@ -424,6 +425,7 @@ public class ConversationManager {
 
 		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
+		request.start();
 		return request;
 	}
 
@@ -516,7 +518,8 @@ public class ConversationManager {
 			item = new ConversationMetadataItem(conversation.getLocalIdentifier(), conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		} else {
-			item.conversationId = notNull(conversation.getConversationId());
+			assertTrue(conversation.getConversationId() != null || conversation.hasState(ANONYMOUS_PENDING), "Missing conversation id for state: %s", conversation.getState());
+			item.conversationId = conversation.getConversationId();
 		}
 
 		item.state = conversation.getState();
@@ -708,7 +711,7 @@ public class ConversationManager {
 	}
 
 	private void sendLoginRequest(String conversationId, final String userId, final String token, final LoginCallback callback) {
-		getHttpClient().login(conversationId, token, new HttpRequest.Listener<HttpJsonRequest>() {
+		HttpJsonRequest request = getHttpClient().createLoginRequest(conversationId, token, new HttpRequest.Listener<HttpJsonRequest>() {
 			@Override
 			public void onFinish(HttpJsonRequest request) {
 				try {
@@ -794,6 +797,7 @@ public class ConversationManager {
 				});
 			}
 		});
+		request.start();
 	}
 
 	public void logout() {

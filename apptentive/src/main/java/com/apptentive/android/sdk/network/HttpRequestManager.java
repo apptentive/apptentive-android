@@ -52,7 +52,7 @@ public class HttpRequestManager {
 	/**
 	 * Starts network request on the network queue (method returns immediately)
 	 */
-	public synchronized HttpRequest startRequest(final HttpRequest request) {
+	synchronized HttpRequest startRequest(HttpRequest request) {
 		if (request == null) {
 			throw new IllegalArgumentException("Request is null");
 		}
@@ -93,8 +93,7 @@ public class HttpRequestManager {
 	 * Register active request
 	 */
 	synchronized void registerRequest(HttpRequest request) {
-		assertNull(request.requestManager);
-		request.requestManager = this;
+		assertTrue(this == request.requestManager);
 		activeRequests.add(request);
 	}
 
@@ -102,11 +101,11 @@ public class HttpRequestManager {
 	 * Unregisters active request
 	 */
 	synchronized void unregisterRequest(HttpRequest request) {
+		assertTrue(this == request.requestManager);
 		boolean removed = activeRequests.remove(request);
 		assertTrue(removed, "Attempted to unregister missing request: %s", request);
 
 		if (removed) {
-			request.requestManager = null;
 			notifyRequestFinished(request);
 		}
 	}

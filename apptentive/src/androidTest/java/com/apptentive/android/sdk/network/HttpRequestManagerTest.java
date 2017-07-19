@@ -317,5 +317,11 @@ public class HttpRequestManagerTest extends TestCaseBase {
 			}
 			super.dispatchRequest(request);
 		}
+
+		@Override
+		synchronized HttpRequest startRequest(HttpRequest request) {
+			request.setRequestManager(this);
+			return super.startRequest(request);
+		}
 	}
 }
