@@ -883,7 +883,8 @@ public class ConversationManager {
 	//region Getters/Setters
 
 	public Conversation getActiveConversation() {
-		assertMainThread();
+		// assertMainThread(); TODO: we should still only access the conversation on a dedicated queue
+		// but at this time we can't do it by design
 		return activeConversation;
 	}
 

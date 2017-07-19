@@ -1,5 +1,6 @@
 package com.apptentive.android.sdk.debug;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
@@ -15,7 +16,12 @@ import com.apptentive.android.sdk.util.threading.DispatchQueue;
  */
 public class Assert {
 
-	private static AssertImp imp;
+	private static AssertImp imp = new AssertImp() {
+		@Override
+		public void assertFailed(String message) {
+			ApptentiveLog.e("Assertion failed: " + message + "\n" + getStackTrace(6));
+		}
+	};
 
 	//region Booleans
 
@@ -77,7 +83,9 @@ public class Assert {
 
 	//region Nullability
 
-	/** Helper function for getting non-null references */
+	/**
+	 * Helper function for getting non-null references
+	 */
 	public static <T> T notNull(T reference) {
 		assertNotNull(reference);
 		return reference;
@@ -192,5 +200,23 @@ public class Assert {
 
 	public static void setImp(AssertImp imp) {
 		Assert.imp = imp;
+	}
+
+	private static String getStackTrace(int offset) {
+		StringBuilder sb = new StringBuilder();
+		try {
+			StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+
+			if (elements != null && elements.length > 0) {
+				for (int i = offset; i < elements.length; ++i) {
+					if (sb.length() > 0) {
+						sb.append('\n');
+					}
+					sb.append(elements[i].toString());
+				}
+			}
+		} catch (Exception ignored) {
+		}
+		return sb.toString();
 	}
 }
