@@ -1,3 +1,9 @@
+# 2017-07-19 - 4.0.0
+
+#### Improvements
+
+* Added the ability to log customers in to different private conversations. Customers who are logged in will be able to see a private conversation that is distinct from the converations of other customers using the same app on the same device. When they log out, their data is protected with strong encryption. Logging back in unlocks their data again, and Apptentive resumes providing services to the customer.
+
 # 2017-03-02 - 3.4.1
 
 #### Improvements
