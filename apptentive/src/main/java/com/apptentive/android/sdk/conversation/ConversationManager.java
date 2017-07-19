@@ -736,9 +736,6 @@ public class ConversationManager {
 			}
 
 			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
-				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-					@Override
-					protected void execute() {
 						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 						assertMainThread();
@@ -785,8 +782,6 @@ public class ConversationManager {
 							handleLoginFailed("Internal error");
 						}
 					}
-				});
-			}
 
 			private void handleLoginFailed(final String reason) {
 				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
@@ -797,6 +792,7 @@ public class ConversationManager {
 				});
 			}
 		});
+		request.setCallbackQueue(DispatchQueue.mainQueue());
 		request.start();
 	}
 
