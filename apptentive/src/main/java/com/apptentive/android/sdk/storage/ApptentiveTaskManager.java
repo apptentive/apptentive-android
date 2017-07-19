@@ -80,10 +80,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 		payloadSender = new PayloadSender(apptentiveHttpClient, new HttpRequestRetryPolicyDefault() {
 			@Override
 			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
-				if (appInBackground) {
-					return false; // don't retry if the app went background
-				}
-				return super.shouldRetryRequest(responseCode, retryAttempt);
+				return false; // don't use built-in retry logic for payloads since payload sender listener
+											// would handle it properly
 			}
 		});
 		payloadSender.setListener(this);
