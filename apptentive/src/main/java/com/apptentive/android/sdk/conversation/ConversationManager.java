@@ -783,10 +783,7 @@ public class ConversationManager {
 						}
 					}
 
-			private void handleLoginFailed(final String reason) {
-				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-					@Override
-					protected void execute() {
+			private void handleLoginFailed(String reason) {
 						callback.onLoginFail(reason);
 					}
 				});
