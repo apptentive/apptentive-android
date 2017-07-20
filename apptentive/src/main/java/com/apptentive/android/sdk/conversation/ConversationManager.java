@@ -736,67 +736,58 @@ public class ConversationManager {
 			}
 
 			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
-				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-					@Override
-					protected void execute() {
-						assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
-						assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
-						assertMainThread();
+				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+				assertMainThread();
 
-						try {
-							// if we were previously logged out we might end up with no active conversation
-							if (activeConversation == null) {
-								// attempt to find previous logged out conversation
-								final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
-									@Override
-									public boolean accept(ConversationMetadataItem item) {
-										return StringUtils.equal(item.getUserId(), userId);
-									}
-								});
-
-								if (conversationItem != null) {
-									conversationItem.conversationToken = token;
-									conversationItem.encryptionKey = encryptionKey;
-									activeConversation = loadConversation(conversationItem);
-								} else {
-									ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
-									File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-									File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-									activeConversation = new Conversation(dataFile, messagesFile);
-
-									// FIXME: if we don't set these here - device payload would return 4xx error code
-									activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
-									activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
-									activeConversation.setSdk(SdkManager.generateCurrentSdk());
-								}
+				try {
+					// if we were previously logged out we might end up with no active conversation
+					if (activeConversation == null) {
+						// attempt to find previous logged out conversation
+						final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
+							@Override
+							public boolean accept(ConversationMetadataItem item) {
+								return StringUtils.equal(item.getUserId(), userId);
 							}
+						});
 
-							activeConversation.setEncryptionKey(encryptionKey);
-							activeConversation.setConversationToken(token);
-							activeConversation.setConversationId(conversationId);
-							activeConversation.setUserId(userId);
-							activeConversation.setState(LOGGED_IN);
-							handleConversationStateChange(activeConversation);
+						if (conversationItem != null) {
+							conversationItem.conversationToken = token;
+							conversationItem.encryptionKey = encryptionKey;
+							activeConversation = loadConversation(conversationItem);
+						} else {
+							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
+							File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+							activeConversation = new Conversation(dataFile, messagesFile);
 
-							// notify delegate
-							callback.onLoginFinish();
-						} catch (Exception e) {
-							ApptentiveLog.e(e, "Exception while creating logged-in conversation");
-							handleLoginFailed("Internal error");
+							// FIXME: if we don't set these here - device payload would return 4xx error code
+							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
+							activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
+							activeConversation.setSdk(SdkManager.generateCurrentSdk());
 						}
 					}
-				});
+
+					activeConversation.setEncryptionKey(encryptionKey);
+					activeConversation.setConversationToken(token);
+					activeConversation.setConversationId(conversationId);
+					activeConversation.setUserId(userId);
+					activeConversation.setState(LOGGED_IN);
+					handleConversationStateChange(activeConversation);
+
+					// notify delegate
+					callback.onLoginFinish();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while creating logged-in conversation");
+					handleLoginFailed("Internal error");
+				}
 			}
 
-			private void handleLoginFailed(final String reason) {
-				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-					@Override
-					protected void execute() {
-						callback.onLoginFail(reason);
-					}
-				});
+			private void handleLoginFailed(String reason) {
+				callback.onLoginFail(reason);
 			}
 		});
+		request.setCallbackQueue(DispatchQueue.mainQueue());
 		request.start();
 	}
 
