@@ -821,35 +821,33 @@ public class ConversationManager {
 			}
 
 			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+				assertNull(activeConversation, "Finished logging into new conversation, but one was already active.");
 				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 				assertMainThread();
 
 				try {
-					// if we were previously logged out we might end up with no active conversation
-					if (activeConversation == null) {
-						// attempt to find previous logged out conversation
-						final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
-							@Override
-							public boolean accept(ConversationMetadataItem item) {
-								return StringUtils.equal(item.getUserId(), userId);
-							}
-						});
-
-						if (conversationItem != null) {
-							conversationItem.conversationToken = token;
-							conversationItem.encryptionKey = encryptionKey;
-							activeConversation = loadConversation(conversationItem);
-						} else {
-							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
-							File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-							activeConversation = new Conversation(dataFile, messagesFile);
-
-							activeConversation.setAppRelease(appRelease);
-							activeConversation.setSdk(sdk);
-							activeConversation.setDevice(device);
+					// attempt to find previous logged out conversation
+					final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
+						@Override
+						public boolean accept(ConversationMetadataItem item) {
+							return StringUtils.equal(item.getUserId(), userId);
 						}
+					});
+
+					if (conversationItem != null) {
+						conversationItem.conversationToken = token;
+						conversationItem.encryptionKey = encryptionKey;
+						activeConversation = loadConversation(conversationItem);
+					} else {
+						ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
+						File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+						File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+						activeConversation = new Conversation(dataFile, messagesFile);
+
+						activeConversation.setAppRelease(appRelease);
+						activeConversation.setSdk(sdk);
+						activeConversation.setDevice(device);
 					}
 
 					activeConversation.setEncryptionKey(encryptionKey);
