@@ -135,6 +135,9 @@ public class ConversationManager {
 			activeConversation = loadActiveConversationGuarded();
 
 			if (activeConversation != null) {
+				activeConversation.startListeningForChanges();
+				activeConversation.scheduleSaveConversationData();
+
 				dispatchDebugEvent(EVT_CONVERSATION_LOAD,
 					"successful", Boolean.TRUE,
 					"conversation_state", activeConversation.getState().toString(),
@@ -317,7 +320,7 @@ public class ConversationManager {
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
-		conversation.setConversationToken(item.getConversationToken());
+		conversation.setConversationToken(item.getConversationToken()); // FIXME: this would be overwritten by the next call
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -464,30 +467,6 @@ public class ConversationManager {
 				printMetadata(conversationMetadata, "Updated Metadata");
 			}
 		}
-	}
-
-	/* For testing purposes */
-	public synchronized boolean setActiveConversation(final String conversationId) throws SerializerException {
-		final ConversationMetadataItem item = conversationMetadata.findItem(new Filter() {
-			@Override
-			public boolean accept(ConversationMetadataItem item) {
-				return item.conversationId.equals(conversationId);
-			}
-		});
-
-		if (item == null) {
-			ApptentiveLog.w(CONVERSATION, "Conversation not found: %s", conversationId);
-			return false;
-		}
-
-		final Conversation conversation = loadConversation(item);
-		if (conversation == null) {
-			ApptentiveLog.w(CONVERSATION, "Conversation not loaded: %s", conversationId);
-			return false;
-		}
-
-		handleConversationStateChange(conversation);
-		return true;
 	}
 
 	private void updateMetadataItems(Conversation conversation) {
@@ -773,6 +752,10 @@ public class ConversationManager {
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
 					activeConversation.setState(LOGGED_IN);
+
+					activeConversation.startListeningForChanges();
+					activeConversation.scheduleSaveConversationData();
+
 					handleConversationStateChange(activeConversation);
 
 					// notify delegate
@@ -855,6 +838,10 @@ public class ConversationManager {
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
 					activeConversation.setState(LOGGED_IN);
+
+					activeConversation.startListeningForChanges();
+					activeConversation.scheduleSaveConversationData();
+
 					handleConversationStateChange(activeConversation);
 
 					// notify delegate
