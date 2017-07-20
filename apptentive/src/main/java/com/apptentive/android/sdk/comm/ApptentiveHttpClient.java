@@ -13,7 +13,13 @@ import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.network.HttpRequestManager;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.network.RawHttpRequest;
+import com.apptentive.android.sdk.storage.AppRelease;
+import com.apptentive.android.sdk.storage.AppReleaseManager;
+import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.PayloadRequestSender;
+import com.apptentive.android.sdk.storage.Sdk;
+import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -102,6 +108,26 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			endPoint = StringUtils.format(ENDPOINT_LOG_IN_TO_EXISTING_CONVERSATION, conversationId);
 		}
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);
+		request.addListener(listener);
+		return request;
+	}
+
+	public HttpJsonRequest createFirstLoginRequest(String token, AppRelease appRelease, Sdk sdk, Device device, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (token == null) {
+			throw new IllegalArgumentException("Token is null");
+		}
+
+		ConversationTokenRequest conversationTokenRequest = new ConversationTokenRequest();
+		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
+		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
+
+		try {
+			conversationTokenRequest.put("token", token);
+		} catch (JSONException e) {
+			// Can't happen
+		}
+
+		HttpJsonRequest request = createJsonRequest(ENDPOINT_LOG_IN_TO_NEW_CONVERSATION, conversationTokenRequest, HttpRequestMethod.POST);
 		request.addListener(listener);
 		return request;
 	}

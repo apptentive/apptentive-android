@@ -641,7 +641,7 @@ public class ConversationManager {
 
 			if (conversationItem == null) {
 				ApptentiveLog.w("No conversation found matching user: '%s'. Logging in as new user.", userId);
-				sendLoginRequest(null, userId, token, callback);
+				sendFirstLoginRequest(userId, token, callback);
 				return;
 			}
 
@@ -765,6 +765,90 @@ public class ConversationManager {
 							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
 							activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
 							activeConversation.setSdk(SdkManager.generateCurrentSdk());
+						}
+					}
+
+					activeConversation.setEncryptionKey(encryptionKey);
+					activeConversation.setConversationToken(token);
+					activeConversation.setConversationId(conversationId);
+					activeConversation.setUserId(userId);
+					activeConversation.setState(LOGGED_IN);
+					handleConversationStateChange(activeConversation);
+
+					// notify delegate
+					callback.onLoginFinish();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while creating logged-in conversation");
+					handleLoginFailed("Internal error");
+				}
+			}
+
+			private void handleLoginFailed(String reason) {
+				callback.onLoginFail(reason);
+			}
+		});
+		request.setCallbackQueue(DispatchQueue.mainQueue());
+		request.start();
+	}
+
+	private void sendFirstLoginRequest(final String userId, final String token, final LoginCallback callback) {
+		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
+		final Sdk sdk = SdkManager.generateCurrentSdk();
+		final Device device = DeviceManager.generateNewDevice(getContext());
+
+		HttpJsonRequest request = getHttpClient().createFirstLoginRequest(token, appRelease, sdk, device, new HttpRequest.Listener<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				try {
+					final JSONObject responseObject = request.getResponseObject();
+					final String encryptionKey = responseObject.getString("encryption_key");
+					final String incomingConversationId = responseObject.getString("id");
+					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while parsing login response");
+					handleLoginFailed("Internal error");
+				}
+			}
+
+			@Override
+			public void onCancel(HttpJsonRequest request) {
+				handleLoginFailed("Login request was cancelled");
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				handleLoginFailed(reason);
+			}
+
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+				assertMainThread();
+
+				try {
+					// if we were previously logged out we might end up with no active conversation
+					if (activeConversation == null) {
+						// attempt to find previous logged out conversation
+						final ConversationMetadataItem conversationItem = conversationMetadata.findItem(new Filter() {
+							@Override
+							public boolean accept(ConversationMetadataItem item) {
+								return StringUtils.equal(item.getUserId(), userId);
+							}
+						});
+
+						if (conversationItem != null) {
+							conversationItem.conversationToken = token;
+							conversationItem.encryptionKey = encryptionKey;
+							activeConversation = loadConversation(conversationItem);
+						} else {
+							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
+							File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+							activeConversation = new Conversation(dataFile, messagesFile);
+
+							activeConversation.setAppRelease(appRelease);
+							activeConversation.setSdk(sdk);
+							activeConversation.setDevice(device);
 						}
 					}
 
