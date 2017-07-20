@@ -1360,24 +1360,24 @@ public class Apptentive {
 	 *                 for the current logged in conversation. If the failure is for another
 	 *                 conversation, or there is no active conversation, the listener is not called.
 	 */
-	public static void setAuthenticationFailureListener(AuthenticationFailedListener listener) {
+	public static void setAuthenticationFailedListener(AuthenticationFailedListener listener) {
 		try {
 			if (!ApptentiveInternal.checkRegistered()) {
 				return;
 			}
-			ApptentiveInternal.getInstance().setAuthenticationFailureListener(listener);
+			ApptentiveInternal.getInstance().setAuthenticationFailedListener(listener);
 		} catch (Exception e) {
 			ApptentiveLog.w(e, "Error in Apptentive.setUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
 
-	public static void clearAuthenticationFailureListener() {
+	public static void clearAuthenticationFailedListener() {
 		try {
 			if (!ApptentiveInternal.checkRegistered()) {
 				return;
 			}
-			ApptentiveInternal.getInstance().setAuthenticationFailureListener(null);
+			ApptentiveInternal.getInstance().setAuthenticationFailedListener(null);
 		} catch (Exception e) {
 			ApptentiveLog.w(e, "Error in Apptentive.clearUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);

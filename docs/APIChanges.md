@@ -1,5 +1,24 @@
 This document tracks changes to the API between versions.
 
+# 4.0.0
+
+Read the [Migrating to 4.0.0](migrating_to_4.0.0.md) guide.
+
+| Added Methods |
+| ------------- |
+| public static void login(String token, LoginCallback callback) |
+| public static void logout() |
+
+| Modified Methods |
+| ---------------- |
+| public static void register(Application application, String apptentiveKey, String apptentiveSignature) |
+
+| Added Classes |
+| ------------- |
+| public interface Apptentive.LoginCallback |
+| public interface Apptentive.AuthenticationFailedListener |
+| public enum Apptentive.AuthenticationFailedReason |
+
 # 3.4.1
 
 | Added Methods|
@@ -35,13 +54,13 @@ Read the [Migrating to 3.3.0](migrating_to_3.3.0.md) guide.
 | public static void onStart(android.app.Activity activity) |
 | public static void onStop(android.app.Activity activity) |
 
-| Removed Class |
+| Removed Classes |
 | ------------------ |
 | ApptentiveActivity.java |
 | ApptentiveListActivity.java |
 | ViewActivity.java |
 
-| Added Class |
+| Added Classes |
 | ------------------ |
 | ApptentiveViewActivity.java |
 

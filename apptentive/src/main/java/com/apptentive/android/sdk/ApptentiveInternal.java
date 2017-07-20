@@ -735,7 +735,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		interactionUpdateListeners.remove(listener);
 	}
 
-	public void setAuthenticationFailureListener(Apptentive.AuthenticationFailedListener listener) {
+	public void setAuthenticationFailedListener(Apptentive.AuthenticationFailedListener listener) {
 		authenticationFailedListenerRef = new WeakReference<>(listener);
 	}
 
