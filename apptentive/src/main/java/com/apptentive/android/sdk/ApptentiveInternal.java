@@ -79,6 +79,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KE
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 
 /**
@@ -593,8 +594,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		// The app key can be passed in programmatically, or we can fallback to checking in the manifest.
 		if (TextUtils.isEmpty(apptentiveKey) || apptentiveKey.contains(Constants.EXAMPLE_APPTENTIVE_KEY_VALUE)) {
 			String errorMessage = "The Apptentive Key is not defined. You may provide your Apptentive Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				"<meta-data android:name=\"apptentive_key\"\n" +
-				"           android:value=\"@string/your_apptentive_key\"/>";
+				                      "<meta-data android:name=\"apptentive_key\"\n" +
+				                      "           android:value=\"@string/your_apptentive_key\"/>";
 			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
@@ -608,8 +609,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		// The app signature can be passed in programmatically, or we can fallback to checking in the manifest.
 		if (TextUtils.isEmpty(apptentiveSignature) || apptentiveSignature.contains(Constants.EXAMPLE_APPTENTIVE_SIGNATURE_VALUE)) {
 			String errorMessage = "The Apptentive Signature is not defined. You may provide your Apptentive Signature in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				"<meta-data android:name=\"apptentive_signature\"\n" +
-				"           android:value=\"@string/your_apptentive_signature\"/>";
+				                      "<meta-data android:name=\"apptentive_signature\"\n" +
+				                      "           android:value=\"@string/your_apptentive_signature\"/>";
 			if (appRelease.isDebug()) {
 				throw new RuntimeException(errorMessage);
 			} else {
@@ -744,8 +745,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			if (StringUtils.equal(activeConversationId, conversationIdOfFailedRequest)) {
 				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
 				if (listener != null) {
-                    listener.onAuthenticationFailed(reason);
-                }
+					listener.onAuthenticationFailed(reason);
+				}
 			}
 		}
 	}
@@ -910,12 +911,12 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 					Object value = customData.get(key);
 					if (value != null) {
 						if (!(value instanceof String ||
-							value instanceof Boolean ||
-							value instanceof Long ||
-							value instanceof Double ||
-							value instanceof Float ||
-							value instanceof Integer ||
-							value instanceof Short)) {
+							      value instanceof Boolean ||
+							      value instanceof Long ||
+							      value instanceof Double ||
+							      value instanceof Float ||
+							      value instanceof Integer ||
+							      value instanceof Short)) {
 							ApptentiveLog.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
 							keysIterator.remove();
 						}
@@ -1013,25 +1014,61 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	//region Login/Logout
 
+	/**
+	 * Flag indicating if login request is currently active (used to avoid multiple competing
+	 * requests
+	 */
+	private boolean loginInProgress;
+
+	/**
+	 * Mutex object for synchronizing login request flag
+	 */
+	private final Object loginMutex = new Object();
+
 	void login(String token, final LoginCallback callback) {
-		LoginCallback wrapperCallback = new LoginCallback() {
-			@Override
-			public void onLoginFinish() {
-				engageInternal(getApplicationContext(), "login");
+		synchronized (loginMutex) {
+			if (loginInProgress) {
 				if (callback != null) {
-					callback.onLoginFinish();
+					callback.onLoginFail("Another login request is currently in progress");
 				}
+				return;
 			}
 
-			@Override
-			public void onLoginFail(String errorMessage) {
-				if (callback != null) {
-					callback.onLoginFail(errorMessage);
-				}
-			}
-		};
+			loginInProgress = true;
 
-		conversationManager.login(token, wrapperCallback);
+			LoginCallback wrapperCallback = new LoginCallback() {
+				@Override
+				public void onLoginFinish() {
+					synchronized (loginMutex) {
+						assertTrue(loginInProgress);
+						try {
+							engageInternal(getApplicationContext(), "login");
+							if (callback != null) {
+								callback.onLoginFinish();
+							}
+						} finally {
+							loginInProgress = false;
+						}
+					}
+				}
+
+				@Override
+				public void onLoginFail(String errorMessage) {
+					synchronized (loginMutex) {
+						assertTrue(loginInProgress);
+						try {
+							if (callback != null) {
+								callback.onLoginFail(errorMessage);
+							}
+						} finally {
+							loginInProgress = false;
+						}
+					}
+				}
+			};
+
+			conversationManager.login(token, wrapperCallback);
+		}
 	}
 
 	void logout() {
