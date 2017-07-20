@@ -141,10 +141,13 @@ public class Conversation implements DataChangedListener, Destroyable {
 		this.conversationMessagesFile = conversationMessagesFile;
 
 		conversationData = new ConversationData();
-		conversationData.setDataChangedListener(this);
 
 		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
+	}
+
+	public void startListeningForChanges() {
+		conversationData.setDataChangedListener(this);
 	}
 
 	//region Payloads
@@ -283,6 +286,15 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	//region Saving
 
+	public void scheduleSaveConversationData() {
+		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
+		if (scheduled) {
+			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
+		} else {
+			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
+		}
+	}
+
 	/**
 	 * Saves conversation data to the disk synchronously. Returns <code>true</code>
 	 * if succeed.
@@ -320,7 +332,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		ApptentiveLog.d(CONVERSATION, "Loading %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
 		conversationData = (ConversationData) serializer.deserialize();
-		conversationData.setDataChangedListener(this);
 		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", System.currentTimeMillis() - start);
 	}
 
@@ -330,12 +341,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	@Override
 	public void onDataChanged() {
-		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
-		if (scheduled) {
-			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
-		} else {
-			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
-		}
+		scheduleSaveConversationData();
 	}
 
 	//endregion
