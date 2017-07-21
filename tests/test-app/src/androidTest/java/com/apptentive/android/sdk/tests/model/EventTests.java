@@ -59,7 +59,7 @@ public class EventTests extends ApptentiveTestCaseBase {
 				CommerceExtendedData.Item item = new CommerceExtendedData.Item(22222222, "Item Name", "Category", 20, 5.0d, "USD");
 				commerce.addItem(item);
 			} catch (JSONException e) {
-				ApptentiveLog.e("Error: ", e);
+				ApptentiveLog.e(e, "Error: ");
 			}
 			assertNotNull(commerce);
 

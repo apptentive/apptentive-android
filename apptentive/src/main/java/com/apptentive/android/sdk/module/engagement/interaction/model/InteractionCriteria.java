@@ -34,9 +34,9 @@ public class InteractionCriteria {
 			ApptentiveLog.i("- => %b", ret);
 			return ret;
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error parsing and running InteractionCriteria predicate logic.", e);
+			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
 		} catch (Exception e) {
-			ApptentiveLog.w("Error parsing and running InteractionCriteria predicate logic.", e);
+			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
 		}
 		return false;
 	}

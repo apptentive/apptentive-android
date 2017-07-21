@@ -143,7 +143,7 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 			}
 			return answer;
 		} catch (Exception e) {
-			ApptentiveLog.e("Error producing survey answer.", e);
+			ApptentiveLog.e(e, "Error producing survey answer.");
 		}
 		return null;
 	}

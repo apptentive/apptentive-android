@@ -50,7 +50,7 @@
                          android:layout_alignParentEnd="true"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:minWidth="48dp"
-                         android:src="@drawable/apptentive_ic_action_send"
+                         android:src="@drawable/apptentive_ic_action_send_auto_mirror"
                          android:scaleType="center"
                          android:contentDescription="@string/apptentive_message_center_content_description_send_button"/>
             <ImageButton android:id="@+id/attach_button"
@@ -61,7 +61,7 @@
                          android:layout_toStartOf="@id/send_button"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:minWidth="48dp"
-                         android:src="@drawable/apptentive_ic_action_attach"
+                         android:src="@drawable/apptentive_ic_action_attach_auto_mirror"
                          android:scaleType="center"
                          android:contentDescription="@string/apptentive_message_center_content_description_attach_button"/>
         </RelativeLayout>

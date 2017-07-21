@@ -6,127 +6,78 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.content.SharedPreferences;
+import com.apptentive.android.sdk.model.PersonPayload;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.CustomData;
-import com.apptentive.android.sdk.model.Person;
-import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.JsonDiffer;
-
-import org.json.JSONException;
-
-/**
- * @author Sky Kelsey
- */
 public class PersonManager {
 
-	public static Person storePersonAndReturnDiff() {
-		Person stored = getStoredPerson();
-
-		Person current = generateCurrentPerson();
-		CustomData customData = loadCustomPersonData();
-		current.setCustomData(customData);
-
-		String email = loadPersonEmail();
-		current.setEmail(email);
-
-		String name = loadPersonName();
-		current.setName(name);
-
-		Object diff = JsonDiffer.getDiff(stored, current);
-		if (diff != null) {
-			try {
-				storePerson(current);
-				return new Person(diff.toString());
-			} catch (JSONException e) {
-				ApptentiveLog.e("Error casting to Person.", e);
-			}
+	public static PersonPayload getDiffPayload(Person oldPerson, Person newPerson) {
+		if (newPerson == null) {
+			return null;
 		}
 
-		return null;
-	}
+		PersonPayload ret = new PersonPayload();
+		boolean changed = false;
 
-	/**
-	 * Provided so we can be sure that the person we send during conversation creation is 100% accurate. Since we do not
-	 * queue this person up in the payload queue, it could otherwise be lost.
-	 */
-	public static Person storePersonAndReturnIt() {
-		Person current = generateCurrentPerson();
-
-		CustomData customData = loadCustomPersonData();
-		current.setCustomData(customData);
-
-		String email = loadPersonEmail();
-		current.setEmail(email);
-
-		String name = loadPersonName();
-		current.setName(name);
-
-		storePerson(current);
-		return current;
-	}
-
-	public static CustomData loadCustomPersonData() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String personDataString = prefs.getString(Constants.PREF_KEY_PERSON_DATA, null);
-		try {
-			return new CustomData(personDataString);
-		} catch (Exception e) {
-			// Ignore
+		if (oldPerson == null || !equal(oldPerson.getId(), newPerson.getId())) {
+			ret.setId(newPerson.getId());
+			changed = true;
 		}
-		try {
-			return new CustomData();
-		} catch (JSONException e) {
-			// Ignore
+
+		if (oldPerson == null || !equal(oldPerson.getEmail(), newPerson.getEmail())) {
+			ret.setEmail(newPerson.getEmail());
+			changed = true;
 		}
-		return null;
-	}
 
-	public static void storeCustomPersonData(CustomData deviceData) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String personDataString = deviceData.toString();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_DATA, personDataString).apply();
-	}
-
-	private static Person generateCurrentPerson() {
-		return new Person();
-	}
-
-	public static String loadPersonEmail() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		return prefs.getString(Constants.PREF_KEY_PERSON_EMAIL, null);
-	}
-
-	public static void storePersonEmail(String email) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_EMAIL, email).apply();
-	}
-
-	public static String loadPersonName() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		return prefs.getString(Constants.PREF_KEY_PERSON_NAME, null);
-	}
-
-	public static void storePersonName(String name) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON_NAME, name).apply();
-	}
-
-	public static Person getStoredPerson() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		String PersonString = prefs.getString(Constants.PREF_KEY_PERSON, null);
-		try {
-			return new Person(PersonString);
-		} catch (Exception e) {
-			// Ignore
+		if (oldPerson == null || !equal(oldPerson.getName(), newPerson.getName())) {
+			ret.setName(newPerson.getName());
+			changed = true;
 		}
-		return null;
+
+		if (oldPerson == null || !equal(oldPerson.getFacebookId(), newPerson.getFacebookId())) {
+			ret.setFacebookId(newPerson.getFacebookId());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getPhoneNumber(), newPerson.getPhoneNumber())) {
+			ret.setPhoneNumber(newPerson.getPhoneNumber());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getStreet(), newPerson.getStreet())) {
+			ret.setStreet(newPerson.getStreet());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getCity(), newPerson.getCity())) {
+			ret.setCity(newPerson.getCity());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getZip(), newPerson.getZip())) {
+			ret.setZip(newPerson.getZip());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getCountry(), newPerson.getCountry())) {
+			ret.setCountry(newPerson.getCountry());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getBirthday(), newPerson.getBirthday())) {
+			ret.setBirthday(newPerson.getBirthday());
+			changed = true;
+		}
+
+		if (oldPerson == null || !equal(oldPerson.getCustomData(), newPerson.getCustomData())) {
+			CustomData customData = newPerson.getCustomData();
+			ret.setCustomData(customData != null ? customData.toJson() : null);
+			changed = true;
+		}
+
+		return changed ? ret : null;
 	}
 
-	private static void storePerson(Person Person) {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
-		prefs.edit().putString(Constants.PREF_KEY_PERSON, Person.toString()).apply();
+	private static boolean equal(Object a, Object b) {
+		return a == null && b == null || a != null && b != null && a.equals(b);
 	}
 }

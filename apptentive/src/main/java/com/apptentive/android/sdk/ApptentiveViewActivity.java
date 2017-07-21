@@ -18,7 +18,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
-
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
@@ -31,6 +30,8 @@ import android.view.ViewTreeObserver;
 import android.view.WindowManager;
 
 import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.FragmentFactory;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
@@ -39,9 +40,11 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.debug.Assert.notNull;
 
-public class ApptentiveViewActivity extends ApptentiveBaseActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener{
 
+public class ApptentiveViewActivity extends ApptentiveBaseActivity implements ApptentiveBaseFragment.OnFragmentTransitionListener {
 	private static final String FRAGMENT_TAG = "fragmentTag";
 	private int fragmentType;
 
@@ -58,6 +61,12 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		Conversation conversation = notNull(ApptentiveInternal.getInstance().getConversation());
+		if (conversation == null) {
+			finish();
+			return;
+		}
 
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
 		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
@@ -80,8 +89,8 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 			if (fragmentType != Constants.FragmentTypes.UNKNOWN) {
 				if (fragmentType == Constants.FragmentTypes.INTERACTION ||
-						fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
-						fragmentType == Constants.FragmentTypes.ABOUT) {
+					fragmentType == Constants.FragmentTypes.MESSAGE_CENTER_ERROR ||
+					fragmentType == Constants.FragmentTypes.ABOUT) {
 					bundle.putInt("toolbarLayoutId", R.id.apptentive_toolbar);
 					if (newFragment == null) {
 						newFragment = FragmentFactory.createFragmentInstance(bundle);
@@ -97,7 +106,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
 						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
 						if (eventName != null) {
-							EngagementModule.engageInternal(this, eventName);
+							EngagementModule.engageInternal(this, conversation, eventName);
 						}
 					}
 					finish();
@@ -106,7 +115,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error creating ApptentiveViewActivity.", e);
+			ApptentiveLog.e(e, "Error creating ApptentiveViewActivity.");
 			MetricModule.sendError(e, null, null);
 		}
 
@@ -126,14 +135,14 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			actionBar.setDisplayHomeAsUpEnabled(true);
 			int navIconResId = newFragment.getToolbarNavigationIconResourceId(getTheme());
 			// Check if fragment may show an alternative navigation icon
-			if ( navIconResId != 0) {
+			if (navIconResId != 0) {
 				/* In order for the alternative icon has the same color used by toolbar icon,
 				 * need to apply the same color in toolbar theme
 				 * By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
 				 */
 				final Drawable alternateUpArrow = ResourcesCompat.getDrawable(getResources(),
-					  navIconResId,
-					  getTheme());
+					navIconResId,
+					getTheme());
 
 				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
 				alternateUpArrow.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
@@ -144,6 +153,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		//current_tab = extra.getInt(SELECTED_TAB_EXTRA_KEY, 0);
 		current_tab = 0;
 
+		newFragment.setConversation(conversation);
 		addFragmentToAdapter(newFragment, newFragment.getTitle());
 
 		// Get the ViewPager and set it's PagerAdapter so that it can display items
@@ -272,7 +282,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	}
 
 	private void applyApptentiveTheme(boolean isModalInteraction) {
-    // Update the activity theme to reflect current attributes
+		// Update the activity theme to reflect current attributes
 		try {
 			ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
 
@@ -288,7 +298,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 				setTaskDescription(taskDes);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error apply Apptentive Theme.", e);
+			ApptentiveLog.e(e, "Error apply Apptentive Theme.");
 		}
 	}
 
@@ -408,10 +418,24 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
-		if (notification.getName().equals(ApptentiveInternal.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
-			if (!isFinishing()) {
-				exitActivity(ApptentiveViewExitType.NOTIFICATION);
+		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
+			dismissActivity();
+		} else if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
+			final Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
+			Assert.assertNotNull(conversation, "Conversation expected to be not null");
+			if (conversation != null && !conversation.hasActiveState()) {
+				dismissActivity();
 			}
+		}
+	}
+
+	//endregion
+
+	//region Helpers
+
+	private void dismissActivity() {
+		if (!isFinishing()) {
+			exitActivity(ApptentiveViewExitType.NOTIFICATION); // TODO: different exit types for different notifications?
 		}
 	}
 

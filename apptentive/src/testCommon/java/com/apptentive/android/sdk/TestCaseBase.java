@@ -8,6 +8,8 @@ package com.apptentive.android.sdk;
 
 import android.os.SystemClock;
 
+import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.debug.AssertImp;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
@@ -21,10 +23,31 @@ public class TestCaseBase {
 	private List<String> result = new ArrayList<>();
 	private MockDispatchQueue dispatchQueue;
 
+	//region Setup
+
+	protected void setUp() {
+		Assert.setImp(new AssertImp() {
+			@Override
+			public void assertFailed(String message) {
+				throw new AssertionError(message);
+			}
+		});
+	}
+
+	protected void tearDown() {
+		Assert.setImp(null);
+	}
+
+	//endregion
+
 	//region Results
 
 	protected void addResult(String str) {
 		result.add(str);
+	}
+
+	protected void addResult(String format, Object... params) {
+		result.add(StringUtils.format(format, params));
 	}
 
 	protected void assertResult(String... expected) {

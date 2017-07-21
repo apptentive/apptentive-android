@@ -133,7 +133,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
 			assertFalse(criteria.isMet());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 		ApptentiveLog.e("Finished test.");
@@ -258,7 +258,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			assertFalse(criteria.isMet());
 
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 		ApptentiveLog.e("Finished test.");
@@ -383,7 +383,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			assertFalse(criteria.isMet());
 
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 		ApptentiveLog.e("Finished test.");
@@ -461,7 +461,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			assertTrue(criteria.isMet());
 
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 		ApptentiveLog.e("Finished test.");
@@ -577,7 +577,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			assertFalse(criteria.isMet());
 
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 		ApptentiveLog.e("Finished test.");

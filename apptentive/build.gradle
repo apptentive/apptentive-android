@@ -2,10 +2,6 @@ init()
 
 apply plugin: 'com.android.library'
 
-repositories {
-    jcenter()
-}
-
 dependencies {
     compile 'com.android.support:support-v4:24.2.1'
     compile 'com.android.support:appcompat-v7:24.2.1'
@@ -24,14 +20,14 @@ dependencies {
 }
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion '24.0.3'
+    compileSdkVersion 25
+    buildToolsVersion '25.0.3'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 24
+        targetSdkVersion 25
         // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
-        versionCode System.getenv("BUILD_NUMBER") as Integer ?: 1
+        versionCode System.getenv("BUILD_NUMBER") as Integer ?: System.getenv("TRAVIS_BUILD_NUMBER") as Integer ?: 1
         versionName project.version
         consumerProguardFiles 'consumer-proguard-rules.pro'
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -72,14 +68,14 @@ def getReleaseRepositoryUrl() {
 }
 
 def getSnapshotRepositoryUrl() {
-    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : ""
+    return hasProperty('SNAPSHOT_REPOSITORY_URL') ? SNAPSHOT_REPOSITORY_URL : System.getenv("SNAPSHOT_REPOSITORY_URL")
 }
 
 def getRepositoryUsername() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_USERNAME') ? NEXUS_USERNAME : ""
     } else {
-        return hasProperty('SNAPSHOT_REPOSITORY_USERNAME') ? SNAPSHOT_REPOSITORY_USERNAME : ""
+        return hasProperty('SNAPSHOT_REPOSITORY_USERNAME') ? SNAPSHOT_REPOSITORY_USERNAME : System.getenv("SNAPSHOT_REPOSITORY_USERNAME")
     }
 }
 
@@ -87,7 +83,7 @@ def getRepositoryPassword() {
     if (isReleaseBuild()) {
         return hasProperty('NEXUS_PASSWORD') ? NEXUS_PASSWORD : ""
     } else {
-        return hasProperty('SNAPSHOT_REPOSITORY_PASSWORD') ? SNAPSHOT_REPOSITORY_PASSWORD : ""
+        return hasProperty('SNAPSHOT_REPOSITORY_PASSWORD') ? SNAPSHOT_REPOSITORY_PASSWORD : System.getenv("SNAPSHOT_REPOSITORY_PASSWORD")
     }
 }
 
@@ -162,7 +158,7 @@ task androidJavadocs(type: Javadoc) {
     classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
 }
 
-androidJavadocs << {
+androidJavadocs.doLast {
     println "Javadocs written to: " + destinationDir
 }
 

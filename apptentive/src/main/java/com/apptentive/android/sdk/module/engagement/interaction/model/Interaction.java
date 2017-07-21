@@ -143,7 +143,7 @@ public abstract class Interaction extends JSONObject {
 						break;
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.w("Error parsing Interaction", e);
+				ApptentiveLog.w(e, "Error parsing Interaction");
 				// Ignore
 			}
 			return null;

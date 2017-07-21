@@ -1,24 +1,23 @@
 /*
- * Copyright (c) 2014, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
 package com.apptentive.android.sdk.model;
 
-import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.Date;
 
-/**
- * @author Sky Kelsey
- */
 public class TimeExtendedData extends ExtendedData {
 
 	private static final String KEY_TIMESTAMP = "timestamp";
 
 	private static final int VERSION = 1;
+
+	private double timestamp;
 
 	@Override
 	protected void init() {
@@ -63,10 +62,13 @@ public class TimeExtendedData extends ExtendedData {
 	}
 
 	protected void setTimestamp(double dateInSeconds) {
-		try {
-			put(KEY_TIMESTAMP, dateInSeconds);
-		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to TimeExtendedData.", KEY_TIMESTAMP, e);
-		}
+		this.timestamp = dateInSeconds;
+	}
+
+	@Override
+	public JSONObject toJsonObject() throws JSONException {
+		JSONObject ret = super.toJsonObject();
+		ret.put(KEY_TIMESTAMP, timestamp);
+		return ret;
 	}
 }

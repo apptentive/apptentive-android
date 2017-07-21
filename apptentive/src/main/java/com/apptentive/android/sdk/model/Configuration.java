@@ -46,12 +46,12 @@ public class Configuration extends JSONObject {
 	}
 
 	public void save() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).apply();
 	}
 
 	public static Configuration load() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getSharedPrefs();
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		return Configuration.load(prefs);
 	}
 
@@ -62,7 +62,7 @@ public class Configuration extends JSONObject {
 				return new Configuration(json);
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error loading Configuration from SharedPreferences.", e);
+			ApptentiveLog.e(e, "Error loading Configuration from SharedPreferences.");
 		}
 		return new Configuration();
 	}
@@ -167,7 +167,7 @@ public class Configuration extends JSONObject {
 			Bundle metaData = ai.metaData;
 			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
-			ApptentiveLog.w("Unexpected error while reading %s manifest setting.", e, Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
+			ApptentiveLog.w(e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;

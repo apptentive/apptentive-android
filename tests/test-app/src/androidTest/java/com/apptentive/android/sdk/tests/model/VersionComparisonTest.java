@@ -76,7 +76,7 @@ public class VersionComparisonTest extends ApptentiveTestCaseBase {
 				assertEquals(String.format("Comparison of [\"%s\" %s \"%s\"] failed", left, operator, right), expected, actual);
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error loading experiment results.", e);
+			ApptentiveLog.e(e, "Error loading experiment results.");
 		}
 	}
 }

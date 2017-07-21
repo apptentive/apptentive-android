@@ -1,11 +1,19 @@
+/*
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+ * Please refer to the LICENSE file for the terms and conditions
+ * under which redistribution and use of this file is permitted.
+ */
+
 package com.apptentive.android.sdk.notifications;
 
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
+import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.ObjectUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
 /**
  * An {@link ApptentiveNotificationCenter} object (or simply, notification center) provides a
@@ -24,29 +32,8 @@ public class ApptentiveNotificationCenter {
 	 */
 	private final Map<String, ApptentiveNotificationObserverList> observerListLookup;
 
-	/**
-	 * Dispatch queue for posting notifications.
-	 */
-	private final DispatchQueue notificationQueue;
-
-	/**
-	 * Dispatch queue for the concurrent access to the internal data structures
-	 * (adding/removing observers, etc).
-	 */
-	private final DispatchQueue operationQueue;
-
-	ApptentiveNotificationCenter(DispatchQueue notificationQueue, DispatchQueue operationQueue) {
-		if (notificationQueue == null) {
-			throw new IllegalArgumentException("Notification queue is not defined");
-		}
-
-		if (operationQueue == null) {
-			throw new IllegalArgumentException("Operation queue is not defined");
-		}
-
+	ApptentiveNotificationCenter() {
 		this.observerListLookup = new HashMap<>();
-		this.notificationQueue = notificationQueue;
-		this.operationQueue = operationQueue;
 	}
 
 	//region Observers
@@ -54,8 +41,9 @@ public class ApptentiveNotificationCenter {
 	/**
 	 * Adds an entry to the receiver’s dispatch table with an observer using strong reference.
 	 */
-	public void addObserver(final String notification, final ApptentiveNotificationObserver observer) {
+	public synchronized ApptentiveNotificationCenter addObserver(String notification, ApptentiveNotificationObserver observer) {
 		addObserver(notification, observer, false);
+		return this;
 	}
 
 	/**
@@ -63,43 +51,28 @@ public class ApptentiveNotificationCenter {
 	 *
 	 * @param useWeakReference - weak reference is used if <code>true</code>
 	 */
-	public void addObserver(final String notification, final ApptentiveNotificationObserver observer, final boolean useWeakReference) {
-		operationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				final ApptentiveNotificationObserverList list = resolveObserverList(notification);
-				list.addObserver(observer, useWeakReference);
-			}
-		});
+	public synchronized void addObserver(String notification, ApptentiveNotificationObserver observer, boolean useWeakReference) {
+		final ApptentiveNotificationObserverList list = resolveObserverList(notification);
+		list.addObserver(observer, useWeakReference);
 	}
 
 	/**
 	 * Removes matching entries from the receiver’s dispatch table.
 	 */
-	public void removeObserver(final String notification, final ApptentiveNotificationObserver observer) {
-		operationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				final ApptentiveNotificationObserverList list = findObserverList(notification);
-				if (list != null) {
-					list.removeObserver(observer);
-				}
-			}
-		});
+	public synchronized void removeObserver(final String notification, final ApptentiveNotificationObserver observer) {
+		final ApptentiveNotificationObserverList list = findObserverList(notification);
+		if (list != null) {
+			list.removeObserver(observer);
+		}
 	}
 
 	/**
 	 * Removes all the entries specifying a given observer from the receiver’s dispatch table.
 	 */
-	public void removeObserver(final ApptentiveNotificationObserver observer) {
-		operationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				for (ApptentiveNotificationObserverList observers : observerListLookup.values()) {
-					observers.removeObserver(observer);
-				}
-			}
-		});
+	public synchronized void removeObserver(final ApptentiveNotificationObserver observer) {
+		for (ApptentiveNotificationObserverList observers : observerListLookup.values()) {
+			observers.removeObserver(observer);
+		}
 	}
 
 	//endregion
@@ -107,42 +80,26 @@ public class ApptentiveNotificationCenter {
 	//region Notifications
 
 	/**
-	 * Posts a given notification to the receiver.
+	 * Creates a notification with a given name and posts it to the receiver.
 	 */
-	public void postNotification(String name) {
+	public synchronized void postNotification(String name) {
 		postNotification(name, EMPTY_USER_INFO);
 	}
 
 	/**
-	 * Creates a notification with a given name and information and posts it to the receiver.
+	 * Creates a notification with a given name and user info and posts it to the receiver.
 	 */
-	public void postNotification(String name, Map<String, Object> userInfo) {
-		postNotification(new ApptentiveNotification(name, userInfo));
+	public synchronized void postNotification(final String name, Object... args) {
+		postNotification(name, ObjectUtils.toMap(args));
 	}
 
 	/**
-	 * Posts a given notification to the receiver.
+	 * Creates a notification with a given name and user info and posts it to the receiver.
 	 */
-	public void postNotification(final ApptentiveNotification notification) {
-		operationQueue.dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				if (notificationQueue == operationQueue) { // is it the same queue?
-					postNotificationSync(notification);
-				} else {
-					notificationQueue.dispatchAsync(new DispatchTask() {
-						@Override
-						protected void execute() {
-							postNotificationSync(notification);
-						}
-					});
-				}
-			}
-		});
-	}
+	public synchronized void postNotification(final String name, final Map<String, Object> userInfo) {
+		final ApptentiveNotification notification = new ApptentiveNotification(name, userInfo);
+		ApptentiveLog.v(NOTIFICATIONS, "Post notification: %s", notification);
 
-	// this method is not thread-safe
-	private void postNotificationSync(ApptentiveNotification notification) {
 		final ApptentiveNotificationObserverList list = findObserverList(notification.getName());
 		if (list != null) {
 			list.notifyObservers(notification);
@@ -158,14 +115,14 @@ public class ApptentiveNotificationCenter {
 	 *
 	 * @return <code>null</code> is not found
 	 */
-	private ApptentiveNotificationObserverList findObserverList(String name) {
+	private synchronized ApptentiveNotificationObserverList findObserverList(String name) {
 		return observerListLookup.get(name);
 	}
 
 	/**
 	 * Find an observer list for the specified name or creates a new one if not found.
 	 */
-	private ApptentiveNotificationObserverList resolveObserverList(String name) {
+	private synchronized ApptentiveNotificationObserverList resolveObserverList(String name) {
 		ApptentiveNotificationObserverList list = observerListLookup.get(name);
 		if (list == null) {
 			list = new ApptentiveNotificationObserverList();
@@ -189,7 +146,7 @@ public class ApptentiveNotificationCenter {
 	 * Thread-safe initialization trick
 	 */
 	private static class Holder {
-		static final ApptentiveNotificationCenter INSTANCE = new ApptentiveNotificationCenter(DispatchQueue.mainQueue(), DispatchQueue.mainQueue());
+		static final ApptentiveNotificationCenter INSTANCE = new ApptentiveNotificationCenter();
 	}
 
 	//endregion

@@ -21,12 +21,14 @@ public class ConcurrentDispatchQueueTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
+		super.setUp();
 		dispatchQueue = DispatchQueue.createBackgroundQueue("Test Queue", DispatchQueueType.Concurrent);
 	}
 
 	@After
 	public void tearDown() {
 		dispatchQueue.stop();
+		super.tearDown();
 	}
 
 	@Test

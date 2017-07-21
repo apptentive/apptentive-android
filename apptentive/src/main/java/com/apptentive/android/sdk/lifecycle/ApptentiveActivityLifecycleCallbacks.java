@@ -17,11 +17,22 @@ import com.apptentive.android.sdk.ApptentiveLog;
 
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 1. Keeps track of whether the app is in the foreground. It does this by counting the number of active Activities.
+ * 2 Tells the SDK when the app goes to the background (exits), or comes to the foreground (launches).
+ * 3. Tells the SDK when an Activity starts or resumes, so the SDK can hold a weak reference to the top Activity.
+ */
 public class ApptentiveActivityLifecycleCallbacks implements Application.ActivityLifecycleCallbacks {
 
 	private AtomicInteger foregroundActivities = new AtomicInteger(0);
 
+	/**
+	 * A <code>Runnable</code> that is <code>postDelayed()</code> in <code>onActivityStopped()</code> if the <code>foregroundActivities</code> is 0. When it runs, if the count is still 0, it fires <code>appEnteredBackground()</code>
+	 */
 	private Runnable checkFgBgRoutine;
+	/**
+	 * Set to false when the app goes to the background.
+	 */
 	private boolean isAppForeground;
 	private Handler delayedChecker = new Handler();
 
@@ -44,12 +55,12 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			appEnteredForeground();
 		}
 
-		ApptentiveInternal.getInstance().onActivityStarted(activity);
+		ApptentiveInternal.getInstance().onActivityStarted(activity); // TODO: post a notification here
 	}
 
 	@Override
 	public void onActivityResumed(Activity activity) {
-		ApptentiveInternal.getInstance().onActivityResumed(activity);
+		ApptentiveInternal.getInstance().onActivityResumed(activity);  // TODO: post a notification here
 	}
 
 	@Override
@@ -66,6 +77,11 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	}
 
+	/**
+	 * Decrements the count of running Activities. If it is now 0, start a task that will check again
+	 * after a small delay. If that task still finds 0 running Activities, it will trigger an <code>appEnteredBackground()</code>
+	 * @param activity
+	 */
 	@Override
 	public void onActivityStopped(Activity activity) {
 		if (foregroundActivities.decrementAndGet() < 0) {
@@ -84,9 +100,13 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		delayedChecker.postDelayed(checkFgBgRoutine = new Runnable() {
 			@Override
 			public void run() {
-				if (foregroundActivities.get() == 0 && isAppForeground) {
-					appEnteredBackground();
-					isAppForeground = false;
+				try {
+					if (foregroundActivities.get() == 0 && isAppForeground) {
+						appEnteredBackground();
+						isAppForeground = false;
+					}
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception in delayed checking");
 				}
 			}
 		}, CHECK_DELAY_SHORT);
@@ -107,16 +127,16 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 
 	private void appEnteredBackground() {
 		ApptentiveLog.d("App went to background.");
-		ApptentiveInternal.getInstance().onAppEnterBackground();
+		ApptentiveInternal.getInstance().onAppEnterBackground();  // TODO: post a notification here
 		// Mark entering background as app exit
 		appExited(ApptentiveInternal.getInstance().getApplicationContext());
 	}
 
 	private void appLaunched(Context appContext) {
-		ApptentiveInternal.getInstance().onAppLaunch(appContext);
+		ApptentiveInternal.getInstance().onAppLaunch(appContext);  // TODO: post a notification here
 	}
 
 	private void appExited(Context appContext) {
-		ApptentiveInternal.getInstance().onAppExit(appContext);
+		ApptentiveInternal.getInstance().onAppExit(appContext);  // TODO: post a notification here
 	}
 }

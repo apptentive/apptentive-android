@@ -21,7 +21,6 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
@@ -45,9 +44,9 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	@Override
 	protected void sendLaunchEvent(Activity activity) {
 		if (wasLastAttemptServerError(getContext()) || Util.isNetworkConnectionPresent()) {
-			EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
+			engage("com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_ATTEMPTING, null, null, (ExtendedData[]) null);
 		} else {
-			EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
+			engage("com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_NO_INTERNET, null, null, (ExtendedData[]) null);
 		}
 	}
 
@@ -84,7 +83,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
-		EngagementModule.engage(getActivity(), "com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
+		engage("com.apptentive", "MessageCenter", null, EVENT_NAME_NO_INTERACTION_CLOSE, exitTypeToDataJson(exitType), null, (ExtendedData[]) null);
 		return false;
 	}
 

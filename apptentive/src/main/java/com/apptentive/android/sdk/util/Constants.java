@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -8,8 +8,11 @@ package com.apptentive.android.sdk.util;
 
 public class Constants {
 
-	public static final String APPTENTIVE_SDK_VERSION = "3.4.1";
+	public static final int  API_VERSION = 9;
+	public static final String APPTENTIVE_SDK_VERSION = "4.0.0";
 
+	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
+	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
 
 	public static final int REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER = 10;
 	public static final int REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION = 20;
@@ -18,57 +21,29 @@ public class Constants {
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
+	// Globals
 	public static final String PREF_KEY_SERVER_URL = "serverUrl";
-	// Just in case a customer copies the example text verbatim.
-	public static final String EXAMPLE_API_KEY_VALUE = "YOUR_APPTENTIVE_API_KEY";
-	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
-	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
-	public static final String PREF_KEY_PERSON_ID = "personId";
-
-	public static final String PREF_KEY_DEVICE = "device";
-	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
-
-	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
-
-	public static final String PREF_KEY_SDK = "sdk";
-	public static final String PREF_KEY_APP_RELEASE = "app_release";
-	public static final String PREF_KEY_PERSON = "person";
-	public static final String PREF_KEY_PERSON_DATA = "personData";
-	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
-	public static final String PREF_KEY_PERSON_NAME = "personName";
-
-	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
-
-	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
-
-	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
-	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
-	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
-	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
-
-	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
-
 	public static final String PREF_KEY_APP_CONFIG_PREFIX = "appConfiguration.";
 	public static final String PREF_KEY_APP_CONFIG_JSON = PREF_KEY_APP_CONFIG_PREFIX+"json";
+	public static final String PREF_KEY_PUSH_PROVIDER = "pushProvider";
+	public static final String PREF_KEY_PUSH_TOKEN = "pushToken";
 
-	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
-	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
-	// Boolean true if migration from v1 to V2 has occurred.
-	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
+	// Just in case a customer copies the example text verbatim.
+	public static final String EXAMPLE_APPTENTIVE_KEY_VALUE = "YOUR_APPTENTIVE_KEY";
+	public static final String EXAMPLE_APPTENTIVE_SIGNATURE_VALUE = "YOUR_APPTENTIVE_SIGNATURE";
 
-	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
+
 
 	// Engagement
-	public static final String PREF_KEY_INTERACTIONS = "interactions";
-	public static final String PREF_KEY_TARGETS = "targets";
-	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
-	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
+	// FIXME: Migrate into global data.
+	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 
 	// Config Defaults
 	public static final String CONFIG_DEFAULT_SERVER_URL = "https://api.apptentive.com";
 
+	//region Default Values
 	public static final int CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS = 28800; // 8 hours
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS = 0;
 	public static final int CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS = 86400; // 24 hours
@@ -77,16 +52,54 @@ public class Constants {
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED = false;
 	public static final boolean CONFIG_DEFAULT_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = false;
 	public static final boolean CONFIG_DEFAULT_HIDE_BRANDING = false;
+	//endregion
 
-	// Manifest keys
+	// region Android Manifest Keys
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
-	public static final String MANIFEST_KEY_APPTENTIVE_API_KEY = "apptentive_api_key";
+	public static final String MANIFEST_KEY_APPTENTIVE_KEY = "apptentive_key";
+	public static final String MANIFEST_KEY_APPTENTIVE_SIGNATURE = "apptentive_signature";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
+	//endregion
 
-	// OLD KEYS USED IN PREVIOUS SDK VERSIONS
+	//region Database and File Storage
+	public static final String CONVERSATIONS_DIR = "apptentive/conversations";
+	public static final String PAYLOAD_DATA_DIR = "payloads";
+	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".data";
+	//endregion
+
+	// region Keys used to access old data for migration
+	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";
+	public static final String PREF_KEY_CONVERSATION_ID = "conversationId";
+	public static final String PREF_KEY_PERSON_ID = "personId";
+	public static final String PREF_KEY_DEVICE = "device";
+	public static final String PREF_KEY_SDK = "sdk";
+	public static final String PREF_KEY_APP_RELEASE = "app_release";
+	public static final String PREF_KEY_PERSON = "person";
+	public static final String PREF_KEY_LAST_SEEN_SDK_VERSION = "lastSeenSdkVersion";
+	public static final String PREF_KEY_MESSAGE_CENTER_FEATURE_USED = "messageCenterFeatureUsed";
+	public static final String PREF_KEY_CODE_POINT_STORE = "codePointStore";
+	public static final String PREF_KEY_VERSION_HISTORY = "versionHistory";
+	public static final String PREF_KEY_VERSION_HISTORY_V2 = "versionHistoryV2";
+	public static final String PREF_KEY_VERSION_HISTORY_V2_MIGRATED = "versionHistoryV2Migrated";
+	public static final String PREF_KEY_MESSAGE_CENTER_WHO_CARD_DISPLAYED_BEFORE = "messageCenterWhoCardSet";
+	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
+	//endregion
+
+
+	//region Old keys no longer used
+	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
+	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
+	public static final String PREF_KEY_PERSON_NAME = "personName";
+	public static final String PREF_KEY_DEVICE_DATA = "deviceData";
+	public static final String PREF_KEY_DEVICE_INTEGRATION_CONFIG = "integrationConfig";
+	public static final String PREF_KEY_PERSON_DATA = "personData";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_MESSAGE = "messageCenterPendingComposingMessage";
+	public static final String PREF_KEY_MESSAGE_CENTER_PENDING_COMPOSING_ATTACHMENTS = "messageCenterPendingComposingAttachments";
+	public static final String PREF_KEY_INTERACTIONS = "interactions";
+	public static final String PREF_KEY_TARGETS = "targets";
 	public static final String MANIFEST_KEY_MESSAGE_CENTER_ENABLED = "apptentive_message_center_enabled";
 	public static final String MANIFEST_KEY_EMAIL_REQUIRED = "apptentive_email_required";
 	public static final String PREF_KEY_APP_CONFIG_EXPIRATION = PREF_KEY_APP_CONFIG_PREFIX+"cache-expiration";
@@ -110,7 +123,8 @@ public class Constants {
 	public static final String PREF_KEY_AUTO_MESSAGE_SHOWN_MANUAL = "autoMessageShownManual";
 	public static final String PREF_KEY_MESSAGE_CENTER_SHOULD_SHOW_INTRO_DIALOG = "messageCenterShouldShowIntroDialog";
 	public static final String MANIFEST_KEY_USE_STAGING_SERVER = "apptentive_use_staging_server";
-
+	public static final String PREF_KEY_PENDING_PUSH_NOTIFICATION = "pendingPushNotification";
+	//region
 
 	public interface FragmentConfigKeys {
 
@@ -150,7 +164,10 @@ public class Constants {
 		"EVDO_B",  // 12
 		"LTE",     // 13
 		"EHRPD",   // 14
-		"HSPAP"    // 15
+		"HSPAP",   // 15
+		"GSM",     // 16
+		"TD_SCDMA",// 17
+		"IWLAN"    // 18
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {
@@ -160,5 +177,4 @@ public class Constants {
 			return networkTypeLookup[0];
 		}
 	}
-
 }
