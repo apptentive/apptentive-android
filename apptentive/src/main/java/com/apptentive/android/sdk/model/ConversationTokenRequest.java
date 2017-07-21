@@ -7,45 +7,72 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.Iterator;
+
 public class ConversationTokenRequest extends JSONObject {
-
-
 	public ConversationTokenRequest() {
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(DevicePayload device) {
 		try {
-			put(Device.KEY, device);
+			put(DevicePayload.KEY, device == null ? null : device.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Device.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
 		}
 	}
 
-	public void setSdk(Sdk sdk) {
+	public void setSdk(SdkPayload sdk) {
 		try {
-			put(Sdk.KEY, sdk);
+			put(SdkPayload.KEY, sdk == null ? null : sdk.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Sdk.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
 		}
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(PersonPayload person) {
 		try {
-			put(Person.KEY, person);
+			put(PersonPayload.KEY, person == null ? null : person.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", Person.KEY);
+			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
 		}
 	}
 
-	public void setAppRelease(AppRelease appRelease) {
+	public void setSdkAndAppRelease(SdkPayload sdkPayload, AppReleasePayload appReleasePayload) {
+		JSONObject combinedJson = new JSONObject();
+
+		if (sdkPayload != null) {
+			Iterator<String> keys = sdkPayload.getJsonObject().keys();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				try {
+					combinedJson.put("sdk_" + key, sdkPayload.getJsonObject().opt(key));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+
+		}
+		if (appReleasePayload != null) {
+			Iterator<String> keys = appReleasePayload.getJsonObject().keys();
+			while (keys.hasNext()) {
+				String key = keys.next();
+				try {
+					combinedJson.put(key, appReleasePayload.getJsonObject().opt(key));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 		try {
-			put(appRelease.getBaseType().name(), appRelease);
+			put("app_release", combinedJson);
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", appRelease.getBaseType().name());
+			e.printStackTrace();
 		}
 	}
 }

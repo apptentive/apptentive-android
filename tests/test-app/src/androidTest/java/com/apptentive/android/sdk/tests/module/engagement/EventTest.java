@@ -49,7 +49,7 @@ public class EventTest extends ApptentiveTestCaseBase {
 				assertTrue(result.equals(expected));
 			}
 		} catch (IOException e) {
-			ApptentiveLog.e("Error reading asset.", e);
+			ApptentiveLog.e(e, "Error reading asset.");
 			throw new RuntimeException(e);
 		} finally {
 			Util.ensureClosed(reader);

@@ -16,7 +16,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
-import com.apptentive.android.sdk.module.messagecenter.model.CompoundMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.view.ApptentiveAvatarView;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
 import com.apptentive.android.sdk.util.Util;
@@ -39,8 +39,6 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 	private TextView nameView;
 	private ApptentiveImageGridView imageBandView;
 
-	private static final boolean loadAvatar = false;
-
 	public IncomingCompoundMessageHolder(View itemView) {
 		super(itemView);
 		root = itemView.findViewById(R.id.message_root);
@@ -54,9 +52,7 @@ public class IncomingCompoundMessageHolder extends MessageHolder {
 	public void bindView(MessageCenterFragment fragment, final RecyclerView parent, final MessageCenterRecyclerViewAdapter adapter, final CompoundMessage message) {
 		super.bindView(fragment, parent, message);
 		imageBandView.setupUi();
-		if (loadAvatar) {
-			ImageUtil.startDownloadAvatarTask(avatar, message.getSenderProfilePhoto());
-		}
+		ImageUtil.startDownloadAvatarTask(avatar, message.getSenderProfilePhoto());
 
 		int widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(parent.getWidth(), View.MeasureSpec.EXACTLY);
 		root.measure(widthMeasureSpec, 0);

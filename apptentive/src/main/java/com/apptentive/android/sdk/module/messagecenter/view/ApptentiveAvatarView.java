@@ -150,7 +150,7 @@ public class ApptentiveAvatarView extends ImageView {
 				d.draw(canvas);
 				return b;
 			} catch (OutOfMemoryError e) {
-				ApptentiveLog.w("Error creating bitmap.", e);
+				ApptentiveLog.w(e, "Error creating bitmap.");
 				return null;
 			}
 		}
@@ -222,7 +222,7 @@ public class ApptentiveAvatarView extends ImageView {
 					URL url = new URL(urlString);
 					bitmap = BitmapFactory.decodeStream(url.openStream());
 				} catch (IOException e) {
-					ApptentiveLog.d("Error opening avatar from URL: \"%s\"", e, urlString);
+					ApptentiveLog.d(e, "Error opening avatar from URL: \"%s\"", urlString);
 				}
 				if (bitmap != null) {
 					final Bitmap finalBitmap = bitmap;
@@ -237,7 +237,7 @@ public class ApptentiveAvatarView extends ImageView {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				ApptentiveLog.w("UncaughtException in AvatarView.", throwable);
+				ApptentiveLog.w(throwable, "UncaughtException in AvatarView.");
 				MetricModule.sendError(throwable, null, null);
 			}
 		};

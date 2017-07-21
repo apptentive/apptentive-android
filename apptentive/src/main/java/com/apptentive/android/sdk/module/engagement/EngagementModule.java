@@ -13,13 +13,15 @@ import android.content.Intent;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewActivity;
-import com.apptentive.android.sdk.model.Event;
-import com.apptentive.android.sdk.model.EventManager;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.Util;
 
 import java.util.Map;
 
@@ -28,43 +30,58 @@ import java.util.Map;
  */
 public class EngagementModule {
 
-	public static synchronized boolean engageInternal(Context context, String eventName) {
-		return engage(context, "com.apptentive", "app", null, eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Conversation conversation, String eventName) {
+		return engage(context, conversation, "com.apptentive", "app", null, eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Context context, String eventName, String data) {
-		return engage(context, "com.apptentive", "app", null, eventName, data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Conversation conversation, String eventName, String data) {
+		return engage(context, conversation, "com.apptentive", "app", null, eventName, data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Context context, Interaction interaction, String eventName) {
-		return engage(context, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, null, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Conversation conversation, Interaction interaction, String eventName) {
+		return engage(context, conversation, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, null, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engageInternal(Context context, Interaction interaction, String eventName, String data) {
-		return engage(context, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, data, null, (ExtendedData[]) null);
+	public static synchronized boolean engageInternal(Context context, Conversation conversation, Interaction interaction, String eventName, String data) {
+		return engage(context, conversation, "com.apptentive", interaction.getType().name(), interaction.getId(), eventName, data, null, (ExtendedData[]) null);
 	}
 
-	public static synchronized boolean engage(Context context, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		if (!ApptentiveInternal.isApptentiveRegistered() || context == null) {
+	public static synchronized boolean engage(Context context, Conversation conversation, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		Assert.assertTrue(ApptentiveInternal.isApptentiveRegistered());
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			return false;
 		}
+
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
 			ApptentiveLog.d("engage(%s)", eventLabel);
 
-			ApptentiveInternal.getInstance().getCodePointStore().storeCodePointForCurrentAppVersion(eventLabel);
-			EventManager.sendEvent(new Event(eventLabel, interactionId, data, customData, extendedData));
-			return doEngage(context, eventLabel);
+			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+			int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+			conversation.getEventData().storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, eventLabel);
+			conversation.addPayload(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
+			return doEngage(conversation, context, eventLabel);
 		} catch (Exception e) {
+			ApptentiveLog.w(e, "Error in engage()");
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
 	}
 
-	public static boolean doEngage(Context context, String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
+	private static boolean doEngage(Conversation conversation, Context context, String eventLabel) {
+		Interaction interaction = conversation.getApplicableInteraction(eventLabel);
 		if (interaction != null) {
-			ApptentiveInternal.getInstance().getCodePointStore().storeInteractionForCurrentAppVersion(interaction.getId());
+			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+			int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+			conversation.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
 			launchInteraction(context, interaction);
 			return true;
 		}
@@ -108,13 +125,17 @@ public class EngagementModule {
 		}
 	}
 
-	public static boolean canShowInteraction(String vendor, String interaction, String eventName) {
+	public static boolean canShowInteraction(Conversation conversation, String interaction, String eventName, String vendor) {
 		String eventLabel = generateEventLabel(vendor, interaction, eventName);
-		return canShowInteraction(eventLabel);
+		return canShowInteraction(conversation, eventLabel);
 	}
 
-	private static boolean canShowInteraction(String eventLabel) {
-		Interaction interaction = ApptentiveInternal.getInstance().getInteractionManager().getApplicableInteraction(eventLabel);
+	private static boolean canShowInteraction(Conversation conversation, String eventLabel) {
+		if (conversation == null) {
+			throw new IllegalArgumentException("Conversation is null");
+		}
+
+		Interaction interaction = conversation.getApplicableInteraction(eventLabel);
 		return interaction != null;
 	}
 

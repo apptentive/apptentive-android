@@ -93,7 +93,7 @@ public class ApptentiveAlertDialog extends DialogFragment {
 				});
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error:", e);
+			ApptentiveLog.e(e, "Error:");
 		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		if (view != null) {

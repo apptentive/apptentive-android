@@ -36,7 +36,7 @@ public class Interactions extends JSONObject {
 				return Interaction.Factory.parseInteraction(getJSONObject(id).toString());
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Exception parsing interactions array.", e);
+			ApptentiveLog.w(e, "Exception parsing interactions array.");
 		}
 		return null;
 	}

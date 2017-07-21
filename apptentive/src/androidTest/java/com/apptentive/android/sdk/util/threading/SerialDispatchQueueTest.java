@@ -22,12 +22,14 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 
 	@Before
 	public void setUp() {
+		super.setUp();
 		dispatchQueue = DispatchQueue.createBackgroundQueue("Test Queue", DispatchQueueType.Serial);
 	}
 
 	@After
 	public void tearDown() {
 		dispatchQueue.stop();
+		super.tearDown();
 	}
 
 	@Test
@@ -63,6 +65,7 @@ public class SerialDispatchQueueTest extends TestCaseBase {
 			protected void execute() {
 				dispatchQueue.stop();
 				sleep(500);
+				dispatchQueue.stop();
 				addResult("task-1");
 			}
 		});

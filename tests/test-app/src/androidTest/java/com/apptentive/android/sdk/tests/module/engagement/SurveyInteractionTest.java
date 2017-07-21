@@ -32,7 +32,7 @@ public class SurveyInteractionTest extends ApptentiveTestCaseBase {
 		try {
 			survey = new SurveyInteraction(json);
 		} catch (Exception e) {
-			ApptentiveLog.e("Error loading survey.", e);
+			ApptentiveLog.e(e, "Error loading survey.");
 		}
 		assertNotNull(survey);
 	}

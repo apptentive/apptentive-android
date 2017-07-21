@@ -25,10 +25,13 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.StateListDrawable;
 import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
@@ -36,8 +39,6 @@ import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -92,7 +93,13 @@ public class Util {
 
 	public static boolean isNetworkConnectionPresent() {
 		ConnectivityManager cm = (ConnectivityManager) ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
-		return cm != null && cm.getActiveNetworkInfo() != null;
+		if (cm != null) {
+			NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+			if (activeNetwork != null) {
+				return activeNetwork.isConnectedOrConnecting();
+			}
+		}
+		return false;
 	}
 
 	public static void ensureClosed(Closeable stream) {
@@ -138,7 +145,7 @@ public class Util {
 							Integer ret = Integer.parseInt(expiration);
 							return ret;
 						} catch (NumberFormatException e) {
-							ApptentiveLog.e("Error parsing cache expiration as number: %s", e, expiration);
+							ApptentiveLog.e(e, "Error parsing cache expiration as number: %s", expiration);
 						}
 					}
 				}
@@ -201,7 +208,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionName;
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Error getting app version name.", e);
+			ApptentiveLog.e(e, "Error getting app version name.");
 		}
 		return null;
 	}
@@ -212,7 +219,7 @@ public class Util {
 			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
 			return packageInfo.versionCode;
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Error getting app version code.", e);
+			ApptentiveLog.e(e, "Error getting app version code.");
 		}
 		return -1;
 	}
@@ -272,7 +279,7 @@ public class Util {
 				return Integer.parseInt(parts[0]);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w("Error getting major OS version", e);
+			ApptentiveLog.w(e, "Error getting major OS version");
 		}
 		return -1;
 	}
@@ -521,6 +528,10 @@ public class Util {
 		return null;
 	}
 
+	public static String generateRandomFilename() {
+		return UUID.randomUUID().toString();
+	}
+
 	/*
 	 * Generate cached file name use md5 from image originalPath and image created time
 	 */
@@ -619,7 +630,7 @@ public class Util {
 					context.startActivity(intent);
 					return true;
 				} catch (ActivityNotFoundException e) {
-					ApptentiveLog.e("Activity not found to open attachment: ", e);
+					ApptentiveLog.e(e, "Activity not found to open attachment: ");
 				}
 			}
 		} else {
@@ -662,6 +673,110 @@ public class Util {
 			Util.ensureClosed(fs);
 		}
 	}
+
+	public static void writeBytes(File file, byte[] bytes) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
+
+		if (bytes == null) {
+			throw new IllegalArgumentException("'bytes' is null");
+		}
+
+		File parentFile = file.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			throw new IOException("Parent file could not be created: " + parentFile);
+		}
+
+		ByteArrayInputStream input = null;
+		FileOutputStream output = null;
+		try {
+			input = new ByteArrayInputStream(bytes);
+			output = new FileOutputStream(file);
+			copy(input, output);
+		} finally {
+			ensureClosed(input);
+			ensureClosed(output);
+		}
+	}
+
+	public static byte[] readBytes(File file) throws IOException {
+		ByteArrayOutputStream output = null;
+		try {
+			output = new ByteArrayOutputStream();
+			appendFileToStream(file, output);
+			return output.toByteArray();
+		} finally {
+			ensureClosed(output);
+		}
+	}
+
+	public static void appendFileToStream(File file, OutputStream outputStream) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
+
+		if (!file.exists()) {
+			throw new FileNotFoundException("File does not exist: " + file);
+		}
+
+		if (file.isDirectory()) {
+			throw new FileNotFoundException("File is directory: " + file);
+		}
+
+		FileInputStream input = null;
+		try {
+			input = new FileInputStream(file);
+			copy(input, outputStream);
+		} finally {
+			ensureClosed(input);
+		}
+	}
+
+	private static void copy(InputStream input, OutputStream output) throws IOException {
+		byte[] buffer = new byte[4096];
+		int bytesRead;
+		while ((bytesRead = input.read(buffer)) > 0) {
+			output.write(buffer, 0, bytesRead);
+		}
+	}
+
+	public static void writeNullableUTF(DataOutput out, String value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeUTF(value);
+		}
+	}
+
+	public static String readNullableUTF(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readUTF() : null;
+	}
+
+	public static void writeNullableBoolean(DataOutput out, Boolean value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeBoolean(value);
+		}
+	}
+
+	public static Boolean readNullableBoolean(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readBoolean() : null;
+	}
+
+	public static void writeNullableDouble(DataOutput out, Double value) throws IOException {
+		out.writeBoolean(value != null);
+		if (value != null) {
+			out.writeDouble(value);
+		}
+	}
+
+	public static Double readNullableDouble(DataInput in) throws IOException {
+		boolean notNull = in.readBoolean();
+		return notNull ? in.readDouble() : null;
+	}
+
 
 	public static boolean isMimeTypeImage(String mimeType) {
 		if (TextUtils.isEmpty(mimeType)) {
@@ -805,9 +920,9 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newMap);
 				} catch (NoSuchFieldException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				} catch (IllegalAccessException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				}
 			}
 		} else {
@@ -825,11 +940,69 @@ public class Util {
 					staticField.setAccessible(true);
 					staticField.set(null, newTypeface);
 				} catch (NoSuchFieldException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				} catch (IllegalAccessException e) {
-					ApptentiveLog.e("Exception replacing system font", e);
+					ApptentiveLog.e(e, "Exception replacing system font");
 				}
 			}
 		}
+	}
+
+	public static String humanReadableByteCount(long bytes, boolean si) {
+		int unit = si ? 1000 : 1024;
+		if (bytes < unit) return bytes + " B";
+		int exp = (int) (Math.log(bytes) / Math.log(unit));
+		String pre = (si ? "kMGTPE" : "KMGTPE").charAt(exp-1) + (si ? "" : "i");
+		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
+	}
+
+	public static String getAndroidId(Context context) {
+		if (context == null) {
+			return null;
+		}
+		return Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+	}
+	/**
+	 * Returns and internal storage directory
+	 */
+	public static File getInternalDir(Context context, String path, boolean createIfNecessary) {
+		File filesDir = context.getFilesDir();
+		File internalDir = new File(filesDir, path);
+		if (!internalDir.exists() && createIfNecessary) {
+			boolean succeed = internalDir.mkdirs();
+			if (!succeed) {
+				ApptentiveLog.w("Unable to create internal directory: %s", internalDir);
+			}
+		}
+		return internalDir;
+	}
+
+	/**
+	 * Helper method for resolving manifest metadata string value
+	 *
+	 * @return null if key is missing or exception is thrown
+	 */
+	public static String getManifestMetadataString(Context context, String key) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		if (key == null) {
+			throw new IllegalArgumentException("Key is null");
+		}
+
+		try {
+			String appPackageName = context.getPackageName();
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
+			Bundle metaData = packageInfo.applicationInfo.metaData;
+			if (metaData != null) {
+				return Util.trim(metaData.getString(key));
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
+		}
+
+		return null;
 	}
 }

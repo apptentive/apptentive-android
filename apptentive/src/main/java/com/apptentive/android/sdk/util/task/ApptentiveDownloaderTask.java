@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -26,11 +26,9 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
-/**
- * @author Barry Li
- */
 public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, ApptentiveHttpResponse> {
 
 	private static boolean FILE_DOWNLOAD_REDIRECTION_ENABLED = false;
@@ -68,7 +66,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 		try {
 			finished = downloadBitmap((String) params[0], (String) params[1], (String) params[2]);
 		} catch (Exception e) {
-			ApptentiveLog.d("Error downloading bitmap", e);
+			ApptentiveLog.d(e, "Error downloading bitmap");
 		}
 		return finished;
 	}
@@ -134,13 +132,13 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				if (bRequestRedirectThroughApptentive) {
 					connection.setRequestProperty("User-Agent", ApptentiveClient.getUserAgentString());
 					connection.setRequestProperty("Authorization", "OAuth " + conversationToken);
-					connection.setRequestProperty("X-API-Version", String.valueOf(ApptentiveClient.API_VERSION));
+					connection.setRequestProperty("X-API-Version", String.valueOf(Constants.API_VERSION));
 				} else if (cookies != null) {
 					connection.setRequestProperty("Cookie", cookies);
 				}
 
-				connection.setConnectTimeout(ApptentiveClient.DEFAULT_HTTP_CONNECT_TIMEOUT);
-				connection.setReadTimeout(ApptentiveClient.DEFAULT_HTTP_SOCKET_TIMEOUT);
+				connection.setConnectTimeout(Constants.DEFAULT_CONNECT_TIMEOUT_MILLIS);
+				connection.setReadTimeout(Constants.DEFAULT_READ_TIMEOUT_MILLIS);
 				connection.setRequestProperty("Accept-Encoding", "gzip");
 				connection.setRequestProperty("Accept", "application/json");
 
@@ -226,18 +224,18 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 				}
 			}
 		} catch (IllegalArgumentException e) {
-			ApptentiveLog.w("Error communicating with server.", e);
+			ApptentiveLog.w(e, "Error communicating with server.");
 		} catch (SocketTimeoutException e) {
-			ApptentiveLog.w("Timeout communicating with server.", e);
+			ApptentiveLog.w(e, "Timeout communicating with server.");
 		} catch (final MalformedURLException e) {
-			ApptentiveLog.w("ClientProtocolException", e);
+			ApptentiveLog.w(e, "ClientProtocolException");
 		} catch (final IOException e) {
-			ApptentiveLog.w("ClientProtocolException", e);
+			ApptentiveLog.w(e, "ClientProtocolException");
 			// Read the error response.
 			try {
 				ret.setContent(ApptentiveClient.getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
-				ApptentiveLog.w("Can't read error stream.", ex);
+				ApptentiveLog.w(ex, "Can't read error stream.");
 			}
 		}
 

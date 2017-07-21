@@ -14,11 +14,10 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
-
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -108,9 +107,9 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 									data.put(Action.KEY_LABEL, buttonAction.getLabel());
 									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 								} catch (JSONException e) {
-									ApptentiveLog.e("Error creating Event data object.", e);
+									ApptentiveLog.e(e, "Error creating Event data object.");
 								}
-								EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
+								engageInternal(TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
 								transit();
 							}
 						});
@@ -132,9 +131,17 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
-									Interactions interactions = ApptentiveInternal.getInstance().getInteractionManager().getInteractions();
-									if (interactions != null) {
-										invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
+									Conversation conversation = getConversation();
+									if (conversation != null) {
+										String interactionsString = conversation.getInteractions();
+										if (interactionsString != null) {
+											try {
+												Interactions interactions = new Interactions(interactionsString);
+												invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
+											}catch (JSONException e) {
+												// Should never happen.
+											}
+										}
 									}
 								}
 
@@ -145,10 +152,10 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 									data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 									data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
 								} catch (JSONException e) {
-									ApptentiveLog.e("Error creating Event data object.", e);
+									ApptentiveLog.e(e, "Error creating Event data object.");
 								}
 
-								EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
+								engageInternal(TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
 								if (invokedInteraction != null) {
 									EngagementModule.launchInteraction(getActivity(), invokedInteraction);
 								}
@@ -168,7 +175,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 	@Override
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
-		EngagementModule.engageInternal(getActivity(), interaction, TextModalInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
+		engageInternal(TextModalInteraction.EVENT_NAME_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 }

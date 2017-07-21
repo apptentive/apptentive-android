@@ -16,7 +16,6 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
 
 public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> implements View.OnClickListener {
@@ -73,7 +72,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 
 	@Override
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
-		EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_CANCEL, exitTypeToDataJson(exitType));
+		engageInternal(CODE_POINT_CANCEL, exitTypeToDataJson(exitType));
 		return false;
 	}
 
@@ -81,11 +80,11 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	public void onClick(View v) {
 		int id = v.getId();
 		if (id == R.id.yes) {
-			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_YES);
+			engageInternal(CODE_POINT_YES);
 		} else if (id == R.id.no) {
-			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_NO);
+			engageInternal(CODE_POINT_NO);
 		} else if (id == R.id.dismiss) {
-			EngagementModule.engageInternal(getActivity(), interaction, CODE_POINT_DISMISS);
+			engageInternal(CODE_POINT_DISMISS);
 		}
 		transit();
 	}

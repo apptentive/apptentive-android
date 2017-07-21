@@ -9,8 +9,8 @@ package com.apptentive.android.sdk.notifications;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,8 +19,14 @@ public class ApptentiveNotificationCenterTest extends TestCaseBase {
 	private ApptentiveNotificationCenter notificationCenter;
 
 	@Before
-	public void setUp() throws Exception {
-		notificationCenter = new ApptentiveNotificationCenter(new MockDispatchQueue(true), new MockDispatchQueue(true));
+	public void setUp() {
+		super.setUp();
+		notificationCenter = new ApptentiveNotificationCenter();
+	}
+
+	@After
+	public void tearDown() {
+		super.tearDown();
 	}
 
 	private static final boolean WEAK_REFERENCE = true;

@@ -26,12 +26,10 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.model.SurveyResponse;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
+import com.apptentive.android.sdk.model.SurveyResponsePayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultiselectQuestion;
@@ -120,9 +118,9 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					}
 					getActivity().finish();
 
-					EngagementModule.engageInternal(getActivity(), interaction, EVENT_SUBMIT);
+					engageInternal(EVENT_SUBMIT);
 
-					ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(new SurveyResponse(interaction, answers));
+					getConversation().addPayload(new SurveyResponsePayload(interaction, answers));
 					ApptentiveLog.d("Survey Submitted.");
 					callListener(true);
 				} else {
@@ -257,7 +255,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		} catch (JSONException e) {
 			// Never happens.
 		}
-		EngagementModule.engageInternal(activity, interaction, EVENT_QUESTION_RESPONSE, answerData.toString());
+		engageInternal(EVENT_QUESTION_RESPONSE, answerData.toString());
 	}
 
 	private void callListener(boolean completed) {
@@ -270,11 +268,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	@Override
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		if (exitType.equals(ApptentiveViewExitType.BACK_BUTTON)) {
-			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL);
+			engageInternal(EVENT_CANCEL);
 		} else if (exitType.equals(ApptentiveViewExitType.NOTIFICATION)) {
-			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CANCEL, exitTypeToDataJson(exitType));
+			engageInternal(EVENT_CANCEL, exitTypeToDataJson(exitType));
 		} else {
-			EngagementModule.engageInternal(getActivity(), interaction, EVENT_CLOSE);
+			engageInternal(EVENT_CLOSE, exitTypeToDataJson(exitType));
 		}
 		return false;
 	}

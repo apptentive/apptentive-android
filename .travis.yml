@@ -1,0 +1,43 @@
+language: android
+env:
+  global:
+    - SNAPSHOT_REPOSITORY_USERNAME=travis
+    - SNAPSHOT_REPOSITORY_URL=http://54.183.158.246:8081/artifactory/apptentive-snapshots
+    - secure: pc2twMw60say0ASdXiJiRAD6tx9Qy82DIMw83qPijB2wyVHLpLbjptqBFyTYy4+JYthZ8xcB5Yretiv//AQS4wdDPsJNwOKUGXamm8IBx+1wnhG/R/ROz67Ibj4XWHIX24GaKN/MD8tCN9VPdeNEL1jysSEVxqqsvOGBsxitAyI=
+jdk:
+  - oraclejdk8
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+    - $HOME/.android/build-cache
+android:
+  components:
+    - tools
+    - tools
+    - platform-tools
+    - build-tools-25.0.3
+    - android-24
+    - android-25
+    - extra-google-google_play_services
+    - extra-google-m2repository
+    - addon-google_apis-google-25
+    - sys-img-armeabi-v7a-android-19
+install: true
+before_script:
+  - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a
+  - emulator -avd test -no-audio -no-window &
+  - android-wait-for-emulator
+  - adb shell input keyevent 82 &
+script:
+  - ./gradlew :apptentive:test -i
+after_script:
+  - if [ "$TRAVIS_BRANCH" = "develop" ]; then
+      ./gradlew :apptentive:uploadArchives;
+    fi
+notifications:
+  slack:
+    secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=

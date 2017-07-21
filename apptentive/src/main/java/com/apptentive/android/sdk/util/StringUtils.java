@@ -25,6 +25,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONObject;
 
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.Map;
 
@@ -114,10 +115,54 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Create URL encoded params string from the map of key-value pairs
+	 *
+	 * @throws IllegalArgumentException if map, any key or value appears to be null
+	 */
+	public static String createQueryString(Map<String, Object> params) { // FIXME: unit tests (DO NOT ACCEPT PULL REQUEST IF YOU SEE THIS COMMENT)
+		if (params == null) {
+			throw new IllegalArgumentException("Params are null");
+		}
+
+		StringBuilder result = new StringBuilder();
+		for (Map.Entry<String, Object> e : params.entrySet()) {
+			String key = e.getKey();
+			if (key == null) {
+				throw new IllegalArgumentException("key is null");
+			}
+
+			Object valueObj = e.getValue();
+			if (valueObj == null) {
+				throw new IllegalArgumentException("value is null for key '" + key + "'");
+			}
+
+			String value = valueObj.toString();
+
+			@SuppressWarnings("deprecation")
+			String encodedKey = URLEncoder.encode(key);
+			@SuppressWarnings("deprecation")
+			String encodedValue = URLEncoder.encode(value);
+
+			result.append(result.length() == 0 ? "?" : "&");
+			result.append(encodedKey);
+			result.append("=");
+			result.append(encodedValue);
+		}
+		return result.toString();
+	}
+
+	/**
 	 * Checks is string is null or empty
 	 */
 	public static boolean isNullOrEmpty(String str) {
 		return str == null || str.length() == 0;
+	}
+
+	/**
+	 * Safely checks if two strings are equal (any argument can be null)
+	 */
+	public static boolean equal(String str1, String str2) {
+		return str1 != null && str2 != null && str1.equals(str2);
 	}
 
 	/**
@@ -132,5 +177,57 @@ public final class StringUtils {
 			ApptentiveLog.e(e, "Exception while creating json-string { %s:%s }", key, value);
 			return null;
 		}
+	}
+
+	/**
+	 * Converts a hex String to a byte array.
+	 */
+	public static byte[] hexToBytes(String hex) {
+		int length = hex.length();
+		byte[] ret = new byte[length / 2];
+		for (int i = 0; i < length; i += 2) {
+			ret[i / 2] = (byte) ((Character.digit(hex.charAt(i), 16) << 4) + Character.digit(hex.charAt(i + 1), 16));
+		}
+		return ret;
+	}
+
+	public static String table(Object[][] rows) {
+		return table(rows, null);
+	}
+
+	public static String table(Object[][] rows, String title) {
+		int[] columnSizes = new int[rows[0].length];
+		for (Object[] row : rows) {
+			for (int i = 0; i < row.length; ++i) {
+				columnSizes[i] = Math.max(columnSizes[i], toString(row[i]).length());
+			}
+		}
+
+		StringBuilder line = new StringBuilder();
+		int totalSize = 0;
+		for (int i = 0; i < columnSizes.length; ++i) {
+			totalSize += columnSizes[i];
+		}
+		totalSize += columnSizes.length > 0 ? (columnSizes.length - 1) * " | ".length() : 0;
+		while (totalSize-- > 0) {
+			line.append('-');
+		}
+
+		StringBuilder result = new StringBuilder(line);
+
+		for (Object[] row : rows) {
+			result.append("\n");
+
+			for (int i = 0; i < row.length; ++i) {
+				if (i > 0) {
+					result.append(" | ");
+				}
+
+				result.append(String.format("%-" + columnSizes[i] + "s", row[i]));
+			}
+		}
+
+		result.append("\n").append(line);
+		return result.toString();
 	}
 }

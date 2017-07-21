@@ -169,7 +169,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet());
 		} catch (Exception e) {
-			ApptentiveLog.e("Error running test.", e);
+			ApptentiveLog.e(e, "Error running test.");
 			assertNull(e);
 		}
 	}
@@ -187,7 +187,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet());
 		} catch (Exception e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 	}
@@ -204,7 +204,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 			assertTrue(criteria.isMet());
 		} catch (Exception e) {
-			ApptentiveLog.e("Error parsing test JSON.", e);
+			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
 		}
 	}

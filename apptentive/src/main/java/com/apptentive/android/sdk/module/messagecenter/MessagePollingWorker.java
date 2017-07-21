@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -7,142 +7,179 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 
-import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.util.Destroyable;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-/**
- * @author Sky Kelsey
- */
-public class MessagePollingWorker {
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
-	private MessagePollingThread sPollingThread;
+class MessagePollingWorker implements Destroyable {
 
-	// The following booleans will be accessed by both ui thread and worker thread
-	public AtomicBoolean messageCenterInForeground = new AtomicBoolean(false);
-	private AtomicBoolean threadRunning = new AtomicBoolean(false);
+	private final MessageManager messageManager;
+	private final long backgroundPollingInterval;
+	private final long foregroundPollingInterval;
+	private final Configuration conf;
 
-	private MessageManager manager;
+	/**
+	 * Worker thread for background message fetching
+	 */
+	private MessagePollingThread pollingThread;
 
-	public MessagePollingWorker(MessageManager manager) {
-		this.manager = manager;
-	}
+	final AtomicBoolean messageCenterInForeground = new AtomicBoolean(); // TODO: remove this flag
 
-	// A synchronized getter/setter to the static instance of thread object
-	public synchronized MessagePollingThread getAndSetMessagePollingThread(boolean expect,
-																		   boolean create) {
-		if (expect && create) {
-			sPollingThread = createPollingThread();
-		} else if (!expect) {
-			sPollingThread = null;
+	MessagePollingWorker(MessageManager messageManager) {
+		if (messageManager == null) {
+			throw new IllegalArgumentException("Message manager is null");
 		}
-		return sPollingThread;
+
+		this.messageManager = messageManager;
+
+		conf = Configuration.load();
+		backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
+		foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
 	}
 
-	private MessagePollingThread createPollingThread() {
-		MessagePollingThread newThread = new MessagePollingThread();
-		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
-			@Override
-			public void uncaughtException(Thread thread, Throwable throwable) {
-				MetricModule.sendError(throwable, null, null);
-			}
-		};
-		newThread.setUncaughtExceptionHandler(handler);
-		newThread.setName("Apptentive-MessagePollingWorker");
-		newThread.start();
-		return newThread;
+	@Override
+	public void destroy() {
+		stopPolling();
 	}
-
 
 	private class MessagePollingThread extends Thread {
+		/**
+		 * Flag indicating if message polling is active (message polling stops when this flag is set to
+		 * <code>false</code>
+		 */
+		private final AtomicBoolean isPolling = new AtomicBoolean(true);
 
-		private long backgroundPollingInterval = -1;
-		private long foregroundPollingInterval = -1;
-		private Configuration conf;
+		/**
+		 * Flag indicating if polling thread is busy with message fetching.
+		 */
+		private final AtomicBoolean isFetching = new AtomicBoolean(false);
 
-		public MessagePollingThread() {
-			conf = Configuration.load();
-			backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
-			foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
+		MessagePollingThread() {
+			super("Message Polling Thread (" + getLocalConversationIdentifier() + ")");
 		}
 
+		@Override
 		public void run() {
 			try {
-				ApptentiveLog.v("Started %s", toString());
+				ApptentiveLog.v(MESSAGES, "%s started", getName());
 
-				while (manager.appInForeground.get()) {
-					MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
-					if (thread != null && thread != MessagePollingThread.this) {
-						return;
+				while (isPolling.get()) {
+
+					// sync poll message and mark thread as 'fetching'
+					isFetching.set(true);
+					pollMessagesSync();
+					isFetching.set(false);
+
+					// if we're done polling - no need to sleep
+					if (!isPolling.get()) {
+						break;
 					}
+
+					// sleep until next iteration
 					long pollingInterval = messageCenterInForeground.get() ? foregroundPollingInterval : backgroundPollingInterval;
-					if (Apptentive.canShowMessageCenter()) {
-						ApptentiveLog.v("Checking server for new messages every %d seconds", pollingInterval / 1000);
-						manager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
-					}
+					ApptentiveLog.v(MESSAGES, "Scheduled polling messages in %d sec", pollingInterval / 1000);
 					goToSleep(pollingInterval);
 				}
+			} catch (Exception e) {
+				ApptentiveLog.e(e, "Exception while polling messages");
 			} finally {
-				threadRunning.set(false);
-				sPollingThread = null;
-				ApptentiveLog.v("Stopping MessagePollingThread.");
+				ApptentiveLog.v(MESSAGES, "%s stopped", getName());
 			}
 		}
-	}
 
-	private void goToSleep(long millis) {
-		try {
-			Thread.sleep(millis);
-		} catch (InterruptedException e) {
-			// This is normal and happens whenever we wake the thread with an interrupt.
+		private void pollMessagesSync() {
+			try {
+				if (ApptentiveInternal.getInstance().canShowMessageCenterInternal(getConversation())) {
+					ApptentiveLog.v(MESSAGES, "Checking server for new messages...");
+					messageManager.fetchAndStoreMessages(messageCenterInForeground.get(), conf.isMessageCenterNotificationPopupEnabled());
+				} else {
+					ApptentiveLog.w(MESSAGES, "Unable to fetch messages: message center can't be show at this time");
+				}
+			} catch (Exception e) {
+				ApptentiveLog.e(MESSAGES, e, "Exception while polling messages");
+			}
 		}
-	}
 
-	private void wakeUp() {
-		ApptentiveLog.v("Waking MessagePollingThread.");
-		MessagePollingThread thread = getAndSetMessagePollingThread(true, false);
-		if (thread != null && thread.isAlive()) {
-			thread.interrupt();
+		private void goToSleep(long millis) {
+			try {
+				Thread.sleep(millis);
+			} catch (InterruptedException e) {
+				ApptentiveLog.vv(MESSAGES, Thread.currentThread().getName() + " interrupted from sleep");
+			}
+		}
+
+		/**
+		 * Stops current polling
+		 */
+		void stopPolling() {
+			isPolling.set(false);
+			interrupt();
+		}
+
+		/**
+		 * Wake thread from a sleep
+		 */
+		void wakeUp() {
+			if (!isFetching.get()) {
+				interrupt();
+			} else {
+				ApptentiveLog.vv("Can't wake up polling thread while it's synchronously fetching new messages");
+			}
 		}
 	}
 
 	// Called from main UI thread to create a new worker thread
-	public void appWentToForeground() {
+	void appWentToForeground() {
 		startPolling();
 	}
 
-
-	public void appWentToBackground() {
-		// When app goes to background, polling thread will be waken up, and finish and terminate
-		wakeUp();
+	void appWentToBackground() {
+		stopPolling();
 	}
 
 	/**
 	 * If coming from the background, wake the thread so that it immediately starts runs and runs more often. If coming
-	 * from the foreground, let the polling interval timeout naturally, at which point the polling interval will become
-	 * the background polling interval.
+	 * from the foreground, let the isPolling interval timeout naturally, at which point the isPolling interval will become
+	 * the background isPolling interval.
 	 *
-	 * @param bInForeground true if the worker should be in foreground polling mode, else false.
+	 * @param foreground true if the worker should be in foreground isPolling mode, else false.
 	 */
-	public void setMessageCenterInForeground(boolean bInForeground) {
-		if (!messageCenterInForeground.getAndSet(bInForeground) && bInForeground) {
-			/* bInForeground is "true" && messageCenterInForeground was false
-			*/
+	public void setMessageCenterInForeground(boolean foreground) {
+		messageCenterInForeground.set(foreground);
+		if (foreground) {
 			startPolling();
 		}
 	}
 
-	private void startPolling() {
-		if (threadRunning.compareAndSet(false, true)) {
-			// If polling thread isn't running (either terminated or hasn't been created it), create a new one and run
-			getAndSetMessagePollingThread(true, true);
+	synchronized void startPolling() {
+		ApptentiveLog.v(MESSAGES, "Start polling messages (%s)", getLocalConversationIdentifier());
+		if (pollingThread == null) {
+			pollingThread = new MessagePollingThread();
+			pollingThread.start();
 		} else {
-			// If polling thread has been created but in sleep, wake it up, then continue the while loop and proceed
-			// with fetching with shorter interval
-			wakeUp();
+			pollingThread.wakeUp();
 		}
+	}
+
+	synchronized void stopPolling() {
+		ApptentiveLog.v(MESSAGES, "Stop polling messages (%s)", getLocalConversationIdentifier());
+		if (pollingThread != null) {
+			pollingThread.stopPolling();
+			pollingThread = null;
+		}
+	}
+
+	private Conversation getConversation() {
+		return messageManager.getConversation();
+	}
+
+	private String getLocalConversationIdentifier() {
+		return getConversation().getLocalIdentifier();
 	}
 }
