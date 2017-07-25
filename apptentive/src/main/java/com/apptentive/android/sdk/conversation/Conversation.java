@@ -190,7 +190,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 	}
 
 	boolean fetchInteractions(Context context) {
-		boolean cacheExpired = getInteractionExpiration() > Util.currentTimeSeconds();
+		boolean cacheExpired = getInteractionExpiration() < Util.currentTimeSeconds();
 		if (cacheExpired || RuntimeUtils.isAppDebuggable(context)) {
 			return DispatchQueue.backgroundQueue().dispatchAsyncOnce(fetchInteractionsTask); // do not allow multiple fetches at the same time
 		}
