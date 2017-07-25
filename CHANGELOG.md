@@ -1,3 +1,13 @@
+# 2017-07-25 - 4.0.1
+
+#### Improvements
+
+* Improved proguard configuration to allow certain Apptentive classes to be shrunk. This removes about 1200 methods.
+
+#### Bugs Fixed
+
+* Fixes a bug that prevented interactions from being downloaded when the app is in release mode.
+
 # 2017-07-19 - 4.0.0
 
 #### Improvements
