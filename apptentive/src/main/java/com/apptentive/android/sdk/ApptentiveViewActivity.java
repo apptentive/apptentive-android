@@ -68,6 +68,12 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			return;
 		}
 
+		if (getIntent().getExtras() == null) {
+			ApptentiveLog.w("ApptentiveViewActivity was started without any extras, which isn't allowed. Finishing Activity.");
+			finish();
+			return;
+		}
+
 		Bundle bundle = FragmentFactory.addDisplayModeToFragmentBundle(getIntent().getExtras());
 		boolean isInteractionModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL);
 

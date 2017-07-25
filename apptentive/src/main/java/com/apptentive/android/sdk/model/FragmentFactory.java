@@ -34,7 +34,7 @@ public class FragmentFactory {
 			if (fragmentType == Constants.FragmentTypes.INTERACTION) {
 				String interactionString;
 
-				interactionString = bundle.getCharSequence(Interaction.KEY_NAME).toString();
+				interactionString = bundle.getString(Interaction.KEY_NAME);
 
 				interaction = Interaction.Factory.parseInteraction(interactionString);
 				if (interaction != null) {
@@ -80,7 +80,7 @@ public class FragmentFactory {
 
 		if (fragmentType == Constants.FragmentTypes.INTERACTION) {
 			String interactionString;
-			interactionString = bundle.getCharSequence(Interaction.KEY_NAME).toString();
+			interactionString = bundle.getString(Interaction.KEY_NAME);
 			interaction = Interaction.Factory.parseInteraction(interactionString);
 			if (interaction != null) {
 				switch (interaction.getType()) {
