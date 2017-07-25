@@ -7,5 +7,9 @@
 
 -dontwarn com.apptentive.android.sdk.**
 -keepattributes SourceFile,LineNumberTable
--keep class com.apptentive.android.sdk.** { *; }
+-keepnames class com.apptentive.android.sdk.** { *; }
+
+-keep class * implements com.apptentive.android.sdk.serialization.SerializableObject { *; }
+-keep class com.apptentive.android.sdk.** implements java.io.Serializable { *; }
+
 -keep class android.support.v4.app.FragmentManagerImpl { *; }
