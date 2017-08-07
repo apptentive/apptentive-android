@@ -20,6 +20,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import static android.view.View.GONE;
@@ -72,6 +73,20 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			viewToFocus = nameEditText;
 		}
 		nameEditText.setText(Apptentive.getPersonName());
+		nameEditText.addTextChangedListener(new TextWatcher() {
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+			}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+			}
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				updateSaveButton(whoCard);
+			}
+		});
 
 		emailLayout.setHint(whoCard.getEmailHint());
 		emailEditText.setText(Apptentive.getPersonEmail());
@@ -98,18 +113,7 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 
 			@Override
 			public void afterTextChanged(Editable editable) {
-				String emailContent = editable.toString().trim();
-				if (Util.isEmailValid(emailContent)) {
-					// email must be in valid format after the change. If it is, enable send button
-					saveButton.setEnabled(true);
-				} else
-					// Allow user remove email completely when editing profile of that doesn't have "Email Required"
-					if (TextUtils.isEmpty(emailContent) && !whoCard.isRequire()) {
-						saveButton.setEnabled(true);
-					} else {
-						// email not valid after change, so disable the send button
-						saveButton.setEnabled(false);
-					}
+				updateSaveButton(whoCard);
 			}
 		};
 		emailEditText.addTextChangedListener(emailTextWatcher);
@@ -168,5 +172,31 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			return true;
 		}
 		return false;
+	}
+
+	private void updateSaveButton(WhoCard whoCard) {
+		String nameContent = nameEditText.getText().toString().trim();
+		String emailContent = emailEditText.getText().toString().trim();
+
+		// if both name and email are empty - disable the button
+		if (nameContent.isEmpty() && emailContent.isEmpty()) {
+			saveButton.setEnabled(false);
+			return;
+		}
+
+		// if email is valid - enable the button
+		if (Util.isEmailValid(emailContent)) {
+			saveButton.setEnabled(true);
+			return;
+		}
+
+		// Allow user remove email completely when editing profile of that doesn't have "Email Required"
+		if (TextUtils.isEmpty(emailContent) && !whoCard.isRequire()) {
+			saveButton.setEnabled(true);
+			return;
+		}
+
+		// otherwise, disable the button
+		saveButton.setEnabled(false);
 	}
 }
