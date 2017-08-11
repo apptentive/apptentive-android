@@ -35,6 +35,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+import android.util.Patterns;
 import android.util.TypedValue;
 import android.view.*;
 import android.view.inputmethod.InputMethodManager;
@@ -155,7 +156,7 @@ public class Util {
 	}
 
 	public static boolean isEmailValid(String email) {
-		return email.matches("^[^\\s@]+@[^\\s@]+$");
+		return !StringUtils.isNullOrEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
 	}
 
 	public static boolean getPackageMetaDataBoolean(Context context, String key) {
