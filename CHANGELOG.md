@@ -1,3 +1,9 @@
+# 2017-08-15 - v4.0.2
+
+#### Bugs Fixed
+
+* Fixes Message Center UI bugs.
+
 # 2017-07-25 - v4.0.1
 
 #### Improvements
