@@ -88,7 +88,7 @@ class PayloadSender {
 			}
 
 			// if an exception was thrown - mark payload as failed
-			handleFinishSendingPayload(payload, false, message, -1, null); // FIXME: a better approach
+			handleFinishSendingPayload(payload, false, message, -1, null); // TODO: a better approach
 		}
 
 		return true;

@@ -31,7 +31,7 @@ public class FieldManager {
 	}
 
 	public static Object doGetValue(String query) {
-		Conversation conversation = ApptentiveInternal.getInstance().getConversation(); // FIXME: get rid of singleton
+		Conversation conversation = ApptentiveInternal.getInstance().getConversation(); // TODO: get rid of singleton
 		if (conversation == null) {
 			return null;
 		}

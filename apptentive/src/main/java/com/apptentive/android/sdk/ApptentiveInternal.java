@@ -104,7 +104,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
 	private String serverUrl;
-	private String androidId; // FIXME: remove this field (never used)
 	private String appPackageName;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
@@ -397,7 +396,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return globalSharedPrefs;
 	}
 
-	// FIXME: remove app release from this class
+	// TODO: remove app release from this class
 	public AppRelease getAppRelease() {
 		return appRelease;
 	}
@@ -527,7 +526,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 		if (conversationLoaded) {
 			Conversation activeConversation = conversationManager.getActiveConversation();
-			// FIXME: don't accept the pull request before this one is resolved
+			// TODO: figure out if this is still necessary
 			// boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
 			// if (featureEverUsed) {
 			// 	messageManager.init();
@@ -938,7 +937,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		EngagementModule.launchMessageCenterErrorActivity(context);
 	}
 
-	// FIXME: remove this method
+	// TODO: remove this method
 	public boolean canShowMessageCenterInternal() {
 		Conversation conversation = getConversation();
 		return conversation != null && canShowMessageCenterInternal(conversation);

@@ -320,7 +320,7 @@ public class ConversationManager {
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
 		conversation.setState(item.getState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
-		conversation.setConversationToken(item.getConversationToken()); // FIXME: this would be overwritten by the next call
+		conversation.setConversationToken(item.getConversationToken()); // TODO: this would be overwritten by the next call
 		conversation.loadConversationData();
 		conversation.checkInternalConsistency();
 
@@ -679,7 +679,7 @@ public class ConversationManager {
 					callback.onLoginFinish();
 					return;
 				}
-				// FIXME: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
+				// TODO: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
 				callback.onLoginFail("Already logged in. You must log out first.");
 				break;
 			default:
@@ -740,7 +740,7 @@ public class ConversationManager {
 							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
 							activeConversation = new Conversation(dataFile, messagesFile);
 
-							// FIXME: if we don't set these here - device payload would return 4xx error code
+							// TODO: if we don't set these here - device payload would return 4xx error code
 							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
 							activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
 							activeConversation.setSdk(SdkManager.generateCurrentSdk());
