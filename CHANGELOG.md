@@ -1,4 +1,4 @@
-# 2017-07-25 - 4.0.1
+# 2017-07-25 - v4.0.1
 
 #### Improvements
 
@@ -8,19 +8,19 @@
 
 * Fixes a bug that prevented interactions from being downloaded when the app is in release mode.
 
-# 2017-07-19 - 4.0.0
+# 2017-07-19 - v4.0.0
 
 #### Improvements
 
 * Added the ability to log customers in to different private conversations. Customers who are logged in will be able to see a private conversation that is distinct from the converations of other customers using the same app on the same device. When they log out, their data is protected with strong encryption. Logging back in unlocks their data again, and Apptentive resumes providing services to the customer.
 
-# 2017-03-02 - 3.4.1
+# 2017-03-02 - v3.4.1
 
 #### Improvements
 
 * Added an internal method `Apptentive.dismissAllInteraction()` for closing Apptentive UI.
 
-# 2016-12-07 - 3.4.0
+# 2016-12-07 - v3.4.0
 
 #### Improvements
 
@@ -33,14 +33,14 @@
 * Fixed a bug where the Profile Card in Message Center wouldn't let a user focus the email field.
 * Fixed a bug where the Survey "thank you" message text was the wrong color.
 
-# 2016-10-21 - 3.3.0
+# 2016-10-21 - v3.3.0
 
 #### Improvements
 
 * Added new APIs for handling Apptentive push notifications. You can now get a `PendingIntent` from Apptentive if we sent the push. The `PendingIntent` can be used to launch Message Center directly from your Notification object. Old APIs are deprecated. 
 * Send debug status to the server so you can target only debug or non-debug builds with your interactions.
  
-# 2016-10-11 - 3.2.2
+# 2016-10-11 - v3.2.2
 
 #### Bugs Fixed
 
@@ -48,7 +48,7 @@
 * Fixed a bug that sometimes prevented the Message Center composing area from gaining focus, even when tapped.
 * Removed unneeded multidex config.
 
-# 2016-08-09 - 3.2.1
+# 2016-08-09 - v3.2.1
 
 #### Bugs Fixed
 
@@ -56,7 +56,7 @@
 * Prevent NPE when animation runs after object is nulled.
 * Fix a bug that sometimes prevented the Message Center Composing view from gaining focus on user touch.
 
-# 2016-07-13 - 3.2.0
+# 2016-07-13 - v3.2.0
 
 #### Improvements
 
@@ -68,7 +68,7 @@
 * Fixed Message Center exception caused by requesting focus on a nulled EditText.
 * Moved database calls off the UI thread.
 
-# 2016-06-20 - 3.1.1
+# 2016-06-20 - v3.1.1
 
 #### Improvements
 
@@ -79,13 +79,13 @@
 
 * statusBarColor attribute was causing run-time exception on pre-21 devices.
 
-# 2016-06-08 - 3.1.0
+# 2016-06-08 - v3.1.0
 
 #### Improvements
 
 * We've added a new answer type to multiple choice surveys. You can now specify an "Other" answer type for multiple choice questions. When a user selects this answer, a text input field will display. Any text entered in that field will be included in the survey response.
 
-# 2016-05-25 - 3.0.1
+# 2016-05-25 - v3.0.1
 
 #### Bugs Fixed
 
@@ -95,7 +95,7 @@
 * Fix our UI to work better when the host app uses a translucent status bar.
 * Fix window panning issue that can result in the keyboard coering part of a survey. 
 
-# 2016-04-26 - 3.0.0
+# 2016-04-26 - v3.0.0
 
 #### Improvements
 
@@ -106,7 +106,7 @@
 * Other improvements include reducing sdk memory footprint and more accurate application lifecycle management.
 
 
-# 2016-03-22 - 2.1.4
+# 2016-03-22 - v2.1.4
 
 #### Bug Fixes and Improvements
 
@@ -114,76 +114,76 @@
 *   Apptentive's Log class is renamed to "ApptentiveLog" to avoid confusion
 
 
-# 2016-01-22 - 2.1.3
+# 2016-01-22 - v2.1.3
 
 #### Bug Fixes and Improvements
 
 *  If apps upgrading from pre-2.0.0 still has now obsolete NetworkStateReceiver defined in their manifest, an immediate run-time assertion error will help app developers detect early. 
 
-# 2016-01-08 - 2.1.2
+# 2016-01-08 - v2.1.2
 
 #### Bugs Fixed
 
 * Fixed Message Center bug where non-english messages were either garbled or failed to send to server
 
-# 2015-12-23 - 2.1.1
+# 2015-12-23 - v2.1.1
 
 #### Bugs Fixed
 
 * Fixed a bug where multiple SqlLite Connections were made when Parse push is integrated
 
-# 2015-12-12 - 2.1.0
+# 2015-12-12 - v2.1.0
 
 #### Improvements
 
 * Message Center now allows consumers to attach up to four images to each outgoing message. You can also attach files to your replies, and they will be downloaded and displayed to consumers when they open Message Center.
 * You've always had the ability to send custom data in the Person, Deveice, Message, and Event objects. However, you can now send custom data that is a Number or Boolean, and use that custom data in your Interaction targeting logic.
 
-# 2015-09-15 - 2.0.1
+# 2015-09-15 - v2.0.1
 
 #### Bugs Fixed
 
 * Fixed a [potentially conflicting resource name. [Issue 105](https://github.com/apptentive/apptentive-android/issues/105)
 * Fixed a bug affecting display of Surveys.
 
-# 2015-09-09 - 2.0.0
+# 2015-09-09 - v2.0.0
 
 #### Improvements
 
 * Message Center: We've completely rebuilt Message Center from the ground up. Our new Message Center uses Material Design throughout, and features streamlined and optimized behavior to help you get feedback from your customers, or start conversations. Message Center is now much more configurable from the server, so you can make changes to text and behavior after you release your app.
 * Apptentive Push: We can now send push notifications to your GCM enabled device without going through a third party push provider. See the [integrations section](https://be.apptentive.com/apps/current/settings/integrations), and check out the [documentation](http://www.apptentive.com/docs/android/integration/#push-notifications).
 
-# 2015-08-12 - 1.7.4
+# 2015-08-12 - v1.7.4
 
 #### Improvements
 
 * Added Polish translations.
 
-# 2015-05-13 - 1.7.3
+# 2015-05-13 - v1.7.3
 
 #### Bugs Fixed
 
 * Fixed a bug where the Feedback Dialog as launched through the Message Center would not be submittable if feedback had already been submitted, Message Center was disabled, and Email was required.
 
-# 2015-05-01 - 1.7.2
+# 2015-05-01 - v1.7.2
 
 #### Improvements
 
 * Updated our Push Notification API to work with Parse 1.8.3 and Urban Airship 6.0.1. If you were using either of these
  push notification providers in a prior version, please see our [Migration Guide](https://github.com/apptentive/apptentive-android-private/blob/push_migration/docs/migrating_to_1.7.2_with_push_notifications.md).
 
-# 2015-04-24 - 1.7.1
+# 2015-04-24 - v1.7.1
 
 * Fixed a bug where HTTP response inputstreams weren't being closed.
 * Fixed a bug that prevented the Feedback Thank You dialog from displaying under some circumstances.
 
-# 2015-4-23 - 1.6.7
+# 2015-4-23 - v1.6.7
 
 #### Bugs fixed
 
 * Fixed a bug where HTTP response inputstreams weren't being closed.
 
-# 2015-02-10 - 1.7.0
+# 2015-02-10 - v1.7.0
 
 This release includes support for Notes, which allows you to send messages to your customers and gives them the option
  to take surveys, navigate directly to content within your app, and more. Notes is currently in beta with select 
@@ -199,7 +199,7 @@ This release includes support for Notes, which allows you to send messages to yo
 
 * Fixed a bug that allowed internal analytics to send multiple launch events per displayed Interaction.
 
-# 2014-11-25 - 1.6.6
+# 2014-11-25 - v1.6.6
 
 #### Improvements
 
@@ -210,20 +210,20 @@ This release includes support for Notes, which allows you to send messages to yo
 
 * Fixed a bug that prevented feedback from being submitted when email is required, but already supplied.
 
-# 2014-11-17 - 1.6.5
+# 2014-11-17 - v1.6.5
 
 #### Improvements
 
 * Minor improvements to prepare for updated Trigger.io module.
 
-# 2014-10-20 1.6.4
+# 2014-10-20 - v1.6.4
 
 #### Improvements
 
 * Dim background when dialogs are shown.
 * Request gzip compression from server to save bandwidth.
 
-# 2014-10-15 - 1.6.2
+# 2014-10-15 - v1.6.2
 
 #### Improvements
 
@@ -234,21 +234,21 @@ This release includes support for Notes, which allows you to send messages to yo
 * Deprecated NetworkStateReceiver.
 * Added method for checking to see if an Interaction will show for a given Event.
 
-# 2014-09-28 - 1.6.1
+# 2014-09-28 - v1.6.1
 
 #### Bugs fixed
 
 * Fix enable Message Center setting.
 * Use proper extension when uploading Attachment files.
 
-# 2014-09-17 - 1.5.2
+# 2014-09-17 - v1.5.2
 
 #### Major changes
 
 * Don't check for messages while Message Center is disabled.
 * If no network connection is present, network worker threads will go back to sleep instead of exit.
 
-# 2014-09-12 - 1.6.0
+# 2014-09-12 - v1.6.0
 
 #### Major changes
 
@@ -267,7 +267,7 @@ This release includes support for Notes, which allows you to send messages to yo
 
 If you were using a previous version, see [Migrating to 1.6.0](https://github.com/apptentive/apptentive-android/blob/master/docs/migrating_to_1.6.0.md)
 
-# 2014-07-16 - 1.5.1
+# 2014-07-16 - v1.5.1
 
 #### Major changes
 
@@ -287,7 +287,7 @@ If you were using a previous version, see [Migrating to 1.6.0](https://github.co
 * During development only, if you forget to specify an API key, we will display a dialog to let you know. Previously we only logged it.
 
 
-# 2014-05-27 - 1.5.0
+# 2014-05-27 - v1.5.0
 
 #### Major changes
 
@@ -299,13 +299,13 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 
 * Fixed a potential crash in the Feedback Dialog if submitted with blank feedback.
 
-# 2014-04-28 - 1.4.3
+# 2014-04-28 - v1.4.3
 
 #### Bugs fixed
 
 * ANDROID-323 Localized strings not properly populated with app name.
 
-# 2014-04-18 - 1.4.2
+# 2014-04-18 - v1.4.2
 
 #### Major changes
 
@@ -315,14 +315,14 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 
 * Improved robustness of message polling.
 
-# 2014-04-14 - 1.4.1
+# 2014-04-14 - v1.4.1
 
 #### Bugs fixed
 
 * ANDROID-318 Surveys targeting custom person data don't return until the second time they are requested.
 * Event Labels were being encoded incorrectly.
 
-# 2014-04-07 - 1.4.0
+# 2014-04-07 - v1.4.0
 
 #### Major changes
 
@@ -332,13 +332,13 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Introduced background polling for messages. We will poll for new messages every 60 seconds whie the app is up, or every 8 seconds while our Message Center is in the foreground.
 * Improved performance and robustness of SDK.
 
-# 2014-04-03 - 1.3.1
+# 2014-04-03 - v1.3.1
 
 #### Major changes
 
 * Add setting to allow Message Center to be disabled by default, even before it has connected to the server.
 
-# 2014-02-24 - 1.3.0
+# 2014-02-24 - v1.3.0
 
 #### Major changes
 
@@ -346,19 +346,19 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Added the ability to send Upgrade Messages to your users. Now you can notify users of new features targeted to specific builds or versions of your app, even if they have opted to auto-update your app in the app store.
 * Added the ability to send hidden attachments to the server. You can now send texts, logs, images, and other files to the server to help provide better support. These files are visible to you in teh conversation view, but are not shown to the end user.
 
-# 2014-01-20 - 1.2.7
+# 2014-01-20 - v1.2.7
 
 #### Bugs fixed
 
 * ANDROID-239 PACKAGE_RESTARTED permission causes app to wake often
 
-# 2014-01-19 - 1.2.6
+# 2014-01-19 - v1.2.6
 
 #### Bugs fixed
 
 * ANDROID-238 Survey module doesn't respect "multiple_responses" flag
 
-# 2013-12-17 -  1.2.5
+# 2013-12-17 - v1.2.5
 
 #### Major changes
 
@@ -366,7 +366,7 @@ See [Migrating to 1.5.0](https://github.com/apptentive/apptentive-android/blob/m
 * Add the ability to pass push notification intents into Apptentive code, and have Apptentive perform actions. Push integration currently supports Urban Airship, and can be configured in your app settings.
 * ANDROID-224 Allow survey thank you dialog to contain links.
 
-# 2013-12-12 - 1.2.4
+# 2013-12-12 - v1.2.4
 
 #### Major changes
 
@@ -378,7 +378,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-223 Trim Survey text responses
 * Fixed a bug where the rating flow could launch twice, especially on devices running KitKat.
 
-# 2013-11-13 - 1.2.3
+# 2013-11-13 - v1.2.3
 
 #### Major changes
 
@@ -389,19 +389,19 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 
 * Fixed a potential crash in survey fetching code.
 
-# 2013-11-05 - 1.2.2
+# 2013-11-05 - v1.2.2
 
 #### Bugs fixed
 
 * Fix memory leak cause by hanging on to Activity context in database code.
 
-# 2013-10-21 - 1.2.1
+# 2013-10-21 - v1.2.1
 
 #### Bugs fixed
 
 * ANDROID-188 Rating logic doesn't respect 0 values with OR
 
-# 2013-10-17 - 1.2.0
+# 2013-10-17 - v1.2.0
 
 #### Major changes
 
@@ -420,13 +420,13 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-181 Surveys can be sent twice
 * ANDROID-173 Database locking issue
 
-# 2013-09-15 - 1.1.2
+# 2013-09-15 - v1.1.2
 
 #### Bugs fixed
 
 * ANDROID-155 Message Center can't scroll
 
-# 2013-08-31 - 1.1.1
+# 2013-08-31 - v1.1.1
 
 #### Bugs fixed
 
@@ -434,7 +434,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-142 Save the text entered in Message Center if the user closes it.
 * ANDROID-145 Dev app can crash in tablet portrait mode.
 
-# 2013-08-29 - 1.1.0
+# 2013-08-29 - v1.1.0
 
 #### Major changes
 
@@ -443,7 +443,7 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * New clean UI for about page.
 * Added ability to set the display name of this app from the web UI. The display name is used to surface a different name than the one specified in your package, and is handled transparently from the client's perspective.
 
-# 2013-08-16 - 1.0.4
+# 2013-08-16 - v1.0.4
 
 #### Major changes
 
@@ -455,13 +455,13 @@ Slightly modified the behavior of the rating flow. The user can now close the ra
 * ANDROID-132 Radio Version is not being set in Device object
 * ANDROID-134 Rating logic does not respect 0 values
 
-# 2013-07-19 - 1.0.3
+# 2013-07-19 - v1.0.3
 
 #### Bugs Fixed
 
 * ANDROID-130 Lower part of message center is transparent.
 
-# 2013-06-28 - 1.0.2
+# 2013-06-28 - v1.0.2
 
 #### Major changes
 
