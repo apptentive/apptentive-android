@@ -594,7 +594,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	void deleteAllPayloads() {
-		// FIXME: Delete files too.
+		// TODO: Delete files too.
 		SQLiteDatabase db;
 		try {
 			db = getWritableDatabase();

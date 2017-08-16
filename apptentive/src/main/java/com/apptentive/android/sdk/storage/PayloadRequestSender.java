@@ -11,7 +11,7 @@ import com.apptentive.android.sdk.network.HttpRequest;
 
 /**
  * Class responsible for creating a {@link HttpRequest} for a given payload
- * FIXME: this is a legacy workaround and might be removed soon
+ * TODO: this is a legacy workaround and might be removed soon
  */
 public interface PayloadRequestSender {
 	/**

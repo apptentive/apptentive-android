@@ -91,7 +91,7 @@ public abstract class DispatchQueue {
 	 * Returns <code>true</code> if code is executing on the main queue
 	 */
 	public static boolean isMainQueue() {
-		return Looper.getMainLooper() == Looper.myLooper(); // FIXME: make it configurable for Unit testing
+		return Looper.getMainLooper() == Looper.myLooper(); // TODO: make it configurable for Unit testing
 	}
 
 	/**

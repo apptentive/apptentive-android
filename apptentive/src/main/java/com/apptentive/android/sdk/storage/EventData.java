@@ -42,7 +42,7 @@ public class EventData implements Saveable {
 	//endregion
 
 
-	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
+	// TODO: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
 	public synchronized void storeEventForCurrentAppVersion(double timestamp, int versionCode, String versionName, String eventLabel) {
 		EventRecord eventRecord = events.get(eventLabel);
 		if (eventRecord == null) {
@@ -53,7 +53,7 @@ public class EventData implements Saveable {
 		notifyDataChanged();
 	}
 
-	// FIXME: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
+	// TODO: Find all usage of this and ensure they use the same timestamp for saving events and runnign interaction queries.
 	public synchronized void storeInteractionForCurrentAppVersion(double timestamp, int versionCode, String versionName, String interactionId) {
 		EventRecord eventRecord = interactions.get(interactionId);
 		if (eventRecord == null) {

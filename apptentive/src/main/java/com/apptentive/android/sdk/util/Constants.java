@@ -36,7 +36,7 @@ public class Constants {
 
 	// Engagement
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
-	// FIXME: Migrate into global data.
+	// TODO: Migrate into global data.
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 

@@ -42,7 +42,7 @@ public final class StringUtils {
 			try {
 				return String.format(format, args);
 			} catch (Exception e) {
-				android.util.Log.e("Apptentive", "Error while formatting String: " + e.getMessage()); // FIXME: better system logging
+				android.util.Log.e("Apptentive", "Error while formatting String: " + e.getMessage()); // TODO: better system logging
 			}
 		}
 
@@ -119,7 +119,7 @@ public final class StringUtils {
 	 *
 	 * @throws IllegalArgumentException if map, any key or value appears to be null
 	 */
-	public static String createQueryString(Map<String, Object> params) { // FIXME: unit tests (DO NOT ACCEPT PULL REQUEST IF YOU SEE THIS COMMENT)
+	public static String createQueryString(Map<String, Object> params) {
 		if (params == null) {
 			throw new IllegalArgumentException("Params are null");
 		}

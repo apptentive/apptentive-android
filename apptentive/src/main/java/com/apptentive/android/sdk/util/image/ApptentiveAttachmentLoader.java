@@ -217,7 +217,7 @@ public class ApptentiveAttachmentLoader {
 				try {
 					ApptentiveLog.v("ApptentiveAttachmentLoader doDownload: " + uri);
 					// Conversation token is needed if the download url is a redirect link from an Apptentive endpoint
-					String conversationToken = ApptentiveInternal.getInstance().getConversation().getConversationToken(); // FIXME: get rid of singleton
+					String conversationToken = ApptentiveInternal.getInstance().getConversation().getConversationToken(); // TODO: get rid of singleton
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, conversationToken);
 					} else {
