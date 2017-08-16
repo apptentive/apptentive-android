@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	public static final String APPTENTIVE_SDK_VERSION = "4.0.1";
+	public static final String APPTENTIVE_SDK_VERSION = "4.0.2";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -36,7 +36,7 @@ public class Constants {
 
 	// Engagement
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.
-	// FIXME: Migrate into global data.
+	// TODO: Migrate into global data.
 	public static final String PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT = "messageCenterServerErrorLastAttempt";
 	public static final String PREF_KEY_POLL_FOR_INTERACTIONS = "pollForInteractions";
 

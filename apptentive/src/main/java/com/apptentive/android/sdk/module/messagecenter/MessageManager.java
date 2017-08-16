@@ -81,7 +81,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	 */
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<>();
 
-	final AtomicBoolean appInForeground = new AtomicBoolean(false); // FIXME: get rid of that
+	final AtomicBoolean appInForeground = new AtomicBoolean(false); // TODO: get rid of that
 	private final MessagePollingWorker pollingWorker;
 
 	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {

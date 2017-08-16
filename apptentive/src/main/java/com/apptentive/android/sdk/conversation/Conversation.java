@@ -158,7 +158,7 @@ public class Conversation implements DataChangedListener, Destroyable {
 		payload.setToken(getConversationToken());
 		payload.setEncryptionKey(getEncryptionKey());
 
-		// FIXME: don't use singleton here
+		// TODO: don't use singleton here
 		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(payload);
 	}
 

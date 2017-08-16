@@ -228,6 +228,8 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	 * Helper to clean up the Activity, whether it is exited through the toolbar back button, or the hardware back button.
 	 */
 	private void exitActivity(ApptentiveViewExitType exitType) {
+		Util.hideSoftKeyboard(this, getCurrentFocus());
+
 		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
 		if (currentFragment != null && currentFragment.isVisible()) {
 			if (currentFragment.onFragmentExit(exitType)) {

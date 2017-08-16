@@ -34,17 +34,17 @@ public class SdkPayload extends JsonPayload {
 
 	@Override
 	public String getHttpEndPoint(String conversationId) {
-		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // TODO: find a better approach
 	}
 
 	@Override
 	public HttpRequestMethod getHttpRequestMethod() {
-		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // TODO: find a better approach
 	}
 
 	@Override
 	public String getHttpRequestContentType() {
-		throw new RuntimeException(getClass().getName() + " is deprecated"); // FIXME: find a better approach
+		throw new RuntimeException(getClass().getName() + " is deprecated"); // TODO: find a better approach
 	}
 
 	//endregion
