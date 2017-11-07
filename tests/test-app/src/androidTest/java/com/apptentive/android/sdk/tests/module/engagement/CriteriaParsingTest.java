@@ -27,8 +27,6 @@ public class CriteriaParsingTest extends ApptentiveTestCaseBase {
 
 	@Test
 	public void predicateParsing() throws JSONException {
-		resetDevice();
-
 		String json = loadTextAssetAsString(TEST_DATA_DIR + "testPredicateParsing.json");
 
 		try {

@@ -7,17 +7,30 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:id="@+id/preview_container"
              android:layout_width="match_parent"
              android:layout_height="match_parent">
-    <com.apptentive.android.sdk.util.image.PreviewImageView android:id="@+id/preview_image"
-                                                            android:layout_width="match_parent"
-                                                            android:layout_height="match_parent"
-                                                            android:background="?attr/apptentiveViewBackground"
-                                                            android:descendantFocusability="beforeDescendants"
-                                                            android:contentDescription="@null"
-                                                            android:src="@drawable/apptentive_ic_image_default_item"
-                                                            android:scaleType="matrix"/>
+    <FrameLayout android:layout_width="match_parent"
+                 android:layout_height="match_parent"
+                 android:descendantFocusability="beforeDescendants"
+                 android:background="?attr/apptentiveViewBackground">
+        <ImageView android:id="@+id/preview_image_placeholder"
+                   android:layout_width="72dp"
+                   android:layout_height="72dp"
+                   android:layout_gravity="center"
+                   android:contentDescription="@null"
+                   app:srcCompat="@drawable/apptentive_image_placeholder"
+                   android:tint="?colorPrimary"
+                   android:scaleType="fitCenter"/>
+        <com.apptentive.android.sdk.util.image.PreviewImageView android:id="@+id/preview_image"
+                                                                android:layout_width="match_parent"
+                                                                android:layout_height="match_parent"
+                                                                android:layout_gravity="center"
+                                                                android:contentDescription="@null"
+                                                                android:src="@null"
+                                                                android:scaleType="matrix"/>
+    </FrameLayout>
     <RelativeLayout android:id="@+id/header_bar"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -32,7 +45,7 @@
                      android:layout_centerVertical="true"
                      android:contentDescription="Close"
                      android:visibility="gone"
-                     android:src="@drawable/apptentive_ic_back_preview"
+                     app:srcCompat="@drawable/apptentive_arrow_back"
                      android:background="?android:attr/selectableItemBackground"
                      android:tint="?android:attr/textColorPrimaryInverse"/>
     </RelativeLayout>

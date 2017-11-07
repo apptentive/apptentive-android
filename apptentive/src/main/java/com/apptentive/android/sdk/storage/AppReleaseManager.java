@@ -49,7 +49,9 @@ public class AppReleaseManager {
 		appRelease.setAppStore(Util.getInstallerPackageName(context));
 		appRelease.setDebug(isAppDebuggable);
 		appRelease.setIdentifier(appPackageName);
-		appRelease.setInheritStyle(apptentiveInternal.isAppUsingAppCompatTheme());
+		if (apptentiveInternal != null) {
+			appRelease.setInheritStyle(apptentiveInternal.isAppUsingAppCompatTheme());
+		}
 		appRelease.setOverrideStyle(themeOverrideResId != 0);
 		appRelease.setTargetSdkVersion(String.valueOf(targetSdkVersion));
 		appRelease.setType("android");

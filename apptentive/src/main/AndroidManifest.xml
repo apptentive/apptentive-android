@@ -14,7 +14,16 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application>
+        <provider android:name=".debug.AttachmentFileProvider"
+                  android:authorities="com.apptentive.android.sdk.debug.AttachmentFileProvider"
+                  android:enabled="true"
+                  android:exported="true"
+                  android:grantUriPermissions="true"/>
         <activity android:name="com.apptentive.android.sdk.ApptentiveViewActivity"
                   android:theme="@style/ApptentiveTheme.Base.Versioned"/>
+        <receiver android:name=".debug.LogBroadcastReceiver"
+                  android:enabled="true"
+                  android:exported="false"/>
+
     </application>
 </manifest>

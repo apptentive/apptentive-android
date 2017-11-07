@@ -10,6 +10,13 @@ import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
+import com.apptentive.android.sdk.storage.AppRelease;
+import com.apptentive.android.sdk.storage.AppReleaseManager;
+import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.EventData;
+import com.apptentive.android.sdk.storage.Person;
+import com.apptentive.android.sdk.storage.VersionHistory;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import com.apptentive.android.sdk.util.Util;
 
@@ -35,103 +42,105 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
+			EventData eventData = new EventData();
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+
 			// 0 - $gt
-			resetDevice();
 			ApptentiveLog.e("Test $gt");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 1 - $gte
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $gte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 2 - $ne
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $ne");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 3 - $eq
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $eq");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 4 - :
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test :");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 5 - $lte
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $lte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 6 - $lt
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $lt");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Error parsing test JSON.");
 			assertNull(e);
@@ -148,114 +157,114 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
+			EventData eventData = new EventData();
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+
 			// 0 - $gt
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $gt");
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 1 - $gte
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $gte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 2 - $ne
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $ne");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 3 - $eq
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $eq");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 4 - :
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test :");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 5 - $lte
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test $lte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 6 - $lt
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test $lt");
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Error parsing test JSON.");
@@ -273,114 +282,114 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
+			EventData eventData = new EventData();
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+
 			// 0 - $gt
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $gt");
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 1 - $gte
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $gte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 2 - $ne
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $ne");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 3 - $eq
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $eq");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 4 - :
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test :");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 5 - $lte
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test $lte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 6 - $lt
-			resetDevice();
-			interactionManager.storeInteractionsPayloadString(json);
+			eventData.clear();
 			ApptentiveLog.e("Test $lt");
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeRecord(false, "test.code.point", "1.1", 3);
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertFalse(criteria.isMet());
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), 3, "1.1", "test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
 
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Error parsing test JSON.");
@@ -398,67 +407,70 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 		try {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
+			EventData eventData = new EventData();
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+
 			// 0 - $after
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $after");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
+			assertTrue(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
 			sleep(300);
-			assertTrue(criteria.isMet());
+			assertTrue(criteria.isMet(fieldManager));
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 1 - $ne
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $ne");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
 			sleep(300);
-			assertTrue(criteria.isMet());
+			assertTrue(criteria.isMet(fieldManager));
 			sleep(300);
-			assertTrue(criteria.isMet());
+			assertTrue(criteria.isMet(fieldManager));
 
 			// 2 - $eq // There's no easy way to test this unless we contrive the times.
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $eq");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 3 - : // Ditto
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test :");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 
 			// 4 - $before
-			resetDevice();
+			eventData.clear();
 			ApptentiveLog.e("Test $before");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeCodePointForCurrentAppVersion("test.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+			assertFalse(criteria.isMet(fieldManager));
+			eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.code.point");
 			sleep(300);
-			assertFalse(criteria.isMet());
+			assertFalse(criteria.isMet(fieldManager));
 			sleep(300);
-			assertTrue(criteria.isMet());
+			assertTrue(criteria.isMet(fieldManager));
 
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Error parsing test JSON.");
@@ -471,115 +483,113 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 	 * Tests for a specific code point running. Tests all condition types.
 	 */
 	@Test
-	public void interactionInvokesTotal() {
-		String appVersionName = Util.getAppVersionName(targetContext);
-		int appVersionCode = Util.getAppVersionCode(targetContext);
+	public void interactionInvokesTotal() throws JSONException {
+		AppRelease appRelease = AppReleaseManager.generateCurrentAppRelease(targetContext, null);
 		String json = loadTextAssetAsString(TEST_DIR + "testInteractionInvokesTotal.json");
-		try {
-			InteractionCriteria criteria = new InteractionCriteria(json);
 
-			// 0 - $gt
-			resetDevice();
-			ApptentiveLog.e("Test $gt");
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
+		InteractionCriteria criteria = new InteractionCriteria(json);
 
-			// 1 - $gte
-			resetDevice();
-			ApptentiveLog.e("Test $gte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
+		EventData eventData = new EventData();
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), appRelease);
 
-			// 2 - $ne
-			resetDevice();
-			ApptentiveLog.e("Test $ne");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
+		// 0 - $gt
+		eventData.clear();
+		ApptentiveLog.e("Test $gt");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
 
-			// 3 - $eq
-			resetDevice();
-			ApptentiveLog.e("Test $eq");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
+		// 1 - $gte
+		eventData.clear();
+		ApptentiveLog.e("Test $gte");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
 
-			// 4 - :
-			resetDevice();
-			ApptentiveLog.e("Test :");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
+		// 2 - $ne
+		eventData.clear();
+		ApptentiveLog.e("Test $ne");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
 
-			// 5 - $lte
-			resetDevice();
-			ApptentiveLog.e("Test $lte");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
+		// 3 - $eq
+		eventData.clear();
+		ApptentiveLog.e("Test $eq");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
 
-			// 6 - $lt
-			resetDevice();
-			ApptentiveLog.e("Test $lt");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			codePointStore.storeCodePointForCurrentAppVersion("switch.code.point");
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertTrue(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
-			codePointStore.storeRecord(true, "test.interaction", appVersionName, appVersionCode);
-			assertFalse(criteria.isMet());
+		// 4 - :
+		eventData.clear();
+		ApptentiveLog.e("Test :");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
 
-		} catch (JSONException e) {
-			ApptentiveLog.e(e, "Error parsing test JSON.");
-			assertNull(e);
-		}
+		// 5 - $lte
+		eventData.clear();
+		ApptentiveLog.e("Test $lte");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+
+		// 6 - $lt
+		eventData.clear();
+		ApptentiveLog.e("Test $lt");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "switch.code.point");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertTrue(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+		eventData.storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "test.interaction");
+		assertFalse(criteria.isMet(fieldManager));
+
 		ApptentiveLog.e("Finished test.");
 	}
 

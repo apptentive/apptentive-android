@@ -8,7 +8,7 @@
 
 <android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
                                                  android:layout_width="match_parent"
-                                                 android:layout_height="match_parent"
+                                                 android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
                                                  android:background="?attr/apptentiveViewBackground">
     <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView android:id="@+id/message_center_recycler_view"
                                                                                     android:layout_width="match_parent"
@@ -25,6 +25,6 @@
                                                         android:layout_height="wrap_content"
                                                         style="?attr/apptentiveFabStyle"
                                                         android:visibility="gone"
-                                                        android:src="@drawable/apptentive_ic_compose_auto_mirror"
+                                                        app:srcCompat="@drawable/apptentive_pencil_icon"
                                                         android:contentDescription="@string/apptentive_message_center_fab_content_description"/>
 </android.support.design.widget.CoordinatorLayout>

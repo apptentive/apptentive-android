@@ -7,6 +7,7 @@
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:layout_width="match_parent"
               android:layout_height="match_parent"
               android:gravity="center_vertical">
@@ -39,7 +40,7 @@
                                  android:paddingLeft="10dp"
                                  android:paddingRight="10dp"
                                  android:contentDescription="Close"
-                                 android:src="@drawable/apptentive_ic_toolbar_close"
+                                 app:srcCompat="@drawable/apptentive_close_x_light"
                                  android:background="?android:attr/selectableItemBackground"
                                  android:scaleType="fitCenter"
                                  android:tint="?android:attr/textColorPrimaryInverse"/>
@@ -63,12 +64,14 @@
                     <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
-                              android:text="@string/apptentive_about_description"/>
+                              android:text="@string/apptentive_about_description"
+                              android:focusable="true"/>
                     <TextView android:layout_width="match_parent"
                               android:layout_height="wrap_content"
                               android:layout_marginTop="16dp"
                               android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
-                              android:text="@string/apptentive_about_privacy"/>
+                              android:text="@string/apptentive_about_privacy"
+                              android:focusable="true"/>
                     <Button android:id="@+id/about_description_link"
                               android:layout_width="wrap_content"
                               android:layout_height="36dp"

@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	public static final String APPTENTIVE_SDK_VERSION = "4.0.2";
+	public static final String APPTENTIVE_SDK_VERSION = "4.1.0";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -58,8 +58,6 @@ public class Constants {
 	public static final String MANIFEST_KEY_APPTENTIVE_LOG_LEVEL = "apptentive_log_level";
 	public static final String MANIFEST_KEY_APPTENTIVE_KEY = "apptentive_key";
 	public static final String MANIFEST_KEY_APPTENTIVE_SIGNATURE = "apptentive_signature";
-	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
-	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String MANIFEST_KEY_INITIALLY_HIDE_BRANDING = "apptentive_initially_hide_branding";
 	public static final String MANIFEST_KEY_APPTENTIVE_DEBUG = "apptentive_debug";
 	//endregion
@@ -88,8 +86,15 @@ public class Constants {
 	public static final String PREF_KEY_INTERACTIONS_PAYLOAD_CACHE_EXPIRATION = "interactionsCacheExpiration";
 	//endregion
 
+	//region File names
+	public static final String FILE_APPTENTIVE_LOG_FILE = "apptentive-log.txt";
+	public static final String FILE_APPTENTIVE_ENGAGEMENT_MANIFEST = "apptentive-engagement-manifest.txt";
+	//endregion
+
 
 	//region Old keys no longer used
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
+	public static final String MANIFEST_KEY_SDK_DISTRIBUTION_VERSION = "apptentive_sdk_distribution_version";
 	public static final String PREF_KEY_APP_ACTIVITY_STATE_QUEUE = "appActivityStateQueue";
 	public static final String PREF_KEY_PERSON_EMAIL = "personEmail";
 	public static final String PREF_KEY_PERSON_NAME = "personName";

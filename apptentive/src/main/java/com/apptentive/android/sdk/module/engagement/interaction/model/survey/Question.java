@@ -22,6 +22,7 @@ public interface Question {
 	String getRequiredText();
 	void setRequiredText(String requiredText);
 	String getInstructions();
+	String getErrorMessage();
 
 	int getMinSelections();
 	int getMaxSelections();

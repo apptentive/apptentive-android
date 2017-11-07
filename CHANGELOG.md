@@ -1,3 +1,16 @@
+# 2017-11-06 - v4.1.0
+
+#### Improvements
+
+* Improved accessibility of Surveys and Message center for the visually impaired
+* Made use of vector drawables to cut down on AAR and APK size
+* Added the ability to enable troubleshooting mode in the SDK, and easily email logs to Apptentive support
+
+#### Bugs Fixed
+
+* Fix global configuration fetching
+* Fix Love Dialog to stack buttons if their labels are too long
+
 # 2017-08-15 - v4.0.2
 
 #### Bugs Fixed

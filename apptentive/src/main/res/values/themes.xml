@@ -25,6 +25,9 @@
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
+        <item name="apptentiveToolbarIconClose">@drawable/apptentive_close_x_dark</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_person_icon_dark</item>
+        <item name="apptentiveTextColorPrimary">@color/apptentive_text_color_primary_light</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
@@ -53,6 +56,9 @@
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_light</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_light</item>
         <item name="apptentiveButtonTintColorDisabled">#FFD6D7D7</item>
+        <item name="apptentiveToolbarIconClose">@drawable/apptentive_close_x_light</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_person_icon_light</item>
+        <item name="apptentiveTextColorPrimary">@color/apptentive_text_color_primary_light</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_light</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_dark</item>
@@ -82,6 +88,9 @@
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
         <item name="apptentiveButtonTintColorDisabled">#FF5A595B</item>
+        <item name="apptentiveToolbarIconClose">@drawable/apptentive_close_x_dark</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_person_icon_dark</item>
+        <item name="apptentiveTextColorPrimary">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
@@ -111,6 +120,9 @@
         <item name="apptentiveCardBorderColor">@color/apptentive_card_border_color_dark</item>
         <item name="apptentiveAttenuateColor">@color/apptentive_attenuate_color_dark</item>
         <item name="apptentiveButtonTintColorDisabled">#FF5A595B</item>
+        <item name="apptentiveToolbarIconClose">@drawable/apptentive_close_x_light</item>
+        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_person_icon_light</item>
+        <item name="apptentiveTextColorPrimary">@color/apptentive_text_color_primary_dark</item>
 
         <item name="android:textColorPrimary">@color/apptentive_text_color_primary_dark</item>
         <item name="android:textColorPrimaryInverse">@color/apptentive_text_color_primary_light</item>
@@ -139,8 +151,6 @@
 
         <item name="apptentiveToolbarBackground">?attr/colorPrimary</item>
         <item name="apptentiveToolbarTitleTextAppearance">@style/Apptentive.TextAppearance.Toolbar</item>
-        <item name="apptentiveToolbarIconClose">@drawable/apptentive_ic_toolbar_close</item>
-        <item name="apptentiveToolbarIconProfile">@drawable/apptentive_ic_profile_edit</item>
 
         <item name="apptentiveViewBackground">?android:attr/colorBackground</item>
 

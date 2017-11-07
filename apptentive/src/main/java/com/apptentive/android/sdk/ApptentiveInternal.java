@@ -28,6 +28,7 @@ import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
+import com.apptentive.android.sdk.debug.LogMonitor;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventPayload;
@@ -56,13 +57,12 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
@@ -74,10 +74,12 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AU
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_FETCHED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTION_MANIFEST_FETCHED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_MANIFEST;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
@@ -99,7 +101,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	// We keep a readonly reference to AppRelease object since it won't change at runtime
 	private final AppRelease appRelease;
 
-	private boolean appIsInForeground;
 	private final SharedPreferences globalSharedPrefs;
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
@@ -151,14 +152,14 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	private static volatile ApptentiveInternal sApptentiveInternal;
 
 	// for unit testing
-	protected ApptentiveInternal() {
+	public ApptentiveInternal(Context appContext) {
 		taskManager = null;
 		globalSharedPrefs = null;
 		apptentiveKey = null;
 		apptentiveSignature = null;
 		apptentiveHttpClient = null;
 		conversationManager = null;
-		appContext = null;
+		this.appContext = appContext;
 		appRelease = null;
 		lifecycleCallbacks = null;
 	}
@@ -188,7 +189,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this)
-			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this);
+			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this)
+			.addObserver(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, this);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -215,6 +217,9 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		if (application == null) {
 			throw new IllegalArgumentException("Application is null");
 		}
+
+		// try initializing log monitor
+		LogMonitor.tryInitialize(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
 
 		synchronized (ApptentiveInternal.class) {
 			if (sApptentiveInternal == null) {
@@ -440,14 +445,15 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppEnterForeground() {
-		appIsInForeground = true;
+
+		// Try to initialize log monitor
+		LogMonitor.tryInitialize(appContext, apptentiveKey, apptentiveSignature);
 
 		// Post a notification
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);
 	}
 
 	public void onAppEnterBackground() {
-		appIsInForeground = false;
 		currentTaskStackTopActivity = null;
 
 		// Post a notification
@@ -666,7 +672,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			conversation.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
 		}
 
-		Sdk sdk = SdkManager.generateCurrentSdk();
+		Sdk sdk = SdkManager.generateCurrentSdk(appContext);
 		if (sdkChanged) {
 			ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 			conversation.setLastSeenSdkVersion(currentSdkVersion);
@@ -757,17 +763,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		ApptentiveLog.overrideLogLevel(level);
 	}
 
-	private String pushCallbackActivityName;
-
-	public void setPushCallbackActivity(Class<? extends Activity> activity) {
-		pushCallbackActivityName = activity.getName();
-		ApptentiveLog.d("Setting push callback activity name to %s", pushCallbackActivityName);
-	}
-
-	public String getPushCallbackActivityName() {
-		return pushCallbackActivityName;
-	}
-
 	/**
 	 * The key that is used to store extra data on an Apptentive push notification.
 	 */
@@ -851,6 +846,9 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		context.startActivity(intent);
 	}
 
+	/**
+	 * TODO: Decouple this from Conversation and Message Manager so it can be unit tested.
+	 */
 	static PendingIntent generatePendingIntentFromApptentivePushData(String apptentivePushData) {
 		ApptentiveLog.d("Generating Apptentive push PendingIntent.");
 		if (!TextUtils.isEmpty(apptentivePushData)) {
@@ -1092,6 +1090,9 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 			String conversationIdOfFailedRequest = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION_ID, String.class);
 			Apptentive.AuthenticationFailedReason authenticationFailedReason = notification.getUserInfo(NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON, Apptentive.AuthenticationFailedReason.class);
 			notifyAuthenticationFailedListener(authenticationFailedReason, conversationIdOfFailedRequest);
+		} else if (notification.hasName(NOTIFICATION_INTERACTION_MANIFEST_FETCHED)) {
+			String manifest = notification.getRequiredUserInfo(NOTIFICATION_KEY_MANIFEST, String.class);
+			storeManifestResponse(appContext, manifest);
 		}
 	}
 
@@ -1101,6 +1102,19 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		Conversation conversation = getConversation();
 		assertNotNull(conversation, "Attempted to engage '%s' internal event without an active conversation", eventName);
 		return conversation != null && EngagementModule.engageInternal(context, conversation, eventName);
+	}
+
+	//endregion
+
+	//region Engagement Manifest Data
+
+	private void storeManifestResponse(Context context, String manifest) {
+		try {
+			File file = new File(context.getCacheDir(), Constants.FILE_APPTENTIVE_ENGAGEMENT_MANIFEST);
+			Util.writeText(file, manifest);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while trying to save engagement manifest data");
+		}
 	}
 
 	//endregion

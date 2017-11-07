@@ -98,6 +98,15 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 	};
 
+	/**
+	 * Testing only.
+	 */
+	protected MessageManager() {
+		conversation = null;
+		messageStore = null;
+		pollingWorker = null;
+	}
+
 	public MessageManager(Conversation conversation, MessageStore messageStore) {
 		if (conversation == null) {
 			throw new IllegalArgumentException("Conversation is null");
@@ -263,7 +272,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		messageStore.updateMessage(apptentiveMessage);
 	}
 
-	private List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
+	public List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<>();
 		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("messages")) {

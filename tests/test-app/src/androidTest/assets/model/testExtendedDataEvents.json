@@ -21,7 +21,7 @@
     "commerce": {
         "version": 1,
         "id": "commerce_id",
-        "affiliation": 1111111111,
+        "affiliation": "1111111111",
         "shipping": 5,
         "revenue": 100,
         "tax": 4.38,

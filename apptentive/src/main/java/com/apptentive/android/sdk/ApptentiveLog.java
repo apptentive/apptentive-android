@@ -16,6 +16,10 @@ public class ApptentiveLog {
 
 	private static Level logLevel = Level.DEFAULT;
 
+	public static Level getLogLevel() {
+		return logLevel;
+	}
+
 	public static void overrideLogLevel(Level level) {
 		ApptentiveLog.logLevel = level;
 	}
@@ -51,12 +55,16 @@ public class ApptentiveLog {
 				message = extra + " " + message;
 			}
 
+
+			//noinspection WrongConstant
 			android.util.Log.println(level.getAndroidLevel(), TAG, message);
 			if(throwable != null){
 				if(throwable.getMessage() != null){
+					//noinspection WrongConstant
 					android.util.Log.println(level.getAndroidLevel(), TAG, throwable.getMessage());
 				}
 				while(throwable != null) {
+					//noinspection WrongConstant
 					android.util.Log.println(level.getAndroidLevel(), TAG, android.util.Log.getStackTraceString(throwable));
 					throwable = throwable.getCause();
 				}

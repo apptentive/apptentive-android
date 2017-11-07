@@ -54,11 +54,11 @@ public class LogicalClause implements Clause {
 	}
 
 	@Override
-	public boolean evaluate() {
+	public boolean evaluate(FieldManager fieldManager) {
 		ApptentiveLog.v("  - <%s>", operator.name());
 		if (operator == LogicalOperator.$and) {
 			for (Clause clause : children) {
-				boolean ret = clause.evaluate();
+				boolean ret = clause.evaluate(fieldManager);
 				ApptentiveLog.v("        - => %b", ret);
 				if (!ret) {
 					ApptentiveLog.v("  - </%s>", operator.name());
@@ -69,7 +69,7 @@ public class LogicalClause implements Clause {
 			return true;
 		} else if (operator == LogicalOperator.$or) {
 			for (Clause clause : children) {
-				boolean ret = clause.evaluate();
+				boolean ret = clause.evaluate(fieldManager);
 				ApptentiveLog.v("        - => %b", ret);
 				if (ret) {
 					ApptentiveLog.v("  - </%s>", operator.name());
@@ -83,7 +83,7 @@ public class LogicalClause implements Clause {
 				throw new IllegalArgumentException("$not condition must have exactly one child, has ." + children.size());
 			}
 			Clause clause = children.get(0);
-			boolean ret = clause.evaluate();
+			boolean ret = clause.evaluate(fieldManager);
 			ApptentiveLog.v("        - => %b", ret);
 			ApptentiveLog.v("  - </%s>", operator.name());
 			return !ret;

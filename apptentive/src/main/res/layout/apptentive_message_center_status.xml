@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
@@ -20,17 +20,19 @@
                   android:paddingRight="@dimen/apptentive_message_center_status_side_padding"
                   android:gravity="center"
                   android:orientation="@integer/apptentive_orientation_fill_length">
-        <ImageView android:id="@+id/icon"
-                   android:layout_width="wrap_content"
-                   android:layout_height="wrap_content"
-                   android:paddingTop="12dp"
-                   android:paddingBottom="12dp"
-                   android:paddingLeft="16dp"
-                   android:paddingRight="16dp"
-                   android:scaleType="center"/>
+        <android.support.v7.widget.AppCompatImageView android:id="@+id/icon"
+                                                      android:layout_width="wrap_content"
+                                                      android:layout_height="wrap_content"
+                                                      android:paddingTop="12dp"
+                                                      android:paddingBottom="12dp"
+                                                      android:paddingLeft="16dp"
+                                                      android:paddingRight="16dp"
+                                                      android:tint="?attr/apptentiveTextColorPrimary"
+                                                      android:scaleType="center"/>
         <TextView android:id="@+id/status_body"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"
-                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
+                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+                  android:focusable="true"/>
     </LinearLayout>
 </LinearLayout>

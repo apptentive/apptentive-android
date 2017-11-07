@@ -1,4 +1,5 @@
 language: android
+dist: precise
 env:
   global:
     - SNAPSHOT_REPOSITORY_USERNAME=travis
@@ -17,15 +18,15 @@ cache:
 android:
   components:
     - tools
-    - tools
     - platform-tools
-    - build-tools-25.0.3
+    - tools # not a mistakenly duplicated line: used above api 25.x
+    - build-tools-26.0.2
     - android-19
-    - android-24
-    - android-25
+    - android-26
     - extra-google-google_play_services
     - extra-google-m2repository
-    - addon-google_apis-google-25
+    - extra-android-m2repository
+    - addon-google_apis-google-26
     - sys-img-armeabi-v7a-android-19
 install: true
 before_script:
@@ -33,12 +34,21 @@ before_script:
   - emulator -avd test -no-audio -no-window &
   - android-wait-for-emulator
   - adb shell input keyevent 82 &
+  #- adb -e logcat *:W | tee logcat.log > /dev/null 2>&1 &
 script:
   - ./gradlew :apptentive:test -i
+  - ./gradlew :test-app:connectedAndroidTest
+#  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebug; fi
+#  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebugAndroidTest; fi
+#  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:connectedAutomatedDebugAndroidTest -i; fi
+  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:assembleQaDebug; fi
 after_script:
   - if [ "$TRAVIS_BRANCH" = "develop" ]; then
       ./gradlew :apptentive:uploadArchives;
+      if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:uploadQaDebugToHockeyApp; fi;
     fi
+after_failure:
+  #- echo " LOGCAT "; echo "========"; cat logcat.log; pkill -KILL -f adb
 notifications:
   slack:
     secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=

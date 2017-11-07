@@ -78,6 +78,8 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		String hint = question.getFreeformHint();
 		if (!TextUtils.isEmpty(hint)) {
 			answerTextInputLayout.setHint(hint);
+			answerTextInputLayout.setContentDescription(hint);
+			answer.setContentDescription(hint);
 		}
 
 		answer.setOnFocusChangeListener(new View.OnFocusChangeListener() {

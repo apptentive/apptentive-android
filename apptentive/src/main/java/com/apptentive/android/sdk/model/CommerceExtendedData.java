@@ -114,8 +114,7 @@ public class CommerceExtendedData extends ExtendedData {
 	public CommerceExtendedData setItems(JSONArray items) throws JSONException {
 		if (items != null) {
 			for (int i = 0; i < items.length(); i++) {
-				Item item = (Item) items.get(i);
-				addItem(item);
+				addItem(new Item((items.getJSONObject(i)).toString()));
 			}
 		}
 		return this;

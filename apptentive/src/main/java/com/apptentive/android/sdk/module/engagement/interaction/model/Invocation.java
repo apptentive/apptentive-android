@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -32,12 +34,12 @@ public class Invocation extends JSONObject {
 		return null;
 	}
 
-	public boolean isCriteriaMet() {
+	public boolean isCriteriaMet(FieldManager fieldManager) {
 		try {
 			if (!isNull(KEY_CRITERIA)) {
 				JSONObject criteriaObject = getJSONObject(KEY_CRITERIA);
 				InteractionCriteria criteria = new InteractionCriteria(criteriaObject.toString());
-				return criteria.isMet();
+				return criteria.isMet(fieldManager);
 			}
 		} catch (JSONException e) {
 			// Ignore

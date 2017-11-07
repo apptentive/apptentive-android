@@ -31,7 +31,9 @@
                               android:layout_width="wrap_content"
                               android:layout_height="wrap_content"
                               android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
-                              android:autoLink="all"/>
+                              android:autoLink="all"
+                              android:focusable="true"
+                              android:text=""/>
                     <LinearLayout android:layout_width="match_parent"
                                   android:layout_height="wrap_content"
                                   android:orientation="horizontal">
@@ -40,7 +42,8 @@
                                   android:layout_height="wrap_content"
                                   android:textAppearance="@style/Apptentive.TextAppearance.Caption"
                                   android:textColor="?attr/apptentiveValidationFailedColor"
-                                  android:text="@string/apptentive_required"/>
+                                  android:text="@string/apptentive_required"
+                                  android:focusable="true"/>
                         <TextView android:id="@+id/dash_view"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
@@ -49,7 +52,8 @@
                         <TextView android:id="@+id/question_instructions"
                                   android:layout_width="wrap_content"
                                   android:layout_height="wrap_content"
-                                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
+                                  android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+                                  android:focusable="true"/>
                     </LinearLayout>
                 </LinearLayout>
                 <View android:layout_width="match_parent"

@@ -587,6 +587,10 @@ public class HttpRequest {
 		return responseCode;
 	}
 
+	public String getResponseHeader(String key) {
+		return responseHeaders != null ? responseHeaders.get(key) : null;
+	}
+
 	public boolean isAuthenticationFailure() {
 		return responseCode == 401;
 	}

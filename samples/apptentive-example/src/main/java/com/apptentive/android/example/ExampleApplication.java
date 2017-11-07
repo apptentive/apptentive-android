@@ -16,6 +16,6 @@ public class ExampleApplication extends Application {
 	@Override
 	public void onCreate() {
 		super.onCreate();
-		Apptentive.register(this, "");
+		Apptentive.register(this, "", "");
 	}
 }

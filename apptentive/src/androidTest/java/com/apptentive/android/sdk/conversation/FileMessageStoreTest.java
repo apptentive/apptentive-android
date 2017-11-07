@@ -6,8 +6,9 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.support.test.InstrumentationRegistry;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveInternalMock;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
@@ -40,7 +41,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 	@Before
 	public void setUp() {
 		super.setUp();
-		ApptentiveInternal.setInstance(new ApptentiveInternalMock());
+		ApptentiveInternal.setInstance(new ApptentiveInternal(InstrumentationRegistry.getTargetContext()));
 	}
 
 	@After

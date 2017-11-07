@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
+import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -123,7 +124,8 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 								List<Invocation> invocations = launchInteractionButton.getInvocations();
 								String interactionIdToLaunch = null;
 								for (Invocation invocation : invocations) {
-									if (invocation.isCriteriaMet()) {
+									FieldManager fieldManager = new FieldManager(getContext(), getConversation().getVersionHistory(), getConversation().getEventData(), getConversation().getPerson(), getConversation().getDevice(), getConversation().getAppRelease());
+									if (invocation.isCriteriaMet(fieldManager)) {
 										interactionIdToLaunch = invocation.getInteractionId();
 										break;
 									}

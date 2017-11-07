@@ -43,7 +43,7 @@ public class DeviceManager {
 		device.setBuildId(Build.ID);
 
 		// Second, set the stuff that requires querying system services.
-		TelephonyManager tm = ((TelephonyManager) (ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.TELEPHONY_SERVICE)));
+		TelephonyManager tm = ((TelephonyManager) (context.getSystemService(Context.TELEPHONY_SERVICE)));
 		device.setCarrier(tm.getSimOperatorName());
 		device.setCurrentCarrier(tm.getNetworkOperatorName());
 		device.setNetworkType(Constants.networkTypeAsString(tm.getNetworkType()));

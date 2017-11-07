@@ -10,10 +10,10 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v7.widget.AppCompatImageView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.Apptentive;
@@ -88,14 +88,13 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	}
 
 	private void updateStatus() {
-		if (wasLastAttemptServerError(getContext()) ||
-				Util.isNetworkConnectionPresent()) {
+		if (wasLastAttemptServerError(getContext()) || Util.isNetworkConnectionPresent()) {
 			progress.setVisibility(View.VISIBLE);
-			((ImageView) root.findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_icon_server_error);
+			((AppCompatImageView) root.findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_ic_error);
 			((TextView) root.findViewById(R.id.message)).setText(R.string.apptentive_message_center_server_error);
 		} else {
 			progress.setVisibility(View.GONE);
-			((ImageView) root.findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_icon_no_connection);
+			((AppCompatImageView) root.findViewById(R.id.icon)).setImageResource(R.drawable.apptentive_ic_no_connection);
 			((TextView) root.findViewById(R.id.message)).setText(R.string.apptentive_message_center_no_connection);
 		}
 	}

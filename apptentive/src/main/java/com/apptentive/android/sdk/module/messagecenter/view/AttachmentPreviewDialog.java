@@ -30,12 +30,12 @@ import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
 
 
-public class AttachmentPreviewDialog extends DialogFragment implements DialogInterface.OnDismissListener,
-		PreviewImageView.GestureCallback {
+public class AttachmentPreviewDialog extends DialogFragment implements DialogInterface.OnDismissListener, PreviewImageView.GestureCallback {
 
 	private View previewContainer;
 	private ProgressBar progressBar;
 	private PreviewImageView previewImageView;
+	private ImageView previewImagePlaceholderView;
 	private ViewGroup header;
 	private ImageButton closeButton;
 	private int width;
@@ -64,6 +64,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 		previewContainer = rootView.findViewById(R.id.preview_container);
 		progressBar = (ProgressBar) rootView.findViewById(R.id.preview_progress);
 		previewImageView = (PreviewImageView) rootView.findViewById(R.id.preview_image);
+		previewImagePlaceholderView = (ImageView) rootView.findViewById(R.id.preview_image_placeholder);
 
 		previewImageView.setGestureCallback(this);
 		header = (ViewGroup) rootView.findViewById(R.id.header_bar);
@@ -99,6 +100,7 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 							previewContainer.setVisibility(View.VISIBLE);
 							if (!d.isRecycled()) {
 								previewImageView.setImageBitmap(d);
+								previewImagePlaceholderView.setVisibility(View.GONE);
 							}
 						}
 					}

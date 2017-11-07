@@ -63,6 +63,21 @@ public class ApptentiveNotifications {
 	 */
 	public static final String NOTIFICATION_INTERACTIONS_FETCHED = "NOTIFICATION_INTERACTIONS_FETCHED";
 
+	/**
+	 * Sent when interaction manifest data is fetched for any conversation. Used by the log monitor.
+	 */
+	public static final String NOTIFICATION_INTERACTION_MANIFEST_FETCHED = "INTERACTION_MANIFEST_FETCHED"; // { manifest: String }
+
+	/**
+	 * Sent when log monitor starts capturing and storing logs.
+	 */
+	public static final String NOTIFICATION_LOG_MONITOR_STARTED = "NOTIFICATION_LOG_MONITOR_STARTED";
+
+	/**
+	 * Sent when log monitor stops capturing and storing logs.
+	 */
+	public static final String NOTIFICATION_LOG_MONITOR_STOPPED = "NOTIFICATION_LOG_MONITOR_STOPPED";
+
 	// keys
 	public static final String NOTIFICATION_KEY_SUCCESSFUL = "successful";
 	public static final String NOTIFICATION_KEY_ACTIVITY = "activity";
@@ -72,4 +87,5 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_KEY_PAYLOAD = "payload";
 	public static final String NOTIFICATION_KEY_RESPONSE_CODE = "responseCode";
 	public static final String NOTIFICATION_KEY_RESPONSE_DATA = "responseData";
+	public static final String NOTIFICATION_KEY_MANIFEST = "manifest";
 }

@@ -7,6 +7,8 @@
 package com.apptentive.android.sdk.tests;
 
 import android.content.Context;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
@@ -14,9 +16,11 @@ import android.test.RenamingDelegatingContext;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.CodePointStore;
+import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.debug.AssertImp;
+import com.apptentive.android.sdk.migration.v4_0_0.CodePointStore;
+import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
-import com.apptentive.android.sdk.storage.VersionHistoryStore;
 import com.apptentive.android.sdk.util.Util;
 
 import org.junit.Before;
@@ -32,22 +36,17 @@ public abstract class ApptentiveTestCaseBase {
 	protected Context targetContext;
 	protected ApptentiveInternal apptentiveInternal;
 	protected InteractionManager interactionManager;
-	protected CodePointStore codePointStore;
+	protected int versionCode;
+	protected String versionName;
 
 	@Before
-	public void initializeApptentiveSdk() {
+	public void initializeApptentiveSdk() throws PackageManager.NameNotFoundException {
 		targetContext = new RenamingDelegatingContext(InstrumentationRegistry.getTargetContext(), "test_");
-		apptentiveInternal = ApptentiveInternal.getInstance(targetContext);
-		apptentiveInternal.setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-		interactionManager = apptentiveInternal.getInteractionManager();
-		codePointStore = apptentiveInternal.getCodePointStore();
-	}
-
-	protected void resetDevice() {
-		targetContext.getSharedPreferences("APPTENTIVE", Context.MODE_PRIVATE).edit().clear().commit();
-		apptentiveInternal.getCodePointStore().clear();
-		apptentiveInternal.getInteractionManager().clear();
-		VersionHistoryStore.clear();
+		apptentiveInternal = ApptentiveInternal.getInstance();
+		ApptentiveLog.overrideLogLevel(ApptentiveLog.Level.VERY_VERBOSE);
+		PackageInfo packageInfo = targetContext.getPackageManager().getPackageInfo(targetContext.getPackageName(), 0);
+		versionCode = packageInfo.versionCode;
+		versionName = packageInfo.versionName;
 	}
 
 	protected static boolean isRunningOnEmulator() {
@@ -55,6 +54,15 @@ public abstract class ApptentiveTestCaseBase {
 	}
 
 	private final static int READ_BUF_LEN = 2048;
+
+	protected void setUp() {
+		Assert.setImp(new AssertImp() {
+			@Override
+			public void assertFailed(String message) {
+				throw new AssertionError(message);
+			}
+		});
+	}
 
 	public static String loadRawTextResourceAsString(Context context, int resourceId) {
 		BufferedReader reader = null;

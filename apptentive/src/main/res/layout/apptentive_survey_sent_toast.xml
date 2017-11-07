@@ -1,12 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!--
-  ~ Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+  ~ Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
   ~ Please refer to the LICENSE file for the terms and conditions
   ~ under which redistribution and use of this file is permitted.
   -->
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              xmlns:app="http://schemas.android.com/apk/res-auto"
               android:id="@+id/survey_sent_toast_root"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
@@ -17,10 +18,10 @@
                   style="?attr/apptentiveSurveySentToastStyle"
                   android:gravity="center"
                   android:orientation="horizontal">
-        <android.support.v7.widget.AppCompatImageView android:id="@+id/survey_sent_action_icon"
-                                                      android:layout_width="wrap_content"
-                                                      android:layout_height="wrap_content"
-                                                      android:src="@drawable/apptentive_checkmark_alt_40dp"/>
+        <ImageView android:id="@+id/survey_sent_action_icon"
+                   android:layout_width="wrap_content"
+                   android:layout_height="wrap_content"
+                   app:srcCompat="@drawable/apptentive_check_icon"/>
         <TextView android:id="@+id/survey_sent_action_text"
                   android:layout_width="wrap_content"
                   android:layout_height="wrap_content"

@@ -32,7 +32,8 @@
                       android:paddingLeft="10dp"
                       android:paddingRight="10dp"
                       android:textIsSelectable="true"
-                      android:autoLink="all"/>
+                      android:autoLink="all"
+                      android:focusable="true"/>
         </LinearLayout>
     </android.support.v7.widget.CardView>
 </LinearLayout>
