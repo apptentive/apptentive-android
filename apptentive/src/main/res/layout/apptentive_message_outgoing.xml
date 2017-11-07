@@ -16,7 +16,8 @@
               android:layout_height="wrap_content"
               android:textAppearance="@style/Apptentive.TextAppearance.Caption.Bold"
               style="@style/Apptentive.Style.TextView.Timestamp"
-              android:visibility="gone"/>
+              android:visibility="gone"
+              android:focusable="true"/>
     <android.support.v7.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         style="@style/Apptentive.Style.Widget.CardView.Message">
@@ -36,7 +37,8 @@
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Body1"
                           android:textIsSelectable="true"
-                          android:autoLink="all"/>
+                          android:autoLink="all"
+                          android:focusable="true"/>
                 <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/grid"
                                                                                android:layout_width="match_parent"
                                                                                android:layout_height="wrap_content"
@@ -52,7 +54,8 @@
                           android:layout_width="wrap_content"
                           android:layout_height="wrap_content"
                           android:textAppearance="@style/Apptentive.TextAppearance.Caption"
-                          android:visibility="gone"/>
+                          android:visibility="gone"
+                          android:focusable="true"/>
             </LinearLayout>
             <com.apptentive.android.sdk.view.ApptentiveMaterialIndeterminateProgressBar android:id="@+id/progressBar"
                                                                                         android:layout_width="match_parent"

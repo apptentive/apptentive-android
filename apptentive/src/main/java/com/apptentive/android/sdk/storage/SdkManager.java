@@ -6,14 +6,17 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
+import android.content.Context;
+import android.content.res.Resources;
+
+import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.SdkPayload;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Util;
 
 public class SdkManager {
 
-	public static Sdk generateCurrentSdk() {
+	public static Sdk generateCurrentSdk(Context context) {
 		Sdk sdk = new Sdk();
 
 		// First, get all the information we can load from static resources.
@@ -21,14 +24,10 @@ public class SdkManager {
 		sdk.setPlatform("Android");
 
 		// Distribution and distribution version are optionally set in the manifest by the wrapping platform (Cordova, mParticle, etc.)
-		Object distribution = Util.getPackageMetaDataSingleQuotedString(ApptentiveInternal.getInstance().getApplicationContext(), Constants.MANIFEST_KEY_SDK_DISTRIBUTION);
-		if (distribution != null && distribution.toString().length() != 0) {
-			sdk.setDistribution(distribution.toString());
-		}
-		Object distributionVersion = Util.getPackageMetaDataSingleQuotedString(ApptentiveInternal.getInstance().getApplicationContext(), Constants.MANIFEST_KEY_SDK_DISTRIBUTION_VERSION);
-		if (distributionVersion != null && distributionVersion.toString().length() != 0) {
-			sdk.setDistributionVersion(distributionVersion.toString());
-		}
+		Resources resources = context.getResources();
+		sdk.setDistribution(resources.getString(R.string.apptentive_distribution));
+		sdk.setDistributionVersion(resources.getString(R.string.apptentive_distribution_version));
+		ApptentiveLog.vv("SDK: %s:%s", sdk.getDistribution(), sdk.getDistributionVersion());
 		return sdk;
 	}
 

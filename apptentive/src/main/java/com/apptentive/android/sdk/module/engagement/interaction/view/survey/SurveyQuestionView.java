@@ -28,6 +28,11 @@ public interface SurveyQuestionView {
 	 */
 	Object getAnswer();
 
+	/**
+	 * Error message for the case if required question is not answered
+	 */
+	String getErrorMessage();
+
 	boolean didSendMetric();
 
 	void setSentMetric(boolean sent);

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
@@ -12,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveViewExitType;
@@ -39,11 +40,13 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		String body = interaction.getTitle();
 		bodyView.setText(body);
 
+		int buttonsTotalLength = 0;
 		// No
 		String noText = interaction.getNoText();
 		Button noButton = (Button) v.findViewById(R.id.no);
 		if (noText != null) {
 			noButton.setText(noText);
+			buttonsTotalLength += noText.length();
 		}
 		noButton.setOnClickListener(this);
 
@@ -53,8 +56,18 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 		yesButton.setActivated(true);
 		if (yesText != null) {
 			yesButton.setText(yesText);
+			buttonsTotalLength += yesText.length();
 		}
 		yesButton.setOnClickListener(this);
+
+		// Change orientation of button area to vertical if buttons won't both fit on one line.
+		LinearLayout buttonContainer = (LinearLayout) v.findViewById(R.id.button_container);
+		boolean vertical = buttonsTotalLength > 16;
+		if (vertical) {
+			buttonContainer.setOrientation(LinearLayout.VERTICAL);
+		} else {
+			buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
+		}
 
 		// Dismiss "X" Button
 		boolean showDismissButton = interaction.showDismissButton();

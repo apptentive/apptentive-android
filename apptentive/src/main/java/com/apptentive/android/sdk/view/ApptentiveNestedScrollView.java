@@ -1452,7 +1452,7 @@ public class ApptentiveNestedScrollView extends FrameLayout implements NestedScr
 	 *
 	 * @param child the View to scroll to
 	 */
-	private void scrollToChild(View child) {
+	public void scrollToChild(View child) {
 		child.getDrawingRect(mTempRect);
 
         /* Offset from child's local coordinates to ScrollView coordinates */

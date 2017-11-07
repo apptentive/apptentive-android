@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
+import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 
 import org.json.JSONException;
 
@@ -23,13 +24,13 @@ public class InteractionCriteria {
 		this.json = json;
 	}
 
-	public boolean isMet() {
+	public boolean isMet(FieldManager fieldManager) {
 		try {
 			Clause rootClause = ClauseParser.parse(json);
 			ApptentiveLog.i("Evaluating Criteria");
 			boolean ret = false;
 			if (rootClause != null) {
-				ret = rootClause.evaluate();
+				ret = rootClause.evaluate(fieldManager);
 			}
 			ApptentiveLog.i("- => %b", ret);
 			return ret;

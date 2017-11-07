@@ -237,7 +237,7 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY), R.drawable.apptentive_icon_server_error);
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_HTTP_BODY), R.drawable.apptentive_ic_error);
 	}
 
 	public MessageCenterStatus getErrorStatusNetwork() {
@@ -249,6 +249,6 @@ public class MessageCenterInteraction extends Interaction {
 		if (errorStatus == null) {
 			return null;
 		}
-		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY), R.drawable.apptentive_icon_no_connection);
+		return new MessageCenterStatus(errorStatus.optString(KEY_ERROR_NETWORK_BODY), R.drawable.apptentive_ic_no_connection);
 	}
 }

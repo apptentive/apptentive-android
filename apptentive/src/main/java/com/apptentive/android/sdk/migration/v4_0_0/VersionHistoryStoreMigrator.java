@@ -12,7 +12,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 
-class VersionHistoryStoreMigrator {
+public class VersionHistoryStoreMigrator {
 
 	private static final String OLD_ENTRY_SEP = "__";
 	private static final String OLD_FIELD_SEP = "--";
@@ -22,7 +22,7 @@ class VersionHistoryStoreMigrator {
 
 	private static boolean migrated_to_v2;
 
-	static void migrateV1ToV2(String oldFormat) {
+	public static void migrateV1ToV2(String oldFormat) {
 		ApptentiveLog.i("Migrating VersionHistoryStore V1 to V2.");
 		ApptentiveLog.i("V1: %s", oldFormat);
 		try {
@@ -53,15 +53,17 @@ class VersionHistoryStoreMigrator {
 		if (migrated_to_v2) {
 			return;
 		}
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		if (prefs != null) {
-			migrated_to_v2 = prefs.getBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, false);
-			if (migrated_to_v2) {
-				return;
+		if (ApptentiveInternal.getInstance() != null) {
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+			if (prefs != null) {
+				migrated_to_v2 = prefs.getBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, false);
+				if (migrated_to_v2) {
+					return;
+				}
+				String versionHistoryStoreOldString = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY, null);
+				VersionHistoryStoreMigrator.migrateV1ToV2(versionHistoryStoreOldString);
+				prefs.edit().putBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, true).apply();
 			}
-			String versionHistoryStoreOldString = prefs.getString(Constants.PREF_KEY_VERSION_HISTORY, null);
-			VersionHistoryStoreMigrator.migrateV1ToV2(versionHistoryStoreOldString);
-			prefs.edit().putBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, true).apply();
 		}
 	}
 }

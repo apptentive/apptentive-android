@@ -12,6 +12,7 @@ import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveNotifications;
 import com.apptentive.android.sdk.comm.ApptentiveClient;
 import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
 import com.apptentive.android.sdk.debug.Assert;
@@ -23,6 +24,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
@@ -49,6 +51,7 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
@@ -222,6 +225,10 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 		if (updateSuccessful) {
 			String interactionsPayloadString = response.getContent();
+
+			// Send a notification so other parts of the SDK can use this data for troubleshooting
+			ApptentiveNotificationCenter.defaultCenter()
+					.postNotification(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, NOTIFICATION_KEY_MANIFEST, interactionsPayloadString);
 
 			// Store new integration cache expiration.
 			String cacheControl = response.getHeaders().get("Cache-Control");

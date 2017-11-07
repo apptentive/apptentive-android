@@ -8,5 +8,5 @@ package com.apptentive.android.sdk.module.engagement.logic;
 
 public interface Clause {
 
-	boolean evaluate();
+	boolean evaluate(FieldManager fieldManager);
 }

@@ -5,7 +5,7 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<resources>
+<resources xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <style name="Apptentive"/>
 
@@ -196,8 +196,9 @@
     <style name="Apptentive.Style.Widget.ImageButton.Info">
         <item name="android:contentDescription">@string/apptentive_about_title</item>
         <item name="android:background">?android:attr/selectableItemBackground</item>
-        <item name="android:src">@drawable/apptentive_ic_info</item>
+        <item name="srcCompat">@drawable/apptentive_ic_info</item>
         <item name="android:tint">?attr/apptentiveExtendedHeaderForegroundColor</item>
+        <item name="android:alpha">0.6</item>
     </style>
 
     <style name="Apptentive.Style.Widget.ImageButton.Composing">

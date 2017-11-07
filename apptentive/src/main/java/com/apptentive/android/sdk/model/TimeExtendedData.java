@@ -32,6 +32,8 @@ public class TimeExtendedData extends ExtendedData {
 
 	public TimeExtendedData(String json) throws JSONException {
 		super(json);
+		JSONObject jsonObject = new JSONObject(json);
+		setTimestamp(jsonObject.optDouble(KEY_TIMESTAMP));
 	}
 
 	public TimeExtendedData(Date date) {

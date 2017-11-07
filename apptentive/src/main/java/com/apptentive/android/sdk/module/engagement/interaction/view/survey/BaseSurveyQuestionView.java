@@ -126,6 +126,11 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 	public abstract Object getAnswer();
 
 	@Override
+	public String getErrorMessage() {
+		return question.getErrorMessage();
+	}
+
+	@Override
 	public boolean didSendMetric() {
 		return sentMetric;
 	}

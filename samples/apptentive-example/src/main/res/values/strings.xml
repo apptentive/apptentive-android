@@ -10,6 +10,4 @@
     <string name="app_name">Apptentive Example</string>
     <string name="demo_intro_text">Apptentive Android SDK Example</string>
     <string name="message_center_button_label">Message Center</string>
-    <string name="show_survey_button_label">Show Survey</string>
-    <string name="show_survey_instructions">with tag:</string>
 </resources>

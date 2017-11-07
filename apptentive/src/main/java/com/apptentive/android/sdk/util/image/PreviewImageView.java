@@ -1,12 +1,9 @@
 /*
- * Copyright (c) 2015, Apptentive, Inc. All Rights Reserved.
+ * Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
  * Please refer to the LICENSE file for the terms and conditions
  * under which redistribution and use of this file is permitted.
  */
 
-/**
- * @author Barry Li
- */
 package com.apptentive.android.sdk.util.image;
 
 import android.content.Context;
@@ -14,6 +11,7 @@ import android.graphics.Matrix;
 import android.graphics.RectF;
 import android.graphics.drawable.Drawable;
 import android.support.v4.view.GestureDetectorCompat;
+import android.support.v7.widget.AppCompatImageView;
 import android.util.AttributeSet;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
@@ -23,10 +21,8 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.ViewConfiguration;
 import android.view.ViewTreeObserver;
-import android.widget.ImageView;
 
-
-public class PreviewImageView extends ImageView implements OnScaleGestureListener,
+public class PreviewImageView extends AppCompatImageView implements OnScaleGestureListener,
 		OnTouchListener, ViewTreeObserver.OnGlobalLayoutListener
 
 {

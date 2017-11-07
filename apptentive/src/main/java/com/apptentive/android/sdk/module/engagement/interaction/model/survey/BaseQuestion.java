@@ -16,6 +16,7 @@ abstract public class BaseQuestion extends JSONObject implements Question {
 	private static final String KEY_VALUE = "value";
 	private static final String KEY_REQUIRED = "required";
 	private static final String KEY_INSTRUCTIONS = "instructions";
+	private static final String KEY_ERROR_MESSAGE = "error_message";
 
 	// Internal state that doesn't exist on the server.
 	private static final String KEY_ANSWERS = "answers";
@@ -42,6 +43,11 @@ abstract public class BaseQuestion extends JSONObject implements Question {
 
 	public String getRequiredText() {
 		return optString(KEY_REQUIRED_TEXT, null);
+	}
+
+	@Override
+	public String getErrorMessage() {
+		return optString(KEY_ERROR_MESSAGE, null);
 	}
 
 	public void setRequiredText(String requiredText) {

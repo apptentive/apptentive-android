@@ -6,6 +6,7 @@
   -->
 
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
              android:layout_width="match_parent"
              android:layout_height="wrap_content"
              android:paddingBottom="@dimen/apptentive_message_center_card_view_composing_margin_bottom"
@@ -32,7 +33,7 @@
                          android:layout_alignParentStart="true"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:minWidth="48dp"
-                         android:src="@drawable/apptentive_ic_composing_close"
+                         app:srcCompat="@drawable/apptentive_close_x_light"
                          android:scaleType="center"
                          android:contentDescription="@string/apptentive_message_center_content_description_close_button"/>
             <TextView android:id="@+id/title"
@@ -41,7 +42,8 @@
                       android:layout_centerVertical="true"
                       android:layout_toRightOf="@id/close_button"
                       android:layout_toEndOf="@id/close_button"
-                      android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"/>
+                      android:textAppearance="@style/Apptentive.TextAppearance.Subhead.Secondary"
+                      android:focusable="true"/>
             <ImageButton android:id="@+id/send_button"
                          android:layout_width="wrap_content"
                          android:layout_height="@dimen/apptentive_message_center_icon_dimension"
@@ -50,7 +52,7 @@
                          android:layout_alignParentEnd="true"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:minWidth="48dp"
-                         android:src="@drawable/apptentive_ic_action_send_auto_mirror"
+                         app:srcCompat="@drawable/apptentive_send_icon"
                          android:scaleType="center"
                          android:contentDescription="@string/apptentive_message_center_content_description_send_button"/>
             <ImageButton android:id="@+id/attach_button"
@@ -61,7 +63,7 @@
                          android:layout_toStartOf="@id/send_button"
                          style="@style/Apptentive.Style.Widget.ImageButton.Composing"
                          android:minWidth="48dp"
-                         android:src="@drawable/apptentive_ic_action_attach_auto_mirror"
+                         app:srcCompat="@drawable/apptentive_attach_icon"
                          android:scaleType="center"
                          android:contentDescription="@string/apptentive_message_center_content_description_attach_button"/>
         </RelativeLayout>
@@ -83,7 +85,8 @@
                       android:background="@null"
                       android:gravity="top|start"
                       android:minLines="5"
-                      android:inputType="textCapSentences|textMultiLine"/>
+                      android:inputType="textCapSentences|textMultiLine"
+                      android:nextFocusForward="@id/send_button"/>
             <com.apptentive.android.sdk.util.image.ApptentiveImageGridView android:id="@+id/attachments"
                                                                            android:layout_width="match_parent"
                                                                            android:layout_height="wrap_content"

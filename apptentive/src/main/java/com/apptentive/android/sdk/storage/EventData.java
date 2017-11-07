@@ -159,5 +159,11 @@ public class EventData implements Saveable {
 		this.interactions = interactions;
 		notifyDataChanged();
 	}
+
+	public synchronized void clear() {
+		events.clear();
+		interactions.clear();
+		notifyDataChanged();
+	}
 	//endregion
 }

@@ -23,6 +23,7 @@ import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,6 +39,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.fragment.Apptent
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
@@ -146,6 +148,8 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 				 * need to apply the same color in toolbar theme
 				 * By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
 				 */
+				// Allows loading of vector drawable resources from XML
+				AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 				final Drawable alternateUpArrow = ResourcesCompat.getDrawable(getResources(),
 					navIconResId,
 					getTheme());
@@ -153,6 +157,11 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
 				alternateUpArrow.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
 				actionBar.setHomeAsUpIndicator(alternateUpArrow);
+			}
+
+			String contentDescription = newFragment.getToolbarNavigationContentDescription();
+			if (!StringUtils.isNullOrEmpty(contentDescription)) {
+				actionBar.setHomeActionContentDescription(contentDescription);
 			}
 		}
 

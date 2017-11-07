@@ -6,7 +6,10 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -31,7 +34,10 @@ public class Targets extends JSONObject {
 				if (invocationObject != null) {
 					try {
 						Invocation invocation = new Invocation(invocationObject.toString());
-						if (invocation.isCriteriaMet()) {
+						Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+						FieldManager fieldManager = new FieldManager(ApptentiveInternal.getInstance().getApplicationContext(), conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease());
+
+						if (invocation.isCriteriaMet(fieldManager)) {
 							return invocation.getInteractionId();
 						}
 					} catch (JSONException e) {

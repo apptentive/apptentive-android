@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
 import android.content.res.Resources;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -18,6 +19,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -29,6 +31,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.SurveyResponsePayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.SurveyInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.MultichoiceQuestion;
@@ -44,6 +47,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.view.survey.Surv
 import com.apptentive.android.sdk.module.engagement.interaction.view.survey.TextSurveyQuestionView;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
 
@@ -80,7 +84,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			getActivity().finish();
 		}
 
-		List<Question> questions = interaction.getQuestions();
+		final List<Question> questions = interaction.getQuestions();
 		answers = new LinkedHashMap<String, Object>(questions.size());
 
 		View v = inflater.inflate(R.layout.apptentive_survey, container, false);
@@ -134,6 +138,29 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 						((TextView) toastView.findViewById(R.id.survey_invalid_toast_text)).setText(validationText);
 					}
 					toast.show();
+
+					// scroll to the first required un-answered question
+					final Fragment fragment = getFirstRequiredQuestionPos();
+					Assert.assertNotNull(fragment, "Expected to have a scroll pos");
+					if (fragment != null) {
+						scrollView.scrollToChild(fragment.getView());
+
+						if (fragment instanceof SurveyQuestionView) {
+							fragment.getView().requestFocus();
+
+							final String errorMessage = ((SurveyQuestionView) fragment).getErrorMessage();
+							if (!StringUtils.isNullOrEmpty(errorMessage)) {
+								fragment.getView().postDelayed(new Runnable() {
+									@Override
+									public void run() {
+										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+											fragment.getView().announceForAccessibility(errorMessage);
+										}
+									}
+								}, 1500); // give other accessibility events a change to propagate
+							}
+						}
+					}
 				}
 			}
 		});
@@ -248,6 +275,17 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		return validationPassed;
 	}
 
+	private Fragment getFirstRequiredQuestionPos() {
+		List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+		for (Fragment fragment : fragments) {
+			SurveyQuestionView surveyQuestionView = (SurveyQuestionView) fragment;
+			if (!surveyQuestionView.isValid()) {
+				return fragment;
+			}
+		}
+		return null;
+	}
+
 	void sendMetricForQuestion(Activity activity, String questionId) {
 		JSONObject answerData = new JSONObject();
 		try {
@@ -296,4 +334,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		return Util.getResourceIdFromAttribute(activityTheme, R.attr.apptentiveToolbarIconClose);
 	}
 
+	@Override
+	public String getToolbarNavigationContentDescription() {
+		return getContext().getString(R.string.apptentive_survey_content_description_close_button);
+	}
 }

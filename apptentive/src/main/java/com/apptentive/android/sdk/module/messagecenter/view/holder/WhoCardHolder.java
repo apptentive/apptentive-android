@@ -6,12 +6,15 @@
 
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.View;
+import android.view.accessibility.AccessibilityEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -20,7 +23,6 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.messagecenter.model.WhoCard;
 import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerViewAdapter;
-import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import static android.view.View.GONE;
@@ -60,17 +62,15 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			title.setVisibility(GONE);
 		} else {
 			title.setVisibility(VISIBLE);
-			title.setHint(whoCard.getTitle());
+			title.setText(whoCard.getTitle());
+			itemView.setContentDescription(whoCard.getTitle());
 		}
 
-		View viewToFocus;
 		if (TextUtils.isEmpty(whoCard.getNameHint())) {
 			nameLayout.setVisibility(GONE);
-			viewToFocus = emailEditText;
 		} else {
 			nameLayout.setVisibility(VISIBLE);
 			nameLayout.setHint(whoCard.getNameHint());
-			viewToFocus = nameEditText;
 		}
 		nameEditText.setText(Apptentive.getPersonName());
 		nameEditText.addTextChangedListener(new TextWatcher() {
@@ -158,7 +158,17 @@ public class WhoCardHolder extends RecyclerView.ViewHolder {
 			}
 		});
 		if (adapter.getListener() != null) {
-			adapter.getListener().onWhoCardViewCreated(nameEditText, emailEditText, viewToFocus);
+			adapter.getListener().onWhoCardViewCreated(nameEditText, emailEditText, null);
+		}
+
+		// we need to properly announce the profile card: sending an implicit accessibility event
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+			itemView.postDelayed(new Runnable() {
+				@Override
+				public void run() {
+						itemView.sendAccessibilityEvent(AccessibilityEvent.TYPE_ANNOUNCEMENT);
+				}
+			}, 500);
 		}
 	}
 

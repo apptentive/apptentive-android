@@ -15,15 +15,13 @@ import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(AndroidJUnit4.class)
 public class Gcm extends ApptentiveTestCaseBase {
 
+/* TODO: Decouple tested code from Conversation and MessageManager
 	@Test
 	public void apptentivePush() {
 		Bundle bundle = generateBasePushBundle();
@@ -35,6 +33,7 @@ public class Gcm extends ApptentiveTestCaseBase {
 		assertEquals(Apptentive.getTitleFromApptentivePush(bundle), "The title.");
 		assertEquals(Apptentive.getBodyFromApptentivePush(bundle), "The body.");
 	}
+*/
 
 	@Test
 	public void nonApptentivePush() {

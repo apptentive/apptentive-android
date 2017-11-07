@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2017, Apptentive, Inc. All Rights Reserved.
+  ~ Please refer to the LICENSE file for the terms and conditions
+  ~ under which redistribution and use of this file is permitted.
+  -->
+
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Shadow -->
+    <item android:top="0dp"
+          android:end="0dp"
+          android:right="0dp">
+        <shape android:shape="oval">
+            <solid android:color="#AAAAAAAA"/>
+            <padding android:bottom="1dp"
+                     android:right="1dp"/>
+        </shape>
+    </item>
+    <!-- White background -->
+    <item android:top="0dp"
+          android:end="0dp"
+          android:right="0dp">
+        <shape android:shape="oval">
+            <solid android:color="#FFFFFF"/>
+        </shape>
+    </item>
+    <!-- X button -->
+    <item android:gravity="center"
+          android:drawable="@drawable/apptentive_remove_icon"
+          android:top="0dp"
+          android:end="0dp"
+          android:right="0dp"/>
+</layer-list>

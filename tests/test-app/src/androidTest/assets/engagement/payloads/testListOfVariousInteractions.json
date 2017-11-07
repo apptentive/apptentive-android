@@ -1,121 +1,29 @@
 {
-  "interactions": [
+  "$or": [
     {
-      "id": "526fe2836dd8bf546a00000c",
-      "type": "RatingDialog",
-      "version": null,
-      "configuration": {
-        "active": true,
-        "question_text": "Do you love Jelly Bean GO SMS Pro?"
+      "time_at_install/version_code": {
+        "$after": -259200
       }
     },
     {
-      "id": "526fe2836dd8bf546a00000d",
-      "priority": 1,
-      "criteria": {},
-      "type": "RatingDialog",
-      "version": null,
-      "active": true,
-      "configuration": {
-        "active": true,
-        "question_text": "Do you love Jelly Bean GO SMS Pro?"
-      }
-    },
-    {
-      "id": "526fe2836dd8bf546a00000e",
-      "priority": 1,
-      "type": "RatingDialog",
-      "version": null,
-      "active": true,
-      "configuration": {
-        "active": true,
-        "question_text": "Do you love Jelly Bean GO SMS Pro?"
-      }
-    },
-    {
-      "id": "526fe2836dd8bf546a00000f",
-      "priority": 1,
-      "type": "RatingDialog",
-      "version": null,
-      "active": true,
-      "configuration": {
-        "active": true,
-        "question_text": "Do you love Jelly Bean GO SMS Pro?"
-      }
-    }
-  ],
-  "targets": {
-    "app.launch": [
-      {
-        "interaction_id": "526fe2836dd8bf546a00000c",
-        "criteria": {
-          "time_at_install/total": {
-            "$after": -259200
-          },
-          "code_point/app.launch/invokes/total": 2,
+      "$and": [
+        {
+          "code_point/app.launch/invokes/total": 2
+        },
+        {
           "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
-        }
-      }
-    ],
-    "big.win": [
-      {
-        "interaction_id": "526fe2836dd8bf546a00000d",
-        "criteria": {}
-      }
-    ],
-    "or_clause": [
-      {
-        "interaction_id": "526fe2836dd8bf546a00000e",
-        "criteria": {
+        },
+        {
           "$or": [
             {
-              "time_at_install/total": {
-                "$after": -259200
-              }
+              "code_point/small.win/invokes/total": 2
             },
             {
-              "code_point/app.launch/invokes/total": 2
-            },
-            {
-              "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
+              "code_point/big.win/invokes/total": 2
             }
           ]
         }
-      }
-    ],
-    "complex_criteria": [
-      {
-        "interaction_id": "526fe2836dd8bf546a00000f",
-        "criteria": {
-          "$or": [
-            {
-              "time_at_install/version_code": {
-                "$after": -259200
-              }
-            },
-            {
-              "$and": [
-                {
-                  "code_point/app.launch/invokes/total": 2
-                },
-                {
-                  "interactions/526fe2836dd8bf546a00000b/invokes/version_code": 0
-                },
-                {
-                  "$or": [
-                    {
-                      "code_point/small.win/invokes/total": 2
-                    },
-                    {
-                      "code_point/big.win/invokes/total": 2
-                    }
-                  ]
-                }
-              ]
-            }
-          ]
-        }
-      }
-    ]
-  }
+      ]
+    }
+  ]
 }

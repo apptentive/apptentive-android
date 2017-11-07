@@ -52,12 +52,14 @@ public class OutgoingCompoundMessageHolder extends MessageHolder {
 		imageBandView.setupUi();
 
 		messageBodyView.setText(message.getBody());
+/*
 		// We have to disable text selection, or the Google TalkBack won't read this unless it's selected. It's too tiny to select by itself easily.
 		AccessibilityManager accessibilityManager = (AccessibilityManager) fragment.getContext().getSystemService(ACCESSIBILITY_SERVICE);
 		if (accessibilityManager != null) {
 			boolean talkbackNotEnabled = accessibilityManager.getEnabledAccessibilityServiceList(AccessibilityServiceInfo.FEEDBACK_SPOKEN).isEmpty();
 			messageBodyView.setTextIsSelectable(talkbackNotEnabled);
 		}
+*/
 
 		boolean showProgress;
 		Double createdAt = message.getCreatedAt();

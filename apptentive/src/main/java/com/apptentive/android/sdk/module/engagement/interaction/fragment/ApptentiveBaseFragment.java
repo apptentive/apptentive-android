@@ -373,6 +373,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		return 0;
 	}
 
+	public String getToolbarNavigationContentDescription() {
+		return null;
+	}
+
 	protected void attachFragmentMenuListeners(Menu menu) {
 	}
 

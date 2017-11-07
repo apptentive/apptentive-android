@@ -81,6 +81,8 @@
         <attr name="apptentiveAvatarViewGreetingStyle" format="reference"/>
         <attr name="apptentiveAvatarViewMessageStyle" format="reference"/>
         <attr name="apptentiveSurveySentToastStyle" format="reference"/>
+
+        <attr name="apptentiveTextColorPrimary" format="reference|color"/>
     </declare-styleable>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">

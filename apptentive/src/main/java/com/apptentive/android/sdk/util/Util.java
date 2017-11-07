@@ -9,6 +9,9 @@ package com.apptentive.android.sdk.util;
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
+import android.content.ClipData;
+import android.content.ClipDescription;
+import android.content.ClipboardManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -712,6 +715,29 @@ public class Util {
 		}
 	}
 
+	public static void writeText(File file, String text) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
+		}
+
+		if (text == null) {
+			throw new IllegalArgumentException("'text' is null");
+		}
+
+		File parentFile = file.getParentFile();
+		if (!parentFile.exists() && !parentFile.mkdirs()) {
+			throw new IOException("Parent file could not be created: " + parentFile);
+		}
+
+		PrintStream output = null;
+		try {
+			output = new PrintStream(file, "UTF-8");
+			output.print(text);
+		} finally {
+			ensureClosed(output);
+		}
+	}
+
 	public static void appendFileToStream(File file, OutputStream outputStream) throws IOException {
 		if (file == null) {
 			throw new IllegalArgumentException("'file' is null");
@@ -1005,5 +1031,37 @@ public class Util {
 		}
 
 		return null;
+	}
+
+	public static String getClipboardText(Context context) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		if (!manager.hasPrimaryClip()) {
+			return null;
+		}
+
+		ClipDescription primaryClipDescription = manager.getPrimaryClipDescription();
+		if (!primaryClipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_PLAIN) && !primaryClipDescription.hasMimeType(ClipDescription.MIMETYPE_TEXT_HTML)) {
+			return null;
+		}
+
+		ClipData clip = manager.getPrimaryClip();
+		if (clip != null && clip.getItemCount() > 0) {
+			return clip.getItemAt(0).getText().toString();
+		}
+
+		return null;
+	}
+
+	public static void setClipboardText(Context context, String text) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
+		manager.setPrimaryClip(ClipData.newPlainText(null, text));
 	}
 }

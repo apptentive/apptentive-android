@@ -62,9 +62,9 @@ public class ConditionalClause implements Clause {
 	 * @return
 	 */
 	@Override
-	public boolean evaluate() {
+	public boolean evaluate(FieldManager fieldManager) {
 		ApptentiveLog.v("    - %s", fieldName);
-		Comparable fieldValue = FieldManager.getValue(fieldName);
+		Comparable fieldValue = fieldManager.getValue(fieldName);
 		for (ConditionalTest test : conditionalTests) {
 			ApptentiveLog.v("      - %s %s %s?", Util.classToString(fieldValue), test.operator, Util.classToString(test.parameter));
 			if (!test.operator.apply(fieldValue, test.parameter)) {

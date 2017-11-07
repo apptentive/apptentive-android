@@ -26,6 +26,7 @@
     <string name="apptentive_message_center_content_description_attach_button">Attach</string>
     <string name="apptentive_message_center_content_description_send_button">Send</string>
     <string name="apptentive_message_center_content_description_close_button">Close</string>
+    <string name="apptentive_message_center_content_description_back_button">Back</string>
     <string name="apptentive_message_center_content_description_attachment">Attachment</string>
     <string name="apptentive_message_center_content_description_attachment_add">Add attachment</string>
     <string name="apptentive_message_center_content_description_attachment_delete">Delete attachment</string>
@@ -46,6 +47,7 @@
 
     <string name="apptentive_survey_singleline_hint">Enter an answer…</string>
     <string name="apptentive_survey_send_response">Send Response</string>
+    <string name="apptentive_survey_content_description_close_button">Close</string>
 
     <string name="apptentive_message_center_title">Message Center</string>
     <string name="apptentive_message_center_no_connection">Please connect to the internet to send feedback.</string>
@@ -66,4 +68,8 @@
     <string name="apptentive_font_family_default_medium_material">sans-serif-medium</string>
 
     <string name="apptentive_dismiss_placeholder">Dismiss</string>
+
+    <string name="apptentive_distribution">default</string>
+    <!-- String with key "apptentive_distribution_version" is set in Apptentive's build.gradle -->
+
 </resources>

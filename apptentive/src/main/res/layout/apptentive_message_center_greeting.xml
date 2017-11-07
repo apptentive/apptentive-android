@@ -12,7 +12,6 @@
              android:paddingBottom="8dp"
              android:clipToPadding="false"
              android:theme="?apptentiveToolbarTheme"
-             android:descendantFocusability="blocksDescendants"
              android:background="@android:color/transparent">
     <RelativeLayout android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -43,13 +42,15 @@
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textAppearance="@style/Apptentive.TextAppearance.Headline"
-                      android:text="Hello"/>
+                      android:text="Hello"
+                      android:focusable="true"/>
             <TextView android:id="@+id/greeting_body"
                       android:layout_width="wrap_content"
                       android:layout_height="wrap_content"
                       android:textAppearance="@style/Apptentive.TextAppearance.Subhead"
                       android:alpha="0.8"
-                      android:autoLink="all"/>
+                      android:autoLink="all"
+                      android:focusable="true"/>
         </LinearLayout>
         <ImageButton android:id="@+id/btn_info"
                      android:layout_width="@dimen/apptentive_message_center_icon_dimension"
@@ -58,6 +59,7 @@
                      android:layout_alignParentEnd="true"
                      android:layout_alignParentBottom="true"
                      android:layout_below="@id/greeting_content"
-                     style="@style/Apptentive.Style.Widget.ImageButton.Info"/>
+                     style="@style/Apptentive.Style.Widget.ImageButton.Info"
+                     android:focusable="true"/>
     </RelativeLayout>
 </FrameLayout>

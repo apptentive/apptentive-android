@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.storage;
 
 import com.apptentive.android.sdk.Apptentive;
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.ArrayList;
@@ -74,9 +73,9 @@ public class VersionHistory implements Saveable {
 	/**
 	 * Returns the timestamp at the first install of the current versionCode of this app that Apptentive was aware of.
 	 */
-	public Apptentive.DateTime getTimeAtInstallForCurrentVersionCode() {
+	public Apptentive.DateTime getTimeAtInstallForVersionCode(int versionCode) {
 		for (VersionHistoryItem item : versionHistoryItems) {
-			if (item.getVersionCode() == Util.getAppVersionCode(ApptentiveInternal.getInstance().getApplicationContext())) {
+			if (item.getVersionCode() == versionCode) {
 				return new Apptentive.DateTime(item.getTimestamp());
 			}
 		}
@@ -86,12 +85,12 @@ public class VersionHistory implements Saveable {
 	/**
 	 * Returns the timestamp at the first install of the current versionName of this app that Apptentive was aware of.
 	 */
-	public Apptentive.DateTime getTimeAtInstallForCurrentVersionName() {
+	public Apptentive.DateTime getTimeAtInstallForVersionName(String versionName) {
 		for (VersionHistoryItem item : versionHistoryItems) {
 			Apptentive.Version entryVersionName = new Apptentive.Version();
 			Apptentive.Version currentVersionName = new Apptentive.Version();
 			entryVersionName.setVersion(item.getVersionName());
-			currentVersionName.setVersion(Util.getAppVersionName(ApptentiveInternal.getInstance().getApplicationContext()));
+			currentVersionName.setVersion(versionName);
 			if (entryVersionName.equals(currentVersionName)) {
 				return new Apptentive.DateTime(item.getTimestamp());
 			}
@@ -132,5 +131,10 @@ public class VersionHistory implements Saveable {
 			return versionHistoryItems.get(versionHistoryItems.size() - 1);
 		}
 		return null;
+	}
+
+	public synchronized void clear() {
+		versionHistoryItems.clear();
+		notifyDataChanged();
 	}
 }

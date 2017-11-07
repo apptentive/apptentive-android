@@ -5,9 +5,9 @@ repositories {
 }
 
 android {
-    compileSdkVersion 25
+    compileSdkVersion 26
 
-    buildToolsVersion '25.0.3'
+    buildToolsVersion '26.0.2'
 
     defaultConfig {
         minSdkVersion 14
@@ -31,10 +31,10 @@ android {
 dependencies {
     compile project(':apptentive')
     androidTestCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test:runner:0.5', {
+    androidTestCompile('com.android.support.test:runner:1.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestCompile('com.android.support.test:rules:0.5', {
+    androidTestCompile('com.android.support.test:rules:1.0.1', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
 }

@@ -26,7 +26,8 @@
               android:layout_alignParentLeft="true"
               android:layout_alignParentStart="true"
               android:layout_below="@id/range_container"
-              android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
+              android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+              android:focusable="true"/>
     <TextView android:id="@+id/max_label"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
@@ -34,5 +35,6 @@
               android:layout_alignParentRight="true"
               android:layout_alignParentEnd="true"
               android:layout_below="@id/range_container"
-              android:textAppearance="@style/Apptentive.TextAppearance.Caption"/>
+              android:textAppearance="@style/Apptentive.TextAppearance.Caption"
+              android:focusable="true"/>
 </RelativeLayout>

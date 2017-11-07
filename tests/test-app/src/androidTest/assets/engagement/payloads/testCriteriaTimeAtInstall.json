@@ -1,69 +1,48 @@
 {
-  "interactions": [
+  "$or": [
     {
-      "id": "528d14854712c7bfd7000002",
-      "type": "UpgradeMessage",
-      "version": null,
-      "configuration": {
-        "show_app_icon": true,
-        "show_powered_by": true,
-        "body": ""
+      "code_point/switch/invokes/total": 0,
+      "$and": [
+        {
+          "time_at_install/total": {
+            "$before": -2
+          }
+        },
+        {
+          "time_at_install/total": {
+            "$after": -4
+          }
+        }
+      ]
+    },
+    {
+      "code_point/switch/invokes/total": 1,
+      "$and": [
+        {
+          "time_at_install/version_code": {
+            "$before": -2.0
+          }
+        },
+        {
+          "time_at_install/version_code": {
+            "$after": -4.0
+          }
+        }
+      ]
+    },
+    {
+      "code_point/switch/invokes/total": 2,
+      "time_at_install/version_code": {
+        "$before": -2.0,
+        "$after": -4
+      }
+    },
+    {
+      "code_point/switch/invokes/total": 3,
+      "time_at_install/version_code": {
+        "$before": 1.0,
+        "$after": -1
       }
     }
-  ],
-  "targets": {
-    "app.launch": [
-      {
-        "interaction_id": "528d14854712c7bfd7000002",
-        "criteria": {
-          "$or": [
-            {
-              "code_point/switch/invokes/total": 0,
-              "$and": [
-                {
-                  "time_at_install/total": {
-                    "$before": -2
-                  }
-                },
-                {
-                  "time_at_install/total": {
-                    "$after": -4
-                  }
-                }
-              ]
-            },
-            {
-              "code_point/switch/invokes/total": 1,
-              "$and": [
-                {
-                  "time_at_install/version_code": {
-                    "$before": -2.0
-                  }
-                },
-                {
-                  "time_at_install/version_code": {
-                    "$after": -4.0
-                  }
-                }
-              ]
-            },
-            {
-              "code_point/switch/invokes/total": 2,
-              "time_at_install/version_code": {
-                "$before": -2.0,
-                "$after": -4
-              }
-            },
-            {
-              "code_point/switch/invokes/total": 3,
-              "time_at_install/version_code": {
-                "$before": 1.0,
-                "$after": -1
-              }
-            }
-          ]
-        }
-      }
-    ]
-  }
+  ]
 }

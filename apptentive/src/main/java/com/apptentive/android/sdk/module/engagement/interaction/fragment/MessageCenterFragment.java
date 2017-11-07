@@ -1542,4 +1542,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public boolean isPaused() {
 		return isPaused;
 	}
+
+	@Override
+	public String getToolbarNavigationContentDescription() {
+		return getContext().getString(R.string.apptentive_message_center_content_description_back_button);
+	}
 }

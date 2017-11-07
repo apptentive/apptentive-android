@@ -37,7 +37,9 @@ public class GreetingHolder extends RecyclerView.ViewHolder {
 
 	public void bindView(MessageCenterGreeting greeting) {
 		title.setText(greeting.title);
+		title.setContentDescription(greeting.title);
 		body.setText(greeting.body);
+		body.setContentDescription(greeting.body);
 		ImageUtil.startDownloadAvatarTask(avatar, greeting.avatar);
 		infoButton.setOnClickListener(new View.OnClickListener() {
 			public void onClick(final View view) {

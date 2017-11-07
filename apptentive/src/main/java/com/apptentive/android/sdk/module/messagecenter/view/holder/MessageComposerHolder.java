@@ -79,6 +79,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
 		title.setText(composer.title);
+		title.setContentDescription(composer.title);
 
 
 		closeButton.setOnClickListener(new View.OnClickListener() {
@@ -153,7 +154,7 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 				}
 			}
 		});
-		attachments.setAdapterIndicator(R.drawable.apptentive_ic_remove_attachment);
+		attachments.setAdapterIndicator(R.drawable.apptentive_remove_button);
 
 		attachments.setImageIndicatorCallback(fragment);
 		//Initialize image attachments band with empty data
