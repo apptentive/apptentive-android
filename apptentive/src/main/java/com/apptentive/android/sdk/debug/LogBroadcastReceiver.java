@@ -68,10 +68,10 @@ public class LogBroadcastReceiver extends BroadcastReceiver {
 
 			ArrayList<Uri> attachments = new ArrayList<>();
 			if (logFile != null && logFile.exists()) {
-				attachments.add(Uri.parse("content://" + AttachmentFileProvider.AUTHORITY + "/" + logFile.getName()));
+				attachments.add(Uri.parse("content://" + ApptentiveAttachmentFileProvider.getAuthority(context) + "/" + logFile.getName()));
 			}
 			if (manifestFile != null && manifestFile.exists()) {
-				attachments.add(Uri.parse("content://" + AttachmentFileProvider.AUTHORITY + "/" + manifestFile.getName()));
+				attachments.add(Uri.parse("content://" + ApptentiveAttachmentFileProvider.getAuthority(context) + "/" + manifestFile.getName()));
 			}
 			email.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachments);
 

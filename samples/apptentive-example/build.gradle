@@ -14,7 +14,7 @@ repositories {
 }
 
 dependencies {
-    compile 'com.apptentive:apptentive-android:4.0.2'
+    compile 'com.apptentive:apptentive-android:4.1.0'
     compile 'com.google.firebase:firebase-messaging:11.4.2'
 }
 

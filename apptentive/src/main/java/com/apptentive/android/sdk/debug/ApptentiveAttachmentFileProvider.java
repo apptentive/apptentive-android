@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.debug;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,12 +18,9 @@ import android.util.Log;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-public class AttachmentFileProvider extends ContentProvider {
+public class ApptentiveAttachmentFileProvider extends ContentProvider {
 
-	private static final String CLASS_NAME = AttachmentFileProvider.class.getSimpleName();
-
-	// The authority is the symbolic name for the provider class
-	public static final String AUTHORITY = AttachmentFileProvider.class.getName();
+	private static final String CLASS_NAME = ApptentiveAttachmentFileProvider.class.getSimpleName();
 
 	// UriMatcher used to match against incoming requests
 	private UriMatcher uriMatcher;
@@ -32,9 +30,9 @@ public class AttachmentFileProvider extends ContentProvider {
 		uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
 
 		// Add a URI to the matcher which will match against the form
-		// 'content://it.my.app.AttachmentFileProvider/*'
+		// 'content://it.my.app.ApptentiveAttachmentFileProvider/*'
 		// and return 1 in the case that the incoming Uri matches this pattern
-		uriMatcher.addURI(AUTHORITY, "*", 1);
+		uriMatcher.addURI(getAuthority(getContext()), "*", 1);
 
 		return true;
 	}
@@ -57,7 +55,7 @@ public class AttachmentFileProvider extends ContentProvider {
 				// The desired file name is specified by the last segment of the
 				// path
 				// E.g.
-				// 'content://com.apptentive.android.sdk.debug.AttachmentFileProvider/log.txt'
+				// 'content://com.apptentive.android.sdk.debug.ApptentiveAttachmentFileProvider/log.txt'
 				// Take this and build the path to the file
 				String fileLocation = getContext().getCacheDir() + File.separator
 						+ uri.getLastPathSegment();
@@ -106,5 +104,12 @@ public class AttachmentFileProvider extends ContentProvider {
 	public Cursor query(Uri uri, String[] projection, String s, String[] as1,
 											String s1) {
 		return null;
+	}
+
+	/**
+	 * The authority is the symbolic name for the provider class
+ 	 */
+	public static String getAuthority(Context context) {
+		return context.getApplicationContext().getPackageName() + "." + CLASS_NAME;
 	}
 }

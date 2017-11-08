@@ -14,8 +14,8 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
 
     <application>
-        <provider android:name=".debug.AttachmentFileProvider"
-                  android:authorities="com.apptentive.android.sdk.debug.AttachmentFileProvider"
+        <provider android:name=".debug.ApptentiveAttachmentFileProvider"
+                  android:authorities="${applicationId}.ApptentiveAttachmentFileProvider"
                   android:enabled="true"
                   android:exported="true"
                   android:grantUriPermissions="true"/>
