@@ -1,3 +1,9 @@
+# 2017-11-08 - v4.1.1
+
+#### Bugs Fixed
+
+* Fix a bug where the SDK can't be installed in multiple apps due to a hard-coded Provider authority string.
+
 # 2017-11-06 - v4.1.0
 
 #### Improvements
