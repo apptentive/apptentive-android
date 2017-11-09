@@ -19,7 +19,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -341,7 +340,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
 			ComponentName componentName = intent.getComponent();
 			/** Backwards compatible method that will clear all activities in the stack. */
-			Intent mainIntent = IntentCompat.makeRestartActivityTask(componentName);
+			Intent mainIntent = Intent.makeRestartActivityTask(componentName);
 			startActivity(mainIntent);
 		}
 	}
