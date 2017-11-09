@@ -1,3 +1,9 @@
+# 2017-11-09 - v4.1.2
+
+#### Bugs Fixed
+
+* Fix a crash that was caused by a method being removed in the Android Support Library.
+
 # 2017-11-08 - v4.1.1
 
 #### Bugs Fixed
