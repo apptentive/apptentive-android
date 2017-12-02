@@ -226,7 +226,7 @@ public class ApptentiveAvatarView extends ImageView {
 				}
 				if (bitmap != null) {
 					final Bitmap finalBitmap = bitmap;
-					post(new Runnable() {
+					post(new Runnable() { // TODO: replace with DispatchQueue
 						public void run() {
 							setImageBitmap(finalBitmap);
 						}

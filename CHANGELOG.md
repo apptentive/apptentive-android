@@ -1,3 +1,9 @@
+# 2017-12-02 - v4.1.3
+
+#### Bugs Fixed
+
+* Fix a NullPointerException crash while announcing accessibility events.
+
 # 2017-11-09 - v4.1.2
 
 #### Bugs Fixed

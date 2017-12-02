@@ -106,7 +106,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 		}
 
 		if (isFocused) {
-			answer.post(new Runnable() {
+			answer.post(new Runnable() { // TODO: replace with DispatchQueue
 				public void run() {
 					answer.requestFocus();
 				}

@@ -111,7 +111,7 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 	private void updateOtherState(boolean showOther) {
 		if (showOther) {
 			otherTextInputLayout.setVisibility(View.VISIBLE);
-			otherTextInput.post(new Runnable() {
+			otherTextInput.post(new Runnable() { // TODO: replace with DispatchQueue
 				@Override
 				public void run() {
 					otherTextInput.requestFocus();
