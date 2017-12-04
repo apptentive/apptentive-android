@@ -158,7 +158,7 @@ public class ApptentiveToastNotificationManager {
 	private void doDismiss() {
 		if (tContainer.getParent() != null) {
 			wManager.removeView(tContainer);
-			tContainer.postDelayed(new Runnable() {
+			tContainer.postDelayed(new Runnable() { // TODO: replace with DispatchQueue
 				@Override
 				public void run() {
 					processNext();

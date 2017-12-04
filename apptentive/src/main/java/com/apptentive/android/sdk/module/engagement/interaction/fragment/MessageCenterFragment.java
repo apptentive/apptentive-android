@@ -775,7 +775,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (composerEditText != null) {
 			composerEditText.requestFocus();
 			if (forceShowKeyboard) {
-				composerEditText.post(new Runnable() {
+				composerEditText.post(new Runnable() { // TODO: replace with DispatchQueue
 					@Override
 					public void run() {
 						if (forceShowKeyboard) {
@@ -807,7 +807,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		if (viewToFocus != null) {
 			viewToFocus.requestFocus();
 			if (forceShowKeyboard) {
-				viewToFocus.post(new Runnable() {
+				viewToFocus.post(new Runnable() { // TODO: replace with DispatchQueue
 					@Override
 					public void run() {
 						if (forceShowKeyboard) {

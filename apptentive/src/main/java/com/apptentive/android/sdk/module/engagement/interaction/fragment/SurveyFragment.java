@@ -49,6 +49,8 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
 
 import org.json.JSONException;
@@ -150,11 +152,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 
 							final String errorMessage = ((SurveyQuestionView) fragment).getErrorMessage();
 							if (!StringUtils.isNullOrEmpty(errorMessage)) {
-								fragment.getView().postDelayed(new Runnable() {
+								DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
 									@Override
-									public void run() {
+									protected void execute() {
 										if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-											fragment.getView().announceForAccessibility(errorMessage);
+											View fragmentView = fragment.getView();
+											if (fragmentView != null) {
+												fragmentView.announceForAccessibility(errorMessage);
+											}
 										}
 									}
 								}, 1500); // give other accessibility events a change to propagate
@@ -209,11 +214,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			public void onClick(final View view) {
 				// Set info button not clickable when it was first clicked
 				view.setClickable(false);
-				getActivity().runOnUiThread(new Runnable() {
+				getActivity().runOnUiThread(new Runnable() { // TODO: replace with DispatchQueue
 					@Override
 					public void run() {
 						final Handler handler = new Handler();
-						handler.postDelayed(new Runnable() {
+						handler.postDelayed(new Runnable() { // TODO: replace with DispatchQueue
 							@Override
 							public void run() {
 								view.setClickable(true);

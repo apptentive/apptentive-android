@@ -31,7 +31,7 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 	}
 
 	public void start() {
-		post(new Runnable() {
+		post(new Runnable() { // TODO: replace with DispatchQueue
 
 			@Override
 			public void run() {
@@ -43,7 +43,7 @@ public class ApptentiveMaterialIndeterminateProgressBar extends ApptentiveMateri
 	}
 
 	public void stop() {
-		post(new Runnable() {
+		post(new Runnable() { // TODO: replace with DispatchQueue
 
 			@Override
 			public void run() {

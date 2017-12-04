@@ -187,7 +187,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 					currentFragment.getActivity().setTitle(title);
 				}
 				if (!currentFragment.isShownAsModalDialog()) {
-					toolbar.post(new Runnable() {
+					toolbar.post(new Runnable() { // TODO: replace with DispatchQueue
 						@Override
 						public void run() {
 							toolbar.setVisibility(View.VISIBLE);

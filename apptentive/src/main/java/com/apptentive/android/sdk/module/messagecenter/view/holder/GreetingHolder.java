@@ -45,7 +45,7 @@ public class GreetingHolder extends RecyclerView.ViewHolder {
 			public void onClick(final View view) {
 				// Don't let the info button open multiple copies of the About page.
 				view.setClickable(false);
-				view.postDelayed(new Runnable() {
+				view.postDelayed(new Runnable() { // TODO: replace with DispatchQueue
 					@Override
 					public void run() {
 						view.setClickable(true);
