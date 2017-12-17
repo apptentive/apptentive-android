@@ -11,6 +11,7 @@ import android.content.Context;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationState;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -18,6 +19,7 @@ import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -30,6 +32,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
@@ -55,7 +59,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	private final ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
 
 	private final PayloadSender payloadSender;
-	private boolean appInBackground;
+	private boolean appInBackground = true;
 
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
@@ -277,8 +281,13 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		// if payload sending was scheduled - notify the rest of the SDK
 		if (scheduled) {
-			ApptentiveNotificationCenter.defaultCenter()
-				.postNotification(NOTIFICATION_PAYLOAD_WILL_START_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+			dispatchOnConversationQueue(new DispatchTask() {
+				@Override
+				protected void execute() {
+					ApptentiveNotificationCenter.defaultCenter()
+							.postNotification(NOTIFICATION_PAYLOAD_WILL_START_SEND, NOTIFICATION_KEY_PAYLOAD, payload);
+				}
+			});
 		}
 	}
 
@@ -286,6 +295,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
+		checkConversationQueue();
+
 		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			final Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			assertNotNull(conversation); // sanity check
@@ -294,8 +305,9 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				final String conversationId = notNull(conversation.getConversationId());
 				final String conversationToken = notNull(conversation.getConversationToken());
 				final String conversationLocalIdentifier = notNull(conversation.getLocalIdentifier());
+				final boolean legacyPayloads = ConversationState.LEGACY_PENDING.equals(conversation.getPrevState());
 
-				ApptentiveLog.d("Conversation %s state changed to %s.", conversationId, conversation.getState());
+				ApptentiveLog.d("Conversation %s state changed %s -> %s.", conversationId, conversation.getPrevState(), conversation.getState());
 				// when the Conversation ID comes back from the server, we need to update
 				// the payloads that may have already been enqueued so
 				// that they each have the Conversation ID.
@@ -304,7 +316,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 						@Override
 						public void run() {
 							try {
-								dbHelper.updateIncompletePayloads(conversationId, conversationToken, conversationLocalIdentifier);
+								dbHelper.updateIncompletePayloads(conversationId, conversationToken, conversationLocalIdentifier, legacyPayloads);
 								sendNextPayloadSync(); // after we've updated payloads - we need to send them
 							} catch (Exception e) {
 								ApptentiveLog.e(e, "Exception while trying to update incomplete payloads");

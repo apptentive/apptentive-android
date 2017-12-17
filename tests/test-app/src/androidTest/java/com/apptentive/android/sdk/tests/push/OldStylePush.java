@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.tests.push;
 
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.test.runner.AndroidJUnit4;
@@ -39,7 +40,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 		{
 			Bundle bundle = null;
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, bundle);
 		}
 
 		// Non-Apptentive push.
@@ -47,7 +53,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 			Bundle bundle = new Bundle();
 			bundle.putString("foo", "bar");
 			assertFalse(Apptentive.isApptentivePushNotification(bundle));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, bundle);
 		}
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
@@ -55,7 +66,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 			Bundle bundle = new Bundle();
 			bundle.putString("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(bundle));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, bundle);
 		}
 
 /* TODO: Decouple tested code from Conversation and MessageManager
@@ -76,14 +92,24 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 		{
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 		// Not a push
 		{
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 		// Non-Apptentive push
@@ -93,7 +119,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 			Intent intent = new Intent();
 			intent.putExtra("com.parse.Data", parseExtraJson.toString());
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
@@ -103,7 +134,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 			Intent intent = new Intent();
 			intent.putExtra("com.parse.Data", parseExtraJson.toString());
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 /* TODO: Decouple tested code from Conversation and MessageManager
@@ -125,14 +161,24 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 		{
 			Intent intent = null;
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 		// Not a push
 		{
 			Intent intent = new Intent();
 			assertFalse(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 		// Invalid Apptentive push. Verify this is benign in UI test with access to Activity.
@@ -140,7 +186,12 @@ public class OldStylePush extends ApptentiveTestCaseBase {
 			Intent intent = new Intent();
 			intent.putExtra("apptentive", "foo");
 			assertTrue(Apptentive.isApptentivePushNotification(intent));
-			assertNull(Apptentive.buildPendingIntentFromPushNotification(intent));
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					assertNull(pendingIntent);
+				}
+			}, intent);
 		}
 
 /* TODO: Decouple tested code from Conversation and MessageManager

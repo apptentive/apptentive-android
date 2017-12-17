@@ -16,7 +16,8 @@ import com.apptentive.android.sdk.util.threading.MockDispatchQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
 
 public class TestCaseBase {
 
@@ -26,6 +27,7 @@ public class TestCaseBase {
 	//region Setup
 
 	protected void setUp() {
+		// assertions
 		Assert.setImp(new AssertImp() {
 			@Override
 			public void assertFailed(String message) {

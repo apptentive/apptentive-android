@@ -21,6 +21,11 @@ public abstract class DispatchTask implements Runnable {
 	private boolean scheduled;
 
 	/**
+	 * True if task is cancelled and should not be executed.
+	 */
+	private boolean cancelled;
+
+	/**
 	 * Task entry point method
 	 */
 	protected abstract void execute();
@@ -28,12 +33,16 @@ public abstract class DispatchTask implements Runnable {
 	@Override
 	public void run() {
 		try {
-			execute();
+			setScheduled(false);
+
+			if (!isCancelled()) {
+				execute();
+			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while executing task");
 			dispatchException(e);
 		} finally {
-			setScheduled(false);
+			setCancelled(false);
 		}
 	}
 
@@ -43,5 +52,17 @@ public abstract class DispatchTask implements Runnable {
 
 	public synchronized boolean isScheduled() {
 		return scheduled;
+	}
+
+	private synchronized void setCancelled(boolean cancelled) {
+		this.cancelled = cancelled;
+	}
+
+	public synchronized boolean isCancelled() {
+		return cancelled;
+	}
+
+	public synchronized void cancel() {
+		this.cancelled = true;
 	}
 }

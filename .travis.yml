@@ -20,7 +20,7 @@ android:
     - tools
     - platform-tools
     - tools # not a mistakenly duplicated line: used above api 25.x
-    - build-tools-26.0.2
+    - build-tools-26.0.3
     - android-19
     - android-26
     - extra-google-google_play_services
@@ -41,12 +41,15 @@ script:
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebug; fi
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebugAndroidTest; fi
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:connectedAutomatedDebugAndroidTest -i; fi
-  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:assembleQaDebug; fi
+
 after_script:
-  - if [ "$TRAVIS_BRANCH" = "develop" ]; then
+  - >
+    if [ "$TRAVIS_BRANCH" = "develop" ]; then
       ./gradlew :apptentive:uploadArchives;
+      if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:assembleQaDebug; fi
       if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:uploadQaDebugToHockeyApp; fi;
     fi
+
 after_failure:
   #- echo " LOGCAT "; echo "========"; cat logcat.log; pkill -KILL -f adb
 notifications:

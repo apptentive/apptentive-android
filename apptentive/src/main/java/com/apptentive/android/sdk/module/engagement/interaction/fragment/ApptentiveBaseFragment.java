@@ -36,6 +36,8 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -43,6 +45,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -50,6 +54,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
@@ -76,7 +81,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	protected boolean hasLaunched;
 	protected String sectionTitle;
 
-	private Conversation conversation;
 	private OnFragmentTransitionListener onTransitionListener;
 
 	public interface OnFragmentTransitionListener {
@@ -525,28 +529,34 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	//region Helpers
 
-	public boolean engage(String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
-		Conversation conversation = getConversation();
-		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation", eventName);
-		return conversation != null && EngagementModule.engage(getActivity(), conversation, vendor, interaction, interactionId, eventName, data, customData, extendedData);
+	public void engage(final String vendor, final String interaction, final String interactionId, final String eventName, final String data, final Map<String, Object> customData, final ExtendedData... extendedData) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return EngagementModule.engage(getActivity(), conversation, vendor, interaction, interactionId, eventName, data, customData, extendedData);
+			}
+		}, "engage");
 	}
 
-	public boolean engageInternal(String eventName) {
-		return engageInternal(eventName, null);
+	public void engageInternal(String eventName) {
+		engageInternal(eventName, null);
 	}
 
-	public boolean engageInternal(String eventName, String data) {
-		Conversation conversation = getConversation();
-		assertNotNull(conversation, "Attempted to engage '%s' event without an active conversation", eventName);
-		return conversation != null && EngagementModule.engageInternal(getActivity(), conversation, interaction, eventName, data);
+	public void engageInternal(final String eventName, final String data) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return EngagementModule.engageInternal(getActivity(), conversation, interaction, eventName, data);
+			}
+		}, "engage");
 	}
 
-	protected Conversation getConversation() {
-		return conversation;
+	protected ConversationProxy getConversation() {
+		return ApptentiveInternal.getInstance().getConversationProxy();
 	}
 
-	public void setConversation(Conversation conversation) {
-		this.conversation = conversation;
+	protected void dispatchOnMainQueue(DispatchTask task) {
+		DispatchQueue.mainQueue().dispatchAsync(task);
 	}
 
 	//endregion

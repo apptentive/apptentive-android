@@ -10,8 +10,10 @@ import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.DeviceDataChangedListener;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.Person;
+import com.apptentive.android.sdk.storage.PersonDataChangedListener;
 import com.apptentive.android.sdk.storage.Saveable;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.VersionHistory;
@@ -19,7 +21,7 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.UUID;
 
-public class ConversationData implements Saveable, DataChangedListener {
+public class ConversationData implements Saveable, DataChangedListener, DeviceDataChangedListener, PersonDataChangedListener {
 
 	private static final long serialVersionUID = 1L;
 	private String localIdentifier;
@@ -55,12 +57,24 @@ public class ConversationData implements Saveable, DataChangedListener {
 	//region Listeners
 
 	private transient DataChangedListener listener;
+	private transient PersonDataChangedListener personDataListener;
+	private transient DeviceDataChangedListener deviceDataListener;
+
+	public void setPersonDataListener(PersonDataChangedListener personDataListener) {
+		this.personDataListener = personDataListener;
+	}
+
+	public void setDeviceDataListener(DeviceDataChangedListener deviceDataListener) {
+		this.deviceDataListener = deviceDataListener;
+	}
 
 	@Override
 	public void setDataChangedListener(DataChangedListener listener) {
 		this.listener = listener;
 		device.setDataChangedListener(this);
+		device.setDeviceDataChangedListener(this);
 		person.setDataChangedListener(this);
+		person.setPersonDataChangedListener(this);
 		eventData.setDataChangedListener(this);
 		versionHistory.setDataChangedListener(this);
 	}
@@ -76,6 +90,21 @@ public class ConversationData implements Saveable, DataChangedListener {
 	public void onDataChanged() {
 		notifyDataChanged();
 	}
+
+	@Override
+	public void onDeviceDataChanged() {
+		if (deviceDataListener != null) {
+			deviceDataListener.onDeviceDataChanged();
+		}
+	}
+
+	@Override
+	public void onPersonDataChanged() {
+		if (personDataListener != null) {
+			personDataListener.onPersonDataChanged();
+		}
+	}
+
 	//endregion
 
 	//region Getters & Setters

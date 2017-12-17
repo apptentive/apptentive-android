@@ -38,6 +38,7 @@ class SerialDispatchQueue extends DispatchQueue {
 	 * Creates a private queue with specified <code>name</code>
 	 */
 	SerialDispatchQueue(String name) {
+		super(name);
 		handlerThread = new HandlerThread(name);
 		handlerThread.start();
 		handler = new Handler(handlerThread.getLooper());
@@ -46,7 +47,8 @@ class SerialDispatchQueue extends DispatchQueue {
 	/**
 	 * Creates a queue with specified <code>looper</code>
 	 */
-	SerialDispatchQueue(Looper looper) {
+	SerialDispatchQueue(Looper looper, String name) {
+		super(name);
 		if (looper == null) {
 			throw new NullPointerException("Looper is null");
 		}
@@ -70,5 +72,10 @@ class SerialDispatchQueue extends DispatchQueue {
 			handler.removeCallbacks(null);
 			handlerThread.quit();
 		}
+	}
+
+	@Override
+	public boolean isCurrent() {
+		return Looper.myLooper() == handler.getLooper();
 	}
 }

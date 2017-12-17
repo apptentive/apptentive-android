@@ -17,5 +17,5 @@ public interface OnSurveyFinishedListener {
 	 * Called when a survey has been finished.
 	 * @param completed true if the survey was fully completed. Otherwise false.
 	 */
-	public void onSurveyFinished(boolean completed);
+	void onSurveyFinished(boolean completed);
 }

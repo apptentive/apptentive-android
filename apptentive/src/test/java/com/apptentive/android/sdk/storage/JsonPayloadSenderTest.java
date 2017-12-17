@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.TestCaseBase;
+import com.apptentive.android.sdk.LogicTestCaseBase;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.network.HttpRequest;
@@ -26,7 +26,7 @@ import org.junit.Test;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
-public class JsonPayloadSenderTest extends TestCaseBase {
+public class JsonPayloadSenderTest extends LogicTestCaseBase {
 	private MockDispatchQueue networkQueue;
 
 	@Before

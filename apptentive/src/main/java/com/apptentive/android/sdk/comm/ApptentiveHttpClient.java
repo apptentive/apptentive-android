@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.comm;
 
+import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -44,6 +45,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private static final String ENDPOINT_LEGACY_CONVERSATION = "/conversation/token";
 	private static final String ENDPOINT_LOG_IN_TO_EXISTING_CONVERSATION = "/conversations/%s/session";
 	private static final String ENDPOINT_LOG_IN_TO_NEW_CONVERSATION = "/conversations";
+	private static final String ENDPOINT_INTERACTIONS = "/conversations/%s/interactions";
+	private static final String ENDPOINT_MESSAGES = "/conversations/%s/messages?count=%s&starts_after=%s&before_id=%s";
 
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
@@ -90,6 +93,38 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		return request;
 	}
 
+	public HttpJsonRequest createFetchInteractionsRequest(String conversationToken, String conversationId, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (StringUtils.isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
+		}
+
+		final String endPoint = StringUtils.format(ENDPOINT_INTERACTIONS, conversationId);
+		HttpJsonRequest request = createJsonRequest(endPoint, new JSONObject(), HttpRequestMethod.GET);
+		request.setRequestProperty("Authorization", "Bearer " + conversationToken);
+		request.addListener(listener);
+		return request;
+	}
+
+	public HttpJsonRequest createFetchMessagesRequest(String conversationToken, String conversationId, String afterId, String beforeId, Integer count, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (StringUtils.isNullOrEmpty(conversationToken)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
+		}
+
+		final String endPoint = String.format(ENDPOINT_MESSAGES, conversationId, count == null ? "" : count.toString(), afterId == null ? "" : afterId, beforeId == null ? "" : beforeId);
+		HttpJsonRequest request = createJsonRequest(endPoint, new JSONObject(), HttpRequestMethod.GET);
+		request.setRequestProperty("Authorization", "Bearer " + conversationToken);
+		request.addListener(listener);
+		return request;
+	}
+
 	public HttpJsonRequest createLoginRequest(String conversationId, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
 		if (token == null) {
 			throw new IllegalArgumentException("Token is null");
@@ -105,7 +140,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 		if (conversationId == null) {
 			endPoint = ENDPOINT_LOG_IN_TO_NEW_CONVERSATION;
 
-		}else {
+		} else {
 			endPoint = StringUtils.format(ENDPOINT_LOG_IN_TO_EXISTING_CONVERSATION, conversationId);
 		}
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);

@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.debug;
 
+import android.support.annotation.NonNull;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -164,6 +166,12 @@ public class Assert {
 	//endregion
 
 	//region Threading
+
+	public static void assertDispatchQueue(@NonNull DispatchQueue queue) {
+		if (imp != null && (queue == null || !queue.isCurrent())) {
+			imp.assertFailed(StringUtils.format("Expected '%s' queue but was '%s'", queue != null ? queue.getName() : "<missing queue>", Thread.currentThread().getName()));
+		}
+	}
 
 	/**
 	 * Asserts that code executes on the main thread.

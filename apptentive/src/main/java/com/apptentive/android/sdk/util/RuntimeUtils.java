@@ -14,6 +14,9 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+
 /**
  * Collection of helper functions for Android runtime queries.
  */
@@ -41,5 +44,16 @@ public class RuntimeUtils {
 		}
 
 		return false;
+	}
+
+	public static void overrideStaticFinalField(Class<?> cls, String fieldName, Object value) throws NoSuchFieldException, IllegalAccessException {
+		Field instanceField = cls.getDeclaredField(fieldName);
+		instanceField.setAccessible(true);
+
+		Field modifiersField = Field.class.getDeclaredField("modifiers");
+		modifiersField.setAccessible(true);
+		modifiersField.setInt(instanceField, instanceField.getModifiers() & ~Modifier.FINAL);
+
+		instanceField.set(null, value);
 	}
 }

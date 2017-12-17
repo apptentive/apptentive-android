@@ -90,8 +90,8 @@ public class ApptentiveAttachmentLoader {
 		return !filesBeingDownloaded.contains(path);
 	}
 
-	public void load(String uri, String diskFilePath, int pos, ImageView imageView, int width, int height, boolean bLoadImage, LoaderCallback callback) {
-		LoaderRequest d = new LoaderRequest(uri, diskFilePath, pos, imageView, width, height, bLoadImage, callback);
+	public void load(String conversationToken, String uri, String diskFilePath, int pos, ImageView imageView, int width, int height, boolean bLoadImage, LoaderCallback callback) {
+		LoaderRequest d = new LoaderRequest(conversationToken, uri, diskFilePath, pos, imageView, width, height, bLoadImage, callback);
 		d.load();
 	}
 
@@ -108,6 +108,7 @@ public class ApptentiveAttachmentLoader {
 	}
 
 	public class LoaderRequest implements ApptentiveDownloaderTask.FileDownloadListener, ApptentiveDrawableLoaderTask.BitmapLoadListener {
+		private final String conversationToken;
 		private String uri;
 		private String diskCacheFilePath;
 		private WeakReference<ImageView> mImageViewRef;
@@ -121,7 +122,11 @@ public class ApptentiveAttachmentLoader {
 		private LoaderCallback loadingTaskCallback;
 		private int pos;
 
-		public LoaderRequest(String url, String diskPath, int position, ImageView imageView, int width, int height, boolean bLoadImage, LoaderCallback loadingTaskCallback) {
+		public LoaderRequest(String conversationToken, String url, String diskPath, int position, ImageView imageView, int width, int height, boolean bLoadImage, LoaderCallback loadingTaskCallback) {
+			if (conversationToken == null) {
+				throw new IllegalArgumentException("Conversation token is null");
+			}
+			this.conversationToken = conversationToken;
 			this.uri = url;
 			this.diskCacheFilePath = diskPath;
 			this.imageViewWidth = width;
@@ -217,7 +222,6 @@ public class ApptentiveAttachmentLoader {
 				try {
 					ApptentiveLog.v("ApptentiveAttachmentLoader doDownload: " + uri);
 					// Conversation token is needed if the download url is a redirect link from an Apptentive endpoint
-					String conversationToken = ApptentiveInternal.getInstance().getConversation().getConversationToken(); // TODO: get rid of singleton
 					if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
 						mDrawableDownloaderTask.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, uri, diskCacheFilePath, conversationToken);
 					} else {

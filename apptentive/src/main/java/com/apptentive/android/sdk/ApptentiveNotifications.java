@@ -9,6 +9,11 @@ package com.apptentive.android.sdk;
 public class ApptentiveNotifications {
 
 	/**
+	 * Sent when conversation data changes
+	 */
+	public static final String NOTIFICATION_CONVERSATION_DATA_DID_CHANGE = "CONVERSATION_DATA_DID_CHANGE"; // { conversation : Conversation }
+
+	/**
 	 * Sent when conversation state changes (user logs out, etc)
 	 */
 	public static final String NOTIFICATION_CONVERSATION_STATE_DID_CHANGE = "CONVERSATION_STATE_DID_CHANGE"; // { conversation : Conversation }
@@ -69,6 +74,11 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_INTERACTION_MANIFEST_FETCHED = "INTERACTION_MANIFEST_FETCHED"; // { manifest: String }
 
 	/**
+	 * Sent when message store changes.
+	 */
+	public static final String NOTIFICATION_MESSAGE_STORE_DID_CHANGE = "MESSAGE_STORE_DID_CHANGE"; // { messageStore: MessageStore }
+
+	/**
 	 * Sent when log monitor starts capturing and storing logs.
 	 */
 	public static final String NOTIFICATION_LOG_MONITOR_STARTED = "NOTIFICATION_LOG_MONITOR_STARTED";
@@ -88,4 +98,5 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_KEY_RESPONSE_CODE = "responseCode";
 	public static final String NOTIFICATION_KEY_RESPONSE_DATA = "responseData";
 	public static final String NOTIFICATION_KEY_MANIFEST = "manifest";
+	public static final String NOTIFICATION_KEY_MESSAGE_STORE = "messageStore";
 }

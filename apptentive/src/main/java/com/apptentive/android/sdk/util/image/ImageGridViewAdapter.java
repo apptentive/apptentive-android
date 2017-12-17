@@ -38,6 +38,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 	private static final int TYPE_IMAGE = 1;
 	public static final int GONE = 0x00000008;
 
+	private final String conversationToken;
 	private LayoutInflater inflater;
 	private boolean showCamera = true;
 	private boolean showImageIndicator = true;
@@ -57,7 +58,16 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 	private boolean bHasWritePermission;
 
-	public ImageGridViewAdapter(Context context, boolean showCamera) {
+	public ImageGridViewAdapter(Context context, String conversationToken, boolean showCamera) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+		if (conversationToken == null) {
+			throw new IllegalArgumentException("Conversation token is null");
+		}
+
+		this.conversationToken = conversationToken;
+
 		inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		this.showCamera = showCamera;
 		itemLayoutParams = new GridView.LayoutParams(GridView.LayoutParams.MATCH_PARENT, GridView.LayoutParams.MATCH_PARENT);
@@ -400,7 +410,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 
 			if (itemWidth > 0) {
 				if (bLoadThumbnail) {
-					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, pos, image, itemWidth, itemHeight, true,
+					ApptentiveAttachmentLoader.getInstance().load(conversationToken, data.originalPath, data.localCachePath, pos, image, itemWidth, itemHeight, true,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
 								public void onLoaded(ImageView view, int i, Bitmap d) {
@@ -464,7 +474,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								}
 							});
 				} else if (!TextUtils.isEmpty(data.originalPath) && downloadItems.contains(data.originalPath)) {
-					ApptentiveAttachmentLoader.getInstance().load(data.originalPath, data.localCachePath, index, image, 0, 0, false,
+					ApptentiveAttachmentLoader.getInstance().load(conversationToken, data.originalPath, data.localCachePath, index, image, 0, 0, false,
 							new ApptentiveAttachmentLoader.LoaderCallback() {
 								@Override
 								public void onLoaded(ImageView view, int pos, Bitmap d) {
@@ -513,7 +523,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 								}
 							});
 				} else {
-					ApptentiveAttachmentLoader.getInstance().load(null, null, index, image, 0, 0, false, new ApptentiveAttachmentLoader.LoaderCallback() {
+					ApptentiveAttachmentLoader.getInstance().load(conversationToken, null, null, index, image, 0, 0, false, new ApptentiveAttachmentLoader.LoaderCallback() {
 						@Override
 						public void onLoaded(ImageView view, int pos, Bitmap d) {
 							if (progressBarDownload != null) {

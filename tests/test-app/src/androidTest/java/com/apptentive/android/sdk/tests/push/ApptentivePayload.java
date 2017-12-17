@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.tests.push;
 
+import android.app.PendingIntent;
 import android.os.Bundle;
 import android.support.test.rule.UiThreadTestRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -43,7 +44,12 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	@Test
 	public void missingApptentive() {
 		Bundle bundle = new Bundle();
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
 	}
 
@@ -67,7 +73,12 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	public void unknownAction() {
 		Bundle bundle = new Bundle();
 		bundle.putString("apptentive", unknownAction);
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
 	}
 
@@ -75,7 +86,12 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	public void wrongActionKey() {
 		Bundle bundle = new Bundle();
 		bundle.putString("apptentive", wrongKey);
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
 	}
 
@@ -83,7 +99,12 @@ public class ApptentivePayload extends ApptentiveTestCaseBase {
 	public void corrupt() {
 		Bundle bundle = new Bundle();
 		bundle.putString("apptentive", corrupt);
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertTrue(Apptentive.isApptentivePushNotification(bundle));
 	}
 }

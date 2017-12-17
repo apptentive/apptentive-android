@@ -14,8 +14,12 @@ import android.os.Handler;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.concurrent.atomic.AtomicInteger;
+
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 
 /**
  * 1. Keeps track of whether the app is in the foreground. It does this by counting the number of active Activities.
@@ -42,7 +46,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	}
 
 	@Override
-	public void onActivityStarted(Activity activity) {
+	public void onActivityStarted(final Activity activity) {
 		boolean wasAppBackground = !isAppForeground;
 		isAppForeground = true;
 
@@ -55,12 +59,22 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			appEnteredForeground();
 		}
 
-		ApptentiveInternal.getInstance().onActivityStarted(activity); // TODO: post a notification here
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				ApptentiveInternal.getInstance().onActivityStarted(activity); // TODO: post a notification here
+			}
+		});
 	}
 
 	@Override
-	public void onActivityResumed(Activity activity) {
-		ApptentiveInternal.getInstance().onActivityResumed(activity);  // TODO: post a notification here
+	public void onActivityResumed(final Activity activity) {
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				ApptentiveInternal.getInstance().onActivityResumed(activity);  // TODO: post a notification here
+			}
+		});
 	}
 
 	@Override
@@ -119,24 +133,36 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	}
 
 	private void appEnteredForeground() {
-		ApptentiveLog.d("App went to foreground.");
-		ApptentiveInternal.getInstance().onAppEnterForeground();
-		// Mark entering foreground as app launch
-		appLaunched(ApptentiveInternal.getInstance().getApplicationContext());
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				ApptentiveLog.d("App went to foreground.");
+				ApptentiveInternal.getInstance().onAppEnterForeground();
+				// Mark entering foreground as app launch
+				appLaunched(ApptentiveInternal.getInstance().getApplicationContext());
+			}
+		});
 	}
 
 	private void appEnteredBackground() {
-		ApptentiveLog.d("App went to background.");
-		ApptentiveInternal.getInstance().onAppEnterBackground();  // TODO: post a notification here
-		// Mark entering background as app exit
-		appExited(ApptentiveInternal.getInstance().getApplicationContext());
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				ApptentiveLog.d("App went to background.");
+				ApptentiveInternal.getInstance().onAppEnterBackground();  // TODO: post a notification here
+				// Mark entering background as app exit
+				appExited(ApptentiveInternal.getInstance().getApplicationContext());
+			}
+		});
 	}
 
 	private void appLaunched(Context appContext) {
+		checkConversationQueue();
 		ApptentiveInternal.getInstance().onAppLaunch(appContext);  // TODO: post a notification here
 	}
 
 	private void appExited(Context appContext) {
+		checkConversationQueue();
 		ApptentiveInternal.getInstance().onAppExit(appContext);  // TODO: post a notification here
 	}
 }

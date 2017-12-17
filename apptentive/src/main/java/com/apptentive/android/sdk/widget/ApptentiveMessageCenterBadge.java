@@ -163,18 +163,11 @@ public class ApptentiveMessageCenterBadge extends RelativeLayout {
 		badgeSize = SIZE_NORMAL;
 		badgeTextColor = Color.BLACK;
 
-		MessageManager mgr;
-		if (ApptentiveInternal.isApptentiveRegistered()) {
-			mgr = ApptentiveInternal.getInstance().getMessageManager();
-		} else {
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			v.setVisibility(GONE);
 			return;
 		}
-		if (mgr != null) {
-			unreadMsgCounter = mgr.getUnreadMessageCount();
-		} else {
-			unreadMsgCounter = 0;
-		}
+		unreadMsgCounter = Apptentive.getUnreadMessageCount();
 
 		unreadMessagesListener = new UnreadMessagesListener() {
 			public void onUnreadMessageCountChanged(final int unreadMessages) {

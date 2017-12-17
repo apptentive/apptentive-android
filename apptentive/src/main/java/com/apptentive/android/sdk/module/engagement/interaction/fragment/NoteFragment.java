@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
@@ -133,7 +134,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
 								Interaction invokedInteraction = null;
 								if (interactionIdToLaunch != null) {
-									Conversation conversation = getConversation();
+									ConversationProxy conversation = getConversation();
 									if (conversation != null) {
 										String interactionsString = conversation.getInteractions();
 										if (interactionsString != null) {

@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.tests.push;
 
+import android.app.PendingIntent;
 import android.os.Bundle;
 import android.support.test.runner.AndroidJUnit4;
 
@@ -38,7 +39,12 @@ public class AwsSns extends ApptentiveTestCaseBase {
 	@Test
 	public void pushIntentNonApptentive() {
 		Bundle bundle = generateBasePushBundle();
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
 		assertNull(Apptentive.getTitleFromApptentivePush(bundle));
 		assertNull(Apptentive.getBodyFromApptentivePush(bundle));
@@ -47,7 +53,12 @@ public class AwsSns extends ApptentiveTestCaseBase {
 	@Test
 	public void nullBundle() {
 		Bundle bundle = null;
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(bundle));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, bundle);
 		assertFalse(Apptentive.isApptentivePushNotification(bundle));
 		assertNull(Apptentive.getTitleFromApptentivePush(bundle));
 		assertNull(Apptentive.getBodyFromApptentivePush(bundle));
