@@ -40,8 +40,14 @@ import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
-import static com.apptentive.android.sdk.ApptentiveNotifications.*;
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 
 
@@ -63,11 +69,20 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Conversation conversation = notNull(ApptentiveInternal.getInstance().getConversation());
-		if (conversation == null) {
-			finish();
-			return;
-		}
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				Conversation conversation = notNull(ApptentiveInternal.getInstance().getConversation());
+				if (conversation == null) {
+					dispatchOnMainQueue(new DispatchTask() {
+						@Override
+						protected void execute() {
+							finish();
+						}
+					});
+				}
+			}
+		});
 
 		if (getIntent().getExtras() == null) {
 			ApptentiveLog.w("ApptentiveViewActivity was started without any extras, which isn't allowed. Finishing Activity.");
@@ -113,7 +128,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 					if (fragmentType == Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT) {
 						String eventName = getIntent().getStringExtra(Constants.FragmentConfigKeys.EXTRA);
 						if (eventName != null) {
-							EngagementModule.engageInternal(this, conversation, eventName);
+							engageInternal(eventName);
 						}
 					}
 					finish();
@@ -167,7 +182,6 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		//current_tab = extra.getInt(SELECTED_TAB_EXTRA_KEY, 0);
 		current_tab = 0;
 
-		newFragment.setConversation(conversation);
 		addFragmentToAdapter(newFragment, newFragment.getTitle());
 
 		// Get the ViewPager and set it's PagerAdapter so that it can display items
@@ -434,13 +448,25 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
+		checkConversationQueue();
+
 		if (notification.hasName(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS)) {
-			dismissActivity();
+			dispatchOnMainQueue(new DispatchTask() {
+				@Override
+				protected void execute() {
+					dismissActivity();
+				}
+			});
 		} else if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			final Conversation conversation = notification.getUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			Assert.assertNotNull(conversation, "Conversation expected to be not null");
 			if (conversation != null && !conversation.hasActiveState()) {
-				dismissActivity();
+				dispatchOnMainQueue(new DispatchTask() {
+					@Override
+					protected void execute() {
+						dismissActivity();
+					}
+				});
 			}
 		}
 	}

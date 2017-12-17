@@ -29,6 +29,19 @@ import android.os.Looper;
  */
 public abstract class DispatchQueue {
 
+	private static final MainQueueChecker MAIN_QUEUE_CHECKER = new MainQueueChecker() {
+		@Override
+		public boolean isMainQueue() {
+			return Looper.getMainLooper() == Looper.myLooper();
+		}
+	};
+
+	private final String name;
+
+	public DispatchQueue(String name) {
+		this.name = name;
+	}
+
 	/**
 	 * Dispatch task implementation
 	 */
@@ -81,6 +94,18 @@ public abstract class DispatchQueue {
 	public abstract void stop();
 
 	/**
+	 * Returns <code>true</code> is this queue is current
+	 */
+	public abstract boolean isCurrent();
+
+	/**
+	 * Returns queue's name
+	 */
+	public String getName() {
+		return name;
+	}
+
+	/**
 	 * A global dispatch queue associated with main thread
 	 */
 	public static DispatchQueue mainQueue() {
@@ -91,7 +116,7 @@ public abstract class DispatchQueue {
 	 * Returns <code>true</code> if code is executing on the main queue
 	 */
 	public static boolean isMainQueue() {
-		return Looper.getMainLooper() == Looper.myLooper(); // TODO: make it configurable for Unit testing
+		return MAIN_QUEUE_CHECKER.isMainQueue();
 	}
 
 	/**
@@ -126,7 +151,7 @@ public abstract class DispatchQueue {
 			try {
 				// this call will fail when running a unit test
 				// we would allow that and make test responsible for setting the implementation
-				return new SerialDispatchQueue(Looper.getMainLooper());
+				return new SerialDispatchQueue(Looper.getMainLooper(), "Main");
 			} catch (Exception e) {
 				return null;
 			}
@@ -135,5 +160,9 @@ public abstract class DispatchQueue {
 		private static DispatchQueue createBackgroundQueue() {
 			return new ConcurrentDispatchQueue("Apptentive Background Queue");
 		}
+	}
+
+	interface MainQueueChecker {
+		boolean isMainQueue();
 	}
 }

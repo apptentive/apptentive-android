@@ -14,8 +14,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.text.TextUtils;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.JsonPayload;
@@ -23,15 +24,12 @@ import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -41,6 +39,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
@@ -119,6 +118,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " = ? AND " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
+
+	private static final String SQL_QUERY_UPDATE_LEGACY_PAYLOADS =
+			"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
+					PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
+					PayloadEntry.COLUMN_CONVERSATION_ID + " = ?, " +
+					PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " = ? " +
+					"WHERE " +
+					PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
+					PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
 
 	private static final String SQL_QUERY_REMOVE_INCOMPLETE_PAYLOADS =
 		"DELETE FROM " + PayloadEntry.TABLE_NAME + " " +
@@ -476,16 +484,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private void migrateMessages(SQLiteDatabase db) {
 		try {
 			final List<ApptentiveMessage> messages = getAllMessages(db);
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+			dispatchConversationTask(new ConversationDispatchTask() {
 				@Override
-				protected void execute() {
-					MessageManager messageManager = ApptentiveInternal.getInstance().getMessageManager();
-					assertNotNull(messageManager, "Can't migrate messages: message manager is not initialized");
-					if (messageManager != null) {
-						messageManager.addMessages(messages.toArray(new ApptentiveMessage[messages.size()]));
-					}
+				protected boolean execute(Conversation conversation) {
+					conversation.getMessageManager().addMessages(messages.toArray(new ApptentiveMessage[messages.size()]));
+					return true;
 				}
-			});
+			}, "migrate messages");
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while trying to migrate messages");
 		}
@@ -664,7 +669,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		return path.replace("${conversationId}", conversationId);
 	}
 
-	void updateIncompletePayloads(String conversationId, String authToken, String localConversationId) {
+	void updateIncompletePayloads(String conversationId, String authToken, String localConversationId, boolean legacyPayloads) {
 		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
 			printPayloadTable("updateIncompletePayloads BEFORE");
 		}
@@ -678,7 +683,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] {
+			cursor = db.rawQuery(legacyPayloads ? SQL_QUERY_UPDATE_LEGACY_PAYLOADS : SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] {
 				authToken, conversationId, localConversationId
 			});
 			cursor.moveToFirst(); // we need to move a cursor in order to update database

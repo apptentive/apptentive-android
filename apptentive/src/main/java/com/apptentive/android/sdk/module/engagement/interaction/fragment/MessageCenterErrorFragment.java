@@ -16,7 +16,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
@@ -24,6 +23,11 @@ import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
+
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
 
 
 public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interaction> {
@@ -67,13 +71,29 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 
 
 	@Override
-	public void onInteractionUpdated(boolean successful) {
-		if (successful && Apptentive.canShowMessageCenter()) {
-			ApptentiveInternal.getInstance().showMessageCenterInternal(getActivity(), null);
-			transit();
-		} else {
-			updateStatus();
-		}
+	public void onInteractionUpdated(final boolean successful) {
+		dispatchOnMainQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				if (successful) {
+					final Activity activity = getActivity();
+					dispatchOnConversationQueue(new DispatchTask() {
+						@Override
+						protected void execute() {
+							ApptentiveInternal.getInstance().showMessageCenterInternal(activity, null);
+							dispatchOnMainQueue(new DispatchTask() {
+								@Override
+								protected void execute() {
+									transit();
+								}
+							});
+						}
+					});
+				} else {
+					updateStatus();
+				}
+			}
+		});
 	}
 
 	private boolean wasLastAttemptServerError(Context context) {

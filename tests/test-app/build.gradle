@@ -1,13 +1,9 @@
 apply plugin: 'com.android.application'
 
-repositories {
-    jcenter()
-}
-
 android {
     compileSdkVersion 26
 
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '26.0.3'
 
     defaultConfig {
         minSdkVersion 14
@@ -29,12 +25,8 @@ android {
 }
 
 dependencies {
-    compile project(':apptentive')
-    androidTestCompile 'junit:junit:4.12'
-    androidTestCompile('com.android.support.test:runner:1.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-    androidTestCompile('com.android.support.test:rules:1.0.1', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
+    implementation project(':apptentive')
+    androidTestImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.1'
+    androidTestImplementation 'com.android.support.test:rules:1.0.1'
 }

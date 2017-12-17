@@ -22,8 +22,13 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCen
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.util.Map;
+
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.util.threading.DispatchQueue.isMainQueue;
+import static com.apptentive.android.sdk.util.threading.DispatchQueue.mainQueue;
 
 /**
  * @author Sky Kelsey
@@ -47,6 +52,8 @@ public class EngagementModule {
 	}
 
 	public static synchronized boolean engage(Context context, Conversation conversation, String vendor, String interaction, String interactionId, String eventName, String data, Map<String, Object> customData, ExtendedData... extendedData) {
+		checkConversationQueue();
+
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
@@ -77,6 +84,8 @@ public class EngagementModule {
 	}
 
 	private static boolean doEngage(Conversation conversation, Context context, String eventLabel) {
+		checkConversationQueue();
+
 		Interaction interaction = conversation.getApplicableInteraction(eventLabel);
 		if (interaction != null) {
 			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
@@ -89,11 +98,22 @@ public class EngagementModule {
 		return false;
 	}
 
-	public static void launchInteraction(Context context, Interaction interaction) {
-		if (interaction != null && context != null) {
+	public static void launchInteraction(final Context context, final Interaction interaction) {
+		if (!isMainQueue()) {
+			mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					launchInteraction(context, interaction);
+				}
+			});
+			return;
+		}
+
+		Context launchContext = context;
+		if (interaction != null && launchContext != null) {
 			ApptentiveLog.i("Launching interaction: %s", interaction.getType().toString());
 			Intent intent = new Intent();
-			intent.setClass(context.getApplicationContext(), ApptentiveViewActivity.class);
+			intent.setClass(launchContext.getApplicationContext(), ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);
 			intent.putExtra(Interaction.KEY_NAME, interaction.toString());
 			/* non-activity context start an Activity, but it requires that a new task be created.
@@ -101,21 +121,31 @@ public class EngagementModule {
 			 * hosting application. non-activity context include application context, context from Service
 			 * ContentProvider, and BroadcastReceiver
 			 */
-			if (!(context instanceof Activity)) {
+			if (!(launchContext instanceof Activity)) {
 				// check if any activity from the hosting app is running at foreground
 				Activity activity = ApptentiveInternal.getInstance().getCurrentTaskStackTopActivity();
 				if (activity != null) {
-					context = activity;
+					launchContext = activity;
 				} else {
 					// If no foreground activity from the host app, launch Apptentive interaction as a new task
 					intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_MULTIPLE_TASK);
 				}
 			}
-			context.startActivity(intent);
+			launchContext.startActivity(intent);
 		}
 	}
 
-	public static void launchMessageCenterErrorActivity(Context context) {
+	public static void launchMessageCenterErrorActivity(final Context context) {
+		if (!isMainQueue()) {
+			mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					launchMessageCenterErrorActivity(context);
+				}
+			});
+			return;
+		}
+
 		if (context != null) {
 			Intent intent = MessageCenterInteraction.generateMessageCenterErrorIntent(context);
 			if (!(context instanceof Activity)) {
@@ -131,6 +161,8 @@ public class EngagementModule {
 	}
 
 	private static boolean canShowInteraction(Conversation conversation, String eventLabel) {
+		checkConversationQueue();
+
 		if (conversation == null) {
 			throw new IllegalArgumentException("Conversation is null");
 		}

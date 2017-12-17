@@ -10,27 +10,28 @@ import android.app.Activity;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.content.Context;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
+import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
-import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.module.metric.MetricModule;
+import com.apptentive.android.sdk.network.HttpJsonRequest;
+import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
 import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.util.Destroyable;
-import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -44,15 +45,20 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_MESSAGE_STORE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_PAYLOAD;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_CODE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_RESPONSE_DATA;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_MESSAGE_STORE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
@@ -81,7 +87,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	 */
 	private final List<WeakReference<UnreadMessagesListener>> hostUnreadMessagesListeners = new ArrayList<>();
 
-	final AtomicBoolean appInForeground = new AtomicBoolean(false); // TODO: get rid of that
+	private final AtomicBoolean appInForeground = new AtomicBoolean(false); // TODO: get rid of that
 	private final MessagePollingWorker pollingWorker;
 
 	private final MessageDispatchTask toastMessageNotifierTask = new MessageDispatchTask() {
@@ -117,7 +123,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		}
 
 		this.conversation = conversation;
-		this.messageStore = messageStore;
+		this.messageStore = new MessageStoreObserver(messageStore);
 		this.pollingWorker = new MessagePollingWorker(this);
 
 		registerNotifications();
@@ -128,86 +134,71 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	 * when push is received on the device.
 	 */
 	public void startMessagePreFetchTask() {
-		final boolean updateMC = isMessageCenterInForeground();
-		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
-			@Override
-			protected void execute() {
-				try {
-					fetchAndStoreMessages(updateMC, false);
-				} catch (final Exception e) {
-					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-						@Override
-						protected void execute() {
-							ApptentiveLog.w(e, "Unhandled Exception thrown from fetching new message task");
-							MetricModule.sendError(e, null, null);
-						}
-					});
-				}
-			}
-		});
+		try {
+			boolean updateMC = isMessageCenterInForeground();
+			fetchAndStoreMessages(updateMC, false, null);
+		} catch (final Exception e) {
+			ApptentiveLog.w(MESSAGES, e, "Unhandled Exception thrown from fetching new message task");
+			MetricModule.sendError(e, null, null);
+		}
 	}
 
 	/**
 	 * Performs a request against the server to check for messages in the conversation since the latest message we already have.
 	 * This method will either be run on MessagePollingThread or as an asyncTask when Push is received.
-	 *
-	 * @return true if messages were returned, else false.
 	 */
-	synchronized boolean fetchAndStoreMessages(boolean isMessageCenterForeground, boolean showToast) {
-		if (!Util.isNetworkConnectionPresent()) {
-			ApptentiveLog.d("Can't fetch messages because a network connection is not present.");
-			return false;
-		}
+	void fetchAndStoreMessages(final boolean isMessageCenterForeground, final boolean showToast, @Nullable final MessageFetchListener listener) {
+		checkConversationQueue();
 
-		// Fetch the messages.
-		List<ApptentiveMessage> messagesToSave = null;
 		try {
 			String lastMessageId = messageStore.getLastReceivedMessageId();
-			messagesToSave = fetchMessages(lastMessageId);
-		} catch (Exception e) {
-			ApptentiveLog.e("Error retrieving last received message id from worker thread");
-		}
+			fetchMessages(lastMessageId, new MessageFetchListener() {
+				@Override
+				public void onFetchFinish(MessageManager messageManager, List<ApptentiveMessage> messages) {
+					try {
+						if (messages == null || messages.size() == 0) return;
 
-		CompoundMessage messageOnToast = null;
-		if (messagesToSave != null && messagesToSave.size() > 0) {
-			ApptentiveLog.d("Messages retrieved.");
-			// Also get the count of incoming unread messages.
-			int incomingUnreadMessages = 0;
-			// Mark messages from server where sender is the app user as read.
-			for (final ApptentiveMessage apptentiveMessage : messagesToSave) {
-				if (apptentiveMessage.isOutgoingMessage()) {
-					apptentiveMessage.setRead(true);
-				} else {
-					if (messageOnToast == null) {
-						if (apptentiveMessage.getMessageType() == ApptentiveMessage.Type.CompoundMessage) {
-							messageOnToast = (CompoundMessage) apptentiveMessage;
+						CompoundMessage messageOnToast = null;
+						ApptentiveLog.d(MESSAGES,"Messages retrieved: %d", messages.size());
+
+						// Also get the count of incoming unread messages.
+						int incomingUnreadMessages = 0;
+						// Mark messages from server where sender is the app user as read.
+						for (final ApptentiveMessage apptentiveMessage : messages) {
+							if (apptentiveMessage.isOutgoingMessage()) {
+								apptentiveMessage.setRead(true);
+							} else {
+								if (messageOnToast == null) {
+									if (apptentiveMessage.getMessageType() == ApptentiveMessage.Type.CompoundMessage) {
+										messageOnToast = (CompoundMessage) apptentiveMessage;
+									}
+								}
+								incomingUnreadMessages++;
+
+								// for every new message received, notify Message Center
+								notifyInternalNewMessagesListeners((CompoundMessage) apptentiveMessage);
+							}
+						}
+						messageStore.addOrUpdateMessages(messages.toArray(new ApptentiveMessage[messages.size()]));
+						if (incomingUnreadMessages > 0) {
+							// Show toast notification only if the foreground activity is not already message center activity
+							if (!isMessageCenterForeground && showToast) {
+								DispatchQueue.mainQueue().dispatchAsyncOnce(toastMessageNotifierTask.setMessage(messageOnToast));
+							}
+						}
+
+						// Send message to notify host app, such as unread message badge
+						conversationQueue().dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
+					} finally {
+						if (listener != null) {
+							listener.onFetchFinish(messageManager, messages);
 						}
 					}
-					incomingUnreadMessages++;
-
-					// for every new message received, notify Message Center
-					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-						@Override
-						protected void execute() {
-							notifyInternalNewMessagesListeners((CompoundMessage) apptentiveMessage);
-						}
-					});
 				}
-			}
-			messageStore.addOrUpdateMessages(messagesToSave.toArray(new ApptentiveMessage[messagesToSave.size()]));
-			if (incomingUnreadMessages > 0) {
-				// Show toast notification only if the foreground activity is not already message center activity
-				if (!isMessageCenterForeground && showToast) {
-					DispatchQueue.mainQueue().dispatchAsyncOnce(toastMessageNotifierTask.setMessage(messageOnToast));
-				}
-			}
-
-			// Send message to notify host app, such as unread message badge
-			DispatchQueue.mainQueue().dispatchAsyncOnce(hostMessageNotifierTask.setMessageCount(getUnreadMessageCount()));
-
-			return incomingUnreadMessages > 0;
+			});
+		} catch (Exception e) {
+			ApptentiveLog.e(MESSAGES, "Error retrieving last received message id from worker thread");
 		}
-		return false;
 	}
 
 	public List<MessageCenterListItem> getMessageCenterListItems() {
@@ -221,7 +212,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				}
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Error getting all messages in worker thread");
+			ApptentiveLog.e(MESSAGES,"Error getting all messages in worker thread");
 		}
 
 		return messagesToShow;
@@ -240,41 +231,53 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	 * This doesn't need to be run during normal program execution. Testing only.
 	 */
 	public void deleteAllMessages(Context context) {
-		ApptentiveLog.d("Deleting all messages.");
+		ApptentiveLog.d(MESSAGES, "Deleting all messages.");
 		messageStore.deleteAllMessages();
 	}
 
-	private List<ApptentiveMessage> fetchMessages(String afterId) {
-		ApptentiveLog.d("Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
+	private HttpJsonRequest fetchMessages(String afterId, final MessageFetchListener listener) {
+		ApptentiveLog.v(MESSAGES, "Fetching messages newer than: %s", (afterId == null) ? "0" : afterId);
 
-		if (!Util.isNetworkConnectionPresent()) {
-			ApptentiveLog.v("No internet present. Cancelling request.");
-			return null;
-		}
 		// TODO: Use the new ApptentiveHttpClient for this.
-		ApptentiveHttpResponse response = ApptentiveClient.getMessages(conversation, afterId, null, null);
+		ApptentiveHttpClient httpClient = ApptentiveInternal.getInstance().getApptentiveHttpClient();
+		HttpJsonRequest request = httpClient.createFetchMessagesRequest(conversation.getConversationToken(), conversation.getConversationId(), afterId, null, null, new HttpRequest.Listener<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				try {
+					notifyFinished(listener, parseMessages(request.getResponseObject()));
+				} catch (Exception e) {
+					ApptentiveLog.e(MESSAGES, e, "Exception while parsing messages");
+					notifyFinished(listener, null);
+				}
+			}
 
-		List<ApptentiveMessage> ret = new ArrayList<>();
-		if (!response.isSuccessful()) {
-			return ret;
-		}
-		try {
-			ret = parseMessagesString(response.getContent());
-		} catch (JSONException e) {
-			ApptentiveLog.e(e, "Error parsing messages JSON.");
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Unexpected error parsing messages JSON.");
-		}
-		return ret;
+			@Override
+			public void onCancel(HttpJsonRequest request) {
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				ApptentiveLog.e(MESSAGES, "Error while fetching messages: %s", reason);
+				notifyFinished(listener, null);
+			}
+
+			private void notifyFinished(MessageFetchListener listener, List<ApptentiveMessage> messages) {
+				if (listener != null) {
+					listener.onFetchFinish(MessageManager.this, messages);
+				}
+			}
+		});
+		request.setCallbackQueue(conversationQueue());
+		request.start();
+		return request;
 	}
 
 	public void updateMessage(ApptentiveMessage apptentiveMessage) {
 		messageStore.updateMessage(apptentiveMessage);
 	}
 
-	public List<ApptentiveMessage> parseMessagesString(String messageString) throws JSONException {
+	public List<ApptentiveMessage> parseMessages(JSONObject root) throws JSONException {
 		List<ApptentiveMessage> ret = new ArrayList<>();
-		JSONObject root = new JSONObject(messageString);
 		if (!root.isNull("messages")) {
 			JSONArray items = root.getJSONArray("messages");
 			for (int i = 0; i < items.length(); i++) {
@@ -344,7 +347,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				apptentiveMessage.setId(responseJson.getString(ApptentiveMessage.KEY_ID));
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
-				ApptentiveLog.e(e, "Error parsing sent apptentiveMessage response.");
+				ApptentiveLog.e(MESSAGES, e, "Error parsing sent apptentiveMessage response.");
 			}
 			messageStore.updateMessage(apptentiveMessage);
 
@@ -359,7 +362,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		try {
 			msgCount = messageStore.getUnreadMessageCount();
 		} catch (Exception e) {
-			ApptentiveLog.e("Error getting unread messages count in worker thread");
+			ApptentiveLog.e(MESSAGES, "Error getting unread messages count in worker thread");
 		}
 		return msgCount;
 	}
@@ -382,6 +385,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
+		checkConversationQueue();
+
 		if (notification.hasName(NOTIFICATION_ACTIVITY_STARTED) ||
 			notification.hasName(NOTIFICATION_ACTIVITY_RESUMED)) {
 			final Activity activity = notification.getRequiredUserInfo(NOTIFICATION_KEY_ACTIVITY, Activity.class);
@@ -425,8 +430,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	//region Polling
 
-	public void startPollingMessages() {
-		pollingWorker.startPolling();
+	public void attemptToStartMessagePolling() {
+		if (conversation.isMessageCenterFeatureUsed()) {
+			pollingWorker.startPolling();
+		}
 	}
 
 	public void stopPollingMessages() {
@@ -513,11 +520,19 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 		hostUnreadMessagesListeners.clear();
 	}
 
-	public void notifyHostUnreadMessagesListeners(int unreadMessages) {
+	public void notifyHostUnreadMessagesListeners(final int unreadMessages) {
+		checkConversationQueue();
+
+		// we dispatch listeners on the main queue
 		for (WeakReference<UnreadMessagesListener> listenerRef : hostUnreadMessagesListeners) {
-			UnreadMessagesListener listener = listenerRef.get();
+			final UnreadMessagesListener listener = listenerRef.get();
 			if (listener != null) {
-				listener.onUnreadMessageCountChanged(unreadMessages);
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						listener.onUnreadMessageCountChanged(unreadMessages);
+					}
+				});
 			}
 		}
 	}
@@ -536,11 +551,12 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	public void setMessageCenterInForeground(boolean bInForeground) {
+		conversation.setMessageCenterFeatureUsed(true);
 		pollingWorker.setMessageCenterInForeground(bInForeground);
 	}
 
 	private boolean isMessageCenterInForeground() {
-		return pollingWorker.messageCenterInForeground.get();
+		return pollingWorker.isMessageCenterInForeground();
 	}
 
 	private void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
@@ -572,7 +588,9 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private void appWentToForeground() {
 		appInForeground.set(true);
-		pollingWorker.appWentToForeground();
+		if (conversation.isMessageCenterFeatureUsed()) {
+			pollingWorker.appWentToForeground();
+		}
 	}
 
 	private void appWentToBackground() {
@@ -586,6 +604,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	public MessageStore getMessageStore() {
 		return messageStore;
+	}
+
+	public interface MessageFetchListener {
+		void onFetchFinish(MessageManager messageManager, List<ApptentiveMessage> messages);
 	}
 
 	//region Message Dispatch Task
@@ -624,6 +646,78 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			this.messageCount = messageCount;
 			return this;
 		}
+	}
+
+	//endregion
+
+	//region Message Store Observer
+
+	/**
+	 * A wrapper class which sends notifications every time a target message store changes
+	 */
+	private static class MessageStoreObserver implements MessageStore {
+
+		private final MessageStore target;
+
+		private MessageStoreObserver(MessageStore target) {
+			if (target == null) {
+				throw new IllegalArgumentException("Target is null");
+			}
+			this.target = target;
+		}
+
+		@Override
+		public void addOrUpdateMessages(ApptentiveMessage... messages) {
+			target.addOrUpdateMessages(messages);
+			notifyChanged();
+		}
+
+		@Override
+		public void updateMessage(ApptentiveMessage message) {
+			target.updateMessage(message);
+			notifyChanged();
+		}
+
+		@Override
+		public List<ApptentiveMessage> getAllMessages() throws Exception {
+			return target.getAllMessages();
+		}
+
+		@Override
+		public String getLastReceivedMessageId() throws Exception {
+			return target.getLastReceivedMessageId();
+		}
+
+		@Override
+		public int getUnreadMessageCount() throws Exception {
+			return target.getUnreadMessageCount();
+		}
+
+		@Override
+		public void deleteAllMessages() {
+			target.deleteAllMessages();
+			notifyChanged();
+		}
+
+		@Override
+		public void deleteMessage(String nonce) {
+			target.deleteMessage(nonce);
+			notifyChanged();
+		}
+
+		@Override
+		public ApptentiveMessage findMessage(String nonce) {
+			return target.findMessage(nonce);
+		}
+
+		//region Notifications
+
+		private void notifyChanged() {
+			ApptentiveNotificationCenter.defaultCenter()
+					.postNotification(NOTIFICATION_MESSAGE_STORE_DID_CHANGE, NOTIFICATION_KEY_MESSAGE_STORE, this);
+		}
+
+		//endregion
 	}
 
 	//endregion

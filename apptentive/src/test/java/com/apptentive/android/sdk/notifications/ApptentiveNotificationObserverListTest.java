@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.notifications;
 
-import com.apptentive.android.sdk.TestCaseBase;
+import com.apptentive.android.sdk.LogicTestCaseBase;
 
 import org.junit.After;
 import org.junit.Before;
@@ -15,7 +15,7 @@ import org.junit.Test;
 import java.util.HashMap;
 import static org.junit.Assert.*;
 
-public class ApptentiveNotificationObserverListTest extends TestCaseBase {
+public class ApptentiveNotificationObserverListTest extends LogicTestCaseBase {
 
 	private static final boolean WEAK_REFERENCE = true;
 	private static final boolean STRONG_REFERENCE = false;

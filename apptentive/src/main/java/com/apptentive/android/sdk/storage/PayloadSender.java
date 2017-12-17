@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
@@ -132,6 +133,7 @@ class PayloadSender {
 
 		// set 'retry' policy
 		payloadRequest.setRetryPolicy(requestRetryPolicy);
+		payloadRequest.setCallbackQueue(conversationQueue());
 		payloadRequest.start();
 	}
 

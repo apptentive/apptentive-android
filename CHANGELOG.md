@@ -1,3 +1,14 @@
+# 2017-12-16 - v5.0.0
+
+#### Major Changes
+
+* All long-running Apptentive API calls are now called asynchronously. See [Migrating to 5.0.0](docs/migrating_to_5.0.0.md) for migration instructions.
+
+#### Bugs Fixed
+
+* Fixed a bug where network operations might start when the app is started, but in the background.
+* Fixed an issue where the SDK might attempt to fetch messages when it shouldn't.
+
 # 2017-12-02 - v4.1.3
 
 #### Bugs Fixed

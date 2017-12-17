@@ -1,5 +1,6 @@
 buildscript {
     repositories {
+        google()
         jcenter()
     }
     dependencies {
@@ -10,17 +11,18 @@ buildscript {
 apply plugin: 'com.android.application'
 
 repositories {
+    google()
     jcenter()
 }
 
 dependencies {
-    compile 'com.apptentive:apptentive-android:4.1.0'
-    compile 'com.google.firebase:firebase-messaging:11.4.2'
+    implementation 'com.apptentive:apptentive-android:4.1.2'
+    implementation 'com.google.firebase:firebase-messaging:11.6.0'
 }
 
 android {
     compileSdkVersion 26
-    buildToolsVersion '26.0.2'
+    buildToolsVersion '26.0.3'
 
     defaultConfig {
         minSdkVersion 14

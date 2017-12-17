@@ -6,13 +6,26 @@
 
 package com.apptentive.android.sdk;
 
-import android.os.Looper;
 import android.util.Log;
+
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
 
 import java.util.IllegalFormatException;
 
 public class ApptentiveLog {
 	private static final String TAG = "Apptentive";
+	private static final LoggerImplementation LOGGER_IMPLEMENTATION = new LoggerImplementation() {
+		@Override
+		public void println(int priority, String tag, String msg) {
+			//noinspection WrongConstant
+			android.util.Log.println(priority, tag, msg);
+		}
+
+		@Override
+		public String getStackTraceString(Throwable throwable) {
+			return android.util.Log.getStackTraceString(throwable);
+		}
+	};
 
 	private static Level logLevel = Level.DEFAULT;
 
@@ -38,7 +51,7 @@ public class ApptentiveLog {
 			String extra = null;
 
 			// add thread name if logging of the UI-thread
-			if (Looper.getMainLooper() != null && Looper.getMainLooper().getThread() != Thread.currentThread()) {
+			if (!DispatchQueue.isMainQueue()) {
 				extra = '[' + Thread.currentThread().getName() + ']';
 			}
 
@@ -56,16 +69,13 @@ public class ApptentiveLog {
 			}
 
 
-			//noinspection WrongConstant
-			android.util.Log.println(level.getAndroidLevel(), TAG, message);
+			LOGGER_IMPLEMENTATION.println(level.getAndroidLevel(), TAG, message);
 			if(throwable != null){
 				if(throwable.getMessage() != null){
-					//noinspection WrongConstant
-					android.util.Log.println(level.getAndroidLevel(), TAG, throwable.getMessage());
+					LOGGER_IMPLEMENTATION.println(level.getAndroidLevel(), TAG, throwable.getMessage());
 				}
 				while(throwable != null) {
-					//noinspection WrongConstant
-					android.util.Log.println(level.getAndroidLevel(), TAG, android.util.Log.getStackTraceString(throwable));
+					LOGGER_IMPLEMENTATION.println(level.getAndroidLevel(), TAG, LOGGER_IMPLEMENTATION.getStackTraceString(throwable));
 					throwable = throwable.getCause();
 				}
 			}
@@ -225,7 +235,7 @@ public class ApptentiveLog {
 			try {
 				return Level.valueOf(level);
 			} catch (IllegalArgumentException e) {
-				android.util.Log.println(Log.WARN, TAG, "Error parsing unknown ApptentiveLog.Level: " + level);
+				LOGGER_IMPLEMENTATION.println(Log.WARN, TAG, "Error parsing unknown ApptentiveLog.Level: " + level);
 			}
 			return DEFAULT;
 		}
@@ -237,5 +247,10 @@ public class ApptentiveLog {
 		public boolean canLog(Level level) {
 			return level.level >= this.level;
 		}
+	}
+
+	interface LoggerImplementation {
+		void println(int priority, String tag, String msg);
+		String getStackTraceString(Throwable throwable);
 	}
 }

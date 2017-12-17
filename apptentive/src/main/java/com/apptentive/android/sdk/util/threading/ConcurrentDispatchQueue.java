@@ -26,14 +26,11 @@ class ConcurrentDispatchQueue extends DispatchQueue implements ThreadFactory {
 	 */
 	private final ScheduledThreadPoolExecutor threadPoolExecutor;
 
-	/** The name of the queue */
-	private final String name;
-
 	/** The number of the next thread in the pool */
 	private final AtomicInteger threadNumber;
 
 	ConcurrentDispatchQueue(String name) {
-		this.name = name;
+		super(name);
 		this.threadPoolExecutor = new ScheduledThreadPoolExecutor(NUMBER_OF_CORES, this);
 		this.threadNumber = new AtomicInteger(1);
 	}
@@ -52,11 +49,16 @@ class ConcurrentDispatchQueue extends DispatchQueue implements ThreadFactory {
 		threadPoolExecutor.shutdownNow();
 	}
 
+	@Override
+	public boolean isCurrent() {
+		return false; // TODO: figure it out how to check if the queue is current
+	}
+
 	//region Thread factory
 
 	@Override
 	public Thread newThread(Runnable r) {
-		return new Thread(r, name + " (thread-" + threadNumber.getAndIncrement() + ")");
+		return new Thread(r, getName() + " (thread-" + threadNumber.getAndIncrement() + ")");
 	}
 
 	//endregion

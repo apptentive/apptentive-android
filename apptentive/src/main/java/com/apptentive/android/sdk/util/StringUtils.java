@@ -159,6 +159,13 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Safely trims input string
+	 */
+	public static String trim(String str) {
+		return str != null && str.length() > 0 ? str.trim() : str;
+	}
+
+	/**
 	 * Safely checks if two strings are equal (any argument can be null)
 	 */
 	public static boolean equal(String str1, String str2) {

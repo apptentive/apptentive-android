@@ -18,6 +18,8 @@ import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.ExtendedData;
@@ -25,12 +27,10 @@ import com.apptentive.android.sdk.model.LocationExtendedData;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
-import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
-import com.apptentive.android.sdk.storage.Person;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -45,6 +45,11 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Map;
+
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.util.StringUtils.trim;
 
 /**
  * This class contains the complete public API for accessing Apptentive features from within your app.
@@ -84,18 +89,14 @@ public class Apptentive {
 	 *
 	 * @param email The user's email address.
 	 */
-	public static void setPersonEmail(String email) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().setEmail(email);
-					conversation.schedulePersonUpdate();
-				}
+	public static void setPersonEmail(final String email) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal.getInstance().getConversationProxy().setPersonEmail(email);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while setting person email");
-		}
+		}, "set person email");
 	}
 
 	/**
@@ -107,9 +108,9 @@ public class Apptentive {
 	public static String getPersonEmail() {
 		try {
 			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				ConversationProxy conversation = ApptentiveInternal.getInstance().getConversationProxy();
 				if (conversation != null) {
-					return conversation.getPerson().getEmail();
+					return conversation.getPersonEmail();
 				}
 			}
 		} catch (Exception e) {
@@ -127,18 +128,14 @@ public class Apptentive {
 	 *
 	 * @param name The user's name.
 	 */
-	public static void setPersonName(String name) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().setName(name);
-					conversation.schedulePersonUpdate();
-				}
+	public static void setPersonName(final String name) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal.getInstance().getConversationProxy().setPersonName(name);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while setting person name");
-		}
+		}, "set person name");
 	}
 
 	/**
@@ -150,9 +147,9 @@ public class Apptentive {
 	public static String getPersonName() {
 		try {
 			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
+				ConversationProxy conversation = ApptentiveInternal.getInstance().getConversationProxy();
 				if (conversation != null) {
-					return conversation.getPerson().getName();
+					return conversation.getPersonName();
 				}
 			}
 		} catch (Exception e) {
@@ -169,21 +166,14 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A String value.
 	 */
-	public static void addCustomDeviceData(String key, String value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				if (value != null) {
-					value = value.trim();
-				}
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().put(key, value);
-					conversation.scheduleDeviceUpdate();
-				}
+	public static void addCustomDeviceData(final String key, final String value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().put(key, trim(value));
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom device data");
-		}
+		}, "add custom device data");
 	}
 
 	/**
@@ -194,17 +184,14 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A Number value.
 	 */
-	public static void addCustomDeviceData(String key, Number value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().put(key, value);
-				}
+	public static void addCustomDeviceData(final String key, final Number value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().put(key, value);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom device data");
-		}
+		}, "add custom device data");
 	}
 
 	/**
@@ -215,43 +202,34 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A Boolean value.
 	 */
-	public static void addCustomDeviceData(String key, Boolean value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().put(key, value);
-				}
+	public static void addCustomDeviceData(final String key, final Boolean value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().put(key, value);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom device data");
-		}
+		}, "add custom device data");
 	}
 
-	private static void addCustomDeviceData(String key, Version version) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().put(key, version);
-				}
+	private static void addCustomDeviceData(final String key, final Version version) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().put(key, version);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom device data");
-		}
+		}, "add custom device data");
 	}
 
-	private static void addCustomDeviceData(String key, DateTime dateTime) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().put(key, dateTime);
-				}
+	private static void addCustomDeviceData(final String key, final DateTime dateTime) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().put(key, dateTime);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom device data");
-		}
+		}, "add custom device data");
 	}
 
 	/**
@@ -259,18 +237,14 @@ public class Apptentive {
 	 *
 	 * @param key The key to remove.
 	 */
-	public static void removeCustomDeviceData(String key) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getDevice().getCustomData().remove(key);
-					conversation.scheduleDeviceUpdate();
-				}
+	public static void removeCustomDeviceData(final String key) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getDevice().getCustomData().remove(key);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while removing custom device data");
-		}
+		}, "remove custom device data");
 	}
 
 	/**
@@ -281,21 +255,14 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A String value.
 	 */
-	public static void addCustomPersonData(String key, String value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				if (value != null) {
-					value = value.trim();
-				}
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().put(key, value);
-					conversation.schedulePersonUpdate();
-				}
+	public static void addCustomPersonData(final String key, final String value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().put(key, trim(value));
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom person data");
-		}
+		}, "add custom person data");
 	}
 
 	/**
@@ -306,17 +273,14 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A Number value.
 	 */
-	public static void addCustomPersonData(String key, Number value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().put(key, value);
-				}
+	public static void addCustomPersonData(final String key, final Number value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().put(key, value);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom person data");
-		}
+		}, "add custom person data");
 	}
 
 	/**
@@ -327,46 +291,34 @@ public class Apptentive {
 	 * @param key   The key to store the data under.
 	 * @param value A Boolean value.
 	 */
-	public static void addCustomPersonData(String key, Boolean value) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().put(key, value);
-					conversation.schedulePersonUpdate();
-				}
+	public static void addCustomPersonData(final String key, final Boolean value) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().put(key, value);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom person data");
-		}
+		}, "add custom person data");
 	}
 
-	private static void addCustomPersonData(String key, Version version) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().put(key, version);
-					conversation.schedulePersonUpdate();
-				}
+	private static void addCustomPersonData(final String key, final Version version) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().put(key, version);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom person data");
-		}
+		}, "add custom person data");
 	}
 
-	private static void addCustomPersonData(String key, DateTime dateTime) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().remove(key);
-					conversation.schedulePersonUpdate();
-				}
+	private static void addCustomPersonData(final String key, final DateTime dateTime) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().put(key, dateTime);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while adding custom person data");
-		}
+		}, "add custom person data");
 	}
 
 	/**
@@ -374,18 +326,14 @@ public class Apptentive {
 	 *
 	 * @param key The key to remove.
 	 */
-	public static void removeCustomPersonData(String key) {
-		try {
-			if (ApptentiveInternal.isApptentiveRegistered()) {
-				Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-				if (conversation != null) {
-					conversation.getPerson().getCustomData().remove(key);
-					conversation.schedulePersonUpdate();
-				}
+	public static void removeCustomPersonData(final String key) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getPerson().getCustomData().remove(key);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e("Exception while removing custom person data");
-		}
+		}, "remove custom person data");
 	}
 
 	//endregion
@@ -454,36 +402,20 @@ public class Apptentive {
 	 *                     </dl>
 	 */
 	public static void setPushNotificationIntegration(final int pushProvider, final String token) {
-		try {
-			// we only access the active conversation on the main thread to avoid concurrency issues
-			if (!DispatchQueue.isMainQueue()) {
-				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-					@Override
-					protected void execute() {
-						setPushNotificationIntegration(pushProvider, token);
-					}
-				});
-				return;
-			}
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				// Store the push stuff globally
+				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+				prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
+						.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
+						.apply();
 
-			if (!ApptentiveInternal.isApptentiveRegistered()) {
-				ApptentiveLog.w("Unable to set push notification integration: Apptentive instance is not initialized");
-				return;
-			}
-			// Store the push stuff globally
-			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-			prefs.edit().putInt(Constants.PREF_KEY_PUSH_PROVIDER, pushProvider)
-					.putString(Constants.PREF_KEY_PUSH_TOKEN, token)
-					.apply();
-
-			// Also set it on the active Conversation, if there is one.
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
+				// Also set it on the active Conversation, if there is one.
 				conversation.setPushIntegration(pushProvider, token);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while setting push notification integration");
-		}
+		}, "set push notification integration");
 	}
 
 	//endregion
@@ -552,6 +484,7 @@ public class Apptentive {
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Intent} that did
 	 * not come from Apptentive will return a null object. If you receive a null object, your app will
 	 * need to handle this notification itself.</p>
+	 * <p>This task is performed asynchronously.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>GCM</li>
@@ -559,21 +492,32 @@ public class Apptentive {
 	 * <li>Parse</li>
 	 * </ul>
 	 *
-	 * @param intent An {@link Intent} containing the Apptentive Push data. Pass in what you receive
-	 *               in the Service or BroadcastReceiver that is used by your chosen push provider.
-	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 * @param callback Called after we check to see Apptentive can launch an Interaction from this
+	 *                 push. Called with a {@link PendingIntent} to launch an Apptentive Interaction
+	 *                 if the push data came from Apptentive, and an Interaction can be shown, or
+	 *                 null.
+	 * @param intent   An {@link Intent} containing the Apptentive Push data. Pass in what you receive
+	 *                 in the Service or BroadcastReceiver that is used by your chosen push provider.
 	 */
-	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Intent intent) {
-		try {
-			if (!ApptentiveInternal.checkRegistered()) {
-				return null;
-			}
-			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(intent);
-			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while building pending intent from push notification");
+	public static void buildPendingIntentFromPushNotification(@NonNull final PendingIntentCallback callback, @NonNull final Intent intent) {
+		if (callback == null) {
+			throw new IllegalArgumentException("Callback is null");
 		}
-		return null;
+
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(intent);
+				final PendingIntent intent = ApptentiveInternal.generatePendingIntentFromApptentivePushData(conversation, apptentivePushData);
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						callback.onPendingIntent(intent);
+					}
+				});
+				return true;
+			}
+		}, "build pending intent");
 	}
 
 	/**
@@ -583,26 +527,38 @@ public class Apptentive {
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>
+	 * <p>This task is performed asynchronously.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>Urban Airship</li>
 	 * </ul>
 	 *
-	 * @param bundle A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
-	 *               the the Service or BroadcastReceiver that is used by your chosen push provider.
-	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 * @param callback Called after we check to see Apptentive can launch an Interaction from this
+	 *                 push. Called with a {@link PendingIntent} to launch an Apptentive Interaction
+	 *                 if the push data came from Apptentive, and an Interaction can be shown, or
+	 *                 null.
+	 * @param bundle   A {@link Bundle} containing the Apptentive Push data. Pass in what you receive in
+	 *                 the the Service or BroadcastReceiver that is used by your chosen push provider.
 	 */
-	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Bundle bundle) {
-		try {
-			if (!ApptentiveInternal.checkRegistered()) {
-				return null;
-			}
-			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(bundle);
-			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while building pending intent form a push notification");
+	public static void buildPendingIntentFromPushNotification(@NonNull final PendingIntentCallback callback, @NonNull final Bundle bundle) {
+		if (callback == null) {
+			throw new IllegalArgumentException("Callback is null");
 		}
-		return null;
+
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(bundle);
+				final PendingIntent intent = ApptentiveInternal.generatePendingIntentFromApptentivePushData(conversation, apptentivePushData);
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						callback.onPendingIntent(intent);
+					}
+				});
+				return true;
+			}
+		}, "build pending intent");
 	}
 
 	/**
@@ -612,27 +568,35 @@ public class Apptentive {
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>
+	 * <p>This task is performed asynchronously.</p>
 	 * <p>This is the method you will likely need if you integrated using:</p>
 	 * <ul>
 	 * <li>Firebase Cloud Messaging (FCM)</li>
 	 * </ul>
 	 *
-	 * @param data A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive Push
-	 *             data. Pass in what you receive in the the Service or BroadcastReceiver that is
-	 *             used by your chosen push provider.
-	 * @return a valid {@link PendingIntent} to launch an Apptentive Interaction if the push data came from Apptentive, or null.
+	 * @param callback Called after we check to see Apptentive can launch an Interaction from this
+	 *                 push. Called with a {@link PendingIntent} to launch an Apptentive Interaction
+	 *                 if the push data came from Apptentive, and an Interaction can be shown, or
+	 *                 null.
+	 * @param data     A {@link Map}&lt;{@link String},{@link String}&gt; containing the Apptentive
+	 *                 Push data. Pass in what you receive in the the Service or BroadcastReceiver
+	 *                 that is used by your chosen push provider.
 	 */
-	public static PendingIntent buildPendingIntentFromPushNotification(@NonNull Map<String, String> data) {
-		try {
-			if (!ApptentiveInternal.checkRegistered()) {
-				return null;
+	public static void buildPendingIntentFromPushNotification(final PendingIntentCallback callback, @NonNull final Map<String, String> data) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(data);
+				final PendingIntent intent = ApptentiveInternal.generatePendingIntentFromApptentivePushData(conversation, apptentivePushData);
+				DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+					@Override
+					protected void execute() {
+						callback.onPendingIntent(intent);
+					}
+				});
+				return true;
 			}
-			String apptentivePushData = ApptentiveInternal.getApptentivePushNotificationData(data);
-			return ApptentiveInternal.generatePendingIntentFromApptentivePushData(apptentivePushData);
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while building pending intent form a push notification");
-		}
-		return null;
+		}, "build pending intent");
 	}
 
 	/**
@@ -848,19 +812,38 @@ public class Apptentive {
 	//region Message Center
 
 	/**
-	 * Opens the Apptentive Message Center UI Activity
+	 * Opens the Apptentive Message Center UI Activity. This task is performed asynchronously. Message
+	 * Center configuration may not have been downloaded yet when this is called. If you would like to
+	 * know whether this method was able to launch Message Center, use
+	 * {@link Apptentive#showMessageCenter(Context, BooleanCallback)}.
 	 *
 	 * @param context The context from which to launch the Message Center
-	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Context context) {
-		return showMessageCenter(context, null);
+	public static void showMessageCenter(Context context) {
+		showMessageCenter(context, null, null);
 	}
 
 	/**
-	 * Opens the Apptentive Message Center UI Activity, and allows custom data to be sent with the next message the user
-	 * sends. If the user sends multiple messages, this data will only be sent with the first message sent after this
-	 * method is invoked. Additional invocations of this method with custom data will repeat this process.
+	 * Opens the Apptentive Message Center UI Activity. This task is performed asynchronously. Message
+	 * Center configuration may not have been downloaded yet when this is called.
+	 *
+	 * @param context  The context from which to launch the Message Center
+	 * @param callback Called after we check to see if Message Center can be displayed, but before it
+	 *                 is displayed. Called with true if an Interaction will be displayed, else false.
+	 */
+	public static void showMessageCenter(Context context, BooleanCallback callback) {
+		showMessageCenter(context, callback, null);
+	}
+
+	/**
+	 * Opens the Apptentive Message Center UI Activity, and allows custom data to be sent with the
+	 * next message the user sends. If the user sends multiple messages, this data will only be sent
+	 * with the first message sent after this method is invoked. Additional invocations of this method
+	 * with custom data will repeat this process. If Message Center is closed without a message being
+	 * sent, the custom data is cleared. This task is performed asynchronously. Message Center
+	 * configuration may not have been downloaded yet when this is called. If you would like to know
+	 * whether this method was able to launch Message Center, use
+	 * {@link Apptentive#showMessageCenter(Context, BooleanCallback, Map)}.
 	 *
 	 * @param context    The context from which to launch the Message Center. This should be an
 	 *                   Activity, except in rare cases where you don't have access to one, in which
@@ -868,40 +851,53 @@ public class Apptentive {
 	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans.
 	 *                   If any message is sent by the Person, this data is sent with it, and then
 	 *                   cleared. If no message is sent, this data is discarded.
-	 * @return true if Message Center was shown, else false.
 	 */
-	public static boolean showMessageCenter(Context context, Map<String, Object> customData) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
-				return false;
+	public static void showMessageCenter(Context context, Map<String, Object> customData) {
+		showMessageCenter(context, null, customData);
+	}
+
+	/**
+	 * Opens the Apptentive Message Center UI Activity, and allows custom data to be sent with the
+	 * next message the user sends. If the user sends multiple messages, this data will only be sent
+	 * with the first message sent after this method is invoked. Additional invocations of this method
+	 * with custom data will repeat this process. If Message Center is closed without a message being
+	 * sent, the custom data is cleared. This task is performed asynchronously. Message Center
+	 * configuration may not have been downloaded yet when this is called.
+	 *
+	 * @param context    The context from which to launch the Message Center. This should be an
+	 *                   Activity, except in rare cases where you don't have access to one, in which
+	 *                   case Apptentive Message Center will launch in a new task.
+	 * @param callback   Called after we check to see if Message Center can be displayed, but before
+	 *                   it is displayed. Called with true if an Interaction will be displayed, else
+	 *                   false.
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or
+	 *                   Booleans. If any message is sent by the Person, this data is sent with it,
+	 *                   and then cleared. If no message is sent, this data is discarded.
+	 */
+	public static void showMessageCenter(final Context context, final BooleanCallback callback, final Map<String, Object> customData) {
+		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
 			}
-			return ApptentiveInternal.getInstance().showMessageCenterInternal(context, customData);
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.showMessageCenter()");
-			MetricModule.sendError(e, null, null);
-		}
-		return false;
+		}, "show message center");
 	}
 
 	/**
 	 * Our SDK must connect to our server at least once to download initial configuration for Message
-	 * Center. Call this method to see whether or not Message Center can be displayed.
+	 * Center. Call this method to see whether or not Message Center can be displayed. This task is
+	 * performed asynchronously.
 	 *
-	 * @return true if a call to {@link #showMessageCenter(Context)} will display Message Center, else false.
+	 * @param callback Called after we check to see if Message Center can be displayed, but before it
+	 *                 is displayed. Called with true if an Interaction will be displayed, else false.
 	 */
-	public static boolean canShowMessageCenter() {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to show message center: no active conversation.");
-				return false;
+	public static void canShowMessageCenter(BooleanCallback callback) {
+		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return ApptentiveInternal.getInstance().canShowMessageCenterInternal(conversation);
 			}
-			return ApptentiveInternal.getInstance().canShowMessageCenterInternal(ApptentiveInternal.getInstance().getConversation());
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.canShowMessageCenter()");
-			MetricModule.sendError(e, null, null);
-		}
-		return false;
+		}, "check message center availability");
 	}
 
 	/**
@@ -915,17 +911,14 @@ public class Apptentive {
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
 	@Deprecated
-	public static void setUnreadMessagesListener(UnreadMessagesListener listener) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to set unread messages listener: no active conversation.");
-				return;
+	public static void setUnreadMessagesListener(final UnreadMessagesListener listener) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getMessageManager().setHostUnreadMessagesListener(listener);
+				return true;
 			}
-			ApptentiveInternal.getInstance().getMessageManager().setHostUnreadMessagesListener(listener);
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.setUnreadMessagesListener()");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "set unread message listener");
 	}
 
 	/**
@@ -935,20 +928,14 @@ public class Apptentive {
 	 *                 Instead, create your listener as an instance variable and pass that in. This
 	 *                 allows us to keep a weak reference to avoid memory leaks.
 	 */
-	public static void addUnreadMessagesListener(UnreadMessagesListener listener) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to add unread messages listener: no active conversation.");
-				return;
-			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation != null) {
+	public static void addUnreadMessagesListener(final UnreadMessagesListener listener) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
 				conversation.getMessageManager().addHostUnreadMessagesListener(listener);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.addUnreadMessagesListener()");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "add unread message listener");
 	}
 
 	/**
@@ -958,12 +945,10 @@ public class Apptentive {
 	 */
 	public static int getUnreadMessageCount() {
 		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.v(ApptentiveLogTag.MESSAGES, "Unable to get unread message count: no active conversation.");
-				return 0;
+			if (ApptentiveInternal.isApptentiveRegistered()) {
+				ConversationProxy conversationProxy = ApptentiveInternal.getInstance().getConversationProxy();
+				return conversationProxy != null ? conversationProxy.getUnreadMessageCount() : 0;
 			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			return conversation.getMessageManager().getUnreadMessageCount();
 		} catch (Exception e) {
 			ApptentiveLog.w(e, "Error in Apptentive.getUnreadMessageCount()");
 			MetricModule.sendError(e, null, null);
@@ -977,27 +962,20 @@ public class Apptentive {
 	 *
 	 * @param text The message you wish to send.
 	 */
-	public static void sendAttachmentText(String text) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
-				return;
+	public static void sendAttachmentText(final String text) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				CompoundMessage message = new CompoundMessage();
+				message.setBody(text);
+				message.setRead(true);
+				message.setHidden(true);
+				message.setSenderId(conversation.getPerson().getId());
+				message.setAssociatedFiles(null);
+				conversation.getMessageManager().sendMessage(message);
+				return true;
 			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			CompoundMessage message = new CompoundMessage();
-			message.setBody(text);
-			message.setRead(true);
-			message.setHidden(true);
-			message.setSenderId(conversation.getPerson().getId());
-			message.setAssociatedFiles(null);
-			MessageManager mgr = conversation.getMessageManager();
-			if (mgr != null) {
-				mgr.sendMessage(message);
-			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentText(String)");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "send attachment text");
 	}
 
 	/**
@@ -1007,61 +985,54 @@ public class Apptentive {
 	 *
 	 * @param uri The URI of the local resource file.
 	 */
-	public static void sendAttachmentFile(String uri) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
-				return;
-			}
-			if (TextUtils.isEmpty(uri)) {
-				return;
-			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			CompoundMessage message = new CompoundMessage();
-			// No body, just attachment
-			message.setBody(null);
-			message.setRead(true);
-			message.setHidden(true);
-			message.setSenderId(conversation.getPerson().getId());
+	public static void sendAttachmentFile(final String uri) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				if (TextUtils.isEmpty(uri)) {
+					return false; // TODO: add error message
+				}
+				CompoundMessage message = new CompoundMessage();
+				// No body, just attachment
+				message.setBody(null);
+				message.setRead(true);
+				message.setHidden(true);
+				message.setSenderId(conversation.getPerson().getId());
 
-			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+				ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
 			/* Make a local copy in the cache dir. By default the file name is "apptentive-api-file + nonce"
 			 * If original uri is known, the name will be taken from the original uri
 			 */
-			Context context = ApptentiveInternal.getInstance().getApplicationContext();
-			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), Uri.parse(uri).getLastPathSegment());
+				Context context = ApptentiveInternal.getInstance().getApplicationContext();
+				String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(context, message.getNonce(), Uri.parse(uri).getLastPathSegment());
 
-			String mimeType = Util.getMimeTypeFromUri(context, Uri.parse(uri));
-			MimeTypeMap mime = MimeTypeMap.getSingleton();
-			String extension = mime.getExtensionFromMimeType(mimeType);
+				String mimeType = Util.getMimeTypeFromUri(context, Uri.parse(uri));
+				MimeTypeMap mime = MimeTypeMap.getSingleton();
+				String extension = mime.getExtensionFromMimeType(mimeType);
 
-			// If we can't get the mime type from the uri, try getting it from the extension.
-			if (extension == null) {
-				extension = MimeTypeMap.getFileExtensionFromUrl(uri);
-			}
-			if (mimeType == null && extension != null) {
-				mimeType = mime.getMimeTypeFromExtension(extension);
-			}
-			if (!TextUtils.isEmpty(extension)) {
-				localFilePath += "." + extension;
-			}
-			StoredFile storedFile = Util.createLocalStoredFile(uri, localFilePath, mimeType);
-			if (storedFile == null) {
-				return;
-			}
+				// If we can't get the mime type from the uri, try getting it from the extension.
+				if (extension == null) {
+					extension = MimeTypeMap.getFileExtensionFromUrl(uri);
+				}
+				if (mimeType == null && extension != null) {
+					mimeType = mime.getMimeTypeFromExtension(extension);
+				}
+				if (!TextUtils.isEmpty(extension)) {
+					localFilePath += "." + extension;
+				}
+				StoredFile storedFile = Util.createLocalStoredFile(uri, localFilePath, mimeType);
+				if (storedFile == null) {
+					return false; // TODO: add error message
+				}
 
-			storedFile.setId(message.getNonce());
-			attachmentStoredFiles.add(storedFile);
+				storedFile.setId(message.getNonce());
+				attachmentStoredFiles.add(storedFile);
 
-			message.setAssociatedFiles(attachmentStoredFiles);
-			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-			if (mgr != null) {
-				mgr.sendMessage(message);
+				message.setAssociatedFiles(attachmentStoredFiles);
+				conversation.getMessageManager().sendMessage(message);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(String)");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "send attachment file");
 	}
 
 	/**
@@ -1072,23 +1043,20 @@ public class Apptentive {
 	 * @param content  A byte array of the file contents.
 	 * @param mimeType The mime type of the file.
 	 */
-	public static void sendAttachmentFile(byte[] content, String mimeType) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.i(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
-				return;
+	public static void sendAttachmentFile(final byte[] content, final String mimeType) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ByteArrayInputStream is = null;
+				try {
+					is = new ByteArrayInputStream(content);
+					sendAttachmentFile(is, mimeType);
+				} finally {
+					Util.ensureClosed(is);
+				}
+				return true;
 			}
-			ByteArrayInputStream is = null;
-			try {
-				is = new ByteArrayInputStream(content);
-				sendAttachmentFile(is, mimeType);
-			} finally {
-				Util.ensureClosed(is);
-			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(byte[], String)");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "send attachment file");
 	}
 
 	/**
@@ -1099,142 +1067,202 @@ public class Apptentive {
 	 * @param is       An InputStream from the desired file.
 	 * @param mimeType The mime type of the file.
 	 */
-	public static void sendAttachmentFile(InputStream is, String mimeType) {
-		try {
-			if (!ApptentiveInternal.isConversationActive()) {
-				ApptentiveLog.w(ApptentiveLogTag.MESSAGES, "Can't send attachment: No active Conversation.");
-				return;
-			}
-			if (is == null) {
-				return;
-			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			CompoundMessage message = new CompoundMessage();
-			// No body, just attachment
-			message.setBody(null);
-			message.setRead(true);
-			message.setHidden(true);
-			message.setSenderId(conversation.getPerson().getId());
+	public static void sendAttachmentFile(final InputStream is, final String mimeType) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				if (is == null) {
+					return false; // TODO: add error message
+				}
+				CompoundMessage message = new CompoundMessage();
+				// No body, just attachment
+				message.setBody(null);
+				message.setRead(true);
+				message.setHidden(true);
+				message.setSenderId(conversation.getPerson().getId());
 
-			ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
-			String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
+				ArrayList<StoredFile> attachmentStoredFiles = new ArrayList<StoredFile>();
+				String localFilePath = Util.generateCacheFilePathFromNonceOrPrefix(ApptentiveInternal.getInstance().getApplicationContext(), message.getNonce(), null);
 
-			String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
-			if (!TextUtils.isEmpty(extension)) {
-				localFilePath += "." + extension;
-			}
-			// When created from InputStream, there is no source file uri or path, thus just use the cache file path
-			StoredFile storedFile = Util.createLocalStoredFile(is, localFilePath, localFilePath, mimeType);
-			if (storedFile == null) {
-				return;
-			}
-			storedFile.setId(message.getNonce());
-			attachmentStoredFiles.add(storedFile);
+				String extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(mimeType);
+				if (!TextUtils.isEmpty(extension)) {
+					localFilePath += "." + extension;
+				}
+				// When created from InputStream, there is no source file uri or path, thus just use the cache file path
+				StoredFile storedFile = Util.createLocalStoredFile(is, localFilePath, localFilePath, mimeType);
+				if (storedFile == null) {
+					return false; // TODO: add error message
+				}
+				storedFile.setId(message.getNonce());
+				attachmentStoredFiles.add(storedFile);
 
-			message.setAssociatedFiles(attachmentStoredFiles);
-			ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.sendAttachmentFile(InputStream, String)");
-			MetricModule.sendError(e, null, null);
-		}
+				message.setAssociatedFiles(attachmentStoredFiles);
+				conversation.getMessageManager().sendMessage(message);
+				return true;
+			}
+		}, "add unread message listener");
 	}
 
 	//endregion
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, determines
-	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
-	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
-	 * invocation of this method.
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method. This task is performed
+	 * asynchronously. If you would like to know whether this method will launch an Apptentive
+	 * Interaction, use {@link Apptentive#engage(Context, String, BooleanCallback)}
 	 *
-	 * @param context The context from which to launch the Interaction. This should be an
-	 *                Activity, except in rare cases where you don't have access to one, in which
-	 *                case Apptentive Interactions will launch in a new task.
-	 * @param event   A unique String representing the line this method is called on. For instance, you may want to have
-	 *                the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                call <strong><code>engage(context, "finished_upload");</code></strong>
-	 * @return true if the an interaction was shown, else false.
+	 * @param context The context from which to launch the Interaction. This should be an Activity,
+	 *                except in rare cases where you don't have access to one, in which case
+	 *                Apptentive Interactions will launch in a new task.
+	 * @param event   A unique String representing the line this method is called on. For instance,
+	 *                you may want to have the ability to target interactions to run after the user
+	 *                uploads a file in your app. You may then call
+	 *                <strong><code>engage(context, "finished_upload");</code></strong>
 	 */
-	public static synchronized boolean engage(Context context, String event) {
-		return engage(context, event, null, (ExtendedData[]) null);
+	public static synchronized void engage(Context context, String event) {
+		engage(context, event, (BooleanCallback) null);
 	}
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, determines
-	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
-	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
-	 * invocation of this method.
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method. This task is performed
+	 * asynchronously.
 	 *
-	 * @param context    The context from which to launch the Interaction. This should be an
-	 *                   Activity, except in rare cases where you don't have access to one, in which
-	 *                   case Apptentive Interactions will launch in a new task.
-	 * @param event      A unique String representing the line this method is called on. For instance, you may want to have
-	 *                   the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                   call <strong><code>engage(context, "finished_upload");</code></strong>
-	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
-	 *                   is sent to the server for tracking information in the context of the engaged Event.
-	 * @return true if the an interaction was shown, else false.
+	 * @param context  The context from which to launch the Interaction. This should be an Activity,
+	 *                 except in rare cases where you don't have access to one, in which case
+	 *                 Apptentive Interactions will launch in a new task.
+	 * @param event    A unique String representing the line this method is called on. For instance,
+	 *                 you may want to have the ability to target interactions to run after the user
+	 *                 uploads a file in your app. You may then call
+	 *                 <strong><code>engage(context, "finished_upload");</code></strong>
+	 * @param callback Called after we check to see if an Interaction should be displayed. Called with
+	 *                 true if an Interaction will be displayed, else false.
 	 */
-	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData) {
-		return engage(context, event, customData, (ExtendedData[]) null);
+	public static synchronized void engage(Context context, String event, BooleanCallback callback) {
+		engage(context, event, null, (ExtendedData[]) null);
 	}
 
 	/**
-	 * This method takes a unique event string, stores a record of that event having been visited, determines
-	 * if there is an interaction that is able to run for this event, and then runs it. If more than one interaction
-	 * can run, then the most appropriate interaction takes precedence. Only one interaction at most will run per
-	 * invocation of this method.
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method. This task is performed
+	 * asynchronously. If you would like to know whether this method will launch an Apptentive
+	 * Interaction, use {@link Apptentive#engage(Context, String, BooleanCallback, Map)}.
+	 *
+	 * @param context    The context from which to launch the Interaction. This should be an Activity,
+	 *                   except in rare cases where you don't have access to one, in which case
+	 *                   Apptentive Interactions will launch in a new task.
+	 * @param event      A unique String representing the line this method is called on. For instance,
+	 *                   you may want to have the ability to target interactions to run after the user
+	 *                   uploads a file in your app. You may then call
+	 *                   <strong><code>engage(context, "finished_upload");</code></strong>
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or
+	 *                   Booleans. This data is sent to the server for tracking information in the
+	 *                   context of the engaged Event.
+	 * @return true if the an interaction was shown, else false.
+	 */
+	public static synchronized void engage(Context context, String event, Map<String, Object> customData) {
+		engage(context, event, (BooleanCallback) null, customData);
+	}
+
+	/**
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method. This task is performed
+	 * asynchronously.
+	 *
+	 * @param context    The context from which to launch the Interaction. This should be an Activity,
+	 *                   except in rare cases where you don't have access to one, in which case
+	 *                   Apptentive Interactions will launch in a new task.
+	 * @param event      A unique String representing the line this method is called on. For instance,
+	 *                   you may want to have the ability to target interactions to run after the user
+	 *                   uploads a file in your app. You may then call
+	 *                   <strong><code>engage(context, "finished_upload");</code></strong>
+	 * @param callback   Called after we check to see if an Interaction should be displayed. Called with
+	 *                   true if an Interaction will be displayed, else false.
+	 * @param customData A Map of String keys to Object values. Objects may be Strings, Numbers, or
+	 *                   Booleans. This data is sent to the server for tracking information in the
+	 *                   context of the engaged Event.
+	 */
+	public static synchronized void engage(Context context, String event, BooleanCallback callback, Map<String, Object> customData) {
+		engage(context, event, callback, customData, (ExtendedData[]) null);
+	}
+
+	/**
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method. This task is performed
+	 * asynchronously. If you would like to know whether this method will launch an Apptentive
+	 * Interaction, use {@link Apptentive#engage(Context, String, BooleanCallback, Map, ExtendedData...)}.
 	 *
 	 * @param context      The context from which to launch the Interaction. This should be an
 	 *                     Activity, except in rare cases where you don't have access to one, in which
 	 *                     case Apptentive Interactions will launch in a new task.
-	 * @param event        A unique String representing the line this method is called on. For instance, you may want to have
-	 *                     the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *                     call <strong><code>engage(context, "finished_upload");</code></strong>
-	 * @param customData   A Map of String keys to Object values. Objects may be Strings, Numbers, or Booleans. This data
-	 *                     is sent to the server for tracking information in the context of the engaged Event.
-	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send structured data that has
-	 *                     specific meaning to the server. By using an {@link ExtendedData} object instead of arbitrary
-	 *                     customData, special meaning can be derived. Supported objects include {@link TimeExtendedData},
-	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include each type only once.
-	 * @return true if the an interaction was shown, else false.
+	 * @param event        A unique String representing the line this method is called on.
+	 *                     For instance, you may want to have the ability to target interactions to
+	 *                     run after the user uploads a file in your app. You may then call
+	 *                     <strong><code>engage(context, "finished_upload");</code></strong>
+	 * @param customData   A Map of String keys to Object values. Objects may be Strings, Numbers, or
+	 *                     Booleans. This data is sent to the server for tracking information in the
+	 *                     context of the engaged Event.
+	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send
+	 *                     structured data that has specific meaning to the server. By using an
+	 *                     {@link ExtendedData} object instead of arbitrary customData, special
+	 *                     meaning can be derived. Supported objects include {@link TimeExtendedData},
+	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include
+	 *                     each type only once.
 	 */
-	public static synchronized boolean engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		try {
-			if (StringUtils.isNullOrEmpty(event)) {
-				ApptentiveLog.e("Unable to engage event: name is null or empty"); // TODO: throw an IllegalArgumentException instead?
-				return false;
-			}
-			if (context == null) {
-				ApptentiveLog.e("Unable to engage '%s' event: context is null", event);  // TODO: throw an IllegalArgumentException instead?
-				return false;
-			}
-			if (!ApptentiveInternal.isApptentiveRegistered()) {
-				ApptentiveLog.e("Unable to engage '%s' event: Apptentive SDK is not initialized", event);
-				return false;
-			}
-			Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-			if (conversation == null) {
-				ApptentiveLog.w("Unable to engage '%s' event: no active conversation", event);
-				return false;
-			}
-
-			return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while engaging '%s' event", event);
-			return false;
-		}
+	public static synchronized void engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
+		engage(context, event, (BooleanCallback) null, customData, extendedData);
 	}
 
 	/**
-	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
-	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
-	 *              call <strong><code>engage(context, "finished_upload");</code></strong>
-	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
-	 * @deprecated Use {@link #canShowInteraction(String)}() instead. The behavior is identical. Only the name has changed.
+	 * This method takes a unique event string, stores a record of that event having been visited,
+	 * determines if there is an interaction that is able to run for this event, and then runs it. If
+	 * more than one interaction can run, then the most appropriate interaction takes precedence. Only
+	 * one interaction at most will run per invocation of this method.
+	 *
+	 * @param context      The context from which to launch the Interaction. This should be an
+	 *                     Activity, except in rare cases where you don't have access to one, in which
+	 *                     case Apptentive Interactions will launch in a new task.
+	 * @param event        A unique String representing the line this method is called on.
+	 *                     For instance, you may want to have the ability to target interactions to
+	 *                     run after the user uploads a file in your app. You may then call
+	 *                     <strong><code>engage(context, "finished_upload");</code></strong>
+	 * @param callback     Called after we check to see if an Interaction should be displayed. Called with
+	 *                     true if an Interaction will be displayed, else false.
+	 * @param customData   A Map of String keys to Object values. Objects may be Strings, Numbers, or
+	 *                     Booleans. This data is sent to the server for tracking information in the
+	 *                     context of the engaged Event.
+	 * @param extendedData An array of ExtendedData objects. ExtendedData objects used to send
+	 *                     structured data that has specific meaning to the server. By using an
+	 *                     {@link ExtendedData} object instead of arbitrary customData, special
+	 *                     meaning can be derived. Supported objects include {@link TimeExtendedData},
+	 *                     {@link LocationExtendedData}, and {@link CommerceExtendedData}. Include
+	 *                     each type only once.
 	 */
-	public static synchronized boolean willShowInteraction(String event) {
-		return canShowInteraction(event);
+	public static synchronized void engage(final Context context, final String event, final BooleanCallback callback, final Map<String, Object> customData, final ExtendedData... extendedData) {
+		if (context == null) {
+			throw new IllegalArgumentException("Context is null");
+		}
+
+		if (StringUtils.isNullOrEmpty(event)) {
+			throw new IllegalArgumentException("Event is null or empty");
+		}
+
+		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+			}
+		}, StringUtils.format("engage '%s' event", event));
 	}
 
 	/**
@@ -1246,18 +1274,14 @@ public class Apptentive {
 	 * @param event A unique String representing the line this method is called on. For instance, you may want to have
 	 *              the ability to target interactions to run after the user uploads a file in your app. You may then
 	 *              call <strong><code>engage(activity, "finished_upload");</code></strong>
-	 * @return true if an immediate call to engage() with the same event name would result in an Interaction being displayed, otherwise false.
 	 */
-	public static synchronized boolean canShowInteraction(String event) {
-		try {
-			if (ApptentiveInternal.isConversationActive()) {
-				return EngagementModule.canShowInteraction(ApptentiveInternal.getInstance().getConversation(), "app", event, "local");
+	public static synchronized void queryCanShowInteraction(final String event, BooleanCallback callback) {
+		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				return EngagementModule.canShowInteraction(conversation, "app", event, "local");
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.canShowInteraction()");
-			MetricModule.sendError(e, null, null);
-		}
-		return false;
+		}, "check if interaction can be shown");
 	}
 
 	/**
@@ -1269,16 +1293,15 @@ public class Apptentive {
 	 * @param listener The {@link com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener} listener
 	 *                 to call when the survey is finished.
 	 */
-	public static void setOnSurveyFinishedListener(OnSurveyFinishedListener listener) {
-		try {
-			ApptentiveInternal internal = ApptentiveInternal.getInstance();
-			if (internal != null) {
-				internal.setOnSurveyFinishedListener(listener);
+	public static void setOnSurveyFinishedListener(final OnSurveyFinishedListener listener) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal sharedInstance = ApptentiveInternal.getInstance();
+				sharedInstance.setOnSurveyFinishedListener(listener);
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.setOnSurveyFinishedListener()");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "set survey finish listener");
 	}
 
 	//region Login/Logout
@@ -1288,31 +1311,49 @@ public class Apptentive {
 	 * you to implement JWT generation on your server. Please read about it in Apptentive's Android
 	 * Integration Reference Guide.
 	 *
-	 * @param token A JWT signed by your server using the secret from your app's Apptentive settings.
+	 * @param token    A JWT signed by your server using the secret from your app's Apptentive settings.
 	 * @param callback A LoginCallback, which will be called asynchronously when the login succeeds
-	 *                  or fails.
+	 *                 or fails.
 	 */
-	public static void login(String token, LoginCallback callback) {
-		try {
-			if (token == null) {
-				if (callback != null) {
-					callback.onLoginFail("token is null");
-				}
-				return;
-			}
+	public static void login(final String token, final LoginCallback callback) {
+		if (StringUtils.isNullOrEmpty(token)) {
+			throw new IllegalArgumentException("Token is null or empty");
+		}
 
-			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
-			if (instance == null) {
-				ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
-				if (callback != null) {
-					callback.onLoginFail("Apptentive instance is not properly initialized");
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				try {
+					loginGuarded(token, callback);
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while trying to login");
+					notifyFailure(callback, "Exception while trying to login");
+					MetricModule.sendError(e, null, null);
 				}
-			} else {
-				ApptentiveInternal.getInstance().login(token, callback);
 			}
-		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.login()");
-			MetricModule.sendError(e, null, null);
+		});
+	}
+
+	private static void loginGuarded(String token, final LoginCallback callback) {
+		checkConversationQueue();
+
+		final ApptentiveInternal sharedInstance = ApptentiveInternal.getInstance();
+		if (sharedInstance == null) {
+			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+			notifyFailure(callback, "Apptentive instance is not properly initialized");
+		} else {
+			sharedInstance.login(token, callback);
+		}
+	}
+
+	private static void notifyFailure(final LoginCallback callback, final String errorMessage) {
+		if (callback != null) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					callback.onLoginFail(errorMessage);
+				}
+			});
 		}
 	}
 
@@ -1335,17 +1376,13 @@ public class Apptentive {
 	}
 
 	public static void logout() {
-		try {
-			final ApptentiveInternal instance = ApptentiveInternal.getInstance();
-			if (instance == null) {
-				ApptentiveLog.e("Unable to logout: Apptentive instance is not properly initialized");
-			} else {
-				instance.logout();
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal.getInstance().logout();
+				return true;
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception in Apptentive.logout()");
-			MetricModule.sendError(e, null, null);
-		}
+		}, "logout");
 	}
 
 	/**
@@ -1353,9 +1390,10 @@ public class Apptentive {
 	 * means that you must store a static reference to the listener as long as you want it to live.
 	 * One possible way to do this is to implement this listener with your Application class, or store
 	 * one on your Application.
-	 *
+	 * <p>
 	 * This listener will alert you to authentication failures, so that you can either recover from
 	 * expired or revoked JWTs, or fix your authentication implementation.
+	 *
 	 * @param listener A listener that will be called when there is an authentication failure other
 	 *                 for the current logged in conversation. If the failure is for another
 	 *                 conversation, or there is no active conversation, the listener is not called.
@@ -1473,9 +1511,9 @@ public class Apptentive {
 		@Override
 		public String toString() {
 			return "AuthenticationFailedReason{" +
-				       "error='" + error + '\'' +
-				       "errorType='" + name() + '\'' +
-				       '}';
+					"error='" + error + '\'' +
+					"errorType='" + name() + '\'' +
+					'}';
 		}
 	}
 
@@ -1637,5 +1675,22 @@ public class Apptentive {
 			double thatDateTime = other.getDateTime();
 			return Double.compare(thisDateTime, thatDateTime);
 		}
+	}
+
+	/**
+	 * Allows certain Apptentive API methods to execute and return a boolean result asynchronously.
+	 */
+	public interface BooleanCallback {
+		/**
+		 * Passes the result of an Apptentive API method call.
+		 *
+		 * @param result true depending on the use of the consuming API method. Check the javadoc for
+		 *               the method that uses this callback in its signature.
+		 */
+		void onFinish(boolean result);
+	}
+
+	public interface PendingIntentCallback {
+		void onPendingIntent(PendingIntent pendingIntent);
 	}
 }

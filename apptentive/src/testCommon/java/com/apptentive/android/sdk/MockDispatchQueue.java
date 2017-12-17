@@ -11,11 +11,15 @@ import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.Queue;
 
+import static com.apptentive.android.sdk.util.RuntimeUtils.overrideStaticFinalField;
+
 public class MockDispatchQueue extends DispatchQueue {
 	private final boolean runImmediately;
 	private Queue<DispatchTask> tasks;
+	private boolean indentifyAsMainQueue = true;
 
 	public MockDispatchQueue(boolean runImmediately) {
+		super("Mock Queue");
 		this.runImmediately = runImmediately;
 		this.tasks = new LinkedList<>();
 	}
@@ -34,6 +38,16 @@ public class MockDispatchQueue extends DispatchQueue {
 		tasks.clear();
 	}
 
+	@Override
+	public boolean isCurrent() {
+		return true; // sure, why not? :)
+	}
+
+	public MockDispatchQueue setIndentifyAsMainQueue(boolean indentifyAsMainQueue) {
+		this.indentifyAsMainQueue = indentifyAsMainQueue;
+		return this;
+	}
+
 	public void dispatchTasks() {
 		while (tasks.size() > 0) {
 			tasks.poll().run();
@@ -46,19 +60,26 @@ public class MockDispatchQueue extends DispatchQueue {
 		return queue;
 	}
 
-	private static void overrideMainQueue(DispatchQueue queue) {
+	private static void overrideMainQueue(final MockDispatchQueue queue) {
 		try {
-			Class<?> holderClass = DispatchQueue.class.getDeclaredClasses()[0];
-			Field instanceField = holderClass.getDeclaredField("MAIN_QUEUE");
-			instanceField.setAccessible(true);
-
-			Field modifiersField = Field.class.getDeclaredField("modifiers");
-			modifiersField.setAccessible(true);
-			modifiersField.setInt(instanceField, instanceField.getModifiers() & ~Modifier.FINAL);
-
-			instanceField.set(null, queue);
+			overrideStaticFinalField(findHolderClass(DispatchQueue.class.getDeclaredClasses()), "MAIN_QUEUE", queue);
+			overrideStaticFinalField(DispatchQueue.class, "MAIN_QUEUE_CHECKER", new DispatchQueue.MainQueueChecker() {
+				@Override
+				public boolean isMainQueue() {
+					return queue.indentifyAsMainQueue;
+				}
+			});
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}
+	}
+
+	private static Class<?> findHolderClass(Class<?>[] classes) {
+		for (Class<?> cls : classes) {
+			if (cls.getSimpleName().equals("Holder")) {
+				return cls;
+			}
+		}
+		return null;
 	}
 }

@@ -43,6 +43,8 @@ import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
@@ -79,6 +81,7 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
@@ -207,12 +210,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		 */
 		setup(view, isInitialViewCreation);
 
-		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-		// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-		mgr.addInternalOnMessagesUpdatedListener(this);
-		// Give the MessageCenterView a callback when a message is sent.
-		mgr.setAfterSendMessageListener(this);
-
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				MessageManager mgr = conversation.getMessageManager();
+				// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
+				mgr.addInternalOnMessagesUpdatedListener(MessageCenterFragment.this);
+				// Give the MessageCenterView a callback when a message is sent.
+				mgr.setAfterSendMessageListener(MessageCenterFragment.this);
+				return true;
+			}
+		}, "set message listeners");
 
 		// Needed to prevent the window from being pushed up when a text input area is focused.
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
@@ -247,12 +255,12 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onStart() {
 		super.onStart();
-		ApptentiveInternal.getInstance().getMessageManager().setMessageCenterInForeground(true);
+		getConversation().setMessageCenterInForeground(true);
 	}
 
 	public void onStop() {
 		super.onStop();
-		ApptentiveInternal.getInstance().getMessageManager().setMessageCenterInForeground(false);
+		getConversation().setMessageCenterInForeground(false);
 	}
 
 	@Override
@@ -314,13 +322,25 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onPause() {
 		super.onPause();
-		ApptentiveInternal.getInstance().getMessageManager().pauseSending(MessageManager.SEND_PAUSE_REASON_ACTIVITY_PAUSE);
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getMessageManager().pauseSending(MessageManager.SEND_PAUSE_REASON_ACTIVITY_PAUSE);
+				return true;
+			}
+		}, "pause message center fragment");
 	}
 
 	@Override
 	public void onResume() {
 		super.onResume();
-		ApptentiveInternal.getInstance().getMessageManager().resumeSending();
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				conversation.getMessageManager().resumeSending();
+				return true;
+			}
+		}, "resume message center fragment");
 
 		/* imagePickerStillOpen was set true when the picker intent was launched. If user had picked an image,
 		 * it would have been set to false. Otherwise, it indicates the user tried to attach an image but
@@ -372,11 +392,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, listItems);
 
 		if (isInitialViewCreation) {
-			List<MessageCenterListItem> items = ApptentiveInternal.getInstance().getMessageManager().getMessageCenterListItems();
-			if (items != null) {
-				// Get message list from DB, and use this as the starting point for the listItems array.
-				prepareMessages(items);
-			}
+			dispatchConversationTask(new ConversationDispatchTask() {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					List<MessageCenterListItem> items = conversation.getMessageManager().getMessageCenterListItems();
+					if (items != null) {
+						// Get message list from DB, and use this as the starting point for the listItems array.
+						prepareMessages(items);
+					}
+					return true;
+				}
+			}, "prepare messages");
+
 
 			String contextMessageBody = interaction.getContextualMessageBody();
 			if (contextMessageBody != null) {
@@ -433,7 +460,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		// Retrieve any saved attachments
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		if (conversation != null && conversation.getMessageCenterPendingAttachments() != null) {
 			String pendingAttachmentsString = conversation.getMessageCenterPendingAttachments();
 			JSONArray savedAttachmentsJsonArray = null;
@@ -526,13 +553,20 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public boolean cleanup() {
 		// Set to null, otherwise they will hold reference to the activity context
-		MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				MessageManager mgr = conversation.getMessageManager();
 
-		mgr.clearInternalOnMessagesUpdatedListeners();
-		mgr.setAfterSendMessageListener(null);
+				mgr.clearInternalOnMessagesUpdatedListeners();
+				mgr.setAfterSendMessageListener(null);
 
-		ApptentiveInternal.getInstance().getAndClearCustomData();
-		ApptentiveAttachmentLoader.getInstance().clearMemoryCache();
+				ApptentiveInternal.getInstance().getAndClearCustomData();
+				ApptentiveAttachmentLoader.getInstance().clearMemoryCache();
+
+				return true;
+			}
+		}, "clean up message center fragment");
 		return true;
 	}
 
@@ -713,7 +747,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			ft.addToBackStack(null);
 
 			// Create and show the dialog.
-			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image);
+			String conversationToken = getConversation().getConversationToken();
+			AttachmentPreviewDialog dialog = AttachmentPreviewDialog.newInstance(image, conversationToken);
 			dialog.show(ft, DIALOG_IMAGE_PREVIEW);
 
 		} catch (Exception e) {
@@ -746,7 +781,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		this.composer = composer;
 		this.composerEditText = composerEditText;
 
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			if (this.composerEditText != null) {
@@ -873,7 +908,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			compoundMessage.setCustomData(ApptentiveInternal.getInstance().getAndClearCustomData());
 			compoundMessage.setAssociatedImages(new ArrayList<ImageItem>(pendingAttachments));
 
-			Conversation conversation = getConversation();
+			ConversationProxy conversation = getConversation();
 			if (conversation != null && conversation.hasActiveState()) {
 				compoundMessage.setSenderId(conversation.getPerson().getId());
 			}
@@ -999,7 +1034,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private void setWhoCardAsPreviouslyDisplayed() {
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		if (conversation == null) {
 			return;
 		}
@@ -1007,7 +1042,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private boolean wasWhoCardAsPreviouslyDisplayed() {
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		if (conversation == null) {
 			return false;
 		}
@@ -1024,7 +1059,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		if (conversation == null) {
 			return;
 		}
@@ -1051,7 +1086,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * will clear the pending composing message previously saved in shared preference
 	 */
 	public void clearPendingComposingMessage() {
-		Conversation conversation = getConversation();
+		ConversationProxy conversation = getConversation();
 		if (conversation != null) {
 			conversation.setMessageCenterPendingMessage(null);
 			conversation.setMessageCenterPendingAttachments(null);
@@ -1363,7 +1398,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					fragment.unsentMessagesCount++;
 					fragment.setPaused(false);
 
-					ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
+					sendMessage(message);
 
 					// After the message is sent, show the Who Card if it has never been seen before, and the configuration specifies it should be requested.
 					if (!fragment.wasWhoCardAsPreviouslyDisplayed() && fragment.interaction.getWhoCardRequestEnabled()) {
@@ -1408,7 +1443,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						fragment.messageCenterRecyclerViewAdapter.notifyItemInserted(fragment.listItems.size() - 1);
 
 						// Send it to the server
-						ApptentiveInternal.getInstance().getMessageManager().sendMessage(message);
+						sendMessage(message);
 					}
 					break;
 				}
@@ -1511,6 +1546,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 					break;
 				}
 			}
+		}
+
+		private void sendMessage(final ApptentiveMessage message) {
+			dispatchConversationTask(new ConversationDispatchTask() {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					conversation.getMessageManager().sendMessage(message);
+					return true;
+				}
+			}, "send message");
 		}
 	}
 

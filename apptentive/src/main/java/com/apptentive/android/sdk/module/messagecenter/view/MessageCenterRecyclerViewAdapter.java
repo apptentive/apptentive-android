@@ -12,9 +12,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.apptentive.android.sdk.ApptentiveHelper;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
@@ -44,6 +47,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.GREETING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_AUTO;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
@@ -243,21 +247,29 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 		@Override
 		protected Void doInBackground(ApptentiveMessage... messages) {
-			messages[0].setRead(true);
+			final ApptentiveMessage message = messages[0];
+			message.setRead(true);
 			JSONObject data = new JSONObject();
 			try {
-				data.put("message_id", messages[0].getId());
-				data.put("message_type", messages[0].getMessageType().name());
+				data.put("message_id", message.getId());
+				data.put("message_type", message.getMessageType().name());
 			} catch (JSONException e) {
 				//
 			}
 			fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
-			MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
-			if (mgr != null) {
-				mgr.updateMessage(messages[0]);
-				mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount());
-			}
+			dispatchConversationTask(new ConversationDispatchTask() {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					MessageManager mgr = conversation.getMessageManager();
+					if (mgr != null) {
+						mgr.updateMessage(message);
+						mgr.notifyHostUnreadMessagesListeners(mgr.getUnreadMessageCount());
+					}
+					return false;
+				}
+			}, "update message");
+
 			return null;
 		}
 

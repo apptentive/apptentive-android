@@ -28,6 +28,7 @@ import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.debug.LogMonitor;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
@@ -51,8 +52,11 @@ import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -65,6 +69,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.isConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
@@ -243,7 +250,12 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 				try {
 					ApptentiveLog.v("Initializing Apptentive instance: apptentiveKey=%s apptentiveSignature=%s", apptentiveKey, apptentiveSignature);
 					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, serverUrl);
-					sApptentiveInternal.start(); // TODO: check the result of this call
+					dispatchOnConversationQueue(new DispatchTask() {
+						@Override
+						protected void execute() {
+							sApptentiveInternal.start(); // TODO: check the result of this call
+						}
+					});
 					application.registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
@@ -349,11 +361,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return null;
 	}
 
-	public MessageManager getMessageManager() {
-		final Conversation conversation = getConversation();
-		return conversation != null ? conversation.getMessageManager() : null;
-	}
-
 	public ApptentiveTaskManager getApptentiveTaskManager() {
 		return taskManager;
 	}
@@ -372,6 +379,10 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	public Conversation getConversation() {
 		return conversationManager.getActiveConversation();
+	}
+
+	public ConversationProxy getConversationProxy() {
+		return conversationManager.getActiveConversationProxy();
 	}
 
 	public String getApptentiveKey() {
@@ -411,18 +422,24 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppLaunch(final Context appContext) {
+		checkConversationQueue();
+
 		if (isConversationActive()) {
 			engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 		}
 	}
 
 	public void onAppExit(final Context appContext) {
+		checkConversationQueue();
+
 		if (isConversationActive()) {
 			engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
 		}
 	}
 
 	public void onActivityStarted(Activity activity) {
+		checkConversationQueue();
+
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<>(activity);
@@ -434,6 +451,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onActivityResumed(Activity activity) {
+		checkConversationQueue();
+
 		if (activity != null) {
 			// Set current foreground activity reference whenever a new activity is started
 			currentTaskStackTopActivity = new WeakReference<>(activity);
@@ -445,6 +464,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppEnterForeground() {
+		checkConversationQueue();
 
 		// Try to initialize log monitor
 		LogMonitor.tryInitialize(appContext, apptentiveKey, apptentiveSignature);
@@ -454,6 +474,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void onAppEnterBackground() {
+		checkConversationQueue();
+
 		currentTaskStackTopActivity = null;
 
 		// Post a notification
@@ -518,6 +540,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	private boolean start() {
+		checkConversationQueue();
+
 		boolean bRet = true;
 		/* If Message Center feature has never been used before, don't initialize message polling thread.
 		 * Message Center feature will be seen as used, if one of the following conditions has been met:
@@ -655,7 +679,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 			previousVersionName = lastVersionItemSeen.getVersionName();
 			lastSeenVersionNameVersion.setVersion(previousVersionName);
-			if (!(currentVersionCode == previousVersionCode) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
+			if (!(ObjectUtils.equal(currentVersionCode, previousVersionCode)) || !currentVersionName.equals(lastSeenVersionNameVersion.getVersion())) {
 				appReleaseChanged = true;
 			}
 		}
@@ -663,7 +687,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		// TODO: Move this into a session became active handler.
 		final String lastSeenSdkVersion = conversation.getLastSeenSdkVersion();
 		final String currentSdkVersion = Constants.APPTENTIVE_SDK_VERSION;
-		if (!TextUtils.equals(lastSeenSdkVersion, currentSdkVersion)) {
+		if (!StringUtils.equal(lastSeenSdkVersion, currentSdkVersion)) {
 			sdkChanged = true;
 		}
 
@@ -681,18 +705,17 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 		if (appReleaseChanged || sdkChanged) {
 			conversation.addPayload(AppReleaseManager.getPayload(sdk, appRelease));
-			invalidateCaches();
+			conversation.setAppRelease(appRelease);
+			conversation.setSdk(sdk);
+			invalidateCaches(conversation);
 		}
 	}
 
 	/**
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
-	private void invalidateCaches() {
-		Conversation conversation = getConversation();
-		if (conversation != null) {
-			conversation.setInteractionExpiration(0L);
-		}
+	private void invalidateCaches(Conversation conversation) {
+		conversation.setInteractionExpiration(0L);
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
 		config.save();
@@ -744,13 +767,20 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		authenticationFailedListenerRef = new WeakReference<>(listener);
 	}
 
-	public void notifyAuthenticationFailedListener(Apptentive.AuthenticationFailedReason reason, String conversationIdOfFailedRequest) {
+	public void notifyAuthenticationFailedListener(final Apptentive.AuthenticationFailedReason reason, String conversationIdOfFailedRequest) {
+		checkConversationQueue();
 		if (isConversationActive()) {
 			String activeConversationId = getConversation().getConversationId();
 			if (StringUtils.equal(activeConversationId, conversationIdOfFailedRequest)) {
-				Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
+				final Apptentive.AuthenticationFailedListener listener = authenticationFailedListenerRef != null ? authenticationFailedListenerRef.get() : null;
 				if (listener != null) {
-					listener.onAuthenticationFailed(reason);
+					// we need to dispatch listener on the main queue
+					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+						@Override
+						protected void execute() {
+							listener.onAuthenticationFailed(reason);
+						}
+					});
 				}
 			}
 		}
@@ -849,7 +879,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	/**
 	 * TODO: Decouple this from Conversation and Message Manager so it can be unit tested.
 	 */
-	static PendingIntent generatePendingIntentFromApptentivePushData(String apptentivePushData) {
+	static PendingIntent generatePendingIntentFromApptentivePushData(Conversation conversation, String apptentivePushData) {
 		ApptentiveLog.d("Generating Apptentive push PendingIntent.");
 		if (!TextUtils.isEmpty(apptentivePushData)) {
 			try {
@@ -858,14 +888,6 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 				// we need to check if current user is actually the receiver of this notification
 				final String conversationId = pushJson.optString(PUSH_CONVERSATION_ID, null);
 				if (conversationId != null) {
-					final Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-
-					// do we have a conversation right now?
-					if (conversation == null) {
-						ApptentiveLog.w("Can't generate pending intent from Apptentive push data: no active conversation");
-						return null;
-					}
-
 					// is it an actual receiver?
 					if (!StringUtils.equal(conversation.getConversationId(), conversationId)) {
 						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
@@ -880,7 +902,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 				switch (action) {
 					case pmc: {
 						// Prefetch message when push for message center is received
-						MessageManager mgr = ApptentiveInternal.getInstance().getMessageManager();
+						MessageManager mgr = conversation.getMessageManager();
 						if (mgr != null) {
 							mgr.startMessagePreFetchTask();
 						}
@@ -957,6 +979,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	public void notifyInteractionUpdated(boolean successful) {
+		checkConversationQueue();
+
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_FETCHED);
 		Iterator it = interactionUpdateListeners.iterator();
 
@@ -971,7 +995,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	public static PendingIntent prepareMessageCenterPendingIntent(Context context) {
 		Intent intent;
-		if (Apptentive.canShowMessageCenter()) {
+		// FIXME: Make this work with the new async format:
+		if (true /* Apptentive.canShowMessageCenter() */) {
 			intent = new Intent();
 			intent.setClass(context, ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT);
@@ -1078,11 +1103,23 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	 * Dismisses any currently-visible interactions. This method is for internal use and is subject to change.
 	 */
 	public static void dismissAllInteractions() {
+		if (!isConversationQueue()) {
+			dispatchOnConversationQueue(new DispatchTask() {
+				@Override
+				protected void execute() {
+					dismissAllInteractions();
+				}
+			});
+			return;
+		}
+
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_SHOULD_DISMISS);
 	}
 
 	@Override
 	public void onReceiveNotification(ApptentiveNotification notification) {
+		checkConversationQueue();
+
 		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			conversation.addPayload(new LogoutPayload());

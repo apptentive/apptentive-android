@@ -12,9 +12,7 @@ import android.content.SharedPreferences;
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveNotifications;
-import com.apptentive.android.sdk.comm.ApptentiveClient;
-import com.apptentive.android.sdk.comm.ApptentiveHttpResponse;
+import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.Payload;
@@ -24,10 +22,13 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interactions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Targets;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
+import com.apptentive.android.sdk.network.HttpJsonRequest;
+import com.apptentive.android.sdk.network.HttpRequest;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
+import com.apptentive.android.sdk.storage.DeviceDataChangedListener;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
 import com.apptentive.android.sdk.storage.EventData;
@@ -35,6 +36,7 @@ import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
 import com.apptentive.android.sdk.storage.IntegrationConfigItem;
 import com.apptentive.android.sdk.storage.Person;
+import com.apptentive.android.sdk.storage.PersonDataChangedListener;
 import com.apptentive.android.sdk.storage.PersonManager;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -51,16 +53,18 @@ import org.json.JSONException;
 
 import java.io.File;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
-import static com.apptentive.android.sdk.debug.Tester.dispatchDebugEvent;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
-import static com.apptentive.android.sdk.debug.TesterEvent.*;
 
-public class Conversation implements DataChangedListener, Destroyable {
+public class Conversation implements DataChangedListener, Destroyable, DeviceDataChangedListener, PersonDataChangedListener {
+
+	private static final String TAG_FETCH_INTERACTIONS_REQUEST = "fetch_interactions";
 
 	/**
 	 * Conversation data for this class to manage
@@ -97,28 +101,17 @@ public class Conversation implements DataChangedListener, Destroyable {
 	 */
 	private Boolean pollForInteractions;
 
+	/**
+	 * Current conversation state
+	 */
 	private ConversationState state = ConversationState.UNDEFINED;
 
+	/**
+	 * Cached conversation state for better transition tracking
+	 */
+	private ConversationState prevState = ConversationState.UNDEFINED;
+
 	private final MessageManager messageManager;
-
-	// we keep references to the tasks in order to dispatch them only once
-	private final DispatchTask fetchInteractionsTask = new DispatchTask() {
-		@Override
-		protected void execute() {
-			final boolean updateSuccessful = fetchInteractionsSync();
-			dispatchDebugEvent(EVT_CONVERSATION_FETCH_INTERACTIONS, updateSuccessful);
-
-			// Update pending state on UI thread after finishing the task
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-				@Override
-				protected void execute() {
-					if (hasActiveState()) {
-						ApptentiveInternal.getInstance().notifyInteractionUpdated(updateSuccessful);
-					}
-				}
-			});
-		}
-	};
 
 	// we keep references to the tasks in order to dispatch them only once
 	private final DispatchTask saveConversationTask = new DispatchTask() {
@@ -151,6 +144,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	public void startListeningForChanges() {
 		conversationData.setDataChangedListener(this);
+		conversationData.setPersonDataListener(this);
+		conversationData.setDeviceDataListener(this);
 	}
 
 	//region Payloads
@@ -192,68 +187,82 @@ public class Conversation implements DataChangedListener, Destroyable {
 		return null;
 	}
 
-	boolean fetchInteractions(Context context) {
+	void fetchInteractions(Context context) {
 		boolean cacheExpired = getInteractionExpiration() < Util.currentTimeSeconds();
 		if (cacheExpired || RuntimeUtils.isAppDebuggable(context)) {
-			return DispatchQueue.backgroundQueue().dispatchAsyncOnce(fetchInteractionsTask); // do not allow multiple fetches at the same time
-		}
+			ApptentiveHttpClient httpClient = ApptentiveInternal.getInstance().getApptentiveHttpClient();
+			HttpRequest existing = httpClient.findRequest(TAG_FETCH_INTERACTIONS_REQUEST);
+			if (existing == null) {
+				HttpJsonRequest request = httpClient.createFetchInteractionsRequest(getConversationToken(), getConversationId(), new HttpRequest.Listener<HttpJsonRequest>() {
+					@Override
+					public void onFinish(HttpJsonRequest request) {
+						// Send a notification so other parts of the SDK can use this data for troubleshooting
+						ApptentiveNotificationCenter.defaultCenter()
+								.postNotification(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, NOTIFICATION_KEY_MANIFEST, request.getResponseData());
 
-		ApptentiveLog.v(CONVERSATION, "Interaction cache is still valid");
-		return false;
-	}
+						// Store new integration cache expiration.
+						String cacheControl = request.getResponseHeader("Cache-Control");
+						Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+						if (cacheSeconds == null) {
+							cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+						}
+						setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
+						try {
+							InteractionManifest payload = new InteractionManifest(request.getResponseData());
+							Interactions interactions = payload.getInteractions();
+							Targets targets = payload.getTargets();
+							if (interactions != null && targets != null) {
+								setTargets(targets.toString());
+								setInteractions(interactions.toString());
+							} else {
+								ApptentiveLog.e(CONVERSATION, "Unable to save interactionManifest.");
+							}
+						} catch (JSONException e) {
+							ApptentiveLog.e(e, "Invalid InteractionManifest received.");
+						}
+						ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished");
 
-	/**
-	 * Fetches interaction synchronously. Returns <code>true</code> if succeed.
-	 */
-	private boolean fetchInteractionsSync() {
-		ApptentiveLog.v(CONVERSATION, "Fetching Interactions");
-		ApptentiveHttpResponse response = ApptentiveClient.getInteractions(getConversationToken(), getConversationId());
+						// Notify the SDK
+						notifyFinish(true);
+					}
 
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		boolean updateSuccessful = true;
+					@Override
+					public void onCancel(HttpJsonRequest request) {
+					}
 
-		// We weren't able to connect to the internet.
-		if (response.isException()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
-			updateSuccessful = false;
-		}
-		// We got a server error.
-		else if (!response.isSuccessful()) {
-			prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
-			updateSuccessful = false;
-		}
+					@Override
+					public void onFail(HttpJsonRequest request, String reason) {
+						SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 
-		if (updateSuccessful) {
-			String interactionsPayloadString = response.getContent();
+						// We weren't able to connect to the internet.
+						if (request.getResponseCode() == -1) {
+							prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, false).apply();
+						}
+						// We got a server error.
+						else {
+							prefs.edit().putBoolean(Constants.PREF_KEY_MESSAGE_CENTER_SERVER_ERROR_LAST_ATTEMPT, true).apply();
+						}
 
-			// Send a notification so other parts of the SDK can use this data for troubleshooting
-			ApptentiveNotificationCenter.defaultCenter()
-					.postNotification(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, NOTIFICATION_KEY_MANIFEST, interactionsPayloadString);
+						ApptentiveLog.w(CONVERSATION, "Fetching new Interactions task failed");
 
-			// Store new integration cache expiration.
-			String cacheControl = response.getHeaders().get("Cache-Control");
-			Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-			if (cacheSeconds == null) {
-				cacheSeconds = Constants.CONFIG_DEFAULT_INTERACTION_CACHE_EXPIRATION_DURATION_SECONDS;
+						// Notify the SDK
+						notifyFinish(false);
+					}
+
+					private void notifyFinish(final boolean successfull) {
+						if (hasActiveState()) {
+							ApptentiveInternal.getInstance().notifyInteractionUpdated(successfull);
+						}
+					}
+
+				});
+				request.setTag(TAG_FETCH_INTERACTIONS_REQUEST);
+				request.setCallbackQueue(conversationQueue());
+				request.start();
 			}
-			setInteractionExpiration(Util.currentTimeSeconds() + cacheSeconds);
-			try {
-				InteractionManifest payload = new InteractionManifest(interactionsPayloadString);
-				Interactions interactions = payload.getInteractions();
-				Targets targets = payload.getTargets();
-				if (interactions != null && targets != null) {
-					setTargets(targets.toString());
-					setInteractions(interactions.toString());
-				} else {
-					ApptentiveLog.e(CONVERSATION, "Unable to save interactionManifest.");
-				}
-			} catch (JSONException e) {
-				ApptentiveLog.e(e, "Invalid InteractionManifest received.");
-			}
+		} else {
+			ApptentiveLog.v(CONVERSATION, "Interaction cache is still valid");
 		}
-		ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished. Successful: %b", updateSuccessful);
-
-		return updateSuccessful;
 	}
 
 	public boolean isPollForInteractions() {
@@ -348,7 +357,29 @@ public class Conversation implements DataChangedListener, Destroyable {
 
 	@Override
 	public void onDataChanged() {
+		notifyDataChanged();
 		scheduleSaveConversationData();
+	}
+
+	@Override
+	public void onDeviceDataChanged() {
+		notifyDataChanged();
+		scheduleDeviceUpdate();
+	}
+
+	@Override
+	public void onPersonDataChanged() {
+		notifyDataChanged();
+		schedulePersonUpdate();
+	}
+
+	//endregion
+
+	//region Notifications
+
+	private void notifyDataChanged() {
+		ApptentiveNotificationCenter.defaultCenter()
+				.postNotification(NOTIFICATION_CONVERSATION_DATA_DID_CHANGE, NOTIFICATION_KEY_CONVERSATION, this);
 	}
 
 	//endregion
@@ -367,6 +398,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private final DispatchTask personUpdateTask = new DispatchTask() {
 		@Override
 		protected void execute() {
+			checkConversationQueue();
+
 			Person lastSentPerson = getLastSentPerson();
 			Person currentPerson = getPerson();
 			assertNotNull(currentPerson, "Current person object is null");
@@ -381,6 +414,8 @@ public class Conversation implements DataChangedListener, Destroyable {
 	private final DispatchTask deviceUpdateTask = new DispatchTask() {
 		@Override
 		protected void execute() {
+			checkConversationQueue();
+
 			Device lastSentDevice = getLastSentDevice();
 			Device currentDevice = getDevice();
 			assertNotNull(currentDevice, "Current device object is null");
@@ -392,12 +427,12 @@ public class Conversation implements DataChangedListener, Destroyable {
 		}
 	};
 
-	public void schedulePersonUpdate() {
-		DispatchQueue.mainQueue().dispatchAsyncOnce(personUpdateTask);
+	private void schedulePersonUpdate() {
+		conversationQueue().dispatchAsyncOnce(personUpdateTask);
 	}
 
-	public void scheduleDeviceUpdate() {
-		DispatchQueue.mainQueue().dispatchAsyncOnce(deviceUpdateTask);
+	private void scheduleDeviceUpdate() {
+		conversationQueue().dispatchAsyncOnce(deviceUpdateTask);
 	}
 
 	//endregion
@@ -412,8 +447,13 @@ public class Conversation implements DataChangedListener, Destroyable {
 		return state;
 	}
 
+	public ConversationState getPrevState() {
+		return prevState;
+	}
+
 	public void setState(ConversationState state) {
 		// TODO: check if state transition would make sense (for example you should not be able to move from 'logged' state to 'anonymous', etc.)
+		this.prevState = this.state;
 		this.state = state;
 	}
 
@@ -643,7 +683,6 @@ public class Conversation implements DataChangedListener, Destroyable {
 				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
 				break;
 		}
-		scheduleDeviceUpdate();
 	}
 
 	/**

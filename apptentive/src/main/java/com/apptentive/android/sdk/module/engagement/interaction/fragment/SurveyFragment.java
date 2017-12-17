@@ -60,6 +60,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
+
 
 public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener,
 		ApptentiveNestedScrollView.OnScrollChangeListener {
@@ -302,6 +304,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	private void callListener(boolean completed) {
+		assertMainThread();
+
 		OnSurveyFinishedListener listener = ApptentiveInternal.getInstance().getOnSurveyFinishedListener();
 		if (listener != null) {
 			listener.onSurveyFinished(completed);

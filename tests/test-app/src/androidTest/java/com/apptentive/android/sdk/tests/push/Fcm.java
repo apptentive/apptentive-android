@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.tests.push;
 
+import android.app.PendingIntent;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
@@ -40,7 +41,12 @@ public class Fcm extends ApptentiveTestCaseBase {
 	@Test
 	public void pushDataNonApptentive() {
 		Map<String, String> data = new HashMap<>();
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(data));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, data);
 		assertFalse(Apptentive.isApptentivePushNotification(data));
 		assertNull(Apptentive.getTitleFromApptentivePush(data));
 		assertNull(Apptentive.getBodyFromApptentivePush(data));
@@ -49,7 +55,12 @@ public class Fcm extends ApptentiveTestCaseBase {
 	@Test
 	public void nullPushData() {
 		Map<String, String> data = null;
-		assertNull(Apptentive.buildPendingIntentFromPushNotification(data));
+		Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+			@Override
+			public void onPendingIntent(PendingIntent pendingIntent) {
+				assertNull(pendingIntent);
+			}
+		}, data);
 		assertFalse(Apptentive.isApptentivePushNotification(data));
 		assertNull(Apptentive.getTitleFromApptentivePush(data));
 		assertNull(Apptentive.getBodyFromApptentivePush(data));

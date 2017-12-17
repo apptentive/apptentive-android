@@ -11,13 +11,13 @@ import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
+import com.apptentive.android.sdk.ApptentiveHelper;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.model.ConversationItem;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -48,8 +48,9 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
-import java.util.Map;
 
+import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
@@ -76,6 +77,8 @@ public class ConversationManager {
 
 	private final WeakReference<Context> contextRef;
 
+	private boolean appIsInForeground;
+
 	/**
 	 * A basic directory for storing conversation-related data.
 	 */
@@ -87,6 +90,7 @@ public class ConversationManager {
 	private ConversationMetadata conversationMetadata;
 
 	private Conversation activeConversation;
+	private ConversationProxy activeConversationProxy;
 
 	public ConversationManager(Context context, File apptentiveConversationsStorageDir) {
 		if (context == null) {
@@ -100,7 +104,8 @@ public class ConversationManager {
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
-					assertMainThread();
+					checkConversationQueue();
+					appIsInForeground = true;
 					if (activeConversation != null && activeConversation.hasActiveState()) {
 						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch app configuration and interactions...");
 						final Context context = getContext();
@@ -113,6 +118,15 @@ public class ConversationManager {
 					}
 				}
 			});
+
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, new ApptentiveNotificationObserver() {
+				@Override
+				public void onReceiveNotification(ApptentiveNotification notification) {
+					checkConversationQueue();
+					appIsInForeground = false;
+				}
+			});
 	}
 
 	//region Conversations
@@ -122,13 +136,13 @@ public class ConversationManager {
 	 * missing or cannot be loaded
 	 */
 	public boolean loadActiveConversation(Context context) {
+		checkConversationQueue();
+
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
 		try {
-			assertMainThread();
-
 			// resolving metadata
 			ApptentiveLog.vv(CONVERSATION, "Resolving metadata...");
 			conversationMetadata = resolveMetadata();
@@ -138,16 +152,16 @@ public class ConversationManager {
 
 			// attempt to load existing conversation
 			ApptentiveLog.vv(CONVERSATION, "Loading active conversation...");
-			activeConversation = loadActiveConversationGuarded();
+			setActiveConversation(loadActiveConversationGuarded());
 
 			if (activeConversation != null) {
 				activeConversation.startListeningForChanges();
 				activeConversation.scheduleSaveConversationData();
 
 				dispatchDebugEvent(EVT_CONVERSATION_LOAD,
-					"successful", Boolean.TRUE,
-					"conversation_state", activeConversation.getState().toString(),
-					"conversation_identifier", activeConversation.getConversationId());
+						"successful", Boolean.TRUE,
+						"conversation_state", activeConversation.getState().toString(),
+						"conversation_identifier", activeConversation.getConversationId());
 
 				handleConversationStateChange(activeConversation);
 				return true;
@@ -272,7 +286,7 @@ public class ConversationManager {
 			.createLegacyConversationIdRequest(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
-					assertMainThread();
+					checkConversationQueue();
 
 					try {
 						JSONObject root = request.getResponseObject();
@@ -314,13 +328,15 @@ public class ConversationManager {
 				}
 			});
 
-		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
+		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
 		request.start();
 		return request;
 	}
 
 	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
+		checkConversationQueue();
+
 		// TODO: use same serialization logic across the project
 		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
 		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
@@ -344,6 +360,8 @@ public class ConversationManager {
 	 * the existing request
 	 */
 	private HttpRequest fetchConversationToken(final Conversation conversation) {
+		checkConversationQueue();
+
 		// check if context is lost
 		final Context context = getContext();
 		if (context == null) {
@@ -376,7 +394,7 @@ public class ConversationManager {
 			.createConversationTokenRequest(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
 				@Override
 				public void onFinish(HttpJsonRequest request) {
-					assertMainThread();
+					checkConversationQueue();
 
 					try {
 						JSONObject root = request.getResponseObject();
@@ -432,7 +450,7 @@ public class ConversationManager {
 				}
 			});
 
-		request.setCallbackQueue(DispatchQueue.mainQueue()); // we only deal with conversation on the main queue
+		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
 		request.start();
 		return request;
@@ -443,7 +461,8 @@ public class ConversationManager {
 	//region Conversation fetching
 
 	private void handleConversationStateChange(Conversation conversation) {
-		assertMainThread();
+		checkConversationQueue();
+
 		assertTrue(conversation != null && !conversation.hasState(UNDEFINED));
 
 		if (conversation != null && !conversation.hasState(UNDEFINED)) {
@@ -456,8 +475,12 @@ public class ConversationManager {
 					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 			if (conversation.hasActiveState()) {
-				conversation.fetchInteractions(getContext());
-				conversation.getMessageManager().startPollingMessages();
+				if (appIsInForeground) {
+					// ConversationManager listens to the foreground event to fetch interactions when it comes to foreground
+					conversation.fetchInteractions(getContext());
+					// Message Manager listens to foreground/background events itself
+					conversation.getMessageManager().attemptToStartMessagePolling();
+				}
 
 				// Fetch app configuration
 				fetchAppConfiguration(conversation);
@@ -479,6 +502,7 @@ public class ConversationManager {
 	}
 
 	private void fetchAppConfiguration(Conversation conversation) {
+		checkConversationQueue();
 		try {
 			fetchAppConfigurationGuarded(conversation);
 		} catch (Exception e) {
@@ -534,10 +558,13 @@ public class ConversationManager {
 			}
 		});
 		request.setTag(TAG_FETCH_APP_CONFIGURATION_REQUEST);
+		request.setCallbackQueue(conversationQueue());
 		request.start();
 	}
 
 	private void updateMetadataItems(Conversation conversation) {
+		checkConversationQueue();
+
 		ApptentiveLog.vv("Updating metadata: state=%s localId=%s conversationId=%s token=%s",
 				conversation.getState(),
 				conversation.getLocalIdentifier(),
@@ -565,7 +592,7 @@ public class ConversationManager {
 			item = new ConversationMetadataItem(conversation.getLocalIdentifier(), conversation.getConversationId(), conversation.getConversationDataFile(), conversation.getConversationMessagesFile());
 			conversationMetadata.addItem(item);
 		} else {
-			assertTrue(conversation.getConversationId() != null || conversation.hasState(ANONYMOUS_PENDING), "Missing conversation id for state: %s", conversation.getState());
+			assertTrue(conversation.getConversationId() != null || conversation.hasState(ANONYMOUS_PENDING) || conversation.hasState(LEGACY_PENDING), "Missing conversation id for state: %s", conversation.getState());
 			item.conversationId = conversation.getConversationId();
 		}
 
@@ -589,6 +616,8 @@ public class ConversationManager {
 	//region Metadata
 
 	private ConversationMetadata resolveMetadata() {
+		checkConversationQueue();
+
 		try {
 			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			if (metaFile.exists()) {
@@ -608,6 +637,8 @@ public class ConversationManager {
 	}
 
 	private void saveMetadata() {
+		checkConversationQueue();
+
 		try {
 			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
 				ApptentiveLog.vv(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
@@ -636,21 +667,11 @@ public class ConversationManager {
 	};
 
 	public void login(final String token, final LoginCallback callback) {
-		// we only deal with an active conversation on the main thread
-		if (DispatchQueue.isMainQueue()) {
-			requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
-		} else {
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-				@Override
-				protected void execute() {
-					requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
-				}
-			});
-		}
+		requestLoggedInConversation(token, callback != null ? callback : NULL_LOGIN_CALLBACK); // avoid constant null-pointer checking
 	}
 
 	private void requestLoggedInConversation(final String token, final LoginCallback callback) {
-		assertMainThread();
+		checkConversationQueue();
 
 		if (callback == null) {
 			throw new IllegalArgumentException("Callback is null");
@@ -671,8 +692,6 @@ public class ConversationManager {
 			callback.onLoginFail("Exception while extracting user id");
 			return;
 		}
-
-		assertMainThread();
 
 		// Check if there is an active conversation
 		if (activeConversation == null) {
@@ -713,7 +732,7 @@ public class ConversationManager {
 					fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
 						@Override
 						public void onFinish(HttpRequest request) {
-							assertMainThread();
+							checkConversationQueue();
 							assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
 
 							if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
@@ -783,9 +802,9 @@ public class ConversationManager {
 			}
 
 			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+				checkConversationQueue();
 				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
-				assertMainThread();
 
 				try {
 					// if we were previously logged out we might end up with no active conversation
@@ -801,12 +820,12 @@ public class ConversationManager {
 						if (conversationItem != null) {
 							conversationItem.conversationToken = token;
 							conversationItem.encryptionKey = encryptionKey;
-							activeConversation = loadConversation(conversationItem);
+							setActiveConversation(loadConversation(conversationItem));
 						} else {
 							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
 							File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
 							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-							activeConversation = new Conversation(dataFile, messagesFile);
+							setActiveConversation(new Conversation(dataFile, messagesFile));
 
 							// TODO: if we don't set these here - device payload would return 4xx error code
 							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
@@ -838,11 +857,13 @@ public class ConversationManager {
 				callback.onLoginFail(reason);
 			}
 		});
-		request.setCallbackQueue(DispatchQueue.mainQueue());
+		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.start();
 	}
 
 	private void sendFirstLoginRequest(final String userId, final String token, final LoginCallback callback) {
+		checkConversationQueue();
+
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 		final Sdk sdk = SdkManager.generateCurrentSdk(getContext());
 		final Device device = DeviceManager.generateNewDevice(getContext());
@@ -872,10 +893,10 @@ public class ConversationManager {
 			}
 
 			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+				checkConversationQueue();
 				assertNull(activeConversation, "Finished logging into new conversation, but one was already active.");
 				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
-				assertMainThread();
 
 				try {
 					// attempt to find previous logged out conversation
@@ -889,12 +910,12 @@ public class ConversationManager {
 					if (conversationItem != null) {
 						conversationItem.conversationToken = token;
 						conversationItem.encryptionKey = encryptionKey;
-						activeConversation = loadConversation(conversationItem);
+						setActiveConversation(loadConversation(conversationItem));
 					} else {
 						ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
 						File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
 						File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-						activeConversation = new Conversation(dataFile, messagesFile);
+						setActiveConversation(new Conversation(dataFile, messagesFile));
 
 						activeConversation.setAppRelease(appRelease);
 						activeConversation.setSdk(sdk);
@@ -924,26 +945,12 @@ public class ConversationManager {
 				callback.onLoginFail(reason);
 			}
 		});
-		request.setCallbackQueue(DispatchQueue.mainQueue());
+		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.start();
 	}
 
 	public void logout() {
-		// we only deal with an active conversation on the main thread
-		if (!DispatchQueue.isMainQueue()) {
-			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-				@Override
-				protected void execute() {
-					doLogout();
-				}
-			});
-		} else {
-			doLogout();
-		}
-	}
-
-	private void doLogout() {
-		assertMainThread();
+		checkConversationQueue();
 		if (activeConversation != null) {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
@@ -954,7 +961,7 @@ public class ConversationManager {
 					activeConversation.destroy();
 					activeConversation.setState(LOGGED_OUT);
 					handleConversationStateChange(activeConversation);
-					activeConversation = null;
+					setActiveConversation(null);
 					ApptentiveInternal.dismissAllInteractions();
 					break;
 				default:
@@ -1011,12 +1018,21 @@ public class ConversationManager {
 	//region Getters/Setters
 
 	public Conversation getActiveConversation() {
-		// assertMainThread(); TODO: we should still only access the conversation on a dedicated queue
-		// but at this time we can't do it by design
+		checkConversationQueue(); // we should only access the conversation on a dedicated queue
 		return activeConversation;
 	}
 
+	private synchronized void setActiveConversation(Conversation conversation) {
+		this.activeConversation = conversation;
+		this.activeConversationProxy = conversation != null ? new ConversationProxy(conversation) : null;
+	}
+
+	public synchronized ConversationProxy getActiveConversationProxy() {
+		return activeConversationProxy;
+	}
+
 	public ConversationMetadata getConversationMetadata() {
+		checkConversationQueue(); // we should only access the conversation on a dedicated queue
 		return conversationMetadata;
 	}
 

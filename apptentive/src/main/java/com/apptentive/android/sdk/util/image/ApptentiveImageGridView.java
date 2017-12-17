@@ -16,6 +16,8 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
+import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.Util;
 
@@ -58,7 +60,9 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setupUi() {
-		imageBandAdapter = new ImageGridViewAdapter(getContext(), false);
+
+		String conversationToken = ApptentiveInternal.getInstance().getConversationProxy().getConversationToken();
+		imageBandAdapter = new ImageGridViewAdapter(getContext(), conversationToken, false);
 		setAdapter(imageBandAdapter);
 	}
 

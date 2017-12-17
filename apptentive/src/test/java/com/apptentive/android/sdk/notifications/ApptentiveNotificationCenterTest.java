@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.notifications;
 
-import com.apptentive.android.sdk.TestCaseBase;
+import com.apptentive.android.sdk.LogicTestCaseBase;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -14,7 +14,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ApptentiveNotificationCenterTest extends TestCaseBase {
+public class ApptentiveNotificationCenterTest extends LogicTestCaseBase {
 
 	private ApptentiveNotificationCenter notificationCenter;
 
