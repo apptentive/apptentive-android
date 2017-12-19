@@ -1,3 +1,9 @@
+# 2017-12-19 - v5.0.1
+
+#### Bugs Fixed
+
+* Fixed callback passing [issue](https://github.com/apptentive/apptentive-android/issues/141).
+
 # 2017-12-16 - v5.0.0
 
 #### Major Changes
