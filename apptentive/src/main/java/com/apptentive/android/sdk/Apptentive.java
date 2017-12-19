@@ -1122,7 +1122,7 @@ public class Apptentive {
 	 *                <strong><code>engage(context, "finished_upload");</code></strong>
 	 */
 	public static synchronized void engage(Context context, String event) {
-		engage(context, event, (BooleanCallback) null);
+		engage(context, event, null, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1143,7 +1143,7 @@ public class Apptentive {
 	 *                 true if an Interaction will be displayed, else false.
 	 */
 	public static synchronized void engage(Context context, String event, BooleanCallback callback) {
-		engage(context, event, null, (ExtendedData[]) null);
+		engage(context, event, callback, null, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1167,7 +1167,7 @@ public class Apptentive {
 	 * @return true if the an interaction was shown, else false.
 	 */
 	public static synchronized void engage(Context context, String event, Map<String, Object> customData) {
-		engage(context, event, (BooleanCallback) null, customData);
+		engage(context, event, null, customData, (ExtendedData[]) null);
 	}
 
 	/**
@@ -1220,7 +1220,7 @@ public class Apptentive {
 	 *                     each type only once.
 	 */
 	public static synchronized void engage(Context context, String event, Map<String, Object> customData, ExtendedData... extendedData) {
-		engage(context, event, (BooleanCallback) null, customData, extendedData);
+		engage(context, event, null, customData, extendedData);
 	}
 
 	/**
