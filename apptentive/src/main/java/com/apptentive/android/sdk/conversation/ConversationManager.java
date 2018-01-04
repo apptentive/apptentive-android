@@ -76,6 +76,8 @@ public class ConversationManager {
 
 	private final WeakReference<Context> contextRef;
 
+	private boolean appIsInForeground;
+
 	/**
 	 * A basic directory for storing conversation-related data.
 	 */
@@ -101,6 +103,7 @@ public class ConversationManager {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					assertMainThread();
+					appIsInForeground = true;
 					if (activeConversation != null && activeConversation.hasActiveState()) {
 						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch app configuration and interactions...");
 						final Context context = getContext();
@@ -111,6 +114,15 @@ public class ConversationManager {
 							ApptentiveLog.w(CONVERSATION, "Can't fetch app configuration and conversation interactions: context is lost");
 						}
 					}
+				}
+			});
+
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, new ApptentiveNotificationObserver() {
+				@Override
+				public void onReceiveNotification(ApptentiveNotification notification) {
+					assertMainThread();
+					appIsInForeground = false;
 				}
 			});
 	}
@@ -456,8 +468,12 @@ public class ConversationManager {
 					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 			if (conversation.hasActiveState()) {
-				conversation.fetchInteractions(getContext());
-				conversation.getMessageManager().startPollingMessages();
+				if (appIsInForeground) {
+					// ConversationManager listens to the foreground event to fetch interactions when it comes to foreground
+					conversation.fetchInteractions(getContext());
+					// Message Manager listens to foreground/background events itself
+					conversation.getMessageManager().attemptToStartMessagePolling();
+				}
 
 				// Fetch app configuration
 				fetchAppConfiguration(conversation);

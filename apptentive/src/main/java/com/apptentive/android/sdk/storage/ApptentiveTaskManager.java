@@ -55,7 +55,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	private final ThreadPoolExecutor singleThreadExecutor; // TODO: replace with a private concurrent dispatch queue
 
 	private final PayloadSender payloadSender;
-	private boolean appInBackground;
+	private boolean appInBackground = true;
 
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.

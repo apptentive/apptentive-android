@@ -1,3 +1,13 @@
+# 2018-01-03 - v4.1.4
+
+#### Bugs Fixed
+
+* Fix a NullPointerException that occurs when the Apptentive SDK is included in an Instant App, and the host app's Activity is not available when exiting the Apptentive UI.
+* Fixed a potential crash when used in Instant Apps that don't contain a launcher Activity.
+* Don't send payloads when the app is in the background.
+* Don't poll for messages when the app is in the background.
+
+
 # 2017-12-02 - v4.1.3
 
 #### Bugs Fixed
@@ -28,6 +38,15 @@
 
 * Fix global configuration fetching
 * Fix Love Dialog to stack buttons if their labels are too long
+
+# 2018-01-03 - v4.0.3
+
+#### Bugs Fixed
+
+* Fixed a potential crash when used in Instant Apps that don't contain a launcher Activity.
+* Don't send payloads when the app is in the background.
+* Don't poll for messages when the app is in the background.
+* Fixed global Configuration polling.
 
 # 2017-08-15 - v4.0.2
 

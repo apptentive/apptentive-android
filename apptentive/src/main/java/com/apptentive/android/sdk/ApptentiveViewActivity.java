@@ -338,10 +338,17 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		if (isTaskRoot()) {
 			PackageManager packageManager = getPackageManager();
 			Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
-			ComponentName componentName = intent.getComponent();
-			/** Backwards compatible method that will clear all activities in the stack. */
-			Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-			startActivity(mainIntent);
+			/*
+			 Make this work with Instant Apps. It is possible and even likely to create an Instant App
+			 that doesn't have the Main Activity included in its APK. In such cases, this Intent is null,
+			 and we can't do anything apart from exiting our Activity.
+			  */
+			if (intent != null) {
+				ComponentName componentName = intent.getComponent();
+				// Backwards compatible method that will clear all activities in the stack.
+				Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+				startActivity(mainIntent);
+			}
 		}
 	}
 

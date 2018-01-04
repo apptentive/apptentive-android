@@ -41,6 +41,7 @@ class MessagePollingWorker implements Destroyable {
 		conf = Configuration.load();
 		backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
 		foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
+		ApptentiveLog.vv("Message Polling Worker: bg=%d, fg=%d", backgroundPollingInterval, foregroundPollingInterval);
 	}
 
 	@Override

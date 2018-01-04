@@ -425,8 +425,10 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	//region Polling
 
-	public void startPollingMessages() {
-		pollingWorker.startPolling();
+	public void attemptToStartMessagePolling() {
+		if (conversation.isMessageCenterFeatureUsed()) {
+			pollingWorker.startPolling();
+		}
 	}
 
 	public void stopPollingMessages() {
@@ -536,6 +538,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 	}
 
 	public void setMessageCenterInForeground(boolean bInForeground) {
+		conversation.setMessageCenterFeatureUsed(true);
 		pollingWorker.setMessageCenterInForeground(bInForeground);
 	}
 
@@ -572,7 +575,9 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private void appWentToForeground() {
 		appInForeground.set(true);
-		pollingWorker.appWentToForeground();
+		if (conversation.isMessageCenterFeatureUsed()) {
+			pollingWorker.appWentToForeground();
+		}
 	}
 
 	private void appWentToBackground() {
