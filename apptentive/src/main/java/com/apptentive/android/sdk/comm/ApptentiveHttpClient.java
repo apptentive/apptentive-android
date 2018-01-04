@@ -40,6 +40,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
+	private static final String ENDPOINT_CONFIGURATION = "/conversations/%s/configuration";
 	private static final String ENDPOINT_LEGACY_CONVERSATION = "/conversation/token";
 	private static final String ENDPOINT_LOG_IN_TO_EXISTING_CONVERSATION = "/conversations/%s/session";
 	private static final String ENDPOINT_LOG_IN_TO_NEW_CONVERSATION = "/conversations";
@@ -108,6 +109,22 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			endPoint = StringUtils.format(ENDPOINT_LOG_IN_TO_EXISTING_CONVERSATION, conversationId);
 		}
 		HttpJsonRequest request = createJsonRequest(endPoint, json, HttpRequestMethod.POST);
+		request.addListener(listener);
+		return request;
+	}
+
+	public HttpJsonRequest createAppConfigurationRequest(String conversationId, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+		if (StringUtils.isNullOrEmpty(conversationId)) {
+			throw new IllegalArgumentException("Conversation id is null or empty");
+		}
+
+		if (StringUtils.isNullOrEmpty(token)) {
+			throw new IllegalArgumentException("Conversation token is null or empty");
+		}
+
+		String endPoint = StringUtils.format(ENDPOINT_CONFIGURATION, conversationId);
+		HttpJsonRequest request = createJsonRequest(endPoint, new JSONObject(), HttpRequestMethod.GET);
+		request.setRequestProperty("Authorization", "Bearer " + token);
 		request.addListener(listener);
 		return request;
 	}

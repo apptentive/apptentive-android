@@ -16,7 +16,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
 import com.apptentive.android.sdk.migration.Migrator;
-import com.apptentive.android.sdk.model.ConversationItem;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -35,6 +35,7 @@ import com.apptentive.android.sdk.storage.SerializerException;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Jwt;
 import com.apptentive.android.sdk.util.ObjectUtils;
+import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
@@ -67,9 +68,13 @@ import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
 public class ConversationManager {
 
 	protected static final String CONVERSATION_METADATA_PATH = "conversation-v1.meta";
+
 	private static final String TAG_FETCH_CONVERSATION_TOKEN_REQUEST = "fetch_conversation_token";
+	private static final String TAG_FETCH_APP_CONFIGURATION_REQUEST = "fetch_app_configuration";
 
 	private final WeakReference<Context> contextRef;
+
+	private boolean appIsInForeground;
 
 	/**
 	 * A basic directory for storing conversation-related data.
@@ -96,15 +101,26 @@ public class ConversationManager {
 				@Override
 				public void onReceiveNotification(ApptentiveNotification notification) {
 					assertMainThread();
+					appIsInForeground = true;
 					if (activeConversation != null && activeConversation.hasActiveState()) {
-						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch interactions...");
+						ApptentiveLog.v(CONVERSATION, "App entered foreground notification received. Trying to fetch app configuration and interactions...");
 						final Context context = getContext();
 						if (context != null) {
+							fetchAppConfiguration(activeConversation);
 							activeConversation.fetchInteractions(context);
 						} else {
-							ApptentiveLog.w(CONVERSATION, "Can't fetch conversation interactions: context is lost");
+							ApptentiveLog.w(CONVERSATION, "Can't fetch app configuration and conversation interactions: context is lost");
 						}
 					}
+				}
+			});
+
+		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, new ApptentiveNotificationObserver() {
+				@Override
+				public void onReceiveNotification(ApptentiveNotification notification) {
+					assertMainThread();
+					appIsInForeground = false;
 				}
 			});
 	}
@@ -450,8 +466,15 @@ public class ConversationManager {
 					ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, conversation));
 
 			if (conversation.hasActiveState()) {
-				conversation.fetchInteractions(getContext());
-				conversation.getMessageManager().startPollingMessages();
+				if (appIsInForeground) {
+					// ConversationManager listens to the foreground event to fetch interactions when it comes to foreground
+					conversation.fetchInteractions(getContext());
+					// Message Manager listens to foreground/background events itself
+					conversation.getMessageManager().attemptToStartMessagePolling();
+				}
+
+				// Fetch app configuration
+				fetchAppConfiguration(conversation);
 
 				// Update conversation with push configuration changes that happened while it wasn't active.
 				SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
@@ -467,6 +490,65 @@ public class ConversationManager {
 				printMetadata(conversationMetadata, "Updated Metadata");
 			}
 		}
+	}
+
+	private void fetchAppConfiguration(Conversation conversation) {
+		try {
+			fetchAppConfigurationGuarded(conversation);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while fetching app configuration");
+		}
+	}
+
+	private void fetchAppConfigurationGuarded(Conversation conversation) {
+		ApptentiveLog.d(APP_CONFIGURATION, "Fetching app configuration...");
+
+		HttpRequest existingRequest = getHttpClient().findRequest(TAG_FETCH_APP_CONFIGURATION_REQUEST);
+		if (existingRequest != null) {
+			ApptentiveLog.d(APP_CONFIGURATION, "Can't fetch app configuration: another request already pending");
+			return;
+		}
+
+		if (!Configuration.load().hasConfigurationCacheExpired()) {
+			// if configuration hasn't expired we would fetch it anyway for debug apps
+			boolean debuggable = RuntimeUtils.isAppDebuggable(getContext());
+			if (!debuggable) {
+				ApptentiveLog.d(APP_CONFIGURATION, "Can't fetch app configuration: the old configuration is still valid");
+				return;
+			}
+		}
+
+		HttpJsonRequest request = getHttpClient()
+				.createAppConfigurationRequest(conversation.getConversationId(), conversation.getConversationToken(),
+						new HttpRequest.Listener<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				try {
+					String cacheControl = request.getResponseHeader("Cache-Control");
+					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+					if (cacheSeconds == null) {
+						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+					}
+					ApptentiveLog.d(APP_CONFIGURATION, "Caching configuration for %d seconds.", cacheSeconds);
+					Configuration config = new Configuration(request.getResponseObject().toString());
+					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+					config.save();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while parsing app configuration response");
+				}
+			}
+
+			@Override
+			public void onCancel(HttpJsonRequest request) {
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				ApptentiveLog.e(APP_CONFIGURATION, "App configuration request failed: %s", reason);
+			}
+		});
+		request.setTag(TAG_FETCH_APP_CONFIGURATION_REQUEST);
+		request.start();
 	}
 
 	private void updateMetadataItems(Conversation conversation) {

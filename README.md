@@ -13,7 +13,7 @@ use your app, to talk to them at the right time, and in the right way.
 
 ##### [Release Notes](https://learn.apptentive.com/knowledge-base/android-sdk-release-notes/)
 
-##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|4.0.2|aar)
+##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|4.0.3|aar)
 
 #### Reporting Bugs
 

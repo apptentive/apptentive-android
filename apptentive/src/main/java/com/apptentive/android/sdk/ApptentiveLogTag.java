@@ -2,6 +2,7 @@ package com.apptentive.android.sdk;
 
 public enum ApptentiveLogTag {
 	NETWORK(true),
+	APP_CONFIGURATION(true),
 	CONVERSATION(true),
 	NOTIFICATIONS(true),
 	MESSAGES(true),
