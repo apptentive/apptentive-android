@@ -250,6 +250,14 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	 * Helper to clean up the Activity, whether it is exited through the toolbar back button, or the hardware back button.
 	 */
 	private void exitActivity(ApptentiveViewExitType exitType) {
+		try {
+			exitActivityGuarded(exitType);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while trying to exit activity (type=%s)", exitType);
+		}
+	}
+
+	private void exitActivityGuarded(ApptentiveViewExitType exitType) {
 		Util.hideSoftKeyboard(this, getCurrentFocus());
 
 		ApptentiveBaseFragment currentFragment = (ApptentiveBaseFragment) viewPager_Adapter.getItem(viewPager.getCurrentItem());
@@ -352,10 +360,19 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 		if (isTaskRoot()) {
 			PackageManager packageManager = getPackageManager();
 			Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
-			ComponentName componentName = intent.getComponent();
-			/** Backwards compatible method that will clear all activities in the stack. */
-			Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-			startActivity(mainIntent);
+			/*
+			 Make this work with Instant Apps. It is possible and even likely to create an Instant App
+			 that doesn't have the Main Activity included in its APK. In such cases, this Intent is null,
+			 and we can't do anything apart from exiting our Activity.
+			  */
+			if (intent != null) {
+				ComponentName componentName = intent.getComponent();
+				/** Backwards compatible method that will clear all activities in the stack. */
+				Intent mainIntent = Intent.makeRestartActivityTask(componentName);
+				startActivity(mainIntent);
+			} else {
+				ApptentiveLog.w("Unable to start app's main activity: launch intent is missing");
+			}
 		}
 	}
 
