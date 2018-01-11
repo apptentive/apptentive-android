@@ -1,3 +1,9 @@
+# 2018-01-11 - v5.0.2
+
+#### Bugs Fixed
+
+* Fix a NullPointerException that occurs when the Apptentive SDK is included in an Instant App, and the host app's Activity is not available when exiting the Apptentive UI.
+
 # 2017-12-19 - v5.0.1
 
 #### Bugs Fixed
@@ -14,6 +20,12 @@
 
 * Fixed a bug where network operations might start when the app is started, but in the background.
 * Fixed an issue where the SDK might attempt to fetch messages when it shouldn't.
+
+# 2018-01-03 - v4.1.4
+
+#### Bugs Fixed
+
+* Fix a NullPointerException that occurs when the Apptentive SDK is included in an Instant App, and the host app's Activity is not available when exiting the Apptentive UI.
 
 # 2017-12-02 - v4.1.3
 

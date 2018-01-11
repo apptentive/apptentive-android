@@ -1,5 +1,29 @@
 This document tracks changes to the API between versions.
 
+# 5.0.0
+
+Read the [Migrating to 5.0.0](migrating_to_5.0.0.md) guide.
+
+| Modified Methods |
+| ---------------- |
+| public static void buildPendingIntentFromPushNotification(@NonNull final PendingIntentCallback callback, @NonNull final Intent intent) |
+| public static void buildPendingIntentFromPushNotification(@NonNull final PendingIntentCallback callback, @NonNull final Bundle bundle) |
+| public static void buildPendingIntentFromPushNotification(final PendingIntentCallback callback, @NonNull final Map<String, String> data) |
+| public static void canShowMessageCenter(BooleanCallback callback) |
+
+| Added Methods |
+| ------------- |
+| public static void showMessageCenter(Context context, BooleanCallback callback) |
+| public static void showMessageCenter(final Context context, final BooleanCallback callback, final Map<String, Object> customData) |
+| public static synchronized void engage(Context context, String event, BooleanCallback callback) |
+| public static synchronized void engage(Context context, String event, BooleanCallback callback, Map<String, Object> customData) |
+| public static synchronized void engage(final Context context, final String event, final BooleanCallback callback, final Map<String, Object> customData, final ExtendedData... extendedData) |
+| public static synchronized void queryCanShowInteraction(final String event, BooleanCallback callback) |
+
+| Removed Methods |
+| --------------- |
+| public static synchronized void canShowInteraction(final String event) |
+
 # 4.0.0
 
 Read the [Migrating to 4.0.0](migrating_to_4.0.0.md) guide.
