@@ -1,3 +1,9 @@
+# 2018-01-30 - v5.0.3
+
+#### Improvements
+
+* Accessibility improvements for TalkBack.
+
 # 2018-01-11 - v5.0.2
 
 #### Bugs Fixed
