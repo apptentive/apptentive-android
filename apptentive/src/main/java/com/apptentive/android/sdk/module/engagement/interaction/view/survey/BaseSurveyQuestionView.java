@@ -53,6 +53,9 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 
 		TextView title = (TextView) view.findViewById(R.id.question_title);
 		title.setText(question.getValue());
+		if (question.isRequired()) {
+			title.setContentDescription(question.getValue() + ". " + getString(R.string.apptentive_required));
+		}
 
 		setInstructions(question.getRequiredText(), question.getInstructions());
 

@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
@@ -113,6 +114,9 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			});
 		}
 
+		if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR1) {
+			answerTextInputLayout.setLabelFor(R.id.answer_text);
+		}
 	}
 
 	@Override
