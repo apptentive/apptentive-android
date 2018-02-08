@@ -924,7 +924,7 @@ public class Util {
 		Map<String, Typeface> newMap = null;
 
 		Resources.Theme apptentiveTheme = context.getResources().newTheme();
-		ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(apptentiveTheme, context);
+		ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(context, apptentiveTheme);
 
 		if (apptentiveTheme == null) {
 			return;

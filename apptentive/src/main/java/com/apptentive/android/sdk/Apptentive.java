@@ -895,7 +895,7 @@ public class Apptentive {
 		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
 			@Override
 			protected boolean execute(Conversation conversation) {
-				return ApptentiveInternal.getInstance().canShowMessageCenterInternal(conversation);
+				return ApptentiveInternal.canShowMessageCenterInternal(conversation);
 			}
 		}, "check message center availability");
 	}
@@ -1297,8 +1297,7 @@ public class Apptentive {
 		dispatchConversationTask(new ConversationDispatchTask() {
 			@Override
 			protected boolean execute(Conversation conversation) {
-				ApptentiveInternal sharedInstance = ApptentiveInternal.getInstance();
-				sharedInstance.setOnSurveyFinishedListener(listener);
+				ApptentiveInternal.getInstance().setOnSurveyFinishedListener(listener);
 				return true;
 			}
 		}, "set survey finish listener");
@@ -1337,8 +1336,8 @@ public class Apptentive {
 	private static void loginGuarded(String token, final LoginCallback callback) {
 		checkConversationQueue();
 
-		final ApptentiveInternal sharedInstance = ApptentiveInternal.getInstance();
-		if (sharedInstance == null) {
+		final ApptentiveInstance sharedInstance = ApptentiveInternal.getInstance();
+		if (sharedInstance.isNull()) {
 			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
 			notifyFailure(callback, "Apptentive instance is not properly initialized");
 		} else {

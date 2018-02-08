@@ -198,6 +198,13 @@ public class Assert {
 	/**
 	 * General failure with a message
 	 */
+	public static void assertFail(String format, Object... args) {
+		assertFail(StringUtils.format(format, args));
+	}
+
+	/**
+	 * General failure with a message
+	 */
 	public static void assertFail(String message) {
 		if (imp != null) {
 			imp.assertFailed(message);

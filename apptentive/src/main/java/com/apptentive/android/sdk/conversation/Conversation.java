@@ -249,9 +249,9 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 						notifyFinish(false);
 					}
 
-					private void notifyFinish(final boolean successfull) {
+					private void notifyFinish(final boolean successful) {
 						if (hasActiveState()) {
-							ApptentiveInternal.getInstance().notifyInteractionUpdated(successfull);
+							ApptentiveInternal.getInstance().notifyInteractionUpdated(successful);
 						}
 					}
 

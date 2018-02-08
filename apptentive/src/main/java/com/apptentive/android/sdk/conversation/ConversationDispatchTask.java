@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.conversation;
 import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.Apptentive;
+import com.apptentive.android.sdk.ApptentiveInstance;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.metric.MetricModule;
@@ -47,8 +48,8 @@ public abstract class ConversationDispatchTask extends DispatchTask {
 	}
 
 	private void executeGuarded() {
-		ApptentiveInternal sharedInstance = ApptentiveInternal.getInstance();
-		if (sharedInstance == null) {
+		ApptentiveInstance sharedInstance = ApptentiveInternal.getInstance();
+		if (sharedInstance.isNull()) {
 			ApptentiveLog.e(CONVERSATION, "Unable to %s: Apptentive SDK is not initialized.", description);
 			notifyFailure(null);
 			return;
