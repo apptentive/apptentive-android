@@ -14,12 +14,11 @@ import android.os.Build;
 import android.support.test.InstrumentationRegistry;
 import android.test.RenamingDelegatingContext;
 
+import com.apptentive.android.sdk.ApptentiveInstance;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.debug.AssertImp;
-import com.apptentive.android.sdk.migration.v4_0_0.CodePointStore;
-import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryStore;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.util.Util;
 
@@ -34,7 +33,7 @@ import java.io.InputStreamReader;
  */
 public abstract class ApptentiveTestCaseBase {
 	protected Context targetContext;
-	protected ApptentiveInternal apptentiveInternal;
+	protected ApptentiveInstance apptentiveInternal;
 	protected InteractionManager interactionManager;
 	protected int versionCode;
 	protected String versionName;

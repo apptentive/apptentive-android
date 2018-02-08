@@ -21,6 +21,9 @@
 
 package com.apptentive.android.sdk.util;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import java.util.HashMap;
 import java.util.Map;
 

@@ -1,3 +1,9 @@
+# 2018-02-08 - v5.0.4
+
+#### Bugs Fixed
+
+* Fix a rare NullPointerException that occurs when Apptentive SDK activities are started without proper SDK initialization.
+
 # 2018-01-30 - v5.0.3
 
 #### Improvements

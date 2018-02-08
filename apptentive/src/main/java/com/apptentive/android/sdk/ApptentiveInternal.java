@@ -21,6 +21,7 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
@@ -94,7 +95,7 @@ import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 /**
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
-public class ApptentiveInternal implements ApptentiveNotificationObserver {
+public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotificationObserver {
 
 	private final ApptentiveTaskManager taskManager;
 
@@ -157,6 +158,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 
 	@SuppressLint("StaticFieldLeak")
 	private static volatile ApptentiveInternal sApptentiveInternal;
+
+	private static final ApptentiveInstance NULL_INSTANCE = new ApptentiveNullInstance();
 
 	// for unit testing
 	public ApptentiveInternal(Context appContext) {
@@ -272,10 +275,15 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	 *
 	 * @return the existing instance of the Apptentive SDK fully initialized with API key, or null
 	 */
-	public static ApptentiveInternal getInstance() {
+	public static @NonNull ApptentiveInstance getInstance() {
 		synchronized (ApptentiveInternal.class) {
-			return sApptentiveInternal;
+			return sApptentiveInternal != null ? sApptentiveInternal : NULL_INSTANCE;
 		}
+	}
+
+	@Override
+	public boolean isNull() {
+		return false;
 	}
 
 	/**
@@ -369,11 +377,13 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return conversationManager;
 	}
 
+	@Override
 	public Resources.Theme getApptentiveToolbarTheme() {
 		return apptentiveToolbarTheme;
 	}
 
-	int getDefaultStatusBarColor() {
+	@Override
+	public int getDefaultStatusBarColor() {
 		return statusBarColorDefault;
 	}
 
@@ -429,6 +439,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 	}
 
+	@Override
 	public void onAppExit(final Context appContext) {
 		checkConversationQueue();
 
@@ -463,6 +474,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 	}
 
+	@Override
 	public void onAppEnterForeground() {
 		checkConversationQueue();
 
@@ -473,6 +485,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);
 	}
 
+	@Override
 	public void onAppEnterBackground() {
 		checkConversationQueue();
 
@@ -493,7 +506,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	 * @param context The context that will host Apptentive interaction fragment, either ApptentiveViewActivity
 	 *                or application context
 	 */
-	public void updateApptentiveInteractionTheme(Resources.Theme interactionTheme, Context context) {
+	public void updateApptentiveInteractionTheme(Context context, Resources.Theme interactionTheme) {
 		/* Step 1: Apply Apptentive default theme layer.
 		 * If host activity is an activity, the base theme already has Apptentive defaults applied, so skip Step 1.
 		 * If parent activity is NOT an activity, first apply Apptentive defaults.
@@ -728,7 +741,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return ratingProvider;
 	}
 
-	void setRatingProvider(IRatingProvider ratingProvider) {
+	@Override
+	public void setRatingProvider(@NonNull IRatingProvider ratingProvider) {
 		this.ratingProvider = ratingProvider;
 	}
 
@@ -736,14 +750,16 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return ratingProviderArgs;
 	}
 
-	void putRatingProviderArg(String key, String value) {
+	@Override
+	public void putRatingProviderArg(@NonNull String key, String value) {
 		if (ratingProviderArgs == null) {
 			ratingProviderArgs = new HashMap<>();
 		}
 		ratingProviderArgs.put(key, value);
 	}
 
-	void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
+	@Override
+	public void setOnSurveyFinishedListener(OnSurveyFinishedListener onSurveyFinishedListener) {
 		if (onSurveyFinishedListener != null) {
 			this.onSurveyFinishedListener = new WeakReference<>(onSurveyFinishedListener);
 		} else {
@@ -751,14 +767,17 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 	}
 
+	@Override
 	public OnSurveyFinishedListener getOnSurveyFinishedListener() {
 		return (onSurveyFinishedListener == null) ? null : onSurveyFinishedListener.get();
 	}
 
+	@Override
 	public void addInteractionUpdateListener(InteractionManager.InteractionUpdateListener listener) {
 		interactionUpdateListeners.add(listener);
 	}
 
+	@Override
 	public void removeInteractionUpdateListener(InteractionManager.InteractionUpdateListener listener) {
 		interactionUpdateListeners.remove(listener);
 	}
@@ -907,12 +926,12 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 							mgr.startMessagePreFetchTask();
 						}
 						// Construct a pending intent to launch message center
-						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext());
+						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext(), conversation);
 					}
 					default:
 						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
-			} catch (JSONException e) {
+			} catch (Exception e) {
 				ApptentiveLog.e(e, "Error parsing JSON from push notification.");
 				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
 			}
@@ -920,7 +939,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		return null;
 	}
 
-	public boolean showMessageCenterInternal(Context context, Map<String, Object> customData) {
+	@Override
+	public boolean showMessageCenterInternal(@NonNull Context context, Map<String, Object> customData) {
 		boolean interactionShown = false;
 		if (canShowMessageCenterInternal()) {
 			if (customData != null) {
@@ -958,12 +978,12 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	}
 
 	// TODO: remove this method
-	public boolean canShowMessageCenterInternal() {
+	private boolean canShowMessageCenterInternal() {
 		Conversation conversation = getConversation();
 		return conversation != null && canShowMessageCenterInternal(conversation);
 	}
 
-	public boolean canShowMessageCenterInternal(Conversation conversation) {
+	public static boolean canShowMessageCenterInternal(Conversation conversation) {
 		return EngagementModule.canShowInteraction(conversation, "app", MessageCenterInteraction.DEFAULT_INTERNAL_EVENT_NAME, "com.apptentive");
 	}
 
@@ -993,10 +1013,9 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 	}
 
-	public static PendingIntent prepareMessageCenterPendingIntent(Context context) {
+	public static PendingIntent prepareMessageCenterPendingIntent(Context context, Conversation conversation) {
 		Intent intent;
-		// FIXME: Make this work with the new async format:
-		if (true /* Apptentive.canShowMessageCenter() */) {
+		if (canShowMessageCenterInternal(conversation)) {
 			intent = new Intent();
 			intent.setClass(context, ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.ENGAGE_INTERNAL_EVENT);
@@ -1013,7 +1032,7 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	 *
 	 * @return true if properly registered, else false.
 	 */
-	public static boolean checkRegistered() {
+	static boolean checkRegistered() {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
 			ApptentiveLog.e("Error: You have failed to call Apptentive.register() in your Application.onCreate()");
 			return false;
@@ -1047,7 +1066,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 	 */
 	private final Object loginMutex = new Object();
 
-	void login(String token, final LoginCallback callback) {
+	@Override
+	public void login(String token, final LoginCallback callback) {
 		synchronized (loginMutex) {
 			if (loginInProgress) {
 				if (callback != null) {
@@ -1093,7 +1113,8 @@ public class ApptentiveInternal implements ApptentiveNotificationObserver {
 		}
 	}
 
-	void logout() {
+	@Override
+	public void logout() {
 		conversationManager.logout();
 	}
 

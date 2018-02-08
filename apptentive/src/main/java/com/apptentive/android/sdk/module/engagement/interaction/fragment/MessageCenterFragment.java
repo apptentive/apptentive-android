@@ -459,7 +459,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		}
 
 		// Retrieve any saved attachments
-		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		ConversationProxy conversation = getConversation();
 		if (conversation != null && conversation.getMessageCenterPendingAttachments() != null) {
 			String pendingAttachmentsString = conversation.getMessageCenterPendingAttachments();

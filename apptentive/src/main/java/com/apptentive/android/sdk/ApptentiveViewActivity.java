@@ -33,14 +33,12 @@ import com.apptentive.android.sdk.adapter.ApptentiveViewPagerAdapter;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.FragmentFactory;
-import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
@@ -68,6 +66,12 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
+		if (!ApptentiveInternal.isApptentiveRegistered()) {
+			ApptentiveLog.e("Apptentive instance is not properly initialized. Finishing activity...");
+			finish();
+			return;
+		}
 
 		dispatchOnConversationQueue(new DispatchTask() {
 			@Override
@@ -322,7 +326,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	private void applyApptentiveTheme(boolean isModalInteraction) {
 		// Update the activity theme to reflect current attributes
 		try {
-			ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(getTheme(), this);
+			ApptentiveInternal.getInstance().updateApptentiveInteractionTheme(this, getTheme());
 
 			if (isModalInteraction) {
 				getTheme().applyStyle(R.style.ApptentiveBaseDialogTheme, true);

@@ -17,6 +17,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.PayloadData;
@@ -47,6 +48,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
@@ -561,27 +563,32 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 
 	private void showUnreadMessageToastNotification(final CompoundMessage apptentiveMsg) {
 		if (currentForegroundApptentiveActivity != null && currentForegroundApptentiveActivity.get() != null) {
-			Activity foreground = currentForegroundApptentiveActivity.get();
+			final Activity foreground = currentForegroundApptentiveActivity.get();
 			if (foreground != null) {
-				PendingIntent pendingIntent = ApptentiveInternal.prepareMessageCenterPendingIntent(foreground.getApplicationContext());
-				if (pendingIntent != null) {
-					final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
-					final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
-					builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
-						.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
-						.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
-						.setContentIntent(pendingIntent)
-						.setFullScreenIntent(pendingIntent, false);
-					DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-						@Override
-						protected void execute() {
-							 ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
-							 notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
-							 manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);
-						 }
-					 }
-					);
-				}
+				dispatchOnConversationQueue(new ConversationDispatchTask() {
+					@Override
+					protected boolean execute(Conversation conversation) {
+						PendingIntent pendingIntent = ApptentiveInternal.prepareMessageCenterPendingIntent(foreground.getApplicationContext(), conversation);
+						if (pendingIntent != null) {
+							final ApptentiveToastNotificationManager manager = ApptentiveToastNotificationManager.getInstance(foreground, true);
+							final ApptentiveToastNotification.Builder builder = new ApptentiveToastNotification.Builder(foreground);
+							builder.setContentTitle(foreground.getResources().getString(R.string.apptentive_message_center_title))
+									.setDefaults(Notification.DEFAULT_SOUND | Notification.DEFAULT_LIGHTS)
+									.setSmallIcon(R.drawable.avatar).setContentText(apptentiveMsg.getBody())
+									.setContentIntent(pendingIntent)
+									.setFullScreenIntent(pendingIntent, false);
+							DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+								@Override
+								protected void execute() {
+									ApptentiveToastNotification notification = builder.buildApptentiveToastNotification();
+									notification.setAvatarUrl(apptentiveMsg.getSenderProfilePhoto());
+									manager.notify(TOAST_TYPE_UNREAD_MESSAGE, notification);}
+								});
+						}
+
+						return true;
+					}
+				});
 			}
 		}
 	}

@@ -35,7 +35,7 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 		protected void execute() {
 			assertTrue(polling, "Not polling messages");
 
-			if (ApptentiveInternal.getInstance().canShowMessageCenterInternal(getConversation())) {
+			if (ApptentiveInternal.canShowMessageCenterInternal(getConversation())) {
 				ApptentiveLog.d(MESSAGES, "Checking server for new messages...");
 				messageManager.fetchAndStoreMessages(messageCenterInForeground, conf.isMessageCenterNotificationPopupEnabled(), MessagePollingWorker.this);
 			} else {
