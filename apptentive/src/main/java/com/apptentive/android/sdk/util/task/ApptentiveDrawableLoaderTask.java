@@ -21,6 +21,8 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.image.ImageUtil;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+
 public class ApptentiveDrawableLoaderTask extends AsyncTask<String, Void, Bitmap> {
 	private WeakReference<ImageView> imageViewReference;
 	private BitmapLoadListener mListener;
@@ -81,7 +83,7 @@ public class ApptentiveDrawableLoaderTask extends AsyncTask<String, Void, Bitmap
 	@Override
 	protected void onPostExecute(Bitmap bitmap) {
 		if (e != null) {
-			ApptentiveLog.w("Unhandled exception thrown from ApptentiveDrawableLoaderTask:" + e);
+			ApptentiveLog.w(UTIL, "Unhandled exception thrown from ApptentiveDrawableLoaderTask:" + e);
 			decoderError = true;
 		}
 

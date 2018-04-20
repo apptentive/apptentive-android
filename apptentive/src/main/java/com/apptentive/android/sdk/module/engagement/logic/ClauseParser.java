@@ -15,6 +15,8 @@ import org.json.JSONObject;
 
 import java.math.BigDecimal;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 /**
  * @author Sky Kelsey
  */
@@ -22,14 +24,14 @@ public class ClauseParser {
 	private static final String KEY_COMPLEX_TYPE = "_type";
 
 	public static Clause parse(String json) throws JSONException {
-		ApptentiveLog.v("+ Parsing Interaction Criteria.");
+		ApptentiveLog.v(INTERACTIONS, "+ Parsing Interaction Criteria.");
 		if (json == null) {
-			ApptentiveLog.e("+ Interaction Criteria is null.");
+			ApptentiveLog.e(INTERACTIONS, "+ Interaction Criteria is null.");
 			return null;
 		}
 		JSONObject root = new JSONObject(json);
 		Clause ret = ClauseParser.parse(null, root);
-		ApptentiveLog.v("+ Finished parsing Interaction Criteria.");
+		ApptentiveLog.v(INTERACTIONS, "+ Finished parsing Interaction Criteria.");
 		return ret;
 	}
 

@@ -24,10 +24,13 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
+
+import static com.apptentive.android.sdk.util.Util.guarded;
 
 
 public class AttachmentPreviewDialog extends DialogFragment implements DialogInterface.OnDismissListener, PreviewImageView.GestureCallback {
@@ -66,69 +69,73 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View rootView = inflater.inflate(R.layout.apptentive_dialog_image_preview, container);
-		previewContainer = rootView.findViewById(R.id.preview_container);
-		progressBar = (ProgressBar) rootView.findViewById(R.id.preview_progress);
-		previewImageView = (PreviewImageView) rootView.findViewById(R.id.preview_image);
-		previewImagePlaceholderView = (ImageView) rootView.findViewById(R.id.preview_image_placeholder);
+		try {
+			previewContainer = rootView.findViewById(R.id.preview_container);
+			progressBar = (ProgressBar) rootView.findViewById(R.id.preview_progress);
+			previewImageView = (PreviewImageView) rootView.findViewById(R.id.preview_image);
+			previewImagePlaceholderView = (ImageView) rootView.findViewById(R.id.preview_image_placeholder);
 
-		previewImageView.setGestureCallback(this);
-		header = (ViewGroup) rootView.findViewById(R.id.header_bar);
-		closeButton = (ImageButton) header.findViewById(R.id.close_dialog);
-		closeButton.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				dismiss();
-			}
-		});
+			previewImageView.setGestureCallback(this);
+			header = (ViewGroup) rootView.findViewById(R.id.header_bar);
+			closeButton = (ImageButton) header.findViewById(R.id.close_dialog);
+			closeButton.setOnClickListener(guarded(new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					dismiss();
+				}
+			}));
 
-		// show the progress bar while we load content...
-		progressBar.setVisibility(View.VISIBLE);
+			// show the progress bar while we load content...
+			progressBar.setVisibility(View.VISIBLE);
 
-		currentImage = getArguments().getParcelable(KEY_IMAGE);
-		conversationToken = getArguments().getString(KEY_CONVERSATION_TOKEN);
-
-
-		width = inflater.getContext().getResources().getDisplayMetrics().widthPixels;
-		height = inflater.getContext().getResources().getDisplayMetrics().heightPixels;
-		LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
-		previewContainer.setLayoutParams(lp);
+			currentImage = getArguments().getParcelable(KEY_IMAGE);
+			conversationToken = getArguments().getString(KEY_CONVERSATION_TOKEN);
 
 
-		ApptentiveAttachmentLoader.getInstance().load(conversationToken, currentImage.originalPath, currentImage.localCachePath, 0, previewImageView, width, height, true,
-				new ApptentiveAttachmentLoader.LoaderCallback() {
-					@Override
-					public void onLoaded(ImageView view, int pos, Bitmap d) {
-						if (progressBar != null) {
-							progressBar.setVisibility(View.GONE);
-						}
+			width = inflater.getContext().getResources().getDisplayMetrics().widthPixels;
+			height = inflater.getContext().getResources().getDisplayMetrics().heightPixels;
+			LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(width, height);
+			previewContainer.setLayoutParams(lp);
 
-						if (previewImageView == view) {
-							previewContainer.setVisibility(View.VISIBLE);
-							if (!d.isRecycled()) {
-								previewImageView.setImageBitmap(d);
-								previewImagePlaceholderView.setVisibility(View.GONE);
+
+			ApptentiveAttachmentLoader.getInstance().load(conversationToken, currentImage.originalPath, currentImage.localCachePath, 0, previewImageView, width, height, true,
+					new ApptentiveAttachmentLoader.LoaderCallback() {
+						@Override
+						public void onLoaded(ImageView view, int pos, Bitmap d) {
+							if (progressBar != null) {
+								progressBar.setVisibility(View.GONE);
+							}
+
+							if (previewImageView == view) {
+								previewContainer.setVisibility(View.VISIBLE);
+								if (!d.isRecycled()) {
+									previewImageView.setImageBitmap(d);
+									previewImagePlaceholderView.setVisibility(View.GONE);
+								}
 							}
 						}
-					}
 
-					@Override
-					public void onLoadTerminated() {
-						if (progressBar != null) {
-							progressBar.setVisibility(View.GONE);
+						@Override
+						public void onLoadTerminated() {
+							if (progressBar != null) {
+								progressBar.setVisibility(View.GONE);
+							}
 						}
-					}
 
-					@Override
-					public void onDownloadStart() {
-						if (progressBar != null) {
-							progressBar.setVisibility(View.VISIBLE);
+						@Override
+						public void onDownloadStart() {
+							if (progressBar != null) {
+								progressBar.setVisibility(View.VISIBLE);
+							}
 						}
-					}
 
-					@Override
-					public void onDownloadProgress(int progress) {
-					}
-				});
+						@Override
+						public void onDownloadProgress(int progress) {
+						}
+					});
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreateView()", AttachmentPreviewDialog.class.getSimpleName());
+		}
 
 
 		return rootView;

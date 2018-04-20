@@ -40,7 +40,7 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] renderData() throws JSONException {
 		String jsonString = marshallForSending().toString();
-		ApptentiveLog.vv(PAYLOADS, jsonString);
+		ApptentiveLog.v(PAYLOADS, jsonString);
 
 		if (encryptionKey != null) {
 			byte[] bytes = jsonString.getBytes();

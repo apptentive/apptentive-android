@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.support.v4.util.AtomicFile;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.util.Util.readNullableBoolean;
 import static com.apptentive.android.sdk.util.Util.readNullableDouble;
 import static com.apptentive.android.sdk.util.Util.readNullableUTF;
@@ -107,7 +110,7 @@ class FileMessageStore implements MessageStore {
 		for (MessageEntry entry : messageEntries) {
 			ApptentiveMessage apptentiveMessage = MessageFactory.fromJson(entry.json);
 			if (apptentiveMessage == null) {
-				ApptentiveLog.e("Error parsing Record json from database: %s", entry.json);
+				ApptentiveLog.e(MESSAGES, "Error parsing Record json from database: %s", entry.json);
 				continue;
 			}
 			apptentiveMessage.setState(ApptentiveMessage.State.parse(entry.state));
@@ -196,7 +199,7 @@ class FileMessageStore implements MessageStore {
 				messageEntries.addAll(entries);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while reading entries");
+			ApptentiveLog.e(MESSAGES, e, "Exception while reading entries");
 		}
 	}
 
@@ -223,22 +226,26 @@ class FileMessageStore implements MessageStore {
 		try {
 			writeToFileGuarded();
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while saving messages");
+			ApptentiveLog.e(MESSAGES, e, "Exception while saving messages");
 		}
 		shouldFetchFromFile = false; // mark it as not shouldFetchFromFile to keep a memory version
 	}
 
 	private void writeToFileGuarded() throws IOException {
-		DataOutputStream dos = null;
+		AtomicFile atomicFile = new AtomicFile(file);
+		FileOutputStream stream = null;
 		try {
-			dos = new DataOutputStream(new FileOutputStream(file));
+			stream = atomicFile.startWrite();
+			DataOutputStream dos = new DataOutputStream(stream);
 			dos.writeByte(VERSION);
 			dos.writeInt(messageEntries.size());
 			for (MessageEntry entry : messageEntries) {
 				entry.writeExternal(dos);
 			}
-		} finally {
-			Util.ensureClosed(dos);
+			atomicFile.finishWrite(stream);
+		} catch (Exception e) {
+			atomicFile.failWrite(stream);
+			throw new IOException(e);
 		}
 	}
 

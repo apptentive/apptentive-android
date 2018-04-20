@@ -27,6 +27,7 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import java.util.Map;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.util.threading.DispatchQueue.isMainQueue;
 import static com.apptentive.android.sdk.util.threading.DispatchQueue.mainQueue;
 
@@ -69,7 +70,7 @@ public class EngagementModule {
 
 		try {
 			String eventLabel = generateEventLabel(vendor, interaction, eventName);
-			ApptentiveLog.d("engage(%s)", eventLabel);
+			ApptentiveLog.i(INTERACTIONS, "Engage event: '%s'", eventLabel);
 
 			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
 			int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
@@ -77,7 +78,7 @@ public class EngagementModule {
 			conversation.addPayload(new EventPayload(eventLabel, interactionId, data, customData, extendedData));
 			return doEngage(conversation, context, eventLabel);
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in engage()");
+			ApptentiveLog.e(INTERACTIONS, e, "Exception while engaging event '%s'", eventName);
 			MetricModule.sendError(e, null, null);
 		}
 		return false;
@@ -94,7 +95,7 @@ public class EngagementModule {
 			launchInteraction(context, interaction);
 			return true;
 		}
-		ApptentiveLog.d("No interaction to show.");
+		ApptentiveLog.d(INTERACTIONS, "No interaction to show for event: '%s'", eventLabel);
 		return false;
 	}
 
@@ -111,7 +112,7 @@ public class EngagementModule {
 
 		Context launchContext = context;
 		if (interaction != null && launchContext != null) {
-			ApptentiveLog.i("Launching interaction: %s", interaction.getType().toString());
+			ApptentiveLog.i(INTERACTIONS, "Launching interaction: '%s'", interaction.getType());
 			Intent intent = new Intent();
 			intent.setClass(launchContext.getApplicationContext(), ApptentiveViewActivity.class);
 			intent.putExtra(Constants.FragmentConfigKeys.TYPE, Constants.FragmentTypes.INTERACTION);

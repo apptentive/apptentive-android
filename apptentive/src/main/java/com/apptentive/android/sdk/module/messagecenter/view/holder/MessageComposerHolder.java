@@ -35,6 +35,8 @@ import com.apptentive.android.sdk.view.ApptentiveAlertDialog;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.util.Util.guarded;
+
 public class MessageComposerHolder extends RecyclerView.ViewHolder {
 
 	private List<ImageItem> images;
@@ -77,12 +79,12 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		attachButton.setImageDrawable(attachButtonDrawable);
 	}
 
+	/* Guarded */
 	public void bindView(final MessageCenterFragment fragment, final MessageCenterRecyclerViewAdapter adapter, final Composer composer) {
 		title.setText(composer.title);
 		title.setContentDescription(composer.title);
 
-
-		closeButton.setOnClickListener(new View.OnClickListener() {
+		closeButton.setOnClickListener(guarded(new View.OnClickListener() {
 			public void onClick(View view) {
 				if (!TextUtils.isEmpty(message.getText().toString().trim()) || !images.isEmpty()) {
 					Bundle bundle = new Bundle();
@@ -96,16 +98,16 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 					}
 				}
 			}
-		});
+		}));
 
 		sendButton.setContentDescription(composer.sendButton);
-		sendButton.setOnClickListener(new View.OnClickListener() {
+		sendButton.setOnClickListener(guarded(new View.OnClickListener() {
 			public void onClick(View view) {
 				if (adapter.getListener() != null) {
 					adapter.getListener().onFinishComposing();
 				}
 			}
-		});
+		}));
 
 		message.setHint(composer.messageHint);
 
@@ -135,13 +137,13 @@ public class MessageComposerHolder extends RecyclerView.ViewHolder {
 		};
 		message.addTextChangedListener(textWatcher);
 
-		attachButton.setOnClickListener(new View.OnClickListener() {
+		attachButton.setOnClickListener(guarded(new View.OnClickListener() {
 			public void onClick(View view) {
 				if (adapter.getListener() != null) {
 					adapter.getListener().onAttachImage();
 				}
 			}
-		});
+		}));
 
 
 		attachments.setupUi();

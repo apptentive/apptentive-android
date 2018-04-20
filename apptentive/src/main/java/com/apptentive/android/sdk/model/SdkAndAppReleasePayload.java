@@ -14,9 +14,10 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 /**
  * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
@@ -214,7 +215,7 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
+			ApptentiveLog.e(PAYLOADS, "Failed to read app's PackageInfo.");
 		}
 
 		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);

@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
@@ -151,7 +152,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachmentStoredFiles);
 			bRet = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to set associated images in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to set associated images in worker thread");
 		} finally {
 			return bRet;
 		}
@@ -174,7 +175,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachedFiles);
 			bRet = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to set associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to set associated files in worker thread");
 		} finally {
 			return bRet;
 		}
@@ -189,7 +190,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<List<StoredFile>> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getAssociatedFiles(getNonce());
 			associatedFiles = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to get associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to get associated files in worker thread");
 		} finally {
 			return associatedFiles;
 		}
@@ -211,7 +212,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			// Delete records from db
 			ApptentiveInternal.getInstance().getApptentiveTaskManager().deleteAssociatedFiles(getNonce());
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to delete associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to delete associated files in worker thread");
 		}
 	}
 
@@ -339,7 +340,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 								ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
 								ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
 							} else {
-								ApptentiveLog.v("Appending non-image attachment.");
+								ApptentiveLog.v(PAYLOADS, "Appending non-image attachment.");
 								Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
 							}
 						} catch (Exception e) {
