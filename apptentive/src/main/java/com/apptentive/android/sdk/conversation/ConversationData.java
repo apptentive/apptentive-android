@@ -147,6 +147,7 @@ public class ConversationData implements Saveable, DataChangedListener, DeviceDa
 		Assert.assertNotNull(device, "Device may not be null.");
 		this.device = device;
 		device.setDataChangedListener(this);
+		device.setDeviceDataChangedListener(this);
 		notifyDataChanged();
 	}
 
@@ -168,6 +169,7 @@ public class ConversationData implements Saveable, DataChangedListener, DeviceDa
 		Assert.assertNotNull(person, "Person may not be null.");
 		this.person = person;
 		this.person.setDataChangedListener(this);
+		this.person.setPersonDataChangedListener(this);
 		notifyDataChanged();
 	}
 

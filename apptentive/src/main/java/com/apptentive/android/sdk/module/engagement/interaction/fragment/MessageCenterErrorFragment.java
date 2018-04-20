@@ -17,17 +17,16 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
-import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
 
 
 public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interaction> {
@@ -66,7 +65,11 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 	@Override
 	public void onResume() {
 		super.onResume();
-		updateStatus();
+		try {
+			updateStatus();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onResume()", MessageCenterErrorFragment.class.getSimpleName());
+		}
 	}
 
 

@@ -130,66 +130,70 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 
 	@Override
 	public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
-		switch (getItemViewType(position)) {
-			case MESSAGE_COMPOSER: {
-				Composer composer = (Composer) listItems.get(position);
-				MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
-				composerHolder.bindView(fragment, this, composer);
-				break;
-			}
-			case STATUS: {
-				MessageCenterStatus status = (MessageCenterStatus) listItems.get(position);
-				StatusHolder statusHolder = (StatusHolder) holder;
-				statusHolder.body.setText(status.body);
-				if (status.icon != null) {
-					statusHolder.icon.setImageResource(status.icon);
-					statusHolder.icon.setVisibility(View.VISIBLE);
-				} else {
-					statusHolder.icon.setVisibility(View.GONE);
+		try {
+			switch (getItemViewType(position)) {
+				case MESSAGE_COMPOSER: {
+					Composer composer = (Composer) listItems.get(position);
+					MessageComposerHolder composerHolder = (MessageComposerHolder) holder;
+					composerHolder.bindView(fragment, this, composer);
+					break;
 				}
-				break;
-			}
-			case GREETING: {
-				MessageCenterGreeting greeting = (MessageCenterGreeting) listItems.get(position);
-				GreetingHolder greetingHolder = (GreetingHolder) holder;
-				greetingHolder.bindView(greeting);
-				break;
-			}
-			case MESSAGE_INCOMING: {
-				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
-				IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
-				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
-				// Mark as read
-				if (!compoundMessage.isRead() && !messagesWithPendingReadStatusUpdate.contains(compoundMessage)) {
-					messagesWithPendingReadStatusUpdate.add(compoundMessage);
-					startUpdateUnreadMessageTask(compoundMessage);
+				case STATUS: {
+					MessageCenterStatus status = (MessageCenterStatus) listItems.get(position);
+					StatusHolder statusHolder = (StatusHolder) holder;
+					statusHolder.body.setText(status.body);
+					if (status.icon != null) {
+						statusHolder.icon.setImageResource(status.icon);
+						statusHolder.icon.setVisibility(View.VISIBLE);
+					} else {
+						statusHolder.icon.setVisibility(View.GONE);
+					}
+					break;
 				}
-				break;
+				case GREETING: {
+					MessageCenterGreeting greeting = (MessageCenterGreeting) listItems.get(position);
+					GreetingHolder greetingHolder = (GreetingHolder) holder;
+					greetingHolder.bindView(greeting);
+					break;
+				}
+				case MESSAGE_INCOMING: {
+					CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
+					IncomingCompoundMessageHolder compoundHolder = (IncomingCompoundMessageHolder) holder;
+					compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
+					// Mark as read
+					if (!compoundMessage.isRead() && !messagesWithPendingReadStatusUpdate.contains(compoundMessage)) {
+						messagesWithPendingReadStatusUpdate.add(compoundMessage);
+						startUpdateUnreadMessageTask(compoundMessage);
+					}
+					break;
+				}
+				case MESSAGE_OUTGOING: {
+					CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
+					OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
+					compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
+					break;
+				}
+				case MESSAGE_AUTO: {
+					CompoundMessage autoMessage = (CompoundMessage) listItems.get(position);
+					AutomatedMessageHolder autoHolder = (AutomatedMessageHolder) holder;
+					autoHolder.bindView(recyclerView, autoMessage);
+					break;
+				}
+				case WHO_CARD: {
+					WhoCard whoCard = (WhoCard) listItems.get(position);
+					WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
+					whoCardHolder.bindView(recyclerView, whoCard);
+					break;
+				}
+				case MESSAGE_CONTEXT: {
+					ContextMessage contextMessage = (ContextMessage) listItems.get(position);
+					ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
+					contextMessageHolder.bindView(contextMessage);
+					break;
+				}
 			}
-			case MESSAGE_OUTGOING: {
-				CompoundMessage compoundMessage = (CompoundMessage) listItems.get(position);
-				OutgoingCompoundMessageHolder compoundHolder = (OutgoingCompoundMessageHolder) holder;
-				compoundHolder.bindView(fragment, recyclerView, this, compoundMessage);
-				break;
-			}
-			case MESSAGE_AUTO: {
-				CompoundMessage autoMessage = (CompoundMessage) listItems.get(position);
-				AutomatedMessageHolder autoHolder = (AutomatedMessageHolder) holder;
-				autoHolder.bindView(recyclerView, autoMessage);
-				break;
-			}
-			case WHO_CARD: {
-				WhoCard whoCard = (WhoCard) listItems.get(position);
-				WhoCardHolder whoCardHolder = (WhoCardHolder) holder;
-				whoCardHolder.bindView(recyclerView, whoCard);
-				break;
-			}
-			case MESSAGE_CONTEXT: {
-				ContextMessage contextMessage = (ContextMessage) listItems.get(position);
-				ContextMessageHolder contextMessageHolder = (ContextMessageHolder) holder;
-				contextMessageHolder.bindView(contextMessage);
-				break;
-			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while binding view holder");
 		}
 	}
 

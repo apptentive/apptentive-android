@@ -41,23 +41,27 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 							 Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.apptentive_upgrade_message_interaction, container, false);
 
-		ImageView iconView = (ImageView) v.findViewById(R.id.icon);
-		Drawable icon = getIconDrawableResourceId();
-		if (icon != null) {
-			iconView.setImageDrawable(icon);
-		} else {
-			iconView.setVisibility(View.GONE);
-		}
-		WebView webview = (WebView) v.findViewById(R.id.webview);
-		webview.loadData(interaction.getBody(), "text/html", "UTF-8");
-		webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
-
-		// If branding is not desired, turn the view off.
-		final View branding = v.findViewById(R.id.apptentive_branding_view);
-		if (branding != null) {
-			if (!interaction.isShowPoweredBy() || Configuration.load().isHideBranding(getContext())) {
-				branding.setVisibility(View.GONE);
+		try {
+			ImageView iconView = (ImageView) v.findViewById(R.id.icon);
+			Drawable icon = getIconDrawableResourceId();
+			if (icon != null) {
+				iconView.setImageDrawable(icon);
+			} else {
+				iconView.setVisibility(View.GONE);
 			}
+			WebView webview = (WebView) v.findViewById(R.id.webview);
+			webview.loadData(interaction.getBody(), "text/html", "UTF-8");
+			webview.setBackgroundColor(Color.TRANSPARENT); // Hack to keep webview background from being colored after load.
+
+			// If branding is not desired, turn the view off.
+			final View branding = v.findViewById(R.id.apptentive_branding_view);
+			if (branding != null) {
+				if (!interaction.isShowPoweredBy() || Configuration.load().isHideBranding(getContext())) {
+					branding.setVisibility(View.GONE);
+				}
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreateView()", UpgradeMessageFragment.class.getSimpleName());
 		}
 
 		return v;

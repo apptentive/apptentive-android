@@ -44,6 +44,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 		Activity activity = getActivity();
 		String errorMessage = activity.getResources().getString(R.string.apptentive_rating_error);
+
 		try {
 			IRatingProvider ratingProvider = ApptentiveInternal.getInstance().getRatingProvider();
 			errorMessage = ratingProvider.activityNotFoundMessage(activity);
@@ -68,10 +69,10 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 		} catch (ActivityNotFoundException e) {
 			displayError(activity, errorMessage);
 		} catch (InsufficientRatingArgumentsException e) {
-			// TODO: Log a message to apptentive to let the developer know that their custom rating provider puked?
 			ApptentiveLog.e(e.getMessage());
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
-		} finally {
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreate()", getClass().getSimpleName());
 		}
 	}
 
@@ -100,12 +101,16 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 	}
 
 	private void displayError(final Activity activity, String message) {
-		ApptentiveLog.e(message);
-		Bundle bundle = new Bundle();
-		bundle.putString("title", activity.getString(R.string.apptentive_oops));
-		bundle.putString("message", message);
-		bundle.putString("positive", activity.getString(R.string.apptentive_ok));
-		ApptentiveAlertDialog.show(this, bundle, 0);
+		try {
+			ApptentiveLog.e(message);
+			Bundle bundle = new Bundle();
+			bundle.putString("title", activity.getString(R.string.apptentive_oops));
+			bundle.putString("message", message);
+			bundle.putString("positive", activity.getString(R.string.apptentive_ok));
+			ApptentiveAlertDialog.show(this, bundle, 0);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while displaying an error");
+		}
 	}
 
 	@Override
