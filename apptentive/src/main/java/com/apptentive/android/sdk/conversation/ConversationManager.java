@@ -1027,7 +1027,7 @@ public class ConversationManager {
 		this.activeConversationProxy = conversation != null ? new ConversationProxy(conversation) : null;
 	}
 
-	public synchronized ConversationProxy getActiveConversationProxy() {
+	public synchronized @Nullable ConversationProxy getActiveConversationProxy() {
 		return activeConversationProxy;
 	}
 

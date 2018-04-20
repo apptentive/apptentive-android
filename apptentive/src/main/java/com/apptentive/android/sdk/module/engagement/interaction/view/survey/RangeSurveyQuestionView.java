@@ -17,6 +17,7 @@ import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
 
@@ -71,31 +72,35 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		ViewGroup answerContainer = getAnswerContainer(v);
-		ViewGroup answer = (ViewGroup) inflater.inflate(R.layout.apptentive_survey_question_range_answer, answerContainer, false);
-		answerContainer.addView(answer);
+		try {
+			ViewGroup answerContainer = getAnswerContainer(v);
+			ViewGroup answer = (ViewGroup) inflater.inflate(R.layout.apptentive_survey_question_range_answer, answerContainer, false);
+			answerContainer.addView(answer);
 
-		TextView minLabelTextView = (TextView) answer.findViewById(R.id.min_label);
-		if (!TextUtils.isEmpty(minLabel)) {
-			minLabelTextView.setText(minLabel);
-		} else {
-			minLabelTextView.setVisibility(View.GONE);
-		}
-		TextView maxLabelTextView = (TextView) answer.findViewById(R.id.max_label);
-		if (!TextUtils.isEmpty(maxLabel)) {
-			maxLabelTextView.setText(maxLabel);
-		} else {
-			maxLabelTextView.setVisibility(View.GONE);
-		}
+			TextView minLabelTextView = (TextView) answer.findViewById(R.id.min_label);
+			if (!TextUtils.isEmpty(minLabel)) {
+				minLabelTextView.setText(minLabel);
+			} else {
+				minLabelTextView.setVisibility(View.GONE);
+			}
+			TextView maxLabelTextView = (TextView) answer.findViewById(R.id.max_label);
+			if (!TextUtils.isEmpty(maxLabel)) {
+				maxLabelTextView.setText(maxLabel);
+			} else {
+				maxLabelTextView.setVisibility(View.GONE);
+			}
 
-		radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
+			radioGroup = (RadioGroup) answer.findViewById(R.id.range_container);
 
-		for (int i = min; i <= max; i++) {
-			RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
-			radioButton.setText(defaultNumberFormat.format(i));
-			radioButton.setTag(i);
-			radioButton.setOnCheckedChangeListener(this);
-			radioGroup.addView(radioButton);
+			for (int i = min; i <= max; i++) {
+				RadioButton radioButton = (RadioButton) inflater.inflate(R.layout.apptentive_survey_question_range_choice, radioGroup, false);
+				radioButton.setText(defaultNumberFormat.format(i));
+				radioButton.setTag(i);
+				radioButton.setOnCheckedChangeListener(this);
+				radioGroup.addView(radioButton);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreateView()", RangeSurveyQuestionView.class.getSimpleName());
 		}
 		return v;
 	}

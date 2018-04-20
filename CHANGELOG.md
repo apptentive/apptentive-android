@@ -1,3 +1,14 @@
+# 2018-04-19 - v5.0.5
+
+#### Bugs Fixed
+
+* Fix message polling issue.
+* Fix UI-related crashes for logged-out conversation.
+
+#### Improvements
+
+* Overall stability improvements.
+
 # 2018-02-08 - v5.0.4
 
 #### Bugs Fixed

@@ -15,9 +15,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveViewExitType;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.EnjoymentDialogInteraction;
+
+import static com.apptentive.android.sdk.util.Util.guarded;
 
 public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDialogInteraction> implements View.OnClickListener {
 
@@ -36,50 +39,54 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = inflater.inflate(R.layout.apptentive_enjoyment_dialog_interaction, container, false);
 
-		TextView bodyView = (TextView) v.findViewById(R.id.title);
-		String body = interaction.getTitle();
-		bodyView.setText(body);
+		try {
+			TextView bodyView = (TextView) v.findViewById(R.id.title);
+			String body = interaction.getTitle();
+			bodyView.setText(body);
 
-		int buttonsTotalLength = 0;
-		// No
-		String noText = interaction.getNoText();
-		Button noButton = (Button) v.findViewById(R.id.no);
-		if (noText != null) {
-			noButton.setText(noText);
-			buttonsTotalLength += noText.length();
-		}
-		noButton.setOnClickListener(this);
-
-		// Yes
-		String yesText = interaction.getYesText();
-		Button yesButton = (Button) v.findViewById(R.id.yes);
-		yesButton.setActivated(true);
-		if (yesText != null) {
-			yesButton.setText(yesText);
-			buttonsTotalLength += yesText.length();
-		}
-		yesButton.setOnClickListener(this);
-
-		// Change orientation of button area to vertical if buttons won't both fit on one line.
-		LinearLayout buttonContainer = (LinearLayout) v.findViewById(R.id.button_container);
-		boolean vertical = buttonsTotalLength > 16;
-		if (vertical) {
-			buttonContainer.setOrientation(LinearLayout.VERTICAL);
-		} else {
-			buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
-		}
-
-		// Dismiss "X" Button
-		boolean showDismissButton = interaction.showDismissButton();
-		String dismissText = interaction.getDismissText();
-		ImageButton dismissButton = (ImageButton) v.findViewById(R.id.dismiss);
-		if (showDismissButton) {
-			if (dismissText != null) {
-				dismissButton.setContentDescription(dismissText);
+			int buttonsTotalLength = 0;
+			// No
+			String noText = interaction.getNoText();
+			Button noButton = (Button) v.findViewById(R.id.no);
+			if (noText != null) {
+				noButton.setText(noText);
+				buttonsTotalLength += noText.length();
 			}
-			dismissButton.setVisibility(View.VISIBLE);
+			noButton.setOnClickListener(guarded(this));
+
+			// Yes
+			String yesText = interaction.getYesText();
+			Button yesButton = (Button) v.findViewById(R.id.yes);
+			yesButton.setActivated(true);
+			if (yesText != null) {
+				yesButton.setText(yesText);
+				buttonsTotalLength += yesText.length();
+			}
+			yesButton.setOnClickListener(guarded(this));
+
+			// Change orientation of button area to vertical if buttons won't both fit on one line.
+			LinearLayout buttonContainer = (LinearLayout) v.findViewById(R.id.button_container);
+			boolean vertical = buttonsTotalLength > 16;
+			if (vertical) {
+				buttonContainer.setOrientation(LinearLayout.VERTICAL);
+			} else {
+				buttonContainer.setOrientation(LinearLayout.HORIZONTAL);
+			}
+
+			// Dismiss "X" Button
+			boolean showDismissButton = interaction.showDismissButton();
+			String dismissText = interaction.getDismissText();
+			ImageButton dismissButton = (ImageButton) v.findViewById(R.id.dismiss);
+			if (showDismissButton) {
+				if (dismissText != null) {
+					dismissButton.setContentDescription(dismissText);
+				}
+				dismissButton.setVisibility(View.VISIBLE);
+			}
+			dismissButton.setOnClickListener(guarded(this));
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreateView()", EnjoymentDialogFragment.class.getSimpleName());
 		}
-		dismissButton.setOnClickListener(this);
 		return v;
 	}
 
