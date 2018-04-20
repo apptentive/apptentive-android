@@ -7,11 +7,14 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 
+import android.support.annotation.NonNull;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.Configuration;
+import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -28,21 +31,8 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 	private final long foregroundPollingInterval;
 	private final Configuration conf;
 	private boolean messageCenterInForeground;
-	private boolean polling;
 
-	private DispatchTask messagePollingTask = new DispatchTask() { // TODO: convert to ConversationDispatchTask
-		@Override
-		protected void execute() {
-			assertTrue(polling, "Not polling messages");
-
-			if (ApptentiveInternal.canShowMessageCenterInternal(getConversation())) {
-				ApptentiveLog.d(MESSAGES, "Checking server for new messages...");
-				messageManager.fetchAndStoreMessages(messageCenterInForeground, conf.isMessageCenterNotificationPopupEnabled(), MessagePollingWorker.this);
-			} else {
-				ApptentiveLog.w(MESSAGES, "Unable to fetch messages: message center can't be show at this time");
-			}
-		}
-	};
+	private DispatchTask messagePollingTask;
 
 	MessagePollingWorker(MessageManager messageManager) {
 		if (messageManager == null) {
@@ -54,7 +44,7 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 		conf = Configuration.load();
 		backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
 		foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
-		ApptentiveLog.vv("Message Polling Worker: bg=%d, fg=%d", backgroundPollingInterval, foregroundPollingInterval);
+		ApptentiveLog.v(MESSAGES, "Message Polling Worker: bg=%d, fg=%d", backgroundPollingInterval, foregroundPollingInterval);
 	}
 
 	@Override
@@ -66,7 +56,7 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 
 	@Override
 	public void onFetchFinish(MessageManager manager, List<ApptentiveMessage> messages) {
-		if (polling) {
+		if (isPolling()) {
 			long pollingInterval = messageCenterInForeground ? foregroundPollingInterval : backgroundPollingInterval;
 			ApptentiveLog.v(MESSAGES, "Scheduled polling messages in %d sec", pollingInterval / 1000);
 			dispatchOnConversationQueueOnce(messagePollingTask, pollingInterval);
@@ -98,20 +88,34 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 	}
 
 	void startPolling() {
-		if (!polling) {
-			polling = true;
+		if (!isPolling()) {
 			ApptentiveLog.v(MESSAGES, "Start polling messages (%s)", getLocalConversationIdentifier());
+			messagePollingTask = createPollingTask();
 			dispatchOnConversationQueueOnce(messagePollingTask, 0L);
+			notifyStartPolling();
 		}
 	}
 
 	void stopPolling() {
-		if (polling) {
-			polling = false;
+		if (isPolling()) {
 			ApptentiveLog.v(MESSAGES, "Stop polling messages (%s)", getLocalConversationIdentifier());
 			messagePollingTask.cancel();
+			messagePollingTask = null;
+			notifyStopPolling();
 		}
 	}
+
+	//region Notifications
+
+	private void notifyStartPolling() {
+		// TBD
+	}
+
+	private void notifyStopPolling() {
+		// TBD
+	}
+
+	//endregion
 
 	private Conversation getConversation() {
 		return messageManager.getConversation();
@@ -123,5 +127,26 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 
 	boolean isMessageCenterInForeground() {
 		return messageCenterInForeground;
+	}
+
+	private boolean isPolling() {
+		return messagePollingTask != null;
+	}
+
+	@NonNull
+	private DispatchTask createPollingTask() {
+		return new DispatchTask() { // TODO: convert to ConversationDispatchTask
+			@Override
+			protected void execute() {
+				assertTrue(isPolling(), "Not polling messages");
+
+				if (ApptentiveInternal.canShowMessageCenterInternal(getConversation())) {
+					ApptentiveLog.d(MESSAGES, "Checking server for new messages...");
+					messageManager.fetchAndStoreMessages(messageCenterInForeground, conf.isMessageCenterNotificationPopupEnabled(), MessagePollingWorker.this);
+				} else {
+					ApptentiveLog.w(MESSAGES, "Unable to fetch messages: message center can't be show at this time");
+				}
+			}
+		};
 	}
 }

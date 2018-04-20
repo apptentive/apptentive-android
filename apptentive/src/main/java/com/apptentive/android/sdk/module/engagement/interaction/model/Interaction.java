@@ -13,6 +13,8 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 public abstract class Interaction extends JSONObject {
 
 	public static final String KEY_NAME = "interaction";
@@ -105,7 +107,7 @@ public abstract class Interaction extends JSONObject {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Interaction.Type: " + type);
+				ApptentiveLog.v(INTERACTIONS, "Error parsing unknown Interaction.Type: " + type);
 			}
 			return unknown;
 		}
@@ -143,7 +145,7 @@ public abstract class Interaction extends JSONObject {
 						break;
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.w(e, "Error parsing Interaction");
+				ApptentiveLog.w(INTERACTIONS, e, "Error parsing Interaction");
 				// Ignore
 			}
 			return null;

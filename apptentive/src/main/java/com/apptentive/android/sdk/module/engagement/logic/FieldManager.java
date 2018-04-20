@@ -10,6 +10,7 @@ import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
@@ -21,6 +22,8 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
 
 public class FieldManager {
 
@@ -345,7 +348,7 @@ public class FieldManager {
 				try {
 					return QueryPart.valueOf(name);
 				} catch (IllegalArgumentException e) {
-					ApptentiveLog.d(e, "Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name);
+					ApptentiveLog.e(INTERACTIONS, e, "Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name);
 				}
 			}
 			return other;

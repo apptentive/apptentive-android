@@ -7,11 +7,14 @@
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 
 import org.json.JSONException;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
 /**
  * @author Sky Kelsey
@@ -27,17 +30,15 @@ public class InteractionCriteria {
 	public boolean isMet(FieldManager fieldManager) {
 		try {
 			Clause rootClause = ClauseParser.parse(json);
-			ApptentiveLog.i("Evaluating Criteria");
+			ApptentiveLog.i(INTERACTIONS, "Evaluating Criteria");
 			boolean ret = false;
 			if (rootClause != null) {
 				ret = rootClause.evaluate(fieldManager);
 			}
-			ApptentiveLog.i("- => %b", ret);
+			ApptentiveLog.i(INTERACTIONS, "- => %b", ret);
 			return ret;
-		} catch (JSONException e) {
-			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
+			ApptentiveLog.e(INTERACTIONS, e, "Exception while evaluating interaction criteria predicate logic.");
 		}
 		return false;
 	}

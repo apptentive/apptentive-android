@@ -107,6 +107,7 @@ public class Device implements Saveable, DataChangedListener {
 			clone.integrationConfig = integrationConfig.clone();
 		}
 		clone.listener = listener;
+		clone.deviceDataChangedListener = deviceDataChangedListener;
 		return clone;
 	}
 

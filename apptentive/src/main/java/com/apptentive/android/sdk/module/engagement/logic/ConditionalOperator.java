@@ -12,6 +12,8 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.math.BigDecimal;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 public enum ConditionalOperator {
 	$exists {
 		@Override
@@ -154,7 +156,7 @@ public enum ConditionalOperator {
 			Double offset = ((BigDecimal) second).doubleValue();
 			Double currentTime = Util.currentTimeSeconds();
 			Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-			ApptentiveLog.v("      		- %s?", Util.classToString(offsetDateTime));
+			ApptentiveLog.v(INTERACTIONS, "      		- %s?", Util.classToString(offsetDateTime));
 			return ((Apptentive.DateTime) first).compareTo(offsetDateTime) < 0;
 		}
 	},
@@ -171,7 +173,7 @@ public enum ConditionalOperator {
 			Double offset = ((BigDecimal) second).doubleValue();
 			Double currentTime = Util.currentTimeSeconds();
 			Apptentive.DateTime offsetDateTime = new Apptentive.DateTime(currentTime + offset);
-			ApptentiveLog.v("      		- %s?", Util.classToString(offsetDateTime));
+			ApptentiveLog.v(INTERACTIONS, "      		- %s?", Util.classToString(offsetDateTime));
 			return ((Apptentive.DateTime) first).compareTo(offsetDateTime) > 0;
 		}
 	},

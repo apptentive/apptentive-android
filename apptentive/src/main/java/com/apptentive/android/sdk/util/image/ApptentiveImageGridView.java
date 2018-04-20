@@ -16,12 +16,14 @@ import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.GridView;
 
-import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.util.Util;
 
 import java.util.List;
+
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 public class ApptentiveImageGridView extends GridView implements AdapterView.OnItemClickListener {
 	private ImageGridViewAdapter imageBandAdapter;
@@ -60,10 +62,13 @@ public class ApptentiveImageGridView extends GridView implements AdapterView.OnI
 	}
 
 	public void setupUi() {
-
-		String conversationToken = ApptentiveInternal.getInstance().getConversationProxy().getConversationToken();
-		imageBandAdapter = new ImageGridViewAdapter(getContext(), conversationToken, false);
-		setAdapter(imageBandAdapter);
+		ConversationProxy conversationProxy = ApptentiveInternal.getInstance().getConversationProxy();
+		assertNotNull(conversationProxy);
+		if (conversationProxy != null) {
+			String conversationToken = conversationProxy.getConversationToken();
+			imageBandAdapter = new ImageGridViewAdapter(getContext(), conversationToken, false);
+			setAdapter(imageBandAdapter);
+		}
 	}
 
 	public void setupLayoutListener() {
