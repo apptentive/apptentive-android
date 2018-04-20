@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 /**
  * @author Sky Kelsey
  */
@@ -30,7 +32,7 @@ public class LogicalClause implements Clause {
 		operatorName = key.trim();
 		operator = LogicalOperator.parse(operatorName);
 		children = new ArrayList<Clause>();
-		ApptentiveLog.v("  + LogicalClause of type \"%s\"", operatorName);
+		ApptentiveLog.v(INTERACTIONS, "  + LogicalClause of type \"%s\"", operatorName);
 		if (value instanceof JSONArray) {
 			JSONArray jsonArray = (JSONArray) value;
 			for (int i = 0; i < jsonArray.length(); i++) {
@@ -49,34 +51,34 @@ public class LogicalClause implements Clause {
 				}
 			}
 		} else {
-			ApptentiveLog.w("Unrecognized LogicalClause: %s", value.toString());
+			ApptentiveLog.w(INTERACTIONS, "Unrecognized LogicalClause: %s", value.toString());
 		}
 	}
 
 	@Override
 	public boolean evaluate(FieldManager fieldManager) {
-		ApptentiveLog.v("  - <%s>", operator.name());
+		ApptentiveLog.v(INTERACTIONS, "  - <%s>", operator.name());
 		if (operator == LogicalOperator.$and) {
 			for (Clause clause : children) {
 				boolean ret = clause.evaluate(fieldManager);
-				ApptentiveLog.v("        - => %b", ret);
+				ApptentiveLog.v(INTERACTIONS, "        - => %b", ret);
 				if (!ret) {
-					ApptentiveLog.v("  - </%s>", operator.name());
+					ApptentiveLog.v(INTERACTIONS, "  - </%s>", operator.name());
 					return false;
 				}
 			}
-			ApptentiveLog.v("  - </%s>", operator.name());
+			ApptentiveLog.v(INTERACTIONS, "  - </%s>", operator.name());
 			return true;
 		} else if (operator == LogicalOperator.$or) {
 			for (Clause clause : children) {
 				boolean ret = clause.evaluate(fieldManager);
-				ApptentiveLog.v("        - => %b", ret);
+				ApptentiveLog.v(INTERACTIONS, "        - => %b", ret);
 				if (ret) {
-					ApptentiveLog.v("  - </%s>", operator.name());
+					ApptentiveLog.v(INTERACTIONS, "  - </%s>", operator.name());
 					return true;
 				}
 			}
-			ApptentiveLog.v("  - </%s> => false", operator.name());
+			ApptentiveLog.v(INTERACTIONS, "  - </%s> => false", operator.name());
 			return false;
 		} else if (operator == LogicalOperator.$not) {
 			if (children.size() != 1) {
@@ -84,13 +86,13 @@ public class LogicalClause implements Clause {
 			}
 			Clause clause = children.get(0);
 			boolean ret = clause.evaluate(fieldManager);
-			ApptentiveLog.v("        - => %b", ret);
-			ApptentiveLog.v("  - </%s>", operator.name());
+			ApptentiveLog.v(INTERACTIONS, "        - => %b", ret);
+			ApptentiveLog.v(INTERACTIONS, "  - </%s>", operator.name());
 			return !ret;
 		} else {
 			// Unsupported
-			ApptentiveLog.v("Unsupported operation: \"%s\" => false", operatorName);
-			ApptentiveLog.v("  - </%s>", operator.name());
+			ApptentiveLog.v(INTERACTIONS, "Unsupported operation: \"%s\" => false", operatorName);
+			ApptentiveLog.v(INTERACTIONS, "  - </%s>", operator.name());
 			return false;
 		}
 

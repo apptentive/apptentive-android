@@ -14,6 +14,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+
 public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
 
 	public static final String KEY_ID = "id";
@@ -232,7 +234,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			try {
 				return Type.valueOf(rawType);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown ApptentiveMessage.Type: " + rawType);
+				ApptentiveLog.v(MESSAGES, "Error parsing unknown ApptentiveMessage.Type: " + rawType);
 			}
 			return unknown;
 		}
@@ -248,7 +250,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			try {
 				return State.valueOf(state);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown ApptentiveMessage.State: " + state);
+				ApptentiveLog.v(MESSAGES, "Error parsing unknown ApptentiveMessage.State: " + state);
 			}
 			return unknown;
 		}

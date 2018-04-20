@@ -394,7 +394,7 @@ public class LogMonitor implements Destroyable {
 		String[] emailRecipients = { "support@apptentive.com" };
 
 		/** New log level */
-		ApptentiveLog.Level logLevel = ApptentiveLog.Level.VERY_VERBOSE;
+		ApptentiveLog.Level logLevel = ApptentiveLog.Level.VERBOSE;
 
 		/** True if logcat output should be filtered by the process id */
 		boolean filterByPID = true;
@@ -485,7 +485,7 @@ public class LogMonitor implements Destroyable {
 					}
 
 					int responseCode = connection.getResponseCode();
-					ApptentiveLog.vv("Response code: %d", responseCode);
+					ApptentiveLog.v("Response code: %d", responseCode);
 
 					InputStream is;
 					StringBuilder buffer;

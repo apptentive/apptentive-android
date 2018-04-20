@@ -17,6 +17,8 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.util.Util;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+
 public class AppReleaseManager {
 
 	public static AppRelease generateCurrentAppRelease(Context context, ApptentiveInternal apptentiveInternal) {
@@ -41,7 +43,7 @@ public class AppReleaseManager {
 				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
+			ApptentiveLog.e(CONVERSATION, "Failed to read app's PackageInfo.");
 		}
 
 		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);

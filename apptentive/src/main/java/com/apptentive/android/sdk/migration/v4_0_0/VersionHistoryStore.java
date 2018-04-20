@@ -21,6 +21,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+
 /**
  * Stores version history in JSON, in SharedPreferences.
  */
@@ -56,7 +58,7 @@ public class VersionHistoryStore {
 						versionHistoryEntries.add(entry);
 					}
 				} catch (Exception e) {
-					ApptentiveLog.w(e, "Error loading VersionHistoryStore.");
+					ApptentiveLog.w(CONVERSATION, e, "Error loading VersionHistoryStore.");
 				}
 			}
 		}
@@ -84,12 +86,12 @@ public class VersionHistoryStore {
 			// Only modify the store if the version hasn't been seen.
 			if (!exists) {
 				VersionHistoryEntry entry = new VersionHistoryEntry(newVersionCode, newVersionName, date);
-				ApptentiveLog.d("Adding Version History entry: %s", entry);
+				ApptentiveLog.v(CONVERSATION, "Adding Version History entry: %s", entry);
 				versionHistoryEntries.add(new VersionHistoryEntry(newVersionCode, newVersionName, date));
 				save();
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error updating VersionHistoryStore.");
+			ApptentiveLog.w(CONVERSATION, e, "Error updating VersionHistoryStore.");
 		}
 	}
 

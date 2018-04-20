@@ -8,10 +8,10 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
-import com.apptentive.android.sdk.ApptentiveHelper;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
@@ -39,8 +39,6 @@ import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONObject;
 
@@ -51,7 +49,7 @@ import java.util.List;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
-import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -144,14 +142,14 @@ public class ConversationManager {
 
 		try {
 			// resolving metadata
-			ApptentiveLog.vv(CONVERSATION, "Resolving metadata...");
+			ApptentiveLog.v(CONVERSATION, "Resolving metadata...");
 			conversationMetadata = resolveMetadata();
-			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+			if (ApptentiveLog.canLog(VERBOSE)) {
 				printMetadata(conversationMetadata, "Loaded Metadata");
 			}
 
 			// attempt to load existing conversation
-			ApptentiveLog.vv(CONVERSATION, "Loading active conversation...");
+			ApptentiveLog.v(CONVERSATION, "Loading active conversation...");
 			setActiveConversation(loadActiveConversationGuarded());
 
 			if (activeConversation != null) {
@@ -168,61 +166,99 @@ public class ConversationManager {
 			}
 
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while loading active conversation");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while loading active conversation");
 		}
 
 		dispatchDebugEvent(EVT_CONVERSATION_LOAD, "successful", Boolean.FALSE);
 		return false;
 	}
 
-	private Conversation loadActiveConversationGuarded() throws IOException, SerializerException {
+	private @Nullable Conversation loadActiveConversationGuarded() throws IOException {
+		// try to load an active conversation from metadata first
+		try {
+			if (conversationMetadata.hasItems()) {
+				return loadConversationFromMetadata(conversationMetadata);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while loading conversation");
+		}
+
+		// no active conversations: create a new one
+		ApptentiveLog.i(CONVERSATION, "Creating 'anonymous' conversation...");
+		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
+		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
+		Conversation conversation = new Conversation(dataFile, messagesFile);
+
+		// attempt to migrate a legacy conversation (if any)
+		if (migrateLegacyConversation(conversation)) {
+			return conversation;
+		}
+
+		// if there is no Legacy Conversation, then just connect it to the server.
+		conversation.setState(ANONYMOUS_PENDING);
+		fetchConversationToken(conversation);
+		return conversation;
+	}
+
+	/**
+	 * Attempts to load an existing conversation based on metadata file
+	 * @return <code>null</code> is only logged out conversations available
+	 */
+	private @Nullable Conversation loadConversationFromMetadata(ConversationMetadata metadata) throws SerializerException {
 		// we're going to scan metadata in attempt to find existing conversations
 		ConversationMetadataItem item;
 
 		// if the user was logged in previously - we should have an active conversation
-		item = conversationMetadata.findItem(LOGGED_IN);
+		item = metadata.findItem(LOGGED_IN);
 		if (item != null) {
-			ApptentiveLog.v(CONVERSATION, "Loading logged-in conversation...");
+			ApptentiveLog.i(CONVERSATION, "Loading 'logged-in' conversation...");
 			return loadConversation(item);
 		}
 
 		// if no users were logged in previously - we might have an anonymous conversation
-		item = conversationMetadata.findItem(ANONYMOUS);
+		item = metadata.findItem(ANONYMOUS);
 		if (item != null) {
-			ApptentiveLog.v(CONVERSATION, "Loading anonymous conversation...");
+			ApptentiveLog.i(CONVERSATION, "Loading 'anonymous' conversation...");
 			return loadConversation(item);
 		}
 
 		// check if we have a 'pending' anonymous conversation
-		item = conversationMetadata.findItem(ANONYMOUS_PENDING);
+		item = metadata.findItem(ANONYMOUS_PENDING);
 		if (item != null) {
-			ApptentiveLog.v(CONVERSATION, "Loading anonymous pending conversation...");
+			ApptentiveLog.i(CONVERSATION, "Loading 'anonymous pending' conversation...");
 			final Conversation conversation = loadConversation(item);
 			fetchConversationToken(conversation);
 			return conversation;
 		}
 
 		// check if we have a 'legacy pending' conversation
-		item = conversationMetadata.findItem(LEGACY_PENDING);
+		item = metadata.findItem(LEGACY_PENDING);
 		if (item != null) {
-			ApptentiveLog.v(CONVERSATION, "Loading legacy pending conversation...");
+			ApptentiveLog.i(CONVERSATION, "Loading 'legacy pending' conversation...");
 			final Conversation conversation = loadConversation(item);
 			fetchLegacyConversation(conversation);
 			return conversation;
 		}
 
-		// Check for only LOGGED_OUT Conversations
-		if (conversationMetadata.hasItems()) {
-			ApptentiveLog.v(CONVERSATION, "Can't load conversation: only 'logged-out' conversations available");
-			return null;
+		// we only have LOGGED_OUT conversations
+		ApptentiveLog.i(CONVERSATION, "No active conversations to load: only 'logged-out' conversations available");
+		return null;
+	}
+
+	/**
+	 * Attempts to migrate a legacy conversation
+	 * @return <code>true</code> is succeed
+	 */
+	private boolean migrateLegacyConversation(Conversation conversation) {
+		try {
+			return migrateLegacyConversationGuarded(conversation);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while migrating legacy conversation");
 		}
+		return false;
+	}
 
-		// No conversation exists: Create a new one
-		ApptentiveLog.v(CONVERSATION, "Can't load conversation: creating anonymous conversation...");
-		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-		Conversation anonymousConversation = new Conversation(dataFile, messagesFile);
-
+	private boolean migrateLegacyConversationGuarded(Conversation conversation) {
 		// If there is a Legacy Conversation, migrate it into the new Conversation object.
 		// Check whether migration is needed.
 		// No Conversations exist in the meta-data.
@@ -230,38 +266,38 @@ public class ConversationManager {
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String legacyConversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
 		if (!isNullOrEmpty(legacyConversationToken)) {
+			ApptentiveLog.i(CONVERSATION, "Migrating an existing legacy conversation to the new format...");
+
 			String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
 			Apptentive.Version version4 = new Apptentive.Version();
 			version4.setVersion("4.0.0");
 			Apptentive.Version lastSeenVersion = new Apptentive.Version();
 			lastSeenVersion.setVersion(lastSeenVersionString);
 			if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
+				conversation.setState(LEGACY_PENDING);
+				conversation.setConversationToken(legacyConversationToken);
 
-				anonymousConversation.setState(LEGACY_PENDING);
-				anonymousConversation.setConversationToken(legacyConversationToken);
-
-				Migrator migrator = new Migrator(getContext(), prefs, anonymousConversation);
+				Migrator migrator = new Migrator(getContext(), prefs, conversation);
 				migrator.migrate();
 
-				ApptentiveLog.v("Fetching legacy conversation...");
-				fetchLegacyConversation(anonymousConversation)
-					// remove legacy key when request is finished
-					.addListener(new HttpRequest.Adapter<HttpRequest>() {
-						@Override
-						public void onFinish(HttpRequest request) {
-							prefs.edit()
-								.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
-								.apply();
-						}
-					});
-				return anonymousConversation;
+				ApptentiveLog.v(CONVERSATION, "Fetching legacy conversation...");
+				fetchLegacyConversation(conversation)
+						// remove legacy key when request is finished
+						.addListener(new HttpRequest.Adapter<HttpRequest>() {
+							@Override
+							public void onFinish(HttpRequest request) {
+								prefs.edit()
+										.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
+										.apply();
+							}
+						});
+				return true;
 			}
+
+			ApptentiveLog.w(CONVERSATION, "Unable to migrate legacy conversation: data format is outdated!");
 		}
 
-		// If there is no Legacy Conversation, then just connect it to the server.
-		anonymousConversation.setState(ANONYMOUS_PENDING);
-		fetchConversationToken(anonymousConversation);
-		return anonymousConversation;
+		return false;
 	}
 
 	private HttpRequest fetchLegacyConversation(final Conversation conversation) {
@@ -314,7 +350,7 @@ public class ConversationManager {
 						// handle state change
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception while handling legacy conversation id");
+						ApptentiveLog.e(CONVERSATION, e, "Exception while handling legacy conversation id");
 					}
 				}
 
@@ -324,7 +360,7 @@ public class ConversationManager {
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.e("Failed to fetch legacy conversation id: %s", reason);
+					ApptentiveLog.e(CONVERSATION, "Failed to fetch legacy conversation id: %s", reason);
 				}
 			});
 
@@ -376,7 +412,7 @@ public class ConversationManager {
 			return existingRequest;
 		}
 
-		ApptentiveLog.i(CONVERSATION, "Fetching Configuration token task started.");
+		ApptentiveLog.d(CONVERSATION, "Started fetching conversation token...");
 		dispatchDebugEvent(EVT_CONVERSATION_WILL_FETCH_TOKEN);
 
 		// Try to fetch a new one from the server.
@@ -433,7 +469,7 @@ public class ConversationManager {
 
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception while handling conversation token");
+						ApptentiveLog.e(CONVERSATION, e, "Exception while handling conversation token");
 						dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 					}
 				}
@@ -445,7 +481,7 @@ public class ConversationManager {
 
 				@Override
 				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.w("Failed to fetch conversation token: %s", reason);
+					ApptentiveLog.w(CONVERSATION, "Failed to fetch conversation token: %s", reason);
 					dispatchDebugEvent(EVT_CONVERSATION_DID_FETCH_TOKEN, false);
 				}
 			});
@@ -461,6 +497,7 @@ public class ConversationManager {
 	//region Conversation fetching
 
 	private void handleConversationStateChange(Conversation conversation) {
+		ApptentiveLog.d(CONVERSATION, "Conversation state changed: %s", conversation);
 		checkConversationQueue();
 
 		assertTrue(conversation != null && !conversation.hasState(UNDEFINED));
@@ -495,7 +532,7 @@ public class ConversationManager {
 			}
 
 			updateMetadataItems(conversation);
-			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
+			if (ApptentiveLog.canLog(VERBOSE)) {
 				printMetadata(conversationMetadata, "Updated Metadata");
 			}
 		}
@@ -506,7 +543,7 @@ public class ConversationManager {
 		try {
 			fetchAppConfigurationGuarded(conversation);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while fetching app configuration");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while fetching app configuration");
 		}
 	}
 
@@ -544,7 +581,7 @@ public class ConversationManager {
 					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
 					config.save();
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while parsing app configuration response");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing app configuration response");
 				}
 			}
 
@@ -565,7 +602,7 @@ public class ConversationManager {
 	private void updateMetadataItems(Conversation conversation) {
 		checkConversationQueue();
 
-		ApptentiveLog.vv("Updating metadata: state=%s localId=%s conversationId=%s token=%s",
+		ApptentiveLog.v(CONVERSATION, "Updating metadata: state=%s localId=%s conversationId=%s token=%s",
 				conversation.getState(),
 				conversation.getLocalIdentifier(),
 				conversation.getConversationId(),
@@ -621,15 +658,15 @@ public class ConversationManager {
 		try {
 			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
 			if (metaFile.exists()) {
-				ApptentiveLog.v(CONVERSATION, "Loading meta file: " + metaFile);
+				ApptentiveLog.v(CONVERSATION, "Loading metadata file: %s", metaFile);
 				final ConversationMetadata metadata = ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
 				dispatchDebugEvent(EVT_CONVERSATION_METADATA_LOAD, true);
 				return metadata;
 			} else {
-				ApptentiveLog.v(CONVERSATION, "Meta file does not exist: " + metaFile);
+				ApptentiveLog.v(CONVERSATION, "Metadata file not found: %s", metaFile);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while loading conversation metadata");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while loading conversation metadata");
 		}
 
 		dispatchDebugEvent(EVT_CONVERSATION_METADATA_LOAD, false);
@@ -640,8 +677,8 @@ public class ConversationManager {
 		checkConversationQueue();
 
 		try {
-			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
-				ApptentiveLog.vv(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
+			if (ApptentiveLog.canLog(VERBOSE)) {
+				ApptentiveLog.v(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
 			}
 			long start = System.currentTimeMillis();
 			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_PATH);
@@ -682,13 +719,13 @@ public class ConversationManager {
 			final Jwt jwt = Jwt.decode(token);
 			userId = jwt.getPayload().optString("sub");
 			if (StringUtils.isNullOrEmpty(userId)) {
-				ApptentiveLog.e("Error while extracting user id: Missing field \"sub\"");
+				ApptentiveLog.e(CONVERSATION, "Error while extracting user id: Missing field \"sub\"");
 				callback.onLoginFail("Error while extracting user id: Missing field \"sub\"");
 				return;
 			}
 
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while extracting user id");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while extracting user id");
 			callback.onLoginFail("Exception while extracting user id");
 			return;
 		}
@@ -706,7 +743,7 @@ public class ConversationManager {
 			});
 
 			if (conversationItem == null) {
-				ApptentiveLog.w("No conversation found matching user: '%s'. Logging in as new user.", userId);
+				ApptentiveLog.w(CONVERSATION, "No conversation found matching user: '%s'. Logging in as new user.", userId);
 				sendFirstLoginRequest(userId, token, callback);
 				return;
 			}
@@ -762,7 +799,7 @@ public class ConversationManager {
 				break;
 			case LOGGED_IN:
 				if (StringUtils.equal(activeConversation.getUserId(), userId)) {
-					ApptentiveLog.w("Already logged in as \"%s\"", userId);
+					ApptentiveLog.w(CONVERSATION, "Already logged in as \"%s\"", userId);
 					callback.onLoginFinish();
 					return;
 				}
@@ -786,7 +823,7 @@ public class ConversationManager {
 					final String incomingConversationId = responseObject.getString("id");
 					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while parsing login response");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -848,7 +885,7 @@ public class ConversationManager {
 					// notify delegate
 					callback.onLoginFinish();
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while creating logged-in conversation");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while creating logged-in conversation");
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -877,7 +914,7 @@ public class ConversationManager {
 					final String incomingConversationId = responseObject.getString("id");
 					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while parsing login response");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -936,7 +973,7 @@ public class ConversationManager {
 					// notify delegate
 					callback.onLoginFinish();
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while creating logged-in conversation");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while creating logged-in conversation");
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -954,7 +991,7 @@ public class ConversationManager {
 		if (activeConversation != null) {
 			switch (activeConversation.getState()) {
 				case LOGGED_IN:
-					ApptentiveLog.d("Ending active conversation.");
+					ApptentiveLog.d(CONVERSATION, "Ending active conversation.");
 					EngagementModule.engageInternal(getContext(), activeConversation, "logout");
 					// Post synchronously to ensure logout payload can be sent before destroying the logged in conversation.
 					ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_CONVERSATION_WILL_LOGOUT, ObjectUtils.toMap(NOTIFICATION_KEY_CONVERSATION, activeConversation));
@@ -981,7 +1018,7 @@ public class ConversationManager {
 	private void printMetadata(ConversationMetadata metadata, String title) {
 		List<ConversationMetadataItem> items = metadata.getItems();
 		if (items.isEmpty()) {
-			ApptentiveLog.vv(CONVERSATION, "%s (%d item(s))", title, items.size());
+			ApptentiveLog.v(CONVERSATION, "%s (%d item(s))", title, items.size());
 			return;
 		}
 
@@ -1010,24 +1047,25 @@ public class ConversationManager {
 			};
 		}
 
-		ApptentiveLog.vv(CONVERSATION, "%s (%d item(s))\n%s", title, items.size(), StringUtils.table(rows));
+		ApptentiveLog.v(CONVERSATION, "%s (%d item(s))\n%s", title, items.size(), StringUtils.table(rows));
 	}
 
 	//endregion
 
 	//region Getters/Setters
 
-	public Conversation getActiveConversation() {
+	public @Nullable Conversation getActiveConversation() {
 		checkConversationQueue(); // we should only access the conversation on a dedicated queue
 		return activeConversation;
 	}
 
-	private synchronized void setActiveConversation(Conversation conversation) {
+	private void setActiveConversation(@Nullable Conversation conversation) {
+		checkConversationQueue(); // we should only access the conversation on a dedicated queue
 		this.activeConversation = conversation;
 		this.activeConversationProxy = conversation != null ? new ConversationProxy(conversation) : null;
 	}
 
-	public synchronized ConversationProxy getActiveConversationProxy() {
+	public synchronized @Nullable ConversationProxy getActiveConversationProxy() {
 		return activeConversationProxy;
 	}
 

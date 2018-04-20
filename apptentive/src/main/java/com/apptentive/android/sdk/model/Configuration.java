@@ -18,6 +18,8 @@ import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+
 /**
  * @author Sky Kelsey
  */
@@ -167,7 +169,7 @@ public class Configuration extends JSONObject {
 			Bundle metaData = ai.metaData;
 			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
+			ApptentiveLog.w(CONVERSATION, e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
@@ -188,7 +190,7 @@ public class Configuration extends JSONObject {
 		try {
 			put(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS, configurationCacheExpirationMillis);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+			ApptentiveLog.w(CONVERSATION, "Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 		}
 	}
 

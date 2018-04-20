@@ -15,6 +15,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 /**
  * @author Sky Kelsey
  */
@@ -46,7 +48,7 @@ public class Targets extends JSONObject {
 				}
 			}
 		}
-		ApptentiveLog.v("No runnable Interactions for EventLabel: %s", eventLabel);
+		ApptentiveLog.v(INTERACTIONS, "No runnable Interactions for EventLabel: %s", eventLabel);
 		return null;
 	}
 }

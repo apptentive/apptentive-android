@@ -8,6 +8,7 @@ package com.apptentive.android.sdk;
 
 import android.util.Log;
 
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 
 import java.util.IllegalFormatException;
@@ -27,7 +28,7 @@ public class ApptentiveLog {
 		}
 	};
 
-	private static Level logLevel = Level.DEFAULT;
+	private static Level logLevel = Level.INFO;
 
 	public static Level getLogLevel() {
 		return logLevel;
@@ -84,23 +85,6 @@ public class ApptentiveLog {
 
 	public static boolean canLog(Level level) {
 		return logLevel.canLog(level);
-	}
-
-	public static void vv(ApptentiveLogTag tag, String message, Object... args) {
-		if (tag.enabled) {
-			doLog(Level.VERY_VERBOSE, tag, null, message, args);
-		}
-	}
-	public static void vv(ApptentiveLogTag tag, Throwable throwable, String message, Object... args){
-		if (tag.enabled) {
-			doLog(Level.VERY_VERBOSE, tag, throwable, message, args);
-		}
-	}
-	public static void vv(String message, Object... args){
-		doLog(Level.VERY_VERBOSE, null, null, message, args);
-	}
-	public static void vv(Throwable throwable, String message, Object... args){
-		doLog(Level.VERY_VERBOSE, null, throwable, message, args);
 	}
 
 	public static void v(ApptentiveLogTag tag, String message, Object... args) {
@@ -206,19 +190,18 @@ public class ApptentiveLog {
 	}
 
 	public enum Level {
-		VERY_VERBOSE(1, Log.VERBOSE),
 		VERBOSE(Log.VERBOSE, Log.VERBOSE),
 		DEBUG(Log.DEBUG, Log.DEBUG),
 		INFO(Log.INFO, Log.INFO),
 		WARN(Log.WARN, Log.WARN),
 		ERROR(Log.ERROR, Log.ERROR),
 		ASSERT(Log.ASSERT, Log.ASSERT),
-		DEFAULT(Log.INFO, Log.INFO);
+		UNKNOWN(-1, -1);
 
 		private int level;
 		private int androidLevel;
 
-		private Level(int level, int androidLevel) {
+		Level(int level, int androidLevel) {
 			this.level = level;
 			this.androidLevel = androidLevel;
 		}
@@ -232,12 +215,14 @@ public class ApptentiveLog {
 		}
 
 		public static Level parse(String level) {
-			try {
-				return Level.valueOf(level);
-			} catch (IllegalArgumentException e) {
-				LOGGER_IMPLEMENTATION.println(Log.WARN, TAG, "Error parsing unknown ApptentiveLog.Level: " + level);
+			if (!StringUtils.isNullOrEmpty(level)) {
+				try {
+					return Level.valueOf(level);
+				} catch (Exception e) {
+					LOGGER_IMPLEMENTATION.println(Log.WARN, TAG, "Error parsing unknown ApptentiveLog.Level: " + level);
+				}
 			}
-			return DEFAULT;
+			return UNKNOWN;
 		}
 
 		/**

@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+
 /**
  * @author Sky Kelsey
  */
@@ -95,7 +97,7 @@ public class EventPayload extends ConversationItem {
 				try {
 					ret.put(key, value);
 				} catch (Exception e) {
-					ApptentiveLog.w("Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
+					ApptentiveLog.w(PAYLOADS, "Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
 				}
 			}
 		}

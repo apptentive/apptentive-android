@@ -31,6 +31,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+import static com.apptentive.android.sdk.util.Util.guarded;
+
 
 public class ImageGridViewAdapter extends BaseAdapter {
 
@@ -341,13 +344,13 @@ public class ImageGridViewAdapter extends BaseAdapter {
 						AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
 						// Add remove button overlay
 						indicator.setImageResource(defaultImageIndicator);
-						indicator.setOnClickListener(new View.OnClickListener() {
-							public void onClick(View v) {
-								if (localCallback != null) {
-									localCallback.onImageSelected(index);
-								}
-							}
-						});
+						indicator.setOnClickListener(guarded(new View.OnClickListener() {
+											public void onClick(View v) {
+												if (localCallback != null) {
+													localCallback.onImageSelected(index);
+												}
+											}
+										}));
 					}
 					mask.setVisibility(View.GONE);
 				}
@@ -483,7 +486,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
 									if (downloadItems.contains(data.originalPath)) {
-										ApptentiveLog.d("ApptentiveAttachmentLoader onLoaded callback");
+										ApptentiveLog.v(UTIL, "ApptentiveAttachmentLoader onLoaded callback");
 										downloadItems.remove(data.originalPath);
 										Util.openFileAttachment(view.getContext(), data.originalPath, data.localCachePath, data.mimeType);
 									}
@@ -517,7 +520,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 										} else if (progress >= 0) {
 											progressBarDownload.setVisibility(View.VISIBLE);
 											progressBarDownload.setProgress(progress);
-											ApptentiveLog.d("ApptentiveAttachmentLoader progress callback: " + progress);
+											ApptentiveLog.v(UTIL, "ApptentiveAttachmentLoader progress callback: " + progress);
 										}
 									}
 								}

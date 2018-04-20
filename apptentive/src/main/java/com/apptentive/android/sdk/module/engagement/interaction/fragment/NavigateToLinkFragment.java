@@ -63,13 +63,15 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 			}
 		} catch (ActivityNotFoundException e) {
 			ApptentiveLog.w(e, "NavigateToLink Error: ");
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreate()", getClass().getSimpleName());
 		} finally {
 			JSONObject data = new JSONObject();
 			try {
 				data.put(NavigateToLinkInteraction.KEY_URL, interaction.getUrl());
 				data.put(NavigateToLinkInteraction.KEY_TARGET, interaction.getTarget().lowercaseName());
 				data.put(NavigateToLinkInteraction.EVENT_KEY_SUCCESS, success);
-			} catch (JSONException e) {
+			} catch (Exception e) {
 				ApptentiveLog.e(e, "Error creating Event data object.");
 			}
 			engageInternal(NavigateToLinkInteraction.EVENT_NAME_NAVIGATE, data.toString());
