@@ -22,6 +22,7 @@ import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 
@@ -79,6 +80,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AC
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_FETCHED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
@@ -198,6 +200,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
 		ApptentiveNotificationCenter.defaultCenter()
+			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
 			.addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this)
 			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this)
 			.addObserver(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, this);
@@ -391,7 +394,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		return conversationManager.getActiveConversation();
 	}
 
-	public ConversationProxy getConversationProxy() {
+	public @Nullable ConversationProxy getConversationProxy() {
 		return conversationManager.getActiveConversationProxy();
 	}
 
@@ -594,11 +597,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
-
-			Conversation conversation = getConversation();
-			if (conversation != null) {
-				checkSendVersionChanges(conversation);
-			}
 
 			defaultAppDisplayName = packageManager.getApplicationLabel(packageManager.getApplicationInfo(packageInfo.packageName, 0)).toString();
 
@@ -1141,7 +1139,13 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	public void onReceiveNotification(ApptentiveNotification notification) {
 		checkConversationQueue();
 
-		if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
+		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
+			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
+			if (conversation.hasActiveState()) {
+				checkSendVersionChanges(conversation);
+			}
+		}
+		else if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			conversation.addPayload(new LogoutPayload());
 		} else if (notification.hasName(NOTIFICATION_AUTHENTICATION_FAILED)) {

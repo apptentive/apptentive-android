@@ -16,6 +16,8 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 
+import static com.apptentive.android.sdk.util.Util.guarded;
+
 public class ApptentiveAlertDialog extends DialogFragment {
 
 	public static void show(Fragment hostingFragment, Bundle bundle, int requestCode) {
@@ -68,14 +70,14 @@ public class ApptentiveAlertDialog extends DialogFragment {
 				positiveButton.setVisibility(View.GONE);
 			} else {
 				positiveButton.setText(positiveButtonTxt);
-				positiveButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dismiss();
-						// TODO
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
-					}
-				});
+				positiveButton.setOnClickListener(guarded(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								dismiss();
+								// TODO
+								getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_OK, getActivity().getIntent());
+							}
+						}));
 			}
 
 			Button negativeButton = (Button) view.findViewById(R.id.button_negative);
@@ -84,13 +86,13 @@ public class ApptentiveAlertDialog extends DialogFragment {
 				negativeButton.setVisibility(View.GONE);
 			} else {
 				negativeButton.setText(negativeButtonTxt);
-				negativeButton.setOnClickListener(new View.OnClickListener() {
-					@Override
-					public void onClick(View v) {
-						dismiss();
-						getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, getActivity().getIntent());
-					}
-				});
+				negativeButton.setOnClickListener(guarded(new View.OnClickListener() {
+							@Override
+							public void onClick(View v) {
+								dismiss();
+								getTargetFragment().onActivityResult(getTargetRequestCode(), Activity.RESULT_CANCELED, getActivity().getIntent());
+							}
+						}));
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error:");
