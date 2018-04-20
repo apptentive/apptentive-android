@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
@@ -408,18 +409,18 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.beginTransaction();
 
 			// 1. Rename existing "payload" table to "legacy_payload"
-			ApptentiveLog.vv(DATABASE, "\t1. Backing up \"payloads\" database to \"legacy_payloads\"");
+			ApptentiveLog.v(DATABASE, "\t1. Backing up \"payloads\" database to \"legacy_payloads\"");
 			db.execSQL(BACKUP_LEGACY_PAYLOAD_TABLE);
 
 			// 2. Create new Payload table as "payload"
-			ApptentiveLog.vv(DATABASE, "\t2. Creating new \"payloads\" database.");
+			ApptentiveLog.v(DATABASE, "\t2. Creating new \"payloads\" database.");
 			db.execSQL(TABLE_CREATE_PAYLOAD);
 
 			// 3. Load legacy payloads
-			ApptentiveLog.vv(DATABASE, "\t3. Loading legacy payloads.");
+			ApptentiveLog.v(DATABASE, "\t3. Loading legacy payloads.");
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST_LEGACY, null);
 
-			ApptentiveLog.vv(DATABASE, "4. Save payloads into new table.");
+			ApptentiveLog.v(DATABASE, "4. Save payloads into new table.");
 			JsonPayload payload;
 			while (cursor.moveToNext()) {
 				PayloadType payloadType = PayloadType.parse(cursor.getString(1));
@@ -439,7 +440,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				payload.setNonce(nonce);
 
 				// 4. Save each payload in the new table.
-				ApptentiveLog.vv(DATABASE, "Payload of type %s:, %s", payload.getPayloadType().name(), payload);
+				ApptentiveLog.v(DATABASE, "Payload of type %s:, %s", payload.getPayloadType().name(), payload);
 				ContentValues values = new ContentValues();
 				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
 				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
@@ -464,11 +465,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 
 			// 5. Migrate messages
-			ApptentiveLog.vv(DATABASE, "\t6. Migrating messages.");
+			ApptentiveLog.v(DATABASE, "\t6. Migrating messages.");
 			migrateMessages(db);
 
 			// 6. Finally, delete the temporary legacy table
-			ApptentiveLog.vv(DATABASE, "\t6. Delete temporary \"legacy_payloads\" database.");
+			ApptentiveLog.v(DATABASE, "\t6. Delete temporary \"legacy_payloads\" database.");
 			db.execSQL(DELETE_LEGACY_PAYLOAD_TABLE);
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
@@ -505,7 +506,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				String json = cursor.getString(6);
 				ApptentiveMessage message = MessageFactory.fromJson(json);
 				if (message == null) {
-					ApptentiveLog.e("Error parsing Record json from database: %s", json);
+					ApptentiveLog.e(MESSAGES, "Error parsing Record json from database: %s", json);
 					continue;
 				}
 				message.setId(cursor.getString(1));
@@ -567,7 +568,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 		}
 
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
 			printPayloadTable("Added payload");
 		}
 	}
@@ -593,7 +594,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		File dest = getPayloadBodyFile(payloadIdentifier);
 		ApptentiveLog.v(DATABASE, "Deleted payload \"%s\" data file successfully? %b", payloadIdentifier, dest.delete());
 
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
 			printPayloadTable("Deleted payload");
 		}
 	}
@@ -610,7 +611,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	PayloadData getOldestUnsentPayload() {
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
 			printPayloadTable("getOldestUnsentPayload");
 		}
 
@@ -646,7 +647,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 				File file = getPayloadBodyFile(nonce);
 				if (!file.exists()) {
-					ApptentiveLog.w("Oldest unsent payload had no data file. Deleting.");
+					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload had no data file. Deleting.");
 					deletePayload(nonce);
 					continue;
 				}
@@ -670,7 +671,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	}
 
 	void updateIncompletePayloads(String conversationId, String authToken, String localConversationId, boolean legacyPayloads) {
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
 			printPayloadTable("updateIncompletePayloads BEFORE");
 		}
 
@@ -697,7 +698,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		// remove incomplete payloads which don't belong to an active conversation
 		removeCorruptedPayloads();
 
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
 			printPayloadTable("updateIncompletePayloads AFTER");
 		}
 	}
@@ -851,7 +852,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
 			int payloadCount = cursor.getCount();
 			if (payloadCount == 0) {
-				ApptentiveLog.vv(PAYLOADS, "%s (%d payload(s))", title, payloadCount);
+				ApptentiveLog.v(PAYLOADS, "%s (%d payload(s))", title, payloadCount);
 				return;
 			}
 
@@ -885,7 +886,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 						cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index)
 				};
 			}
-			ApptentiveLog.vv(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));
+			ApptentiveLog.v(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));
 		} catch (Exception ignored) {
 			ignored.printStackTrace();
 		} finally {

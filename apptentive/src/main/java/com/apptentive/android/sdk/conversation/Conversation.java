@@ -120,7 +120,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 			try {
 				saveConversationData();
 			} catch (Exception e) {
-				ApptentiveLog.e(e, "Exception while saving conversation data");
+				ApptentiveLog.e(CONVERSATION, e, "Exception while saving conversation data");
 			}
 		}
 	};
@@ -181,7 +181,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 					}
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.e(e, "Exception while getting applicable interaction: %s", eventLabel);
+				ApptentiveLog.e(INTERACTIONS, e, "Exception while getting applicable interaction: %s", eventLabel);
 			}
 		}
 		return null;
@@ -218,7 +218,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 								ApptentiveLog.e(CONVERSATION, "Unable to save interactionManifest.");
 							}
 						} catch (JSONException e) {
-							ApptentiveLog.e(e, "Invalid InteractionManifest received.");
+							ApptentiveLog.e(CONVERSATION, e, "Invalid InteractionManifest received.");
 						}
 						ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished");
 
@@ -291,10 +291,10 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				setTargets(targets.toString());
 				setInteractions(interactions.toString());
 			} else {
-				ApptentiveLog.e("Unable to save InteractionManifest.");
+				ApptentiveLog.e(CONVERSATION, "Unable to save InteractionManifest.");
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Invalid InteractionManifest received.");
+			ApptentiveLog.w(CONVERSATION, "Invalid InteractionManifest received.");
 		}
 	}
 
@@ -305,7 +305,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	public void scheduleSaveConversationData() {
 		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
 		if (scheduled) {
-			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
+			ApptentiveLog.v(CONVERSATION, "Scheduling conversation save.");
 		} else {
 			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
 		}
@@ -316,10 +316,10 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
-			ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
-			ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
-			ApptentiveLog.vv(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
+			ApptentiveLog.v(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+			ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString());
+			ApptentiveLog.v(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
 		}
 		long start = System.currentTimeMillis();
 
@@ -333,7 +333,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		}
 
 		serializer.serialize(conversationData);
-		ApptentiveLog.vv(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
+		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
@@ -680,7 +680,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				integrationConfig.setAmazonAwsSns(item);
 				break;
 			default:
-				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
+				ApptentiveLog.e(CONVERSATION, "Invalid pushProvider: %d", pushProvider);
 				break;
 		}
 	}

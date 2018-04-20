@@ -16,6 +16,7 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentHostCallback;
@@ -55,7 +56,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
-import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
@@ -124,7 +124,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		return isChangingConfigurations;
 	}
 
-	public Context getContext() {
+	public @Nullable Context getContext() {
 		Context context = super.getContext();
 		return context != null ? context : ApptentiveInternal.getInstance().getApplicationContext();
 	}
@@ -134,35 +134,42 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	}
 
 	public void transit() {
-		if (onTransitionListener != null) {
-			onTransitionListener.onFragmentTransition(this);
+		try {
+			if (onTransitionListener != null) {
+				onTransitionListener.onFragmentTransition(this);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception in %s.transit()", ApptentiveBaseFragment.class.getSimpleName());
 		}
 	}
 
+	/* Guarded */
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(HAS_LAUNCHED, hasLaunched);
 	}
 
+	/* Guarded */
 	@Override
 	public void onAttach(Context context) {
 		super.onAttach(context);
-		if (retainedChildFragmentManager != null) {
-			//Use the retained child fragment manager after rotation
-			try {
+		try {
+			if (retainedChildFragmentManager != null) {
+				//Use the retained child fragment manager after rotation
+
 				//Set the retained ChildFragmentManager to the field
 				Field field = Fragment.class.getDeclaredField("mChildFragmentManager");
 				field.setAccessible(true);
 				field.set(this, retainedChildFragmentManager);
 
 				updateHosts(getFragmentManager(), (FragmentHostCallback) hostField.get(getFragmentManager()));
-			} catch (Exception e) {
-				ApptentiveLog.w(e, e.getMessage());
+			} else {
+				//If the child fragment manager has not been retained yet
+				retainedChildFragmentManager = getChildFragmentManager();
 			}
-		} else {
-			//If the child fragment manager has not been retained yet
-			retainedChildFragmentManager = getChildFragmentManager();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onAttach()", getClass().getSimpleName());
 		}
 
 	}
@@ -217,36 +224,40 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 
-		Bundle bundle = getArguments();
+		try {
+			Bundle bundle = getArguments();
 
-		if (bundle != null) {
-			toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
-			bShownAsModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
-			String interactionString = bundle.getString("interaction");
-			if (!TextUtils.isEmpty(interactionString)) {
-				interaction = (T) Interaction.Factory.parseInteraction(interactionString);
+			if (bundle != null) {
+				toolbarLayoutId = bundle.getInt(Constants.FragmentConfigKeys.TOOLBAR_ID);
+				bShownAsModal = bundle.getBoolean(Constants.FragmentConfigKeys.MODAL, false);
+				String interactionString = bundle.getString("interaction");
+				if (!TextUtils.isEmpty(interactionString)) {
+					interaction = (T) Interaction.Factory.parseInteraction(interactionString);
+				}
 			}
-		}
 
-		if (interaction != null) {
-			// Set the title for modal Interactions for TalkBack support here. Fullscreen Interactions will set title in the ViewPager when they page into view.
-			if (bShownAsModal) {
-				getActivity().setTitle(interaction.getTitle());
-			} else {
-				sectionTitle = interaction.getTitle();
+			if (interaction != null) {
+				// Set the title for modal Interactions for TalkBack support here. Fullscreen Interactions will set title in the ViewPager when they page into view.
+				if (bShownAsModal) {
+					getActivity().setTitle(interaction.getTitle());
+				} else {
+					sectionTitle = interaction.getTitle();
+				}
 			}
-		}
 
-		if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {
-			setHasOptionsMenu(true);
-		}
+			if (toolbarLayoutId != 0 && getMenuResourceId() != 0) {
+				setHasOptionsMenu(true);
+			}
 
-		if (savedInstanceState != null) {
-			hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
-		}
-		if (!hasLaunched) {
-			hasLaunched = true;
-			sendLaunchEvent(getActivity());
+			if (savedInstanceState != null) {
+				hasLaunched = savedInstanceState.getBoolean(HAS_LAUNCHED);
+			}
+			if (!hasLaunched) {
+				hasLaunched = true;
+				sendLaunchEvent(getActivity());
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreate()", getClass().getSimpleName());
 		}
 	}
 
@@ -255,6 +266,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	 *
 	 * @param activity The launching Activity
 	 */
+	/* Guarded */
 	protected void sendLaunchEvent(Activity activity) {
 		if (interaction != null) {
 			engageInternal(EVENT_NAME_LAUNCH);
@@ -264,51 +276,63 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onViewCreated(View view, Bundle savedInstanceState) {
 		super.onViewCreated(view, savedInstanceState);
-		if (toolbarLayoutId != 0) {
-			toolbar = (Toolbar) getActivity().findViewById(toolbarLayoutId);
-			if (getMenuResourceId() != 0 && toolbar != null) {
-				Menu parentMenu = toolbar.getMenu();
-				ArrayList parentMenuItems = new ArrayList();
-        // Before creating fragment, host activity may already has menu items on toolbar
-				for (int fragmentMenu = 0; fragmentMenu < parentMenu.size(); ++fragmentMenu) {
-					parentMenuItems.add(Integer.valueOf(parentMenu.getItem(fragmentMenu).getItemId()));
-				}
-        // Add to toolbar menu items and menu listeners created this fragment
-				toolbar.inflateMenu(getMenuResourceId());
-				attachFragmentMenuListeners(toolbar.getMenu());
 
-				//
-				Menu combinedMenu = toolbar.getMenu();
-				fragmentMenuItems = new ArrayList();
+		try {
+			if (toolbarLayoutId != 0) {
+				toolbar = (Toolbar) getActivity().findViewById(toolbarLayoutId);
+				if (getMenuResourceId() != 0 && toolbar != null) {
+					Menu parentMenu = toolbar.getMenu();
+					ArrayList parentMenuItems = new ArrayList();
+					// Before creating fragment, host activity may already has menu items on toolbar
+					for (int fragmentMenu = 0; fragmentMenu < parentMenu.size(); ++fragmentMenu) {
+						parentMenuItems.add(Integer.valueOf(parentMenu.getItem(fragmentMenu).getItemId()));
+					}
+					// Add to toolbar menu items and menu listeners created this fragment
+					toolbar.inflateMenu(getMenuResourceId());
+					attachFragmentMenuListeners(toolbar.getMenu());
 
-				int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
-				for (int i = 0; i < combinedMenu.size(); ++i) {
-					int menuItemId = combinedMenu.getItem(i).getItemId();
-          // fragmentMenuItems contains new menu items added by this fragment
-					if (!parentMenuItems.contains(Integer.valueOf(menuItemId))) {
-						fragmentMenuItems.add(Integer.valueOf(menuItemId));
-						Drawable drawable = combinedMenu.getItem(i).getIcon();
-						if(drawable != null) {
-							drawable.mutate();
-							drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+					//
+					Menu combinedMenu = toolbar.getMenu();
+					fragmentMenuItems = new ArrayList();
+
+					int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
+					for (int i = 0; i < combinedMenu.size(); ++i) {
+						int menuItemId = combinedMenu.getItem(i).getItemId();
+						// fragmentMenuItems contains new menu items added by this fragment
+						if (!parentMenuItems.contains(Integer.valueOf(menuItemId))) {
+							fragmentMenuItems.add(Integer.valueOf(menuItemId));
+							Drawable drawable = combinedMenu.getItem(i).getIcon();
+							if(drawable != null) {
+								drawable.mutate();
+								drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+							}
 						}
 					}
 				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onViewCreated()", ApptentiveBaseFragment.class.getSimpleName());
 		}
-
 	}
 
 
 	@Override
 	public void onResume() {
-		ApptentiveInternal.getInstance().addInteractionUpdateListener(this);
+		try {
+			ApptentiveInternal.getInstance().addInteractionUpdateListener(this);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onResume()", ApptentiveBaseFragment.class.getSimpleName());
+		}
 		super.onResume();
 	}
 
 	@Override
 	public void onPause() {
-		ApptentiveInternal.getInstance().removeInteractionUpdateListener(this);
+		try {
+			ApptentiveInternal.getInstance().removeInteractionUpdateListener(this);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onPause()", ApptentiveBaseFragment.class.getSimpleName());
+		}
 		super.onPause();
 	}
 
@@ -319,42 +343,54 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onStop() {
 		super.onStop();
-		if (Build.VERSION.SDK_INT >= 11 && getActivity() != null) {
-			isChangingConfigurations = getActivity().isChangingConfigurations();
+		try {
+			if (Build.VERSION.SDK_INT >= 11 && getActivity() != null) {
+				isChangingConfigurations = getActivity().isChangingConfigurations();
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onStop()", ApptentiveBaseFragment.class.getSimpleName());
 		}
-
 	}
 
 	@Override
 	public void onDestroyView() {
 		super.onDestroyView();
-		if (toolbar != null && fragmentMenuItems != null) {
-			Menu toolbarMenu = toolbar.getMenu();
-			Iterator it = fragmentMenuItems.iterator();
-      // Remove menu items added by this fragment
-			while (it.hasNext()) {
-				Integer menuItem = (Integer) it.next();
 
-				toolbarMenu.removeItem(menuItem.intValue());
+		try {
+			if (toolbar != null && fragmentMenuItems != null) {
+				Menu toolbarMenu = toolbar.getMenu();
+				Iterator it = fragmentMenuItems.iterator();
+				// Remove menu items added by this fragment
+				while (it.hasNext()) {
+					Integer menuItem = (Integer) it.next();
+
+					toolbarMenu.removeItem(menuItem.intValue());
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onDestroyView()", ApptentiveBaseFragment.class.getSimpleName());
 		}
 
 	}
 
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-		inflater.inflate(getMenuResourceId(), menu);
-		// Make menu icon color same as toolbar up arrow. Both use ?colorControlNormal
-		// By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
-		int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
-		for(int i = 0; i < menu.size(); i++){
-			Drawable drawable = menu.getItem(i).getIcon();
-			if(drawable != null) {
-				drawable.mutate();
-				drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+		try {
+			inflater.inflate(getMenuResourceId(), menu);
+			// Make menu icon color same as toolbar up arrow. Both use ?colorControlNormal
+			// By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
+			int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
+			for(int i = 0; i < menu.size(); i++){
+				Drawable drawable = menu.getItem(i).getIcon();
+				if(drawable != null) {
+					drawable.mutate();
+					drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
+				}
 			}
+			attachFragmentMenuListeners(menu);
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception in %s.onCreateOptionsMenu()", ApptentiveBaseFragment.class.getSimpleName());
 		}
-		attachFragmentMenuListeners(menu);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 
@@ -426,6 +462,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	 * Delegates the hardware or software back button press to the Interaction Fragment.
 	 * @return
 	 */
+	/* Guarded */
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
 		List fragments = getRetainedChildFragmentManager().getFragments();
 
@@ -551,7 +588,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 		}, "engage");
 	}
 
-	protected ConversationProxy getConversation() {
+	protected @Nullable ConversationProxy getConversation() {
 		return ApptentiveInternal.getInstance().getConversationProxy();
 	}
 

@@ -10,6 +10,8 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 /**
  * @author Sky Kelsey
  */
@@ -43,7 +45,7 @@ public abstract class Action<T extends Action> extends JSONObject {
 			try {
 				return Type.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Action.Type: " + name);
+				ApptentiveLog.v(INTERACTIONS, "Error parsing unknown Action.Type: " + name);
 			}
 			return unknown;
 		}

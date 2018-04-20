@@ -34,6 +34,7 @@ import java.util.concurrent.TimeUnit;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
@@ -307,7 +308,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				final String conversationLocalIdentifier = notNull(conversation.getLocalIdentifier());
 				final boolean legacyPayloads = ConversationState.LEGACY_PENDING.equals(conversation.getPrevState());
 
-				ApptentiveLog.d("Conversation %s state changed %s -> %s.", conversationId, conversation.getPrevState(), conversation.getState());
+				ApptentiveLog.d(CONVERSATION, "Conversation %s state changed %s -> %s.", conversationId, conversation.getPrevState(), conversation.getState());
 				// when the Conversation ID comes back from the server, we need to update
 				// the payloads that may have already been enqueued so
 				// that they each have the Conversation ID.
@@ -319,7 +320,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 								dbHelper.updateIncompletePayloads(conversationId, conversationToken, conversationLocalIdentifier, legacyPayloads);
 								sendNextPayloadSync(); // after we've updated payloads - we need to send them
 							} catch (Exception e) {
-								ApptentiveLog.e(e, "Exception while trying to update incomplete payloads");
+								ApptentiveLog.e(CONVERSATION, e, "Exception while trying to update incomplete payloads");
 							}
 						}
 					});

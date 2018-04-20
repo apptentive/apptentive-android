@@ -36,11 +36,15 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.util.TypedValue;
-import android.view.*;
+import android.view.Display;
+import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
 
@@ -49,11 +53,33 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 
-import java.io.*;
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.Closeable;
+import java.io.DataInput;
+import java.io.DataOutput;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.Reader;
+import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 
 public class Util {
 
@@ -96,7 +122,12 @@ public class Util {
 	}
 
 	public static boolean isNetworkConnectionPresent() {
-		ConnectivityManager cm = (ConnectivityManager) ApptentiveInternal.getInstance().getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
+		Context context = ApptentiveInternal.getInstance().getApplicationContext();
+		if (context == null) {
+			return false;
+		}
+
+		ConnectivityManager cm = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
 		if (cm != null) {
 			NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
 			if (activeNetwork != null) {
@@ -283,7 +314,7 @@ public class Util {
 				return Integer.parseInt(parts[0]);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error getting major OS version");
+			ApptentiveLog.w(UTIL, e, "Error getting major OS version");
 		}
 		return -1;
 	}
@@ -876,9 +907,9 @@ public class Util {
 			while ((count = is.read(buf, 0, 2048)) != -1) {
 				cos.write(buf, 0, count);
 			}
-			ApptentiveLog.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.v(UTIL, "File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
-			ApptentiveLog.e("Error creating local copy of file attachment.");
+			ApptentiveLog.e(UTIL, "Error creating local copy of file attachment.");
 			return null;
 		} finally {
 			Util.ensureClosed(cos);
@@ -998,7 +1029,7 @@ public class Util {
 		if (!internalDir.exists() && createIfNecessary) {
 			boolean succeed = internalDir.mkdirs();
 			if (!succeed) {
-				ApptentiveLog.w("Unable to create internal directory: %s", internalDir);
+				ApptentiveLog.w(UTIL, "Unable to create internal directory: %s", internalDir);
 			}
 		}
 		return internalDir;
@@ -1063,5 +1094,25 @@ public class Util {
 
 		ClipboardManager manager = (ClipboardManager) context.getSystemService(Context.CLIPBOARD_SERVICE);
 		manager.setPrimaryClip(ClipData.newPlainText(null, text));
+	}
+
+	/**
+	 * Creates a fail-safe try..catch wrapped listener
+	 */
+	public static @Nullable View.OnClickListener guarded(@Nullable final View.OnClickListener listener) {
+		if (listener != null) {
+			return new View.OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					try {
+						listener.onClick(v);
+					} catch (Exception e) {
+						ApptentiveLog.e(e, "Exception while handling click listener");
+					}
+				}
+			};
+		}
+
+		return null;
 	}
 }

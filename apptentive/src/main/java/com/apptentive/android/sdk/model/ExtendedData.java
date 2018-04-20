@@ -13,6 +13,8 @@ import org.json.JSONObject;
 
 import java.io.Serializable;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+
 public abstract class ExtendedData implements Serializable {
 
 	private static final String KEY_VERSION = "version";
@@ -61,7 +63,7 @@ public abstract class ExtendedData implements Serializable {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown ExtendedData.PayloadType: " + type);
+				ApptentiveLog.v(PAYLOADS, "Error parsing unknown ExtendedData.PayloadType: " + type);
 			}
 			return unknown;
 		}

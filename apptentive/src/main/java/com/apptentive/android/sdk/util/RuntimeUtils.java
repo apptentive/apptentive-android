@@ -17,6 +17,8 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+
 /**
  * Collection of helper functions for Android runtime queries.
  */
@@ -40,7 +42,7 @@ public class RuntimeUtils {
 				return (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
+			ApptentiveLog.e(UTIL, "Failed to read app's PackageInfo.");
 		}
 
 		return false;

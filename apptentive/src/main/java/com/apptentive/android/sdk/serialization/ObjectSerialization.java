@@ -1,5 +1,7 @@
 package com.apptentive.android.sdk.serialization;
 
+import android.support.v4.util.AtomicFile;
+
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.DataInput;
@@ -19,13 +21,16 @@ public class ObjectSerialization {
 	 * Writes an object ot a file
 	 */
 	public static void serialize(File file, SerializableObject object) throws IOException {
+		AtomicFile atomicFile = new AtomicFile(file);
 		FileOutputStream stream = null;
 		try {
-			stream = new FileOutputStream(file);
+			stream = atomicFile.startWrite();
 			DataOutputStream out = new DataOutputStream(stream);
 			object.writeExternal(out);
-		} finally {
-			Util.ensureClosed(stream);
+			atomicFile.finishWrite(stream); // serialization was successful
+		} catch (Exception e) {
+			atomicFile.failWrite(stream); // serialization failed
+			throw new IOException(e); // throw exception up the chain
 		}
 	}
 

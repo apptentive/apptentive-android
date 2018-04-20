@@ -27,7 +27,7 @@ public class SdkManager {
 		Resources resources = context.getResources();
 		sdk.setDistribution(resources.getString(R.string.apptentive_distribution));
 		sdk.setDistributionVersion(resources.getString(R.string.apptentive_distribution_version));
-		ApptentiveLog.vv("SDK: %s:%s", sdk.getDistribution(), sdk.getDistributionVersion());
+		ApptentiveLog.v("SDK: %s:%s", sdk.getDistribution(), sdk.getDistributionVersion());
 		return sdk;
 	}
 

@@ -61,6 +61,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecycle
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
@@ -82,11 +83,14 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.STATUS;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.WHO_CARD;
+import static com.apptentive.android.sdk.util.Util.guarded;
 
 public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements
 	OnListviewItemActionListener,
@@ -204,32 +208,37 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onViewCreated(View view, Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
-		boolean isInitialViewCreation = (onSavedInstanceState == null);
-		/* When isInitialViewCreation is false, the view is being recreated after orientation change.
-		 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
-		 */
-		setup(view, isInitialViewCreation);
 
-		dispatchConversationTask(new ConversationDispatchTask() {
-			@Override
-			protected boolean execute(Conversation conversation) {
-				MessageManager mgr = conversation.getMessageManager();
-				// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-				mgr.addInternalOnMessagesUpdatedListener(MessageCenterFragment.this);
-				// Give the MessageCenterView a callback when a message is sent.
-				mgr.setAfterSendMessageListener(MessageCenterFragment.this);
-				return true;
+		try {
+			boolean isInitialViewCreation = (onSavedInstanceState == null);
+			/* When isInitialViewCreation is false, the view is being recreated after orientation change.
+			 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
+			 */
+			setup(view, isInitialViewCreation);
+
+			dispatchConversationTask(new ConversationDispatchTask() {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					MessageManager mgr = conversation.getMessageManager();
+					// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
+					mgr.addInternalOnMessagesUpdatedListener(MessageCenterFragment.this);
+					// Give the MessageCenterView a callback when a message is sent.
+					mgr.setAfterSendMessageListener(MessageCenterFragment.this);
+					return true;
+				}
+			}, "set message listeners");
+
+			// Needed to prevent the window from being pushed up when a text input area is focused.
+			getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+			// Restore listview scroll offset to where it was before rotation
+			if (listViewSavedTopIndex != -1) {
+				messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
+			} else {
+				messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 			}
-		}, "set message listeners");
-
-		// Needed to prevent the window from being pushed up when a text input area is focused.
-		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-		// Restore listview scroll offset to where it was before rotation
-		if (listViewSavedTopIndex != -1) {
-			messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
-		} else {
-			messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onViewCreated()", MessageCenterFragment.class.getSimpleName());
 		}
 	}
 
@@ -237,30 +246,52 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	public void onAttach(Context context) {
 		super.onAttach(context);
 
-		hostingActivityRef = new WeakReference<Activity>((Activity) context);
-		messagingActionHandler = new MessageCenterFragment.MessagingActionHandler(this);
+		try {
+			hostingActivityRef = new WeakReference<Activity>((Activity) context);
+			messagingActionHandler = new MessagingActionHandler(this);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while attaching");
+		}
 	}
 
 	@Override
 	public void onDetach() {
-		super.onDetach();
-		// messageCenterRecyclerViewAdapter holds a reference to fragment context. Need to set it to null in this and other Views to prevent a memory leak.
-		messageCenterRecyclerViewAdapter = null;
-		messageCenterRecyclerView.setAdapter(null);
-		composer = null;
-		composerEditText = null;
-		whoCardNameEditText = null;
-		whoCardEmailEditText = null;
+		try {
+			super.onDetach();
+			// messageCenterRecyclerViewAdapter holds a reference to fragment context. Need to set it to null in this and other Views to prevent a memory leak.
+			messageCenterRecyclerViewAdapter = null;
+			messageCenterRecyclerView.setAdapter(null);
+			composer = null;
+			composerEditText = null;
+			whoCardNameEditText = null;
+			whoCardEmailEditText = null;
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onDetach()", getClass().getSimpleName());
+		}
 	}
 
 	public void onStart() {
 		super.onStart();
-		getConversation().setMessageCenterInForeground(true);
+		try {
+			ConversationProxy conversation = getConversation();
+			if (conversation != null) {
+				conversation.setMessageCenterInForeground(true);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception in %s.onStart()", MessageCenterFragment.class.getSimpleName());
+		}
 	}
 
 	public void onStop() {
 		super.onStop();
-		getConversation().setMessageCenterInForeground(false);
+		try {
+			ConversationProxy conversation = getConversation();
+			if (conversation != null) {
+				conversation.setMessageCenterInForeground(false);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e("Exception in %s.onStop()", MessageCenterFragment.class.getSimpleName());
+		}
 	}
 
 	@Override
@@ -273,7 +304,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER: {
 					if (data == null) {
-						ApptentiveLog.d("no image is picked");
+						ApptentiveLog.d(MESSAGES, "no image is picked");
 						return;
 					}
 					imagePickerStillOpen = false;
@@ -334,21 +365,26 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onResume() {
 		super.onResume();
-		dispatchConversationTask(new ConversationDispatchTask() {
-			@Override
-			protected boolean execute(Conversation conversation) {
-				conversation.getMessageManager().resumeSending();
-				return true;
-			}
-		}, "resume message center fragment");
 
-		/* imagePickerStillOpen was set true when the picker intent was launched. If user had picked an image,
-		 * it would have been set to false. Otherwise, it indicates the user tried to attach an image but
-		 * abandoned the image picker without picking anything
-		 */
-		if (imagePickerStillOpen) {
-			engageInternal(MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
-			imagePickerStillOpen = false;
+		try {
+			dispatchConversationTask(new ConversationDispatchTask() {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					conversation.getMessageManager().resumeSending();
+					return true;
+				}
+			}, "resume message center fragment");
+
+			/* imagePickerStillOpen was set true when the picker intent was launched. If user had picked an image,
+			 * it would have been set to false. Otherwise, it indicates the user tried to attach an image but
+			 * abandoned the image picker without picking anything
+			 */
+			if (imagePickerStillOpen) {
+				engageInternal(MessageCenterInteraction.EVENT_NAME_ATTACHMENT_CANCEL);
+				imagePickerStillOpen = false;
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onResume()", MessageCenterFragment.class.getSimpleName());
 		}
 	}
 
@@ -381,13 +417,13 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterRecyclerView.setLayoutManager(layoutManager);
 
 		fab = rootView.findViewById(R.id.composing_fab);
-		fab.setOnClickListener(new View.OnClickListener() {
+		fab.setOnClickListener(guarded(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
 				forceShowKeyboard = true;
 				addComposingCard();
 			}
-		});
+		}));
 
 		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, listItems);
 
@@ -515,19 +551,23 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
-		savePendingComposingMessage();
-		//int index = messageCenterRecyclerView.getFirstVisiblePosition();
-		View v = messageCenterRecyclerView.getChildAt(0);
-		int top = (v == null) ? 0 : (v.getTop() - messageCenterRecyclerView.getPaddingTop());
-		outState.putInt(LIST_TOP_OFFSET, top);
-		outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
-		if (messageCenterRecyclerViewAdapter != null) {
-			outState.putParcelable(WHO_CARD_NAME, whoCardNameEditText != null ? whoCardNameEditText.onSaveInstanceState() : null);
-			outState.putParcelable(WHO_CARD_EMAIL, whoCardEmailEditText != null ? whoCardEmailEditText.onSaveInstanceState() : null);
-			outState.putString(WHO_CARD_AVATAR_FILE, messageCenterRecyclerViewAdapter.getWhoCardAvatarFileName());
+		try {
+			savePendingComposingMessage();
+			//int index = messageCenterRecyclerView.getFirstVisiblePosition();
+			View v = messageCenterRecyclerView.getChildAt(0);
+			int top = (v == null) ? 0 : (v.getTop() - messageCenterRecyclerView.getPaddingTop());
+			outState.putInt(LIST_TOP_OFFSET, top);
+			outState.putParcelable(COMPOSING_EDITTEXT_STATE, saveEditTextInstanceState());
+			if (messageCenterRecyclerViewAdapter != null) {
+				outState.putParcelable(WHO_CARD_NAME, whoCardNameEditText != null ? whoCardNameEditText.onSaveInstanceState() : null);
+				outState.putParcelable(WHO_CARD_EMAIL, whoCardEmailEditText != null ? whoCardEmailEditText.onSaveInstanceState() : null);
+				outState.putString(WHO_CARD_AVATAR_FILE, messageCenterRecyclerViewAdapter.getWhoCardAvatarFileName());
+			}
+			outState.putBoolean(WHO_CARD_MODE, pendingWhoCardMode);
+			super.onSaveInstanceState(outState);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onSaveInstanceState()", getClass().getSimpleName());
 		}
-		outState.putBoolean(WHO_CARD_MODE, pendingWhoCardMode);
-		super.onSaveInstanceState(outState);
 	}
 
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
@@ -717,22 +757,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void openNonImageAttachment(final ImageItem image) {
 		if (image == null) {
-			ApptentiveLog.d("No attachment argument.");
+			ApptentiveLog.d(MESSAGES, "No attachment argument.");
 			return;
 		}
 
 		try {
 			if (!Util.openFileAttachment(hostingActivityRef.get(), image.originalPath, image.localCachePath, image.mimeType)) {
-				ApptentiveLog.d("Cannot open file attachment");
+				ApptentiveLog.d(MESSAGES, "Cannot open file attachment");
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error loading attachment");
+			ApptentiveLog.e(MESSAGES, e, "Error loading attachment");
 		}
 	}
 
 	public void showAttachmentDialog(final ImageItem image) {
 		if (image == null) {
-			ApptentiveLog.d("No attachment argument.");
+			ApptentiveLog.d(MESSAGES, "No attachment argument.");
 			return;
 		}
 
@@ -751,7 +791,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			dialog.show(ft, DIALOG_IMAGE_PREVIEW);
 
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error loading attachment preview.");
+			ApptentiveLog.e(MESSAGES, e, "Error loading attachment preview.");
 		}
 	}
 
@@ -775,12 +815,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messagingActionHandler.sendEmptyMessage(MSG_RESUME_SENDING);
 	}
 
+	/* Guarded */
 	@Override
 	public void onComposingViewCreated(MessageComposerHolder composer, final EditText composerEditText, final ApptentiveImageGridView attachments) {
 		this.composer = composer;
 		this.composerEditText = composerEditText;
 
 		ConversationProxy conversation = getConversation();
+		assertNotNull(conversation);
+		if (conversation == null) {
+			return;
+		}
+
 		// Restore composing text editing state, such as cursor position, after rotation
 		if (composingViewSavedState != null) {
 			if (this.composerEditText != null) {
@@ -788,12 +834,10 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			composingViewSavedState = null;
 			// Stored pending composing text has been restored from the saved state, so it's not needed here anymore
-			if (conversation != null) {
-				conversation.setMessageCenterPendingMessage(null);
-			}
+			conversation.setMessageCenterPendingMessage(null);
 		}
 		// Restore composing text
-		else if (conversation != null && !TextUtils.isEmpty(conversation.getMessageCenterPendingMessage())) {
+		else if (!StringUtils.isNullOrEmpty(conversation.getMessageCenterPendingMessage())) {
 			String messageText = conversation.getMessageCenterPendingMessage();
 			if (messageText != null && this.composerEditText != null) {
 				this.composerEditText.setText(messageText);
@@ -894,6 +938,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		showProfileButton();
 	}
 
+	/* Guarded */
 	@Override
 	public void onFinishComposing() {
 		messagingActionHandler.sendEmptyMessage(MSG_REMOVE_COMPOSER);
@@ -1028,7 +1073,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (Exception e) {
 			e.printStackTrace();
 			imagePickerStillOpen = false;
-			ApptentiveLog.d("can't launch image picker");
+			ApptentiveLog.w(MESSAGES, "can't launch image picker");
 		}
 	}
 
@@ -1053,15 +1098,18 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		return (composerEditText == null) ? null : composerEditText.getText();
 	}
 
-
+	/* Guarded */
 	public void savePendingComposingMessage() {
 		Editable content = getPendingComposingContent();
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		SharedPreferences.Editor editor = prefs.edit();
+
 		ConversationProxy conversation = getConversation();
+		assertNotNull(conversation);
 		if (conversation == null) {
 			return;
 		}
+
 		if (content != null) {
 			conversation.setMessageCenterPendingMessage(content.toString().trim());
 		} else {

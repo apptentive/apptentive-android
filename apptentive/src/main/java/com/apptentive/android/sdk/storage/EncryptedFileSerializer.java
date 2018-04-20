@@ -12,6 +12,8 @@ import com.apptentive.android.sdk.util.Util;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -29,7 +31,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 	}
 
 	@Override
-	protected void serialize(File file, Object object) throws SerializerException {
+	protected void serialize(FileOutputStream stream, Object object) throws Exception {
 		ByteArrayOutputStream bos = null;
 		ObjectOutputStream oos = null;
 		try {
@@ -39,9 +41,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 			final byte[] unencryptedBytes = bos.toByteArray();
 			Encryptor encryptor = new Encryptor(encryptionKey);
 			final byte[] encryptedBytes = encryptor.encrypt(unencryptedBytes);
-			Util.writeBytes(file, encryptedBytes);
-		} catch (Exception e) {
-			throw new SerializerException(e);
+			stream.write(encryptedBytes); // TODO: should we write using a buffer?
 		} finally {
 			Util.ensureClosed(bos);
 			Util.ensureClosed(oos);

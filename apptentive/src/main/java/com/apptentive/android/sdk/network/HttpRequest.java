@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 
@@ -232,14 +231,14 @@ public class HttpRequest {
 		} catch (NetworkUnavailableException e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
-			ApptentiveLog.w(e.getMessage());
-			ApptentiveLog.w("Cancelled? %b", isCancelled());
+			ApptentiveLog.w(NETWORK, e.getMessage());
+			ApptentiveLog.w(NETWORK, "Cancelled? %b", isCancelled());
 		} catch (Exception e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
-			ApptentiveLog.e("Cancelled? %b", isCancelled());
+			ApptentiveLog.e(NETWORK, "Cancelled? %b", isCancelled());
 			if (!isCancelled()) {
-				ApptentiveLog.e(e, "Unable to perform request");
+				ApptentiveLog.e(NETWORK, e, "Unable to perform request");
 			}
 		}
 
@@ -271,8 +270,8 @@ public class HttpRequest {
 
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s %s", method, url);
-			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
-				ApptentiveLog.vv(NETWORK, "%s", toString());
+			if (ApptentiveLog.canLog(VERBOSE)) {
+				ApptentiveLog.v(NETWORK, "%s", toString());
 			}
 			retrying = false;
 
@@ -282,7 +281,7 @@ public class HttpRequest {
 			connection.setReadTimeout(readTimeout);
 
 			if (!isNetworkConnectionPresent()) {
-				ApptentiveLog.d("No network connection present. Request will fail.");
+				ApptentiveLog.d(NETWORK, "No network connection present. Request will fail.");
 				throw new NetworkUnavailableException("The network is not currently active.");
 			}
 
@@ -603,7 +602,7 @@ public class HttpRequest {
 				String errorType = errorObject.optString("error_type", null);
 				return Apptentive.AuthenticationFailedReason.parse(errorType, error);
 			} catch (Exception e) {
-				ApptentiveLog.w(e, "Error parsing authentication failure object.");
+				ApptentiveLog.w(NETWORK, e, "Error parsing authentication failure object.");
 			}
 		}
 		return Apptentive.AuthenticationFailedReason.UNKNOWN;
