@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
@@ -63,7 +64,11 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 		View v = super.onCreateView(inflater, container, savedInstanceState);
-		inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer(v));
+		try {
+			inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer(v));
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in %s.onCreateView", TextSurveyQuestionView.class.getSimpleName());
+		}
 
 		return v;
 	}

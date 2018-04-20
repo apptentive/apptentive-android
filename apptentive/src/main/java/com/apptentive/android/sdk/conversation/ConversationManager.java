@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
@@ -1027,7 +1028,7 @@ public class ConversationManager {
 		this.activeConversationProxy = conversation != null ? new ConversationProxy(conversation) : null;
 	}
 
-	public synchronized ConversationProxy getActiveConversationProxy() {
+	public synchronized @Nullable ConversationProxy getActiveConversationProxy() {
 		return activeConversationProxy;
 	}
 
