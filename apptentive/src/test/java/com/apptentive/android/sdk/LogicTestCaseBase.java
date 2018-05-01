@@ -17,26 +17,10 @@ public class LogicTestCaseBase extends TestCaseBase {
 	//region Setup
 
 	@Override
-	protected void setUp() {
+	protected void setUp() throws Exception {
 		super.setUp();
 
-		// logger
 		try {
-			RuntimeUtils.overrideStaticFinalField(ApptentiveLog.class, "LOGGER_IMPLEMENTATION", new ApptentiveLog.LoggerImplementation() {
-				@Override
-				public void println(int priority, String tag, String msg) {
-					System.out.println(tag + "/" + msg);
-				}
-
-				@Override
-				public String getStackTraceString(Throwable throwable) {
-					StringWriter sw = new StringWriter();
-					PrintWriter pw = new PrintWriter(sw);
-					throwable.printStackTrace(pw);
-					return sw.toString();
-				}
-			});
-
 			// main queue
 			overrideMainQueue(true);
 

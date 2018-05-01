@@ -36,6 +36,7 @@ public interface ApptentiveInstance extends Nullsafe {
 
 	void onActivityStarted(Activity activity);
 	void onActivityResumed(Activity activity);
+	void onActivityStopped(Activity activity);
 	void onAppEnterForeground();
 	void onAppEnterBackground();
 	void onAppLaunch(Context context);

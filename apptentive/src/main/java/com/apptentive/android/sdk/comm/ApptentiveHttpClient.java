@@ -6,7 +6,6 @@
 
 package com.apptentive.android.sdk.comm;
 
-import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.network.HttpJsonRequest;
@@ -36,8 +35,8 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 	public static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
-	public static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
-	public static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
+	private static final int DEFAULT_HTTP_CONNECT_TIMEOUT = 45000;
+	private static final int DEFAULT_HTTP_SOCKET_TIMEOUT = 45000;
 
 	// Active API
 	private static final String ENDPOINT_CONVERSATION = "/conversation";
@@ -52,7 +51,6 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	private final String apptentiveSignature;
 	private final String serverURL;
 	private final String userAgentString;
-	private final HttpRequestManager httpRequestManager;
 
 	public ApptentiveHttpClient(String apptentiveKey, String apptentiveSignature, String serverURL) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -67,11 +65,10 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			throw new IllegalArgumentException("Illegal server URL: '" + serverURL + "'");
 		}
 
-		this.httpRequestManager = new HttpRequestManager();
 		this.apptentiveKey = apptentiveKey;
 		this.apptentiveSignature = apptentiveSignature;
 		this.serverURL = serverURL;
-		this.userAgentString = String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
+		this.userAgentString = String.format(USER_AGENT_STRING, Constants.getApptentiveSdkVersion());
 	}
 
 	//region API Requests
@@ -188,7 +185,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	 * Returns the first request with a given tag or <code>null</code> is not found
 	 */
 	public HttpRequest findRequest(String tag) {
-		return httpRequestManager.findRequest(tag);
+		return HttpRequestManager.sharedManager().findRequest(tag);
 	}
 
 	//endregion
@@ -272,7 +269,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 	}
 
 	private void setupRequestDefaults(HttpRequest request) {
-		request.setRequestManager(httpRequestManager);
+		request.setRequestManager(HttpRequestManager.sharedManager());
 		request.setRequestProperty("User-Agent", userAgentString);
 		request.setRequestProperty("Connection", "Keep-Alive");
 		request.setRequestProperty("Accept-Encoding", "gzip");

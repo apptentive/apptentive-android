@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	public static final String APPTENTIVE_SDK_VERSION = "5.0.5";
+	private static final String APPTENTIVE_SDK_VERSION = "5.1.0";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -64,6 +64,7 @@ public class Constants {
 
 	//region Database and File Storage
 	public static final String CONVERSATIONS_DIR = "apptentive/conversations";
+	public static final String CONVERSATION_METADATA_FILE = "conversation-v1.meta";
 	public static final String PAYLOAD_DATA_DIR = "payloads";
 	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".data";
 	//endregion
@@ -87,10 +88,28 @@ public class Constants {
 	//endregion
 
 	//region File names
-	public static final String FILE_APPTENTIVE_LOG_FILE = "apptentive-log.txt";
 	public static final String FILE_APPTENTIVE_ENGAGEMENT_MANIFEST = "apptentive-engagement-manifest.txt";
+	/**
+	 * File extension for each log file
+	 */
+	public static final String LOG_FILE_PREFIX = "apptentive-";
+	/**
+	 * File extension for each log file
+	 */
+	public static final String LOG_FILE_EXT = ".log";
 	//endregion
 
+	//region Notification Interactions
+	public static final String NOTIFICATION_CHANNEL_DEFAULT = "com.apptentive.notification.channel.DEFAULT";
+	public static final String NOTIFICATION_ACTION_DELETE = "com.apptentive.notification.action.DELETE";
+	public static final String NOTIFICATION_ACTION_DISPLAY = "com.apptentive.notification.action.DISPLAY";
+	public static final String NOTIFICATION_EXTRA_INTERACTION_TYPE = "com.apptentive.notification.extra.INTERACTION_TYPE";
+	public static final String NOTIFICATION_EXTRA_INTERACTION_DEFINITION= "com.apptentive.notification.extra.INTERACTION_DEFINITION";
+	public static final String NOTIFICATION_EXTRA_ID= "com.apptentive.notification.extra.ID";
+	public static final int NOTIFICATION_ID_DEFAULT = 0xFEEDBAAC;
+	public static final String NOTIFICATION_ACTION_NOTE_BUTTON_PRESSED = "com.apptentive.notification.action.note.BUTTON_PRESSED";
+	public static final String NOTIFICATION_EXTRA_NOTE_ACTION_INDEX = "com.apptentive.notification.extra.note.ACTION_INDEX";
+	//endregion
 
 	//region Old keys no longer used
 	public static final String MANIFEST_KEY_SDK_DISTRIBUTION = "apptentive_sdk_distribution";
@@ -181,5 +200,15 @@ public class Constants {
 		} catch (ArrayIndexOutOfBoundsException e) {
 			return networkTypeLookup[0];
 		}
+	}
+
+	// Only accessible from the tester client via reflection (should start with 'overridden')
+	private static String overriddenSdkVersion;
+
+	public static String getApptentiveSdkVersion() {
+		if (overriddenSdkVersion != null) {
+			return overriddenSdkVersion;
+		}
+		return APPTENTIVE_SDK_VERSION;
 	}
 }

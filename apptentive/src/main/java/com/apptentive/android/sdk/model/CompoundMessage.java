@@ -26,16 +26,16 @@ import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 public class CompoundMessage extends ApptentiveMessage implements MessageCenterUtil.CompoundMessageCommonInterface {
 
-	private static final String KEY_BODY = "body";
+	@SensitiveDataKey private static final String KEY_BODY = "body";
 	public static final String KEY_TEXT_ONLY = "text_only";
-	private static final String KEY_TITLE = "title";
+	@SensitiveDataKey private static final String KEY_TITLE = "title";
 	private static final String KEY_ATTACHMENTS = "attachments";
 
 	private boolean isLast;
@@ -49,6 +49,10 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	 * StoredFile:localFilePath is set by the "thumbnail_url" of the remote attachment (maybe empty)
 	 */
 	private ArrayList<StoredFile> remoteAttachmentStoredFiles;
+
+	static {
+		registerSensitiveKeys(CompoundMessage.class);
+	}
 
 	// Default constructor will only be called when the message is created from local, a.k.a outgoing
 	public CompoundMessage() {
@@ -151,7 +155,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachmentStoredFiles);
 			bRet = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to set associated images in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to set associated images in worker thread");
 		} finally {
 			return bRet;
 		}
@@ -174,7 +178,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<Boolean> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().addCompoundMessageFiles(attachedFiles);
 			bRet = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to set associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to set associated files in worker thread");
 		} finally {
 			return bRet;
 		}
@@ -189,7 +193,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			Future<List<StoredFile>> future = ApptentiveInternal.getInstance().getApptentiveTaskManager().getAssociatedFiles(getNonce());
 			associatedFiles = future.get();
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to get associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to get associated files in worker thread");
 		} finally {
 			return associatedFiles;
 		}
@@ -211,7 +215,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			// Delete records from db
 			ApptentiveInternal.getInstance().getApptentiveTaskManager().deleteAssociatedFiles(getNonce());
 		} catch (Exception e) {
-			ApptentiveLog.e("Unable to delete associated files in worker thread");
+			ApptentiveLog.e(MESSAGES, "Unable to delete associated files in worker thread");
 		}
 	}
 
@@ -339,7 +343,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 								ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
 								ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
 							} else {
-								ApptentiveLog.v("Appending non-image attachment.");
+								ApptentiveLog.v(PAYLOADS, "Appending non-image attachment.");
 								Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
 							}
 						} catch (Exception e) {

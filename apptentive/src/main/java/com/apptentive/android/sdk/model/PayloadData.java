@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
+
 public class PayloadData {
 	private final PayloadType type;
 	private final String nonce;
@@ -65,7 +67,7 @@ public class PayloadData {
 
 	@Override
 	public String toString() {
-		return StringUtils.format("type=%s nonce=%s conversationId=%s authToken=%s httpRequestPath=%s", type, nonce, conversationId, authToken, httpRequestPath);
+		return StringUtils.format("type=%s nonce=%s conversationId=%s authToken=%s httpRequestPath=%s", type, nonce, conversationId, hideIfSanitized(authToken), httpRequestPath);
 	}
 
 	//endregion

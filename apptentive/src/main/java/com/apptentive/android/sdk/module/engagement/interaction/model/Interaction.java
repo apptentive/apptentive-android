@@ -13,12 +13,15 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+
 public abstract class Interaction extends JSONObject {
 
 	public static final String KEY_NAME = "interaction";
 
 	public static final String KEY_ID = "id";
 	private static final String KEY_TYPE = "type";
+	public static final String KEY_DISPLAY_TYPE = "display_type";
 	private static final String KEY_VERSION = "version";
 	protected static final String KEY_CONFIGURATION = "configuration";
 
@@ -68,6 +71,22 @@ public abstract class Interaction extends JSONObject {
 		return Type.unknown;
 	}
 
+	public DisplayType getDisplayType() {
+		try {
+			if (isNull(KEY_DISPLAY_TYPE)) {
+				return getDefaultDisplayType();
+			}
+			return DisplayType.parse(getString(KEY_DISPLAY_TYPE));
+		} catch (JSONException e) {
+			// Ignore
+		}
+		return DisplayType.unknown;
+	}
+
+	protected DisplayType getDefaultDisplayType() {
+		return DisplayType.unknown;
+	}
+
 	public Integer getVersion() {
 		try {
 			if (!isNull(KEY_VERSION)) {
@@ -105,7 +124,21 @@ public abstract class Interaction extends JSONObject {
 			try {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.v("Error parsing unknown Interaction.Type: " + type);
+				ApptentiveLog.v(INTERACTIONS, "Error parsing unknown Interaction.Type: " + type);
+			}
+			return unknown;
+		}
+	}
+
+	public enum DisplayType {
+		notification,
+		unknown;
+
+		public static DisplayType parse(String type) {
+			try {
+				return DisplayType.valueOf(type);
+			} catch (Exception e) {
+				ApptentiveLog.e(e, "Error parsing interaction display_type: " + type);
 			}
 			return unknown;
 		}
@@ -143,7 +176,7 @@ public abstract class Interaction extends JSONObject {
 						break;
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.w(e, "Error parsing Interaction");
+				ApptentiveLog.w(INTERACTIONS, e, "Error parsing Interaction");
 				// Ignore
 			}
 			return null;

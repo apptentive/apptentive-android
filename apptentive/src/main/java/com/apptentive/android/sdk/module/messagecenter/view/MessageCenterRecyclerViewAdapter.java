@@ -15,6 +15,7 @@ import android.view.ViewGroup;
 import com.apptentive.android.sdk.ApptentiveHelper;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
@@ -48,6 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.GREETING;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_AUTO;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
@@ -124,7 +126,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				return new ContextMessageHolder(view);
 			}
 		}
-		ApptentiveLog.w("onCreateViewHolder(%d) returning null.", viewType);
+		ApptentiveLog.w(MESSAGES, "onCreateViewHolder(%d) returning null.", viewType);
 		return null;
 	}
 

@@ -16,11 +16,15 @@ public class SdkPayload extends JsonPayload {
 
 	private static final String KEY_VERSION = "version";
 	private static final String KEY_PROGRAMMING_LANGUAGE = "programming_language";
-	private static final String KEY_AUTHOR_NAME = "author_name";
-	private static final String KEY_AUTHOR_EMAIL = "author_email";
+	@SensitiveDataKey private static final String KEY_AUTHOR_NAME = "author_name";
+	@SensitiveDataKey private static final String KEY_AUTHOR_EMAIL = "author_email";
 	private static final String KEY_PLATFORM = "platform";
 	private static final String KEY_DISTRIBUTION = "distribution";
 	private static final String KEY_DISTRIBUTION_VERSION = "distribution_version";
+
+	static {
+		registerSensitiveKeys(SdkPayload.class);
+	}
 
 	public SdkPayload() {
 		super(PayloadType.sdk);

@@ -17,7 +17,7 @@ public class AssertTest extends TestCaseBase implements AssertImp {
 	//region Setup
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		AssertEx.setImp(this);
 	}
 

@@ -21,7 +21,7 @@ public class ApptentiveNotificationObserverListTest extends LogicTestCaseBase {
 	private static final boolean STRONG_REFERENCE = false;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 	}
 

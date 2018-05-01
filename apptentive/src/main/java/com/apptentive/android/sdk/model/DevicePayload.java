@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 public class DevicePayload extends JsonPayload {
 
@@ -34,12 +33,17 @@ public class DevicePayload extends JsonPayload {
 	private static final String KEY_BUILD_ID = "build_id";
 	private static final String KEY_BOOTLOADER_VERSION = "bootloader_version";
 	private static final String KEY_RADIO_VERSION = "radio_version";
-	public static final String KEY_CUSTOM_DATA = "custom_data";
+	@SensitiveDataKey private static final String KEY_CUSTOM_DATA = "custom_data";
 	private static final String KEY_LOCALE_COUNTRY_CODE = "locale_country_code";
 	private static final String KEY_LOCALE_LANGUAGE_CODE = "locale_language_code";
 	private static final String KEY_LOCALE_RAW = "locale_raw";
 	private static final String KEY_UTC_OFFSET = "utc_offset";
+	@SensitiveDataKey private static final String KEY_ADVERTISER_ID = "advertiser_id";
 	private static final String KEY_INTEGRATION_CONFIG = "integration_config";
+
+	static {
+		registerSensitiveKeys(DevicePayload.class);
+	}
 
 	public DevicePayload() {
 		super(PayloadType.device);
@@ -176,6 +180,10 @@ public class DevicePayload extends JsonPayload {
 
 	public void setUtcOffset(String utcOffset) {
 		put(KEY_UTC_OFFSET, utcOffset);
+	}
+
+	public void setAdvertiserId(String advertiserId) {
+		put(KEY_ADVERTISER_ID, advertiserId);
 	}
 
 	@Override

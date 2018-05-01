@@ -20,7 +20,7 @@ public class ConcurrentDispatchQueueTest extends TestCaseBase {
 	private DispatchQueue dispatchQueue;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 		dispatchQueue = DispatchQueue.createBackgroundQueue("Test Queue", DispatchQueueType.Concurrent);
 	}
