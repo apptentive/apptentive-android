@@ -16,7 +16,6 @@ import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
@@ -32,7 +31,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.zip.GZIPInputStream;
 
-import static com.apptentive.android.sdk.ApptentiveLog.Level.VERY_VERBOSE;
+import static com.apptentive.android.sdk.ApptentiveLog.Level.VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 
@@ -232,14 +231,14 @@ public class HttpRequest {
 		} catch (NetworkUnavailableException e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
-			ApptentiveLog.w(e.getMessage());
-			ApptentiveLog.w("Cancelled? %b", isCancelled());
+			ApptentiveLog.w(NETWORK, e.getMessage());
+			ApptentiveLog.w(NETWORK, "Cancelled? %b", isCancelled());
 		} catch (Exception e) {
 			responseCode = -1; // indicates failure
 			errorMessage = e.getMessage();
-			ApptentiveLog.e("Cancelled? %b", isCancelled());
+			ApptentiveLog.e(NETWORK, "Cancelled? %b", isCancelled());
 			if (!isCancelled()) {
-				ApptentiveLog.e(e, "Unable to perform request");
+				ApptentiveLog.e(NETWORK, "Unable to perform request: %s", this);
 			}
 		}
 
@@ -271,8 +270,8 @@ public class HttpRequest {
 
 			URL url = new URL(urlString);
 			ApptentiveLog.d(NETWORK, "Performing request: %s %s", method, url);
-			if (ApptentiveLog.canLog(VERY_VERBOSE)) {
-				ApptentiveLog.vv(NETWORK, "%s", toString());
+			if (ApptentiveLog.canLog(VERBOSE)) {
+				ApptentiveLog.v(NETWORK, "%s", toString());
 			}
 			retrying = false;
 
@@ -282,7 +281,7 @@ public class HttpRequest {
 			connection.setReadTimeout(readTimeout);
 
 			if (!isNetworkConnectionPresent()) {
-				ApptentiveLog.d("No network connection present. Request will fail.");
+				ApptentiveLog.d(NETWORK, "No network connection present. Request will fail.");
 				throw new NetworkUnavailableException("The network is not currently active.");
 			}
 
@@ -326,7 +325,11 @@ public class HttpRequest {
 			boolean gzipped = isGzipContentEncoding(responseHeaders);
 			if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE) {
 				responseData = readResponse(connection.getInputStream(), gzipped);
-				ApptentiveLog.v(NETWORK, "Response data: %s", responseData);
+				if (ApptentiveLog.shouldSanitizeLogMessages()) {
+					ApptentiveLog.v(NETWORK, "Response data: <HIDDEN> %d bytes", responseData.length());
+				} else {
+					ApptentiveLog.v(NETWORK, "Response data: %s", responseData);
+				}
 			} else {
 				errorMessage = StringUtils.format("Unexpected response code: %d (%s)", responseCode, connection.getResponseMessage());
 				responseData = readResponse(connection.getErrorStream(), gzipped);
@@ -369,12 +372,14 @@ public class HttpRequest {
 		++retryAttempt;
 
 		if (!retryPolicy.shouldRetryRequest(responseCode, retryAttempt)) {
-			ApptentiveLog.v(NETWORK, "Retry policy declined request retry");
+			ApptentiveLog.v(NETWORK, "Retry policy declined request retry: %s", this);
 			return false;
 		}
 
 		retrying = true;
-		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryPolicy.getRetryTimeoutMillis(retryAttempt));
+		long retryTimeout = retryPolicy.getRetryTimeoutMillis(retryAttempt);
+		ApptentiveLog.v(NETWORK, "Retry request in %d ms: %s", retryTimeout, this);
+		networkQueue.dispatchAsyncOnce(retryDispatchTask, retryTimeout);
 
 		return true;
 	}
@@ -482,12 +487,16 @@ public class HttpRequest {
 			byte[] requestData = createRequestData();
 			String requestString;
 			String contentType = requestProperties.get("Content-Type").toString();
-			if (contentType.contains("application/octet-stream") || contentType.contains("multipart/encrypted")) {
-				requestString = "Base64 encoded binary request: " + Base64.encodeToString(requestData, Base64.NO_WRAP);
+			if (ApptentiveLog.shouldSanitizeLogMessages()) {
+				requestString = StringUtils.format("<HIDDEN> %d bytes", requestData.length);
 			} else {
-				requestString = new String(requestData);
+				if (contentType.contains("application/octet-stream") || contentType.contains("multipart/encrypted")) {
+					requestString = "Base64 encoded binary request: " + Base64.encodeToString(requestData, Base64.NO_WRAP);
+				} else {
+					requestString = new String(requestData);
+				}
 			}
-			return String.format(
+			return StringUtils.format(
 				"\n" +
 					"Request:\n" +
 					"\t%s %s\n" +
@@ -499,7 +508,7 @@ public class HttpRequest {
 					"\t%s",
 				/* Request */
 				method.name(), urlString,
-				requestProperties,
+				sanitize(requestProperties),
 				requestString,
 				/* Response */
 				responseCode,
@@ -509,6 +518,18 @@ public class HttpRequest {
 			ApptentiveLog.e(e, "Exception while getting request string representation");
 		}
 		return null;
+	}
+
+	private Map<String, Object> sanitize(Map<String, Object> requestProperties) {
+		if (ApptentiveLog.shouldSanitizeLogMessages()) {
+			HashMap<String, Object> copy = new HashMap<>(requestProperties);
+			if (copy.containsKey("Authorization")) {
+				copy.put("Authorization", "<HIDDEN>");
+			}
+			return copy;
+		}
+
+		return requestProperties;
 	}
 
 	//endregion
@@ -603,7 +624,7 @@ public class HttpRequest {
 				String errorType = errorObject.optString("error_type", null);
 				return Apptentive.AuthenticationFailedReason.parse(errorType, error);
 			} catch (Exception e) {
-				ApptentiveLog.w(e, "Error parsing authentication failure object.");
+				ApptentiveLog.w(NETWORK, e, "Error parsing authentication failure object.");
 			}
 		}
 		return Apptentive.AuthenticationFailedReason.UNKNOWN;

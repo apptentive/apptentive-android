@@ -16,6 +16,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
@@ -47,11 +48,14 @@ import android.view.Window;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
+import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
+import com.apptentive.android.sdk.util.threading.DispatchQueue;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -74,13 +78,14 @@ import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TimeZone;
-import java.util.UUID;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+
+// TODO: this class does too much - split into smaller classes and clean up
 public class Util {
-
 	public static int getStatusBarHeight(Window window) {
 		Rect rectangle = new Rect();
 		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
@@ -116,6 +121,24 @@ public class Util {
 		if (activity != null && activity.getCurrentFocus() != null) {
 			InputMethodManager imm = (InputMethodManager) activity.getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(target, 0);
+		}
+	}
+
+	public static void showToast(final Context context, final String message, final int duration) {
+		if (!DispatchQueue.isMainQueue()) {
+			DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
+				@Override
+				protected void execute() {
+					showToast(context, message, duration);
+				}
+			});
+			return;
+		}
+
+		try {
+			Toast.makeText(context, message, duration).show();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while trying to display toast message");
 		}
 	}
 
@@ -235,26 +258,12 @@ public class Util {
 		return sw.toString();
 	}
 
-	public static String getAppVersionName(Context appContext) {
+	public static String getStackTraceString(Throwable throwable) {
 		try {
-			PackageManager packageManager = appContext.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
-			return packageInfo.versionName;
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e(e, "Error getting app version name.");
+			return android.util.Log.getStackTraceString(throwable);
+		} catch (Exception e) {
+			return stackTraceAsString(throwable); // fallback for unit-tests
 		}
-		return null;
-	}
-
-	public static int getAppVersionCode(Context appContext) {
-		try {
-			PackageManager packageManager = appContext.getPackageManager();
-			PackageInfo packageInfo = packageManager.getPackageInfo(appContext.getPackageName(), 0);
-			return packageInfo.versionCode;
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e(e, "Error getting app version code.");
-		}
-		return -1;
 	}
 
 	/**
@@ -312,7 +321,7 @@ public class Util {
 				return Integer.parseInt(parts[0]);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error getting major OS version");
+			ApptentiveLog.w(UTIL, e, "Error getting major OS version");
 		}
 		return -1;
 	}
@@ -745,12 +754,42 @@ public class Util {
 	}
 
 	public static void writeText(File file, String text) throws IOException {
-		if (file == null) {
-			throw new IllegalArgumentException("'file' is null");
-		}
-
 		if (text == null) {
 			throw new IllegalArgumentException("'text' is null");
+		}
+
+		PrintStream output = null;
+		try {
+			output = openTextWrite(file, false); // TODO: make a parameter
+			output.print(text);
+		} finally {
+			ensureClosed(output);
+		}
+	}
+
+	public static void writeText(File file, List<String> text) throws IOException {
+		writeText(file, text, false);
+	}
+
+	public static void writeText(File file, List<String> text, boolean append) throws IOException {
+		if (text == null) {
+			throw new IllegalArgumentException("'text' is null");
+		}
+
+		PrintStream output = null;
+		try {
+			output = openTextWrite(file, append);
+			for (String line : text) {
+				output.println(line);
+			}
+		} finally {
+			ensureClosed(output);
+		}
+	}
+
+	private static PrintStream openTextWrite(File file, boolean append) throws IOException {
+		if (file == null) {
+			throw new IllegalArgumentException("'file' is null");
 		}
 
 		File parentFile = file.getParentFile();
@@ -758,13 +797,7 @@ public class Util {
 			throw new IOException("Parent file could not be created: " + parentFile);
 		}
 
-		PrintStream output = null;
-		try {
-			output = new PrintStream(file, "UTF-8");
-			output.print(text);
-		} finally {
-			ensureClosed(output);
-		}
+		return new PrintStream(new FileOutputStream(file, append), false, "UTF-8");
 	}
 
 	public static void appendFileToStream(File file, OutputStream outputStream) throws IOException {
@@ -905,9 +938,9 @@ public class Util {
 			while ((count = is.read(buf, 0, 2048)) != -1) {
 				cos.write(buf, 0, count);
 			}
-			ApptentiveLog.d("File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.v(UTIL, "File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
-			ApptentiveLog.e("Error creating local copy of file attachment.");
+			ApptentiveLog.e(UTIL, "Error creating local copy of file attachment.");
 			return null;
 		} finally {
 			Util.ensureClosed(cos);
@@ -1004,6 +1037,47 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Builds out the main theme that we would like to use for all Apptentive UI, basing it on the
+	 * existing app theme, and adding Apptentive's theme where it doesn't override the existing app's
+	 * attributes. Finally, it forces changes to the theme using ApptentiveThemeOverride.
+	 * @param context The context for the app or Activity whose theme we want to inherit from.
+	 * @return A {@link Resources.Theme}
+	 */
+	public static Resources.Theme buildApptentiveInteractionTheme(Context context) {
+		Resources.Theme theme = context.getResources().newTheme();
+
+		// 1. Start by basing this on the Apptentive theme.
+		theme.applyStyle(R.style.ApptentiveTheme_Base_Versioned, true);
+
+		// 2. Get the theme from the host app. Overwrite what we have so far with the app's theme from
+		// the AndroidManifest.xml. This ensures that the app's styling shows up in our UI.
+		int appTheme;
+		try {
+			PackageManager packageManager = context.getPackageManager();
+			PackageInfo packageInfo = packageManager.getPackageInfo(context.getPackageName(), 0);
+			ApplicationInfo ai = packageInfo.applicationInfo;
+			appTheme = ai.theme;
+			if (appTheme != 0) {
+				theme.applyStyle(appTheme, true);
+			}
+		} catch (PackageManager.NameNotFoundException e) {
+			// Can't happen
+			return null;
+		}
+
+		// Step 3: Restore Apptentive UI window properties that may have been overridden in Step 2. This
+		// ensures Apptentive interaction has a modal feel and look.
+		theme.applyStyle(R.style.ApptentiveBaseFrameTheme, true);
+
+		// Step 4: Apply optional theme override specified in host app's style
+		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", context.getPackageName());
+		if (themeOverrideResId != 0) {
+			theme.applyStyle(themeOverrideResId, true);
+		}
+		return theme;
+	}
+
 	public static String humanReadableByteCount(long bytes, boolean si) {
 		int unit = si ? 1000 : 1024;
 		if (bytes < unit) return bytes + " B";
@@ -1027,7 +1101,7 @@ public class Util {
 		if (!internalDir.exists() && createIfNecessary) {
 			boolean succeed = internalDir.mkdirs();
 			if (!succeed) {
-				ApptentiveLog.w("Unable to create internal directory: %s", internalDir);
+				ApptentiveLog.w(UTIL, "Unable to create internal directory: %s", internalDir);
 			}
 		}
 		return internalDir;
@@ -1112,5 +1186,10 @@ public class Util {
 		}
 
 		return null;
+	}
+  
+	public static String currentDateAsFilename(String prefix, String suffix) {
+		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss", Locale.US);
+		return prefix + df.format(new Date()) + suffix;
 	}
 }

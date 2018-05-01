@@ -15,6 +15,8 @@ import android.net.Uri;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
 
+import com.apptentive.android.sdk.ApptentiveLog;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -57,7 +59,7 @@ public class ApptentiveAttachmentFileProvider extends ContentProvider {
 				// E.g.
 				// 'content://com.apptentive.android.sdk.debug.ApptentiveAttachmentFileProvider/log.txt'
 				// Take this and build the path to the file
-				String fileLocation = getContext().getCacheDir() + File.separator
+				String fileLocation = ApptentiveLog.getLogsDirectory(getContext()) + File.separator
 						+ uri.getLastPathSegment();
 
 				// Create & return a ParcelFileDescriptor pointing to the file

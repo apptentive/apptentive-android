@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.text.TextUtils;
-
 import com.apptentive.android.sdk.util.StringUtils;
 
 public class Device implements Saveable, DataChangedListener {
@@ -38,6 +36,7 @@ public class Device implements Saveable, DataChangedListener {
 	private String localeLanguageCode;
 	private String localeRaw;
 	private String utcOffset;
+	private String advertiserId;
 	private IntegrationConfig integrationConfig;
 
 	private transient DataChangedListener listener;
@@ -103,6 +102,7 @@ public class Device implements Saveable, DataChangedListener {
 		clone.localeLanguageCode = localeLanguageCode;
 		clone.localeRaw = localeRaw;
 		clone.utcOffset = utcOffset;
+		clone.advertiserId = advertiserId;
 		if (integrationConfig != null) {
 			clone.integrationConfig = integrationConfig.clone();
 		}
@@ -372,6 +372,17 @@ public class Device implements Saveable, DataChangedListener {
 	public void setUtcOffset(String utcOffset) {
 		if (!StringUtils.equal(this.utcOffset, utcOffset)) {
 			this.utcOffset = utcOffset;
+			notifyDataChanged();
+		}
+	}
+
+	public String getAdvertiserId() {
+		return advertiserId;
+	}
+
+	public void setAdvertiserId(String advertiserId) {
+		if (!StringUtils.equal(this.advertiserId, advertiserId)) {
+			this.advertiserId = advertiserId;
 			notifyDataChanged();
 		}
 	}

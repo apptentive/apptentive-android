@@ -19,7 +19,7 @@ public class ApptentiveNotificationCenterTest extends LogicTestCaseBase {
 	private ApptentiveNotificationCenter notificationCenter;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 		notificationCenter = new ApptentiveNotificationCenter();
 	}

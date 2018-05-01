@@ -22,6 +22,9 @@ import java.util.List;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueueOnce;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_INTERVAL;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_MESSAGES_STOPPED_POLLING;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_MESSAGES_STARTED_POLLING;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 
 class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchListener {
@@ -44,7 +47,7 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 		conf = Configuration.load();
 		backgroundPollingInterval = conf.getMessageCenterBgPoll() * 1000;
 		foregroundPollingInterval = conf.getMessageCenterFgPoll() * 1000;
-		ApptentiveLog.vv("Message Polling Worker: bg=%d, fg=%d", backgroundPollingInterval, foregroundPollingInterval);
+		ApptentiveLog.v(MESSAGES, "Message Polling Worker: bg=%d, fg=%d", backgroundPollingInterval, foregroundPollingInterval);
 	}
 
 	@Override
@@ -57,7 +60,7 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 	@Override
 	public void onFetchFinish(MessageManager manager, List<ApptentiveMessage> messages) {
 		if (isPolling()) {
-			long pollingInterval = messageCenterInForeground ? foregroundPollingInterval : backgroundPollingInterval;
+			long pollingInterval = getPollingInterval();
 			ApptentiveLog.v(MESSAGES, "Scheduled polling messages in %d sec", pollingInterval / 1000);
 			dispatchOnConversationQueueOnce(messagePollingTask, pollingInterval);
 		}
@@ -83,16 +86,24 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 	void setMessageCenterInForeground(boolean foreground) {
 		messageCenterInForeground = foreground;
 		if (foreground) {
-			startPolling();
+			startPolling(true);
 		}
 	}
 
 	void startPolling() {
+		startPolling(false);
+	}
+
+	private void startPolling(boolean force) {
+		if (force) {
+			stopPolling();
+		}
+
 		if (!isPolling()) {
 			ApptentiveLog.v(MESSAGES, "Start polling messages (%s)", getLocalConversationIdentifier());
 			messagePollingTask = createPollingTask();
 			dispatchOnConversationQueueOnce(messagePollingTask, 0L);
-			notifyStartPolling();
+			notifyStartPolling(getPollingInterval());
 		}
 	}
 
@@ -105,14 +116,20 @@ class MessagePollingWorker implements Destroyable, MessageManager.MessageFetchLi
 		}
 	}
 
+	private long getPollingInterval() {
+		return messageCenterInForeground ? foregroundPollingInterval : backgroundPollingInterval;
+	}
+
 	//region Notifications
 
-	private void notifyStartPolling() {
-		// TBD
+	private void notifyStartPolling(long interval) {
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_MESSAGES_STARTED_POLLING,
+				NOTIFICATION_KEY_INTERVAL, interval);
 	}
 
 	private void notifyStopPolling() {
-		// TBD
+		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_MESSAGES_STOPPED_POLLING);
 	}
 
 	//endregion

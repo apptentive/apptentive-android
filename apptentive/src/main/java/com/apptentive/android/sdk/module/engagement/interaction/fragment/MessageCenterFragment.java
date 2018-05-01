@@ -84,6 +84,7 @@ import java.util.Set;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
@@ -303,7 +304,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				}
 				case Constants.REQUEST_CODE_PHOTO_FROM_SYSTEM_PICKER: {
 					if (data == null) {
-						ApptentiveLog.d("no image is picked");
+						ApptentiveLog.d(MESSAGES, "no image is picked");
 						return;
 					}
 					imagePickerStillOpen = false;
@@ -756,22 +757,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void openNonImageAttachment(final ImageItem image) {
 		if (image == null) {
-			ApptentiveLog.d("No attachment argument.");
+			ApptentiveLog.d(MESSAGES, "No attachment argument.");
 			return;
 		}
 
 		try {
 			if (!Util.openFileAttachment(hostingActivityRef.get(), image.originalPath, image.localCachePath, image.mimeType)) {
-				ApptentiveLog.d("Cannot open file attachment");
+				ApptentiveLog.d(MESSAGES, "Cannot open file attachment");
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error loading attachment");
+			ApptentiveLog.e(MESSAGES, e, "Error loading attachment");
 		}
 	}
 
 	public void showAttachmentDialog(final ImageItem image) {
 		if (image == null) {
-			ApptentiveLog.d("No attachment argument.");
+			ApptentiveLog.d(MESSAGES, "No attachment argument.");
 			return;
 		}
 
@@ -790,7 +791,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			dialog.show(ft, DIALOG_IMAGE_PREVIEW);
 
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Error loading attachment preview.");
+			ApptentiveLog.e(MESSAGES, e, "Error loading attachment preview.");
 		}
 	}
 
@@ -1072,7 +1073,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		} catch (Exception e) {
 			e.printStackTrace();
 			imagePickerStillOpen = false;
-			ApptentiveLog.d("can't launch image picker");
+			ApptentiveLog.w(MESSAGES, "can't launch image picker");
 		}
 	}
 

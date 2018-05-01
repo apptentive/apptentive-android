@@ -6,11 +6,18 @@
 
 package com.apptentive.android.sdk.network;
 
+import java.util.Random;
+
 public class HttpRequestRetryPolicyDefault implements HttpRequestRetryPolicy {
 	public static final int RETRY_COUNT_INFINITE = -1;
 
 	public static final long DEFAULT_RETRY_TIMEOUT_MILLIS = 5 * 1000;
 	public static final int DEFAULT_RETRY_COUNT = 5;
+
+	/**
+	 * Maximum retry timeout for the exponential back-off
+	 */
+	private static final long MAX_RETRY_CAP = 10 * 60 * 1000L;
 
 	/**
 	 * How many times should request retry before giving up
@@ -21,6 +28,8 @@ public class HttpRequestRetryPolicyDefault implements HttpRequestRetryPolicy {
 	 * How long should we wait before retrying again
 	 */
 	private long retryTimeoutMillis = DEFAULT_RETRY_TIMEOUT_MILLIS;
+
+	private static final Random RANDOM = new Random();
 
 	/**
 	 * Returns <code>true</code> is request should be retried.
@@ -47,7 +56,8 @@ public class HttpRequestRetryPolicyDefault implements HttpRequestRetryPolicy {
 	 */
 	@Override
 	public long getRetryTimeoutMillis(int retryAttempt) {
-		return retryTimeoutMillis;
+		long temp = Math.min(MAX_RETRY_CAP, (long) (retryTimeoutMillis * Math.pow(2.0, retryAttempt - 1)));
+		return (long) ((temp / 2) * (1.0 + RANDOM.nextDouble()));
 	}
 
 	public void setMaxRetryCount(int maxRetryCount) {

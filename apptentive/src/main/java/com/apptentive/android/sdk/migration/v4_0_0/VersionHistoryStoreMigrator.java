@@ -12,6 +12,8 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+
 public class VersionHistoryStoreMigrator {
 
 	private static final String OLD_ENTRY_SEP = "__";
@@ -23,8 +25,8 @@ public class VersionHistoryStoreMigrator {
 	private static boolean migrated_to_v2;
 
 	public static void migrateV1ToV2(String oldFormat) {
-		ApptentiveLog.i("Migrating VersionHistoryStore V1 to V2.");
-		ApptentiveLog.i("V1: %s", oldFormat);
+		ApptentiveLog.i(CONVERSATION, "Migrating VersionHistoryStore V1 to V2.");
+		ApptentiveLog.i(CONVERSATION, "V1: %s", oldFormat);
 		try {
 			String[] entriesOld = oldFormat.split(OLD_ENTRY_SEP);
 			for (String entryOld : entriesOld) {
@@ -36,12 +38,12 @@ public class VersionHistoryStoreMigrator {
 						Double.parseDouble(entryPartsOld[OLD_POSITION_TIMESTAMP])
 					);
 				} catch (Exception e) {
-					ApptentiveLog.w("Error migrating old version history entry: %s", entryOld);
+					ApptentiveLog.w(CONVERSATION, "Error migrating old version history entry: %s", entryOld);
 				}
 			}
-			ApptentiveLog.i("V2: %s", VersionHistoryStore.getBaseArray().toString());
+			ApptentiveLog.i(CONVERSATION, "V2: %s", VersionHistoryStore.getBaseArray().toString());
 		} catch (Exception e) {
-			ApptentiveLog.w("Error migrating old version history entries: %s", oldFormat);
+			ApptentiveLog.w(CONVERSATION, "Error migrating old version history entries: %s", oldFormat);
 		}
 	}
 

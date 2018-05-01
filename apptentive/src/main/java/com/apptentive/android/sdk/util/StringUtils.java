@@ -26,13 +26,18 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import org.json.JSONObject;
 
 import java.net.URLEncoder;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 /**
  * A collection of useful string-related functions
  */
 public final class StringUtils {
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-dd-MM HH:mm:ss:SSS", Locale.US);
 
 	/**
 	 * Safe <code>String.format</code>
@@ -73,6 +78,11 @@ public final class StringUtils {
 		}
 
 		return result.toString();
+	}
+
+	public static String toPrettyDate(double timeInSeconds) {
+		long timeInMillis = (long) (1000L * timeInSeconds);
+		return DATE_FORMAT.format(new Date(timeInMillis));
 	}
 
 	/**

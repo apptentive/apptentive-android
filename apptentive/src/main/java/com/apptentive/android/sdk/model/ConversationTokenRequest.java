@@ -7,12 +7,15 @@
 package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Iterator;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 
 public class ConversationTokenRequest extends JSONObject {
 	public ConversationTokenRequest() {
@@ -22,7 +25,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(DevicePayload.KEY, device == null ? null : device.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
+			ApptentiveLog.e(CONVERSATION, "Error adding %s to ConversationTokenRequest", DevicePayload.KEY);
 		}
 	}
 
@@ -30,7 +33,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(SdkPayload.KEY, sdk == null ? null : sdk.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
+			ApptentiveLog.e(CONVERSATION, "Error adding %s to ConversationTokenRequest", SdkPayload.KEY);
 		}
 	}
 
@@ -38,7 +41,7 @@ public class ConversationTokenRequest extends JSONObject {
 		try {
 			put(PersonPayload.KEY, person == null ? null : person.getJsonObject());
 		} catch (JSONException e) {
-			ApptentiveLog.e("Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
+			ApptentiveLog.e(CONVERSATION, "Error adding %s to ConversationTokenRequest", PersonPayload.KEY);
 		}
 	}
 

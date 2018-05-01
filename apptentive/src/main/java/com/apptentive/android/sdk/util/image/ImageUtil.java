@@ -33,6 +33,8 @@ import java.io.OutputStream;
 import java.lang.ref.WeakReference;
 import java.net.URL;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+
 public class ImageUtil {
 
 	private static final int MAX_SENT_IMAGE_EDGE = 1024;
@@ -122,14 +124,14 @@ public class ImageUtil {
 			height = decodeBoundsOptions.outHeight;
 		}
 
-		ApptentiveLog.v("Original bitmap dimensions: %d x %d", width, height);
+		ApptentiveLog.v(UTIL, "Original bitmap dimensions: %d x %d", width, height);
 		int sampleRatio = Math.min(width / minShrunkWidth, height / minShrunkHeight);
 		if (sampleRatio >= 2) {
 			options.inSampleSize = sampleRatio;
 		}
 		options.inScaled = false;
 		options.inJustDecodeBounds = false;
-		ApptentiveLog.v("Bitmap sample size = %d", options.inSampleSize);
+		ApptentiveLog.v(UTIL, "Bitmap sample size = %d", options.inSampleSize);
 
 		Bitmap retImg = null;
 		if (bCreateFromUri && context != null) {
@@ -147,7 +149,7 @@ public class ImageUtil {
 		}
 
 
-		ApptentiveLog.d("Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
+		ApptentiveLog.v(UTIL, "Sampled bitmap size = %d X %d", options.outWidth, options.outHeight);
 
 		if ((orientation != 0 && orientation != -1) && retImg != null) {
 			Matrix matrix = new Matrix();
@@ -228,13 +230,13 @@ public class ImageUtil {
 		if (ratio < 1.0f) { // Don't blow up small images, only shrink bigger ones.
 			int newWidth = (int) (ratio * width);
 			int newHeight = (int) (ratio * height);
-			ApptentiveLog.v("Scaling image further down to %d x %d", newWidth, newHeight);
+			ApptentiveLog.v(UTIL, "Scaling image further down to %d x %d", newWidth, newHeight);
 			try {
 				outBitmap = Bitmap.createScaledBitmap(tempBitmap, newWidth, newHeight, true);
 			} catch (IllegalArgumentException e) {
 				throw new NullPointerException("Failed to create scaled bitmap");
 			}
-			ApptentiveLog.d("Final bitmap dimensions: %d x %d", outBitmap.getWidth(), outBitmap.getHeight());
+			ApptentiveLog.v(UTIL, "Final bitmap dimensions: %d x %d", outBitmap.getWidth(), outBitmap.getHeight());
 			tempBitmap.recycle();
 		}
 		return outBitmap;
@@ -285,14 +287,14 @@ public class ImageUtil {
 			// TODO: Is JPEG what we want here?
 			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
 			cos.flush();
-			ApptentiveLog.d("Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.v(UTIL, "Bitmap saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 			smaller.recycle();
 			System.gc();
 		} catch (FileNotFoundException e) {
-			ApptentiveLog.e(e, "File not found while storing image.");
+			ApptentiveLog.e(UTIL, e, "File not found while storing image.");
 			return false;
 		} catch (Exception e) {
-			ApptentiveLog.a(e, "Error storing image.");
+			ApptentiveLog.a(UTIL, e, "Error storing image.");
 			return false;
 		} finally {
 			Util.ensureClosed(cos);
@@ -318,11 +320,11 @@ public class ImageUtil {
 			Bitmap smaller = ImageUtil.createScaledBitmapFromLocalImageSource(sourcePath, MAX_SENT_IMAGE_EDGE, MAX_SENT_IMAGE_EDGE, null, imageOrientation);
 			smaller.compress(Bitmap.CompressFormat.JPEG, 95, cos);
 			cos.flush();
-			ApptentiveLog.v("Bitmap bytes appended, size = " + (cos.getBytesWritten() / 1024) + "k");
+			ApptentiveLog.v(UTIL, "Bitmap bytes appended, size = " + (cos.getBytesWritten() / 1024) + "k");
 			smaller.recycle();
 			return true;
 		} catch (Exception e) {
-			ApptentiveLog.a(e, "Error storing image.");
+			ApptentiveLog.a(UTIL, e, "Error storing image.");
 			return false;
 		} finally {
 			Util.ensureClosed(cos);

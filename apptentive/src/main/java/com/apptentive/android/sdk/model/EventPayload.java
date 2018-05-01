@@ -16,6 +16,8 @@ import org.json.JSONObject;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+
 /**
  * @author Sky Kelsey
  */
@@ -25,7 +27,11 @@ public class EventPayload extends ConversationItem {
 	private static final String KEY_INTERACTION_ID = "interaction_id";
 	private static final String KEY_DATA = "data";
 	private static final String KEY_TRIGGER = "trigger";
-	private static final String KEY_CUSTOM_DATA = "custom_data";
+	@SensitiveDataKey private static final String KEY_CUSTOM_DATA = "custom_data";
+
+	static {
+		registerSensitiveKeys(EventPayload.class);
+	}
 
 	public EventPayload(String json) throws JSONException {
 		super(PayloadType.event, json);
@@ -95,7 +101,7 @@ public class EventPayload extends ConversationItem {
 				try {
 					ret.put(key, value);
 				} catch (Exception e) {
-					ApptentiveLog.w("Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
+					ApptentiveLog.w(PAYLOADS, "Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
 				}
 			}
 		}

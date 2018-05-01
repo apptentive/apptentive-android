@@ -42,7 +42,7 @@ public abstract class ApptentiveTestCaseBase {
 	public void initializeApptentiveSdk() throws PackageManager.NameNotFoundException {
 		targetContext = new RenamingDelegatingContext(InstrumentationRegistry.getTargetContext(), "test_");
 		apptentiveInternal = ApptentiveInternal.getInstance();
-		ApptentiveLog.overrideLogLevel(ApptentiveLog.Level.VERY_VERBOSE);
+		ApptentiveLog.overrideLogLevel(ApptentiveLog.Level.VERBOSE);
 		PackageInfo packageInfo = targetContext.getPackageManager().getPackageInfo(targetContext.getPackageName(), 0);
 		versionCode = packageInfo.versionCode;
 		versionName = packageInfo.versionName;

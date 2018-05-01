@@ -24,25 +24,26 @@ import java.io.File;
 
 import static android.content.Context.NOTIFICATION_SERVICE;
 
-public class TroubleshootingNotification {
+final class TroubleshootingNotificationBuilder {
 
-	public static final String NOTIFICATION_CHANNEL_ID = "com.apptentive.debug.NOTIFICATION_CHANNEL_TROUBLESHOOTING";
-	public static final String NOTIFICATION_CHANNEL_NAME = "Apptentive Notifications";
-	public static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Used for SDK troubleshooting";
-	public static final String NOTIFICATION_ID_KEY = "com.apptentive.debug.NOTIFICATION_ID";
-	public static final int APPTENTIVE_NOTIFICATION_ID = 1;
+	private static final String NOTIFICATION_CHANNEL_ID = "com.apptentive.debug.NOTIFICATION_CHANNEL_TROUBLESHOOTING";
+	private static final String NOTIFICATION_CHANNEL_NAME = "Apptentive Notifications";
+	private static final String NOTIFICATION_CHANNEL_DESCRIPTION = "Used for SDK troubleshooting";
+	static final String NOTIFICATION_ID_KEY = "com.apptentive.debug.NOTIFICATION_ID";
+	private static final int APPTENTIVE_NOTIFICATION_ID = 1;
 
-	public static final String ACTION_ABORT = "com.apptentive.debug.ACTION_ABORT";
-	public static final String ACTION_SEND_LOGS = "com.apptentive.debug.ACTION_SEND_LOGS";
+	static final String ACTION_ABORT = "com.apptentive.debug.ACTION_ABORT";
+	static final String ACTION_SEND_LOGS = "com.apptentive.debug.ACTION_SEND_LOGS";
 
-	public static final String EXTRA_EMAIL_RECIPIENTS = "EMAIL_RECIPIENTS";
-	public static final String EXTRA_SUBJECT = "SUBJECT";
-	public static final String EXTRA_INFO = "INFO";
-	public static final String EXTRA_LOG_FILE = "LOG_FILE";
-	public static final String EXTRA_MANIFEST_FILE = "MANIFEST_FILE";
+	static final String EXTRA_EMAIL_RECIPIENTS = "EMAIL_RECIPIENTS";
+	static final String EXTRA_SUBJECT = "SUBJECT";
+	static final String EXTRA_INFO = "INFO";
+	static final String EXTRA_ATTACHMENTS = "ATTACHMENTS";
 
+	private TroubleshootingNotificationBuilder() {
+	}
 
-	public Notification buildNotification(@NonNull Context context, String subject, String systemInfo, File logFile, File manifestFile, String[] emailRecipients) {
+	static Notification buildNotification(@NonNull Context context, String subject, String systemInfo, File[] attachments, String[] emailRecipients) {
 
 		NotificationManager notificationManager = (NotificationManager) context.getSystemService(NOTIFICATION_SERVICE);
 
@@ -59,8 +60,7 @@ public class TroubleshootingNotification {
 		sendLogsIntent.putExtra(EXTRA_EMAIL_RECIPIENTS, emailRecipients);
 		sendLogsIntent.putExtra(EXTRA_SUBJECT, subject);
 		sendLogsIntent.putExtra(EXTRA_INFO, systemInfo);
-		sendLogsIntent.putExtra(EXTRA_LOG_FILE, logFile);
-		sendLogsIntent.putExtra(EXTRA_MANIFEST_FILE, manifestFile);
+		sendLogsIntent.putExtra(EXTRA_ATTACHMENTS, attachments);
 
 		PendingIntent sendLogsPendingIntent = PendingIntent.getBroadcast(context, 0, sendLogsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
 		NotificationCompat.Action sendLogsAction = new NotificationCompat.Action.Builder(0, "Send Report", sendLogsPendingIntent).build();

@@ -9,16 +9,26 @@ package com.apptentive.android.sdk.model;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 public abstract class JsonPayload extends Payload {
+
+	private static final Map<Class<? extends JsonPayload>, List<String>> SENSITIVE_KEYS_LOOKUP = new HashMap<>();
 
 	private static final String KEY_NONCE = "nonce";
 
@@ -40,7 +50,7 @@ public abstract class JsonPayload extends Payload {
 	@Override
 	public byte[] renderData() throws JSONException {
 		String jsonString = marshallForSending().toString();
-		ApptentiveLog.vv(PAYLOADS, jsonString);
+		ApptentiveLog.v(PAYLOADS, jsonString);
 
 		if (encryptionKey != null) {
 			byte[] bytes = jsonString.getBytes();
@@ -62,7 +72,7 @@ public abstract class JsonPayload extends Payload {
 
 	protected void put(String key, String value) {
 		try {
-			jsonObject.put(key, value);
+			jsonObject.put(key, toNullableValue(value));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, value);
 		}
@@ -94,7 +104,7 @@ public abstract class JsonPayload extends Payload {
 
 	protected void put(String key, JSONObject object) {
 		try {
-			jsonObject.put(key, object);
+			jsonObject.put(key, toNullableValue(object));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, object);
 		}
@@ -144,13 +154,41 @@ public abstract class JsonPayload extends Payload {
 		return jsonObject.isNull(key);
 	}
 
+	private Object toNullableValue(Object value) {
+		return value != null ? value : JSONObject.NULL;
+	}
+
 	//endregion
 
 	//region String Representation
 
 	@Override
 	public String toString() {
+		if (ApptentiveLog.shouldSanitizeLogMessages()) {
+			JSONObject safeJsonObject = createSafeJsonObject(jsonObject);
+			return StringUtils.format("%s %s", getClass().getSimpleName(), safeJsonObject);
+		}
 		return StringUtils.format("%s %s", getClass().getSimpleName(), jsonObject);
+	}
+
+	private JSONObject createSafeJsonObject(JSONObject jsonObject) {
+		try {
+			List<String> sensitiveKeys = SENSITIVE_KEYS_LOOKUP.get(getClass());
+			if (sensitiveKeys != null && sensitiveKeys.size() > 0) {
+				JSONObject safeObject = new JSONObject();
+				Iterator<String> iterator = jsonObject.keys();
+				while (iterator.hasNext()) {
+					String key = iterator.next();
+					Object value = sensitiveKeys.contains(key) ? "<HIDDEN>" : jsonObject.get(key);
+					safeObject.put(key, value);
+				}
+				return safeObject;
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while creating safe json object");
+		}
+
+		return null;
 	}
 
 	//endregion
@@ -207,4 +245,33 @@ public abstract class JsonPayload extends Payload {
 	protected String getJsonContainer() {
 		return null;
 	}
+
+	//region Sensitive Keys
+
+	protected static void registerSensitiveKeys(Class<? extends JsonPayload> cls) {
+		List<Field> fields = RuntimeUtils.listFields(cls, new RuntimeUtils.FieldFilter() {
+			@Override
+			public boolean accept(Field field) {
+				return Modifier.isStatic(field.getModifiers()) && // static fields
+						field.getAnnotation(SensitiveDataKey.class) != null &&  // marked as 'sensitive'
+						field.getType().equals(String.class); // with type of String
+			}
+		});
+
+		if (fields.size() > 0) {
+			List<String> keys = new ArrayList<>(fields.size());
+			try {
+				for (Field field : fields) {
+					field.setAccessible(true);
+					String value = (String) field.get(null);
+					keys.add(value);
+				}
+				SENSITIVE_KEYS_LOOKUP.put(cls, keys);
+			} catch (Exception e) {
+				ApptentiveLog.e(e, "Exception while registering sensitive keys");
+			}
+		}
+	}
+
+	//endregion
 }

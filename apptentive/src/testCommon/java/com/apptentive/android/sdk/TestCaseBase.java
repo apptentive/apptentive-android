@@ -26,7 +26,7 @@ public class TestCaseBase {
 
 	//region Setup
 
-	protected void setUp() {
+	protected void setUp() throws Exception {
 		// assertions
 		Assert.setImp(new AssertImp() {
 			@Override
@@ -81,7 +81,7 @@ public class TestCaseBase {
 
 	//region Helpers
 
-	protected void sleep(long millis) {
+	protected static void sleep(long millis) {
 		SystemClock.sleep(millis);
 	}
 

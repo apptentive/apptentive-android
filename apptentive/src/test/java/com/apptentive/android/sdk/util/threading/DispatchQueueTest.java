@@ -17,7 +17,7 @@ import static org.junit.Assert.*;
 public class DispatchQueueTest extends TestCaseBase {
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 		overrideMainQueue(false);
 	}
