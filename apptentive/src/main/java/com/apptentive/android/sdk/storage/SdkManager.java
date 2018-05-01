@@ -20,14 +20,14 @@ public class SdkManager {
 		Sdk sdk = new Sdk();
 
 		// First, get all the information we can load from static resources.
-		sdk.setVersion(Constants.APPTENTIVE_SDK_VERSION);
+		sdk.setVersion(Constants.getApptentiveSdkVersion());
 		sdk.setPlatform("Android");
 
 		// Distribution and distribution version are optionally set in the manifest by the wrapping platform (Cordova, mParticle, etc.)
 		Resources resources = context.getResources();
 		sdk.setDistribution(resources.getString(R.string.apptentive_distribution));
 		sdk.setDistributionVersion(resources.getString(R.string.apptentive_distribution_version));
-		ApptentiveLog.vv("SDK: %s:%s", sdk.getDistribution(), sdk.getDistributionVersion());
+		ApptentiveLog.v("SDK: %s:%s", sdk.getDistribution(), sdk.getDistributionVersion());
 		return sdk;
 	}
 

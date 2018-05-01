@@ -30,7 +30,7 @@ public class JsonPayloadSenderTest extends LogicTestCaseBase {
 	private MockDispatchQueue networkQueue;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 		networkQueue = new MockDispatchQueue(false);
 	}

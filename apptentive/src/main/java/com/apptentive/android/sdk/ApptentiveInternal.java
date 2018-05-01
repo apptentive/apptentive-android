@@ -53,6 +53,8 @@ import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.VersionHistoryItem;
+import com.apptentive.android.sdk.util.AdvertiserManager;
+import com.apptentive.android.sdk.util.AdvertiserManager.AdvertisingIdClientInfo;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -74,22 +76,29 @@ import java.util.concurrent.LinkedBlockingQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.isConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.ADVERTISER_ID;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.ApptentiveLogTag.PUSH;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STOPPED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_FETCHED;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_DID_FETCH;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTION_MANIFEST_FETCHED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONFIGURATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_MANIFEST;
+import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
@@ -98,7 +107,6 @@ import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
  * This class contains only internal methods. These methods should not be access directly by the host app.
  */
 public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotificationObserver {
-
 	private final ApptentiveTaskManager taskManager;
 
 	private final ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
@@ -143,6 +151,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	private static final String PUSH_ACTION = "action";
 	private static final String PUSH_CONVERSATION_ID = "conversation_id";
+	private static final int LOG_HISTORY_SIZE = 2;
 
 	private enum PushAction {
 		pmc,       // Present Message Center.
@@ -152,7 +161,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			try {
 				return PushAction.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				ApptentiveLog.d("Error parsing unknown PushAction: " + name);
+				ApptentiveLog.w(PUSH, "This version of the SDK can't handle push action '%s'", name);
 			}
 			return unknown;
 		}
@@ -193,6 +202,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
+
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true));
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
@@ -203,7 +213,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
 			.addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this)
 			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this)
-			.addObserver(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, this);
+			.addObserver(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, this)
+			.addObserver(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH, this);
 	}
 
 	public static boolean isApptentiveRegistered() {
@@ -226,40 +238,33 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	 *
 	 * @param application the context of the app that is creating the instance
 	 */
-	static void createInstance(Application application, String apptentiveKey, String apptentiveSignature, final String serverUrl) {
-		if (application == null) {
-			throw new IllegalArgumentException("Application is null");
-		}
+	static void createInstance(@NonNull Application application, @NonNull ApptentiveConfiguration configuration) {
+		final String apptentiveKey = configuration.getApptentiveKey();
+		final String apptentiveSignature = configuration.getApptentiveSignature();
+		final String baseURL = configuration.getBaseURL();
+
+		// set log message sanitizing
+		ApptentiveLog.setShouldSanitizeLogMessages(configuration.shouldSanitizeLogMessages());
+
+		// set log level before we initialize log monitor since log monitor can override it as well
+		ApptentiveLog.overrideLogLevel(configuration.getLogLevel());
+
+		// initialize log writer
+		ApptentiveLog.initialize(application.getApplicationContext(), LOG_HISTORY_SIZE);
 
 		// try initializing log monitor
-		LogMonitor.tryInitialize(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
+		LogMonitor.startSession(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
 
 		synchronized (ApptentiveInternal.class) {
 			if (sApptentiveInternal == null) {
-
-				// trim spaces
-				apptentiveKey = Util.trim(apptentiveKey);
-				apptentiveSignature = Util.trim(apptentiveSignature);
-
-				// if App key is not defined - try loading from AndroidManifest.xml
-				if (StringUtils.isNullOrEmpty(apptentiveKey)) {
-					apptentiveKey = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_KEY);
-					// TODO: check if Apptentive Key is still empty
-				}
-
-				// if App signature is not defined - try loading from AndroidManifest.xml
-				if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
-					apptentiveSignature = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_SIGNATURE);
-					// TODO: check if Apptentive Signature is still empty
-				}
-
 				try {
-					ApptentiveLog.v("Initializing Apptentive instance: apptentiveKey=%s apptentiveSignature=%s", apptentiveKey, apptentiveSignature);
-					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, serverUrl);
+					ApptentiveLog.i("Registering Apptentive Android SDK %s", Constants.getApptentiveSdkVersion());
+					ApptentiveLog.v("ApptentiveKey=%s ApptentiveSignature=%s", apptentiveKey, apptentiveSignature);
+					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, baseURL);
 					dispatchOnConversationQueue(new DispatchTask() {
 						@Override
 						protected void execute() {
-							sApptentiveInternal.start(); // TODO: check the result of this call
+							sApptentiveInternal.start();
 						}
 					});
 					application.registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
@@ -464,6 +469,16 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		}
 	}
 
+	public void onActivityStopped(Activity activity) {
+		checkConversationQueue();
+
+		if (activity != null) {
+			// Post a notification
+			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STOPPED,
+					NOTIFICATION_KEY_ACTIVITY, activity);
+		}
+	}
+
 	public void onActivityResumed(Activity activity) {
 		checkConversationQueue();
 
@@ -482,7 +497,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		checkConversationQueue();
 
 		// Try to initialize log monitor
-		LogMonitor.tryInitialize(appContext, apptentiveKey, apptentiveSignature);
+		LogMonitor.startSession(appContext, apptentiveKey, apptentiveSignature);
 
 		// Post a notification
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);
@@ -566,34 +581,18 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		 * 3. An unreadMessageCountListener() is set up
 		 */
 
-		long start = System.currentTimeMillis();
 		boolean conversationLoaded = conversationManager.loadActiveConversation(getApplicationContext());
-		ApptentiveLog.i(CONVERSATION, "Active conversation is%s loaded. Took %d ms", conversationLoaded ? "" : " not", System.currentTimeMillis() - start);
-
-		if (conversationLoaded) {
-			Conversation activeConversation = conversationManager.getActiveConversation();
-			// TODO: figure out if this is still necessary
-			// boolean featureEverUsed = activeConversation.isMessageCenterFeatureUsed();
-			// if (featureEverUsed) {
-			// 	messageManager.init();
-			// }
+		if (!conversationLoaded) {
+			ApptentiveLog.w(CONVERSATION, "There is no active conversation. The SDK will be disabled until a conversation becomes active.");
 		}
 
 		apptentiveToolbarTheme = appContext.getResources().newTheme();
 
-		boolean apptentiveDebug = false;
-		String logLevelOverride = null;
 		try {
 			appPackageName = appContext.getPackageName();
 			PackageManager packageManager = appContext.getPackageManager();
 			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
 			ApplicationInfo ai = packageInfo.applicationInfo;
-
-			Bundle metaData = ai.metaData;
-			if (metaData != null) {
-				logLevelOverride = Util.trim(metaData.getString(Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL));
-				apptentiveDebug = metaData.getBoolean(Constants.MANIFEST_KEY_APPTENTIVE_DEBUG);
-			}
 
 			// Used for application theme inheritance if the theme is an AppCompat theme.
 			setApplicationDefaultTheme(ai.theme);
@@ -606,7 +605,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				for (ActivityInfo activityInfo : registered) {
 					// Throw assertion error when relict class found in manifest.
 					if (activityInfo.name.equals("com.apptentive.android.sdk.comm.NetworkStateReceiver")) {
-						throw new AssertionError("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file");
+						throw new AssertionError("NetworkStateReceiver has been removed from Apptentive SDK, please make sure it's also removed from manifest file"); // TODO: should be IllegalStateException or similar
 					}
 				}
 			}
@@ -616,59 +615,13 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			bRet = false;
 		}
 
-
-		// Set debuggable and appropriate log level.
-		if (apptentiveDebug) {
-			ApptentiveLog.i("Apptentive debug logging set to VERBOSE.");
-			setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-		} else if (logLevelOverride != null) {
-			ApptentiveLog.i("Overriding log level: %s", logLevelOverride);
-			setMinimumLogLevel(ApptentiveLog.Level.parse(logLevelOverride));
-		} else {
-			if (appRelease.isDebug()) {
-				setMinimumLogLevel(ApptentiveLog.Level.VERBOSE);
-			}
-		}
-		ApptentiveLog.i("Debug mode enabled? %b", appRelease.isDebug());
-
-		// The app key can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(apptentiveKey) || apptentiveKey.contains(Constants.EXAMPLE_APPTENTIVE_KEY_VALUE)) {
-			String errorMessage = "The Apptentive Key is not defined. You may provide your Apptentive Key in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				                      "<meta-data android:name=\"apptentive_key\"\n" +
-				                      "           android:value=\"@string/your_apptentive_key\"/>";
-			if (appRelease.isDebug()) {
-				throw new RuntimeException(errorMessage);
-			} else {
-				ApptentiveLog.e(errorMessage);
-			}
-		} else {
-			ApptentiveLog.d("Using cached Apptentive App Key");
-		}
-		ApptentiveLog.d("Apptentive App Key: %s", apptentiveKey);
-
-		// The app signature can be passed in programmatically, or we can fallback to checking in the manifest.
-		if (TextUtils.isEmpty(apptentiveSignature) || apptentiveSignature.contains(Constants.EXAMPLE_APPTENTIVE_SIGNATURE_VALUE)) {
-			String errorMessage = "The Apptentive Signature is not defined. You may provide your Apptentive Signature in Apptentive.register(), or in as meta-data in your AndroidManifest.xml.\n" +
-				                      "<meta-data android:name=\"apptentive_signature\"\n" +
-				                      "           android:value=\"@string/your_apptentive_signature\"/>";
-			if (appRelease.isDebug()) {
-				throw new RuntimeException(errorMessage);
-			} else {
-				ApptentiveLog.e(errorMessage);
-			}
-		} else {
-			ApptentiveLog.d("Using cached Apptentive App Signature");
-		}
-		ApptentiveLog.d("Apptentive App Signature: %s", apptentiveSignature);
-
-		// Grab app info we need to access later on.
-		ApptentiveLog.d("Default Locale: %s", Locale.getDefault().toString());
+		ApptentiveLog.v("Application Info:\n\tApptentive Key: %s\n\tApptentive Key: %s\n\tDebuggable APK: %b\n\tDefault locale: %s", apptentiveKey, apptentiveSignature, appRelease.isDebug(), Locale.getDefault());
 		return bRet;
 	}
 
 	private void checkSendVersionChanges(Conversation conversation) {
 		if (conversation == null) {
-			ApptentiveLog.e("Can't check session data changes: session data is not initialized");
+			ApptentiveLog.e(CONVERSATION, "Can't check session data changes: session data is not initialized");
 			return;
 		}
 
@@ -697,19 +650,19 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		// TODO: Move this into a session became active handler.
 		final String lastSeenSdkVersion = conversation.getLastSeenSdkVersion();
-		final String currentSdkVersion = Constants.APPTENTIVE_SDK_VERSION;
+		final String currentSdkVersion = Constants.getApptentiveSdkVersion();
 		if (!StringUtils.equal(lastSeenSdkVersion, currentSdkVersion)) {
 			sdkChanged = true;
 		}
 
 		if (appReleaseChanged) {
-			ApptentiveLog.i("Version changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
+			ApptentiveLog.i(CONVERSATION, "Application version was changed: Name: %s => %s, Code: %d => %d", previousVersionName, currentVersionName, previousVersionCode, currentVersionCode);
 			conversation.getVersionHistory().updateVersionHistory(Util.currentTimeSeconds(), currentVersionCode, currentVersionName);
 		}
 
 		Sdk sdk = SdkManager.generateCurrentSdk(appContext);
 		if (sdkChanged) {
-			ApptentiveLog.i("SDK version changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
+			ApptentiveLog.i(CONVERSATION, "SDK version was changed: %s => %s", lastSeenSdkVersion, currentSdkVersion);
 			conversation.setLastSeenSdkVersion(currentSdkVersion);
 			conversation.setSdk(sdk);
 		}
@@ -726,6 +679,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	 * We want to make sure the app is using the latest configuration from the server if the app or sdk version changes.
 	 */
 	private void invalidateCaches(Conversation conversation) {
+		checkConversationQueue();
+
 		conversation.setInteractionExpiration(0L);
 		Configuration config = Configuration.load();
 		config.setConfigurationCacheExpirationMillis(System.currentTimeMillis());
@@ -804,13 +759,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	}
 
 	/**
-	 * Pass in a log level to override the default, which is {@link ApptentiveLog.Level#INFO}
-	 */
-	private void setMinimumLogLevel(ApptentiveLog.Level level) {
-		ApptentiveLog.overrideLogLevel(level);
-	}
-
-	/**
 	 * The key that is used to store extra data on an Apptentive push notification.
 	 */
 	static final String APPTENTIVE_PUSH_EXTRA_KEY = "apptentive";
@@ -826,7 +774,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	static String getApptentivePushNotificationData(Intent intent) {
 		if (intent != null) {
-			ApptentiveLog.v("Got an Intent.");
+			ApptentiveLog.v(PUSH, "Got an Intent.");
 			return getApptentivePushNotificationData(intent.getExtras());
 		}
 		return null;
@@ -842,36 +790,36 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	static String getApptentivePushNotificationData(Bundle pushBundle) {
 		if (pushBundle != null) {
 			if (pushBundle.containsKey(PUSH_EXTRA_KEY_PARSE)) { // Parse
-				ApptentiveLog.v("Got a Parse Push.");
+				ApptentiveLog.v(PUSH, "Got a Parse Push.");
 				String parseDataString = pushBundle.getString(PUSH_EXTRA_KEY_PARSE);
 				if (parseDataString == null) {
-					ApptentiveLog.e("com.parse.Data is null.");
+					ApptentiveLog.e(PUSH, "com.parse.Data is null.");
 					return null;
 				}
 				try {
 					JSONObject parseJson = new JSONObject(parseDataString);
 					return parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
 				} catch (JSONException e) {
-					ApptentiveLog.e("com.parse.Data is corrupt: %s", parseDataString);
+					ApptentiveLog.e(PUSH, "com.parse.Data is corrupt: %s", parseDataString);
 					return null;
 				}
 			} else if (pushBundle.containsKey(PUSH_EXTRA_KEY_UA)) { // Urban Airship
-				ApptentiveLog.v("Got an Urban Airship push.");
+				ApptentiveLog.v(PUSH, "Got an Urban Airship push.");
 				Bundle uaPushBundle = pushBundle.getBundle(PUSH_EXTRA_KEY_UA);
 				if (uaPushBundle == null) {
-					ApptentiveLog.e("Urban Airship push extras bundle is null");
+					ApptentiveLog.e(PUSH, "Urban Airship push extras bundle is null");
 					return null;
 				}
 				return uaPushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY);
 			} else if (pushBundle.containsKey(APPTENTIVE_PUSH_EXTRA_KEY)) { // All others
 				// Straight FCM / GCM / SNS, or nested
-				ApptentiveLog.v("Found apptentive push data.");
+				ApptentiveLog.v(PUSH, "Found apptentive push data.");
 				return pushBundle.getString(APPTENTIVE_PUSH_EXTRA_KEY);
 			} else {
-				ApptentiveLog.e("Got an unrecognizable push.");
+				ApptentiveLog.e(PUSH, "Got an unrecognizable push.");
 			}
 		}
-		ApptentiveLog.e("Push bundle was null.");
+		ApptentiveLog.e(PUSH, "Push bundle was null.");
 		return null;
 	}
 
@@ -897,7 +845,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	 * TODO: Decouple this from Conversation and Message Manager so it can be unit tested.
 	 */
 	static PendingIntent generatePendingIntentFromApptentivePushData(Conversation conversation, String apptentivePushData) {
-		ApptentiveLog.d("Generating Apptentive push PendingIntent.");
+		ApptentiveLog.d(PUSH, "Generating Apptentive push PendingIntent.");
 		if (!TextUtils.isEmpty(apptentivePushData)) {
 			try {
 				JSONObject pushJson = new JSONObject(apptentivePushData);
@@ -907,7 +855,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				if (conversationId != null) {
 					// is it an actual receiver?
 					if (!StringUtils.equal(conversation.getConversationId(), conversationId)) {
-						ApptentiveLog.i("Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
+						ApptentiveLog.i(PUSH, "Can't generate pending intent from Apptentive push data: push conversation id doesn't match active conversation");
 						return null;
 					}
 				}
@@ -927,10 +875,10 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 						return ApptentiveInternal.prepareMessageCenterPendingIntent(ApptentiveInternal.getInstance().getApplicationContext(), conversation);
 					}
 					default:
-						ApptentiveLog.w("Unknown Apptentive push notification action: \"%s\"", action.name());
+						ApptentiveLog.w(PUSH, "Unknown Apptentive push notification action: \"%s\"", action.name());
 				}
 			} catch (Exception e) {
-				ApptentiveLog.e(e, "Error parsing JSON from push notification.");
+				ApptentiveLog.e(PUSH, e, "Error parsing JSON from push notification.");
 				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
 			}
 		}
@@ -954,7 +902,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 							      value instanceof Float ||
 							      value instanceof Integer ||
 							      value instanceof Short)) {
-							ApptentiveLog.w("Removing invalid customData type: %s", value.getClass().getSimpleName());
+							ApptentiveLog.w(MESSAGES, "Removing invalid customData type: %s", value.getClass().getSimpleName());
 							keysIterator.remove();
 						}
 					}
@@ -999,7 +947,10 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	public void notifyInteractionUpdated(boolean successful) {
 		checkConversationQueue();
 
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_INTERACTIONS_FETCHED);
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_INTERACTIONS_DID_FETCH,
+				NOTIFICATION_KEY_SUCCESSFUL, successful);
+
 		Iterator it = interactionUpdateListeners.iterator();
 
 		while (it.hasNext()) {
@@ -1032,7 +983,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	 */
 	static boolean checkRegistered() {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveLog.e("Error: You have failed to call Apptentive.register() in your Application.onCreate()");
+			ApptentiveLog.e(CONVERSATION, "Error: You have failed to call Apptentive.register() in your Application.onCreate()");
 			return false;
 		}
 		return true;
@@ -1143,6 +1094,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			if (conversation.hasActiveState()) {
 				checkSendVersionChanges(conversation);
+				updateConversationAdvertiserIdentifier(conversation);
 			}
 		}
 		else if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
@@ -1155,6 +1107,29 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		} else if (notification.hasName(NOTIFICATION_INTERACTION_MANIFEST_FETCHED)) {
 			String manifest = notification.getRequiredUserInfo(NOTIFICATION_KEY_MANIFEST, String.class);
 			storeManifestResponse(appContext, manifest);
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
+			if (Configuration.load().isCollectingAdID()) {
+				// update advertiser id every time we come back from the background
+				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
+					// update active conversation's device info
+					Conversation conversation = getConversation();
+					if (conversation != null) {
+						updateConversationAdvertiserIdentifier(conversation);
+					}
+				}
+			}
+		} else if (notification.hasName(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH)) {
+			Configuration configuration = notification.getUserInfo(NOTIFICATION_KEY_CONFIGURATION, Configuration.class);
+			if (configuration != null && configuration.isCollectingAdID()) {
+				// update advertiser id since the current customer needs it
+				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
+					// update active conversation's device info
+					Conversation conversation = getConversation();
+					if (conversation != null) {
+						updateConversationAdvertiserIdentifier(conversation);
+					}
+				}
+			}
 		}
 	}
 
@@ -1172,10 +1147,29 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	private void storeManifestResponse(Context context, String manifest) {
 		try {
-			File file = new File(context.getCacheDir(), Constants.FILE_APPTENTIVE_ENGAGEMENT_MANIFEST);
+			File file = new File(ApptentiveLog.getLogsDirectory(context), Constants.FILE_APPTENTIVE_ENGAGEMENT_MANIFEST);
 			Util.writeText(file, manifest);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while trying to save engagement manifest data");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while trying to save engagement manifest data");
+		}
+	}
+
+	//endregion
+
+	//region Advertiser Identifier
+
+	private void updateConversationAdvertiserIdentifier(Conversation conversation) {
+		checkConversationQueue();
+
+		try {
+			Configuration config = Configuration.load();
+			if (config.isCollectingAdID()) {
+				AdvertisingIdClientInfo info = AdvertiserManager.getAdvertisingIdClientInfo();
+				String advertiserId = info != null && !info.isLimitAdTrackingEnabled() ? info.getId() : null;
+				conversation.getDevice().setAdvertiserId(advertiserId);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(ADVERTISER_ID, e,"Exception while updating conversation advertiser id");
 		}
 	}
 

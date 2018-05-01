@@ -25,13 +25,7 @@ public class HttpRequestManager {
 	private final DispatchQueue networkQueue;
 
 	private Listener listener;
-
-	/**
-	 * Creates a request manager with a default concurrent "network" queue.
-	 */
-	public HttpRequestManager() {
-		this(DispatchQueue.createBackgroundQueue("Apptentive Network Queue", DispatchQueueType.Concurrent));
-	}
+	private HttpRequest.Injector requestInjector;
 
 	/**
 	 * Creates a request manager with custom network dispatch queue
@@ -55,6 +49,10 @@ public class HttpRequestManager {
 	synchronized HttpRequest startRequest(HttpRequest request) {
 		if (request == null) {
 			throw new IllegalArgumentException("Request is null");
+		}
+
+		if (requestInjector != null) {
+			request.setInjector(requestInjector);
 		}
 
 		registerRequest(request);
@@ -148,12 +146,20 @@ public class HttpRequestManager {
 
 	//region Getters/Setters
 
+	public static HttpRequestManager sharedManager() {
+		return Holder.INSTANCE;
+	}
+
 	public Listener getListener() {
 		return listener;
 	}
 
 	public void setListener(Listener listener) {
 		this.listener = listener;
+	}
+
+	public void setRequestInjector(HttpRequest.Injector requestInjector) {
+		this.requestInjector = requestInjector;
 	}
 
 	//endregion
@@ -166,6 +172,14 @@ public class HttpRequestManager {
 		void onRequestFinish(HttpRequestManager manager, HttpRequest request);
 
 		void onRequestsCancel(HttpRequestManager manager);
+	}
+
+	//endregion
+
+	//region Holder
+
+	private static class Holder {
+		private static final HttpRequestManager INSTANCE = new HttpRequestManager(DispatchQueue.createBackgroundQueue("Apptentive Network Queue", DispatchQueueType.Concurrent));
 	}
 
 	//endregion

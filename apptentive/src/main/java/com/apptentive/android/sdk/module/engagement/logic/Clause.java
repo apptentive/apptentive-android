@@ -6,7 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
-public interface Clause {
+import com.apptentive.android.sdk.util.IndentPrinter;
 
-	boolean evaluate(FieldManager fieldManager);
+public interface Clause {
+	boolean evaluate(FieldManager fieldManager, IndentPrinter printer);
 }

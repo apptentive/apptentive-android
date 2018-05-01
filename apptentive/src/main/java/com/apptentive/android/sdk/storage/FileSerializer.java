@@ -6,12 +6,15 @@
 
 package com.apptentive.android.sdk.storage;
 
+import android.support.v4.util.AtomicFile;
+
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
@@ -29,7 +32,18 @@ public class FileSerializer implements Serializer {
 	@Override
 	public void serialize(Object object) throws SerializerException {
 		file.getParentFile().mkdirs();
-		serialize(file, object);
+
+		AtomicFile atomicFile = new AtomicFile(file);
+		FileOutputStream stream = null;
+		try {
+			stream = atomicFile.startWrite();
+			serialize(stream, object);
+			atomicFile.finishWrite(stream);
+		} catch (Exception e) {
+			atomicFile.failWrite(stream);
+			throw new SerializerException(e);
+		}
+
 	}
 
 	@Override
@@ -37,20 +51,14 @@ public class FileSerializer implements Serializer {
 		return deserialize(file);
 	}
 
-	protected void serialize(File file, Object object) throws SerializerException {
-		ByteArrayOutputStream bos;
+	protected void serialize(FileOutputStream stream, Object object) throws Exception {
 		ObjectOutputStream oos = null;
-		FileOutputStream fos = null;
 		try {
-			bos = new ByteArrayOutputStream();
+			ByteArrayOutputStream bos = new ByteArrayOutputStream();
 			oos = new ObjectOutputStream(bos);
 			oos.writeObject(object);
-			fos = new FileOutputStream(file);
-			fos.write(bos.toByteArray());
-		} catch (Exception e) {
-			throw new SerializerException(e);
+			stream.write(bos.toByteArray());
 		} finally {
-			Util.ensureClosed(fos);
 			Util.ensureClosed(oos);
 		}
 	}

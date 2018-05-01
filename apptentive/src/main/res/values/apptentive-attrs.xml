@@ -83,6 +83,9 @@
         <attr name="apptentiveSurveySentToastStyle" format="reference"/>
 
         <attr name="apptentiveTextColorPrimary" format="reference|color"/>
+
+        <attr name="apptentiveInteractionNotificationSmallIcon" format="reference"/>
+        <attr name="apptentiveInteractionNotificationColor" format="color|reference"/>
     </declare-styleable>
 
     <declare-styleable name="ApptentiveMaterialDeterminateProgressBar">

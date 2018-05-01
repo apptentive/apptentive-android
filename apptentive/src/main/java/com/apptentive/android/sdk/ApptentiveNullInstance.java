@@ -58,6 +58,11 @@ class ApptentiveNullInstance implements ApptentiveInstance {
 	}
 
 	@Override
+	public void onActivityStopped(Activity activity) {
+		failMethodCall("onActivityStopped");
+	}
+
+	@Override
 	public void onAppEnterForeground() {
 		failMethodCall("onAppEnterForeground");
 	}

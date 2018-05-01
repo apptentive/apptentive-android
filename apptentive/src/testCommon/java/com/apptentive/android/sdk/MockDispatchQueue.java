@@ -6,8 +6,6 @@
 
 package com.apptentive.android.sdk.util.threading;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
 import java.util.LinkedList;
 import java.util.Queue;
 

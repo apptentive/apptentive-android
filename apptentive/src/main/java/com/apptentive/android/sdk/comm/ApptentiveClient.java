@@ -19,7 +19,7 @@ public class ApptentiveClient {
 	private static final String USER_AGENT_STRING = "Apptentive/%s (Android)"; // Format with SDK version string.
 
 	public static String getUserAgentString() {
-		return String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION);
+		return String.format(USER_AGENT_STRING, Constants.getApptentiveSdkVersion());
 	}
 
 	/**

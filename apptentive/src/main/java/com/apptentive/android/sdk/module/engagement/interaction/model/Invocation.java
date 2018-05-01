@@ -34,12 +34,12 @@ public class Invocation extends JSONObject {
 		return null;
 	}
 
-	public boolean isCriteriaMet(FieldManager fieldManager) {
+	public boolean isCriteriaMet(FieldManager fieldManager, boolean verbose) {
 		try {
 			if (!isNull(KEY_CRITERIA)) {
 				JSONObject criteriaObject = getJSONObject(KEY_CRITERIA);
 				InteractionCriteria criteria = new InteractionCriteria(criteriaObject.toString());
-				return criteria.isMet(fieldManager);
+				return criteria.isMet(fieldManager, verbose);
 			}
 		} catch (JSONException e) {
 			// Ignore

@@ -103,71 +103,71 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 					switch (buttonAction.getType()) {
 						case dismiss:
 							button.setOnClickListener(guarded(new View.OnClickListener() {
-												@Override
-												public void onClick(View view) {
-													JSONObject data = new JSONObject();
-													try {
-														data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
-														data.put(Action.KEY_LABEL, buttonAction.getLabel());
-														data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
-													} catch (JSONException e) {
-														ApptentiveLog.e(e, "Error creating Event data object.");
-													}
-													engageInternal(TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
-													transit();
-												}
-											}));
+								@Override
+								public void onClick(View view) {
+									JSONObject data = new JSONObject();
+									try {
+										data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
+										data.put(Action.KEY_LABEL, buttonAction.getLabel());
+										data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
+									} catch (JSONException e) {
+										ApptentiveLog.e(e, "Error creating Event data object.");
+									}
+									engageInternal(TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
+									transit();
+								}
+							}));
 							break;
 						case interaction:
 							button.setActivated(true);
 							button.setOnClickListener(guarded(new View.OnClickListener() {
-												@Override
-												public void onClick(View view) {
-													LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
-													List<Invocation> invocations = launchInteractionButton.getInvocations();
-													String interactionIdToLaunch = null;
-													for (Invocation invocation : invocations) {
-														FieldManager fieldManager = new FieldManager(getContext(), getConversation().getVersionHistory(), getConversation().getEventData(), getConversation().getPerson(), getConversation().getDevice(), getConversation().getAppRelease());
-														if (invocation.isCriteriaMet(fieldManager)) {
-															interactionIdToLaunch = invocation.getInteractionId();
-															break;
-														}
-													}
+								@Override
+								public void onClick(View view) {
+									LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
+									List<Invocation> invocations = launchInteractionButton.getInvocations();
+									String interactionIdToLaunch = null;
+									for (Invocation invocation : invocations) {
+										FieldManager fieldManager = new FieldManager(getContext(), getConversation().getVersionHistory(), getConversation().getEventData(), getConversation().getPerson(), getConversation().getDevice(), getConversation().getAppRelease());
+										if (invocation.isCriteriaMet(fieldManager, false)) { // TODO: should we print details here as well?
+											interactionIdToLaunch = invocation.getInteractionId();
+											break;
+										}
+									}
 
-													Interaction invokedInteraction = null;
-													if (interactionIdToLaunch != null) {
-														ConversationProxy conversation = getConversation();
-														if (conversation != null) {
-															String interactionsString = conversation.getInteractions();
-															if (interactionsString != null) {
-																try {
-																	Interactions interactions = new Interactions(interactionsString);
-																	invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
-																}catch (JSONException e) {
-																	// Should never happen.
-																}
-															}
-														}
-													}
-
-													JSONObject data = new JSONObject();
-													try {
-														data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
-														data.put(Action.KEY_LABEL, buttonAction.getLabel());
-														data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
-														data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
-													} catch (JSONException e) {
-														ApptentiveLog.e(e, "Error creating Event data object.");
-													}
-
-													engageInternal(TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
-													if (invokedInteraction != null) {
-														EngagementModule.launchInteraction(getActivity(), invokedInteraction);
-													}
-													transit();
-
+									Interaction invokedInteraction = null;
+									if (interactionIdToLaunch != null) {
+										ConversationProxy conversation = getConversation();
+										if (conversation != null) {
+											String interactionsString = conversation.getInteractions();
+											if (interactionsString != null) {
+												try {
+													Interactions interactions = new Interactions(interactionsString);
+													invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
+												}catch (JSONException e) {
+													// Should never happen.
 												}
-											}));
+											}
+										}
+									}
+
+									JSONObject data = new JSONObject();
+									try {
+										data.put(TextModalInteraction.EVENT_KEY_ACTION_ID, buttonAction.getId());
+										data.put(Action.KEY_LABEL, buttonAction.getLabel());
+										data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
+										data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
+									} catch (JSONException e) {
+										ApptentiveLog.e(e, "Error creating Event data object.");
+									}
+
+									engageInternal(TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
+									if (invokedInteraction != null) {
+										EngagementModule.launchInteraction(getActivity(), invokedInteraction);
+									}
+									transit();
+
+								}
+							}));
 							break;
 					}
 					bottomArea.addView(button);

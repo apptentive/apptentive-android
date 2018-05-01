@@ -21,6 +21,7 @@ import java.util.Map;
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.isConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 
 /**
  * @author Sky Kelsey.
@@ -50,7 +51,7 @@ public class MetricModule {
 
 		Configuration config = Configuration.load();
 		if (config.isMetricsEnabled()) {
-			ApptentiveLog.v("Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
+			ApptentiveLog.v(UTIL, "Sending Metric: %s, trigger: %s, data: %s", type.getLabelName(), trigger, data != null ? data.toString() : "null");
 			EventPayload event = new EventPayload(type.getLabelName(), trigger);
 			event.putData(data);
 			sendEvent(event);
@@ -93,14 +94,14 @@ public class MetricModule {
 			}
 			Configuration config = Configuration.load();
 			if (config.isMetricsEnabled()) {
-				ApptentiveLog.v("Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
+				ApptentiveLog.v(UTIL, "Sending Error Metric: %s, data: %s", type.getLabelName(), data.toString());
 				EventPayload event = new EventPayload(type.getLabelName(), data);
 				sendEvent(event);
 			}
 		} catch (Exception e) {
 			// Since this is the last place in Apptentive code we can catch exceptions, we must catch all other Exceptions to
 			// prevent the app from crashing.
-			ApptentiveLog.w(e, "Error creating Error Metric. Nothing we can do but log this.");
+			ApptentiveLog.w(UTIL, e, "Error creating Error Metric. Nothing we can do but log this.");
 		}
 	}
 
@@ -111,7 +112,7 @@ public class MetricModule {
 		if (conversation != null) {
 			conversation.addPayload(event);
 		} else {
-			ApptentiveLog.w("Unable to send event '%s': no active conversation", event);
+			ApptentiveLog.w(UTIL, "Unable to send event '%s': no active conversation", event);
 		}
 	}
 }

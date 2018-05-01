@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.notifications;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.ObjectUtils;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -97,12 +98,11 @@ public class ApptentiveNotificationCenter {
 	 * Creates a notification with a given name and user info and posts it to the receiver.
 	 */
 	public synchronized void postNotification(final String name, final Map<String, Object> userInfo) {
-		final ApptentiveNotification notification = new ApptentiveNotification(name, userInfo);
-		ApptentiveLog.v(NOTIFICATIONS, "Post notification: %s", notification);
+		ApptentiveLog.v(NOTIFICATIONS, "Post notification: name=%s userInfo={%s}", name, StringUtils.toString(userInfo));
 
-		final ApptentiveNotificationObserverList list = findObserverList(notification.getName());
+		final ApptentiveNotificationObserverList list = findObserverList(name);
 		if (list != null) {
-			list.notifyObservers(notification);
+			list.notifyObservers(new ApptentiveNotification(name, userInfo));
 		}
 	}
 

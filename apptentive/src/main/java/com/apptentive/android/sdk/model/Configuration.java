@@ -18,11 +18,15 @@ import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+
 /**
  * @author Sky Kelsey
  */
+// TODO: get rid of JSONObject
 public class Configuration extends JSONObject {
 	private static final String KEY_METRICS_ENABLED = "metrics_enabled";
+	private static final String KEY_COLLECT_AD_ID = "collect_ad_id";
 	private static final String KEY_APP_DISPLAY_NAME = "app_display_name";
 	private static final String KEY_MESSAGE_CENTER = "message_center";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
@@ -36,6 +40,8 @@ public class Configuration extends JSONObject {
 	// This one is not sent in JSON, but as a header form the server.
 	private static final String KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS = "configuration_cache_expiration_millis";
 
+	// Store the last configuration object to avoid json parsing and disk IO
+	private static Configuration cachedConfiguration;
 
 	public Configuration() {
 		super();
@@ -48,11 +54,16 @@ public class Configuration extends JSONObject {
 	public void save() {
 		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		prefs.edit().putString(Constants.PREF_KEY_APP_CONFIG_JSON, toString()).apply();
+		cachedConfiguration = this;
 	}
 
 	public static Configuration load() {
-		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
-		return Configuration.load(prefs);
+		if (cachedConfiguration == null) {
+			SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+			cachedConfiguration = Configuration.load(prefs);
+		}
+
+		return cachedConfiguration;
 	}
 
 	public static Configuration load(SharedPreferences prefs) {
@@ -68,14 +79,11 @@ public class Configuration extends JSONObject {
 	}
 
 	public boolean isMetricsEnabled() {
-		try {
-			if (!isNull(KEY_METRICS_ENABLED)) {
-				return getBoolean(KEY_METRICS_ENABLED);
-			}
-		} catch (JSONException e) {
-			// Ignore
-		}
-		return true;
+		return getBoolean(KEY_METRICS_ENABLED, true);
+	}
+
+	public boolean isCollectingAdID() {
+		return getBoolean(KEY_COLLECT_AD_ID, false);
 	}
 
 	public String getAppDisplayName() {
@@ -129,15 +137,7 @@ public class Configuration extends JSONObject {
 	}
 
 	public boolean isMessageCenterEnabled() {
-		try {
-			if (!isNull(KEY_MESSAGE_CENTER_ENABLED)) {
-				return getBoolean(KEY_MESSAGE_CENTER_ENABLED);
-			}
-		} catch (JSONException e) {
-			// Move on.
-		}
-
-		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED;
+		return getBoolean(KEY_MESSAGE_CENTER_ENABLED, Constants.CONFIG_DEFAULT_MESSAGE_CENTER_ENABLED);
 	}
 
 	public boolean isMessageCenterNotificationPopupEnabled() {
@@ -167,7 +167,7 @@ public class Configuration extends JSONObject {
 			Bundle metaData = ai.metaData;
 			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
+			ApptentiveLog.w(CONVERSATION, e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
@@ -188,11 +188,24 @@ public class Configuration extends JSONObject {
 		try {
 			put(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS, configurationCacheExpirationMillis);
 		} catch (JSONException e) {
-			ApptentiveLog.w("Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+			ApptentiveLog.w(CONVERSATION, "Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 		}
 	}
 
 	public boolean hasConfigurationCacheExpired() {
 		return getConfigurationCacheExpirationMillis() < System.currentTimeMillis();
 	}
+
+	//region Helpers
+
+	private boolean getBoolean(String key, boolean defaultValue) {
+		try {
+			return optBoolean(key, defaultValue);
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while getting boolean key '%s'", key);
+			return defaultValue;
+		}
+	}
+
+	//endregion
 }

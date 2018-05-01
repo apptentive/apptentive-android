@@ -10,8 +10,10 @@ import android.content.Context;
 import android.os.Build;
 import android.telephony.TelephonyManager;
 
-import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.DevicePayload;
+import com.apptentive.android.sdk.util.AdvertiserManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
@@ -22,7 +24,6 @@ import java.util.TimeZone;
  * A helper class with static methods for and diffing information about the current device.
  */
 public class DeviceManager {
-
 	public static Device generateNewDevice(Context context) {
 		Device device = new Device();
 
@@ -41,6 +42,21 @@ public class DeviceManager {
 		device.setUuid(Util.getAndroidId(context));
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
+
+		// advertiser id
+		try {
+			Configuration configuration = Configuration.load();
+			if (configuration.isCollectingAdID()) {
+				AdvertiserManager.AdvertisingIdClientInfo info = AdvertiserManager.getAdvertisingIdClientInfo();
+				if (info != null && !info.isLimitAdTrackingEnabled()) {
+					device.setAdvertiserId(info.getId());
+				} else {
+					ApptentiveLog.w("Advertising ID tracking is not available or limited");
+				}
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while collecting advertising ID");
+		}
 
 		// Second, set the stuff that requires querying system services.
 		TelephonyManager tm = ((TelephonyManager) (context.getSystemService(Context.TELEPHONY_SERVICE)));
@@ -190,6 +206,11 @@ public class DeviceManager {
 
 		if (oldDevice == null || !equal(oldDevice.getUtcOffset(), newDevice.getUtcOffset())) {
 			ret.setUtcOffset(newDevice.getUtcOffset());
+			changed = true;
+		}
+
+		if (oldDevice == null || !equal(oldDevice.getAdvertiserId(), newDevice.getAdvertiserId())) {
+			ret.setAdvertiserId(newDevice.getAdvertiserId());
 			changed = true;
 		}
 

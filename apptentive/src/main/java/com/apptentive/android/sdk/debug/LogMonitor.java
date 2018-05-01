@@ -6,218 +6,160 @@
 
 package com.apptentive.android.sdk.debug;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
-import android.content.SharedPreferences;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Build;
-import android.util.Log;
+import android.support.annotation.Nullable;
+import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
-import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
+import com.apptentive.android.sdk.network.HttpJsonRequest;
+import com.apptentive.android.sdk.network.HttpRequest;
+import com.apptentive.android.sdk.network.HttpRequestManager;
+import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.network.HttpRequestRetryPolicy;
+import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.Destroyable;
-import com.apptentive.android.sdk.util.Jwt;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.lang.ref.WeakReference;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_LOG_MONITOR_STARTED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_LOG_MONITOR_STOPPED;
+import static com.apptentive.android.sdk.ApptentiveHelper.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.comm.ApptentiveHttpClient.USER_AGENT_STRING;
 
-public class LogMonitor implements Destroyable {
-
-	// TODO: Replace with a better unique number
-	public static final int NOTIFICATION_ID = 1;
-
-	private static final String TAG = "LogMonitor";
-
-	private static final String PREFS_NAME = "com.apptentive.debug";
-	private static final String PREFS_KEY_EMAIL_RECIPIENTS = "com.apptentive.debug.EmailRecipients";
-	private static final String PREFS_KEY_LOG_LEVEL = "com.apptentive.debug.LogLevel";
-	private static final String PREFS_KEY_FILTER_PID = "com.apptentive.debug.FilterPID";
-
+public final class LogMonitor {
+	/**
+	 * Text prefix for a valid access token
+	 */
 	private static final String DEBUG_TEXT_HEADER = "com.apptentive.debug:";
 
-	private static LogMonitor instance;
-
-	private final WeakReference<Context> contextRef;
-	private final ApptentiveLog.Level logLevel;
-	private final String[] emailRecipients;
-
-	private final LogWriter logWriter;
-
-	private ApptentiveLog.Level oldLogLevel;
-
-	private LogMonitor(Context context, Configuration configuration) {
-		if (context == null) {
-			throw new IllegalArgumentException("Context is null");
-		}
-		if (configuration == null) {
-			throw new IllegalArgumentException("Configuration is null");
-		}
-
-		this.contextRef = new WeakReference<>(context);
-		this.logLevel = configuration.logLevel;
-		this.emailRecipients = configuration.emailRecipients;
-		this.logWriter = new LogWriter(getLogFile(context), configuration.restored, configuration.filterByPID);
-	}
-
-	//region Initialization
+	/**
+	 * Access token verification request tag
+	 */
+	private static final String TAG_VERIFICATION_REQUEST = "VERIFICATION_REQUEST";
 
 	/**
-	 * Attempts to initialize an instance. Returns <code>true</code> if succeed.
+	 * Holds current session instance (if any).
+	 * NOTE: This field should only be accessed on the conversation queue.
 	 */
-	public static boolean tryInitialize(Context context, String apptentiveApiKey, String apptentiveApiSignature) {
-		if (instance != null) {
-			ApptentiveLog.i("Log Monitor already initialized");
-			return false;
-		}
+	private static @Nullable LogMonitorSession currentSession;
 
-		try {
-			Configuration configuration = readConfigurationFromPersistentStorage(context);
-			if (configuration != null) {
-				ApptentiveLog.i("Read log monitor configuration from persistent storage: " + configuration);
-			} else {
-				String accessToken = readAccessTokenFromClipboard(context);
-
-				// No access token was supplied
-				if (accessToken == null) {
-					return false;
-				}
-
-				// The access token was invalid, or expired, or the server could be reached to verify it
-				if (!syncVerifyAccessToken(apptentiveApiKey, apptentiveApiSignature, accessToken)) {
-					ApptentiveLog.i("Can't start log monitor: access token verification failed");
-					return false;
-				}
-
-				configuration = readConfigurationFromToken(accessToken);
-				if (configuration != null) {
-					ApptentiveLog.i("Read log monitor configuration from clipboard: " + configuration);
-					Util.setClipboardText(context, ""); // clear the clipboard contents after the data is parsed
-
-					// store the configuration to make sure we can resume the current session
-					saveConfigurationFromPersistentStorage(context, configuration);
-				}
-			}
-
-			if (configuration != null) {
-				ApptentiveLog.i("Entering Apptentive Troubleshooting mode.");
-				instance = new LogMonitor(context, configuration);
-				instance.start(context);
-				return true;
-			}
-
-		} catch (Exception e) {
-			ApptentiveLog.i("Exception while initializing Apptentive Log Monitor", e);
-		}
-
-		return false;
+	// no instancing or subclassing
+	private LogMonitor() {
 	}
 
-	private static Configuration readConfigurationFromToken(String accessToken) {
-		try {
-			final Jwt jwt = Jwt.decode(accessToken);
-			JSONObject payload = jwt.getPayload();
-
-			Configuration config = new Configuration();
-
-			// log level
-			String logLevelStr = payload.optString("level");
-			if (!StringUtils.isNullOrEmpty(logLevelStr)) {
-				config.logLevel = ApptentiveLog.Level.parse(logLevelStr);
-			}
-
-			// recipients
-			JSONArray recipientsJson = payload.optJSONArray("recipients");
-			if (recipientsJson != null) {
-				String[] recipients = new String[recipientsJson.length()];
-				for (int i = 0; i < recipientsJson.length(); ++i) {
-					recipients[i] = recipientsJson.optString(i);
-				}
-
-				config.emailRecipients = recipients;
-			}
-
-			// should we filter by PID
-			config.filterByPID = payload.optBoolean("filter_app_process", config.filterByPID);
-
-			return config;
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while parsing access token: '%s'", accessToken);
-			return null;
-		}
-	}
+	//region Session
 
 	/**
-	 * Attempts to read a log monitor configuration stored in the last session. Returns <code>null</code> if failed
+	 * Attempts to start a new troubleshooting session. First the SDK will check if there is
+	 * an existing session stored in the persistent storage and then check if the clipboard
+	 * contains a valid access token.
+	 * This call is async and returns immediately.
 	 */
-	private static Configuration readConfigurationFromPersistentStorage(Context context) {
-		if (context == null) {
-			throw new IllegalArgumentException("Context is null");
-		}
-		SharedPreferences prefs = getPrefs(context);
-		if (!prefs.contains(PREFS_KEY_EMAIL_RECIPIENTS)) {
-			return null;
-		}
-
-		Configuration configuration = new Configuration();
-		configuration.restored = true;
-
-		String emailRecipients = prefs.getString(PREFS_KEY_EMAIL_RECIPIENTS, null);
-		if (!StringUtils.isNullOrEmpty(emailRecipients)) {
-			configuration.emailRecipients = emailRecipients.split(",");
-		}
-
-		String logLevel = prefs.getString(PREFS_KEY_LOG_LEVEL, null);
-		if (!StringUtils.isNullOrEmpty(logLevel)) {
-			configuration.logLevel = ApptentiveLog.Level.parse(logLevel);
-		}
-
-		configuration.filterByPID = prefs.getBoolean(PREFS_KEY_FILTER_PID, configuration.filterByPID);
-
-		return configuration;
+	public static void startSession(final Context context, final String appKey, final String appSignature) {
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				try {
+					startSessionGuarded(context, appKey, appSignature);
+				} catch (Exception e) {
+					ApptentiveLog.e(TROUBLESHOOT, e, "Unable to start Apptentive Log Monitor");
+				}
+			}
+		});
 	}
 
-	/** Saves the configuration into SharedPreferences */
-	private static void saveConfigurationFromPersistentStorage(Context context, Configuration configuration) {
-		SharedPreferences prefs = getPrefs(context);
-		SharedPreferences.Editor editor = prefs.edit();
-		editor.putString(PREFS_KEY_EMAIL_RECIPIENTS, StringUtils.join(configuration.emailRecipients));
-		editor.putString(PREFS_KEY_LOG_LEVEL, configuration.logLevel.toString());
-		editor.putBoolean(PREFS_KEY_FILTER_PID, configuration.filterByPID);
-		editor.apply();
+	private static void startSessionGuarded(final Context context, String appKey, String appSignature) {
+		checkConversationQueue();
+
+		// check if another session is currently active
+		if (currentSession != null) {
+			return;
+		}
+
+		// attempt to load an existing session
+		final LogMonitorSession existingSession = LogMonitorSessionIO.readCurrentSession(context);
+		if (existingSession != null) {
+			ApptentiveLog.i(TROUBLESHOOT, "Previous Apptentive Log Monitor session loaded from persistent storage: %s", existingSession);
+			startSession(context, existingSession);
+			return;
+		}
+
+		// attempt to create a new session based on the clipboard content
+		final String accessToken = readAccessTokenFromClipboard(context);
+
+		// no access token was found
+		if (accessToken == null) {
+			ApptentiveLog.v(TROUBLESHOOT, "No access token found in clipboard");
+			return;
+		}
+
+		// clear the clipboard
+		Util.setClipboardText(context, ""); // clear the clipboard contents after the data is parsed
+
+		// check if access token
+		HttpRequest existingRequest = HttpRequestManager.sharedManager().findRequest(TAG_VERIFICATION_REQUEST);
+		if (existingRequest != null) {
+			ApptentiveLog.v(TROUBLESHOOT, "Another access token verification request is running");
+			return;
+		}
+
+		// create and send a token verification request
+		HttpRequest verificationRequest = createTokenVerificationRequest(appKey, appSignature, accessToken, new HttpRequest.Adapter<HttpJsonRequest>() {
+			@Override
+			public void onFinish(HttpJsonRequest request) {
+				checkConversationQueue();
+
+				JSONObject response = request.getResponseObject();
+				boolean tokenValid = response.optBoolean("valid", false);
+				if (!tokenValid) {
+					ApptentiveLog.w(TROUBLESHOOT, "Unable to start Apptentive Log Monitor: the access token was rejected on the server (%s)", accessToken);
+					Util.showToast(context, "Token rejected", Toast.LENGTH_LONG);
+					return;
+				}
+
+				LogMonitorSession session = LogMonitorSessionIO.readSessionFromJWT(accessToken);
+				if (session == null) {
+					ApptentiveLog.w(TROUBLESHOOT, "Unable to start Apptentive Log Monitor: failed to parse the access token (%s)", accessToken);
+					Util.showToast(context, "Token invalid", Toast.LENGTH_LONG);
+					return;
+				}
+
+				// store the current session to make sure we can resume log monitoring on the next application start
+				LogMonitorSessionIO.saveCurrentSession(context, session);
+
+				// start the session
+				startSession(context, session);
+			}
+
+			@Override
+			public void onFail(HttpJsonRequest request, String reason) {
+				ApptentiveLog.e(TROUBLESHOOT, "Unable to start Apptentive Log Monitor: failed to verify the access token (%s)\n%s", accessToken, reason);
+				Util.showToast(context, "Can't verify token", Toast.LENGTH_LONG);
+			}
+		});
+		verificationRequest.setCallbackQueue(conversationQueue());
+		verificationRequest.start();
 	}
 
-	private static void deleteConfigurationFromPersistentStorage(Context context) {
-		SharedPreferences.Editor editor = getPrefs(context).edit();
-		editor.remove(PREFS_KEY_EMAIL_RECIPIENTS);
-		editor.remove(PREFS_KEY_LOG_LEVEL);
-		editor.remove(PREFS_KEY_FILTER_PID);
-		editor.apply();
+	private static void startSession(Context context, LogMonitorSession session) {
+		currentSession = session;
+		session.start(context);
+	}
+
+	static void stopSession(final Context context) {
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				if (currentSession != null) {
+					currentSession.stop();
+					currentSession = null;
+				}
+				LogMonitorSessionIO.deleteCurrentSession(context);
+			}
+		});
 	}
 
 	//endregion
@@ -227,7 +169,7 @@ public class LogMonitor implements Destroyable {
 	/**
 	 * Attempts to read access token from the clipboard
 	 */
-	private static String readAccessTokenFromClipboard(Context context) {
+	private static @Nullable String readAccessTokenFromClipboard(Context context) {
 		String text = Util.getClipboardText(context);
 
 		if (StringUtils.isNullOrEmpty(text)) {
@@ -242,292 +184,50 @@ public class LogMonitor implements Destroyable {
 		}
 
 		// Remove the header
-		text = text.substring(DEBUG_TEXT_HEADER.length());
-		return text;
-	}
-
-	/**
-	 * Send a sync URL request to the backend to verify the access token. This method would block
-	 */
-	private static boolean syncVerifyAccessToken(String apptentiveApiKey, String apptentiveApiSignature, String accessToken) {
-		return verifyToken(apptentiveApiKey, apptentiveApiSignature, accessToken);
-	}
-
-	//endregion
-
-	//region Lifecycle
-
-	private void start(Context context) {
-		Log.i(TAG, "Overriding log level: " + logLevel);
-		oldLogLevel = ApptentiveLog.getLogLevel();
-		ApptentiveLog.overrideLogLevel(logLevel);
-
-		showDebugNotification(context);
-
-		logWriter.start();
-
-		// post a notification
-		ApptentiveNotificationCenter.defaultCenter()
-				.postNotification(NOTIFICATION_LOG_MONITOR_STARTED);
-	}
-
-	public void stopWritingLogs() {
-		try {
-			logWriter.stopAndWait();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
-
-		// post a notification
-		ApptentiveNotificationCenter.defaultCenter()
-				.postNotification(NOTIFICATION_LOG_MONITOR_STOPPED);
-	}
-
-	private void showDebugNotification(Context context) {
-		NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-		Notification notification = new TroubleshootingNotification().buildNotification(context, getSubject(context), getSystemInfo(context), getLogFile(context), getManifestFile(context), emailRecipients);
-		notificationManager.notify(NOTIFICATION_ID, notification);
-	}
-
-	private String getSubject(Context context) {
-		String subject = String.format("%s (Android)", context.getPackageName());
-		try {
-			ApplicationInfo ai = context.getApplicationInfo();
-			subject = String.format("%s (Android)", ai.loadLabel(context.getPackageManager()).toString());
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Unable to load troubleshooting email status line");
-		}
-		return subject;
-	}
-
-	private String getSystemInfo(Context context) {
-		String versionName = "";
-		int versionCode = -1;
-		try {
-			PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
-			// TODO: list activities, permissions, etc
-			versionName = packageInfo.versionName;
-			versionCode = packageInfo.versionCode;
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
-		}
-
-		Object[] info = {
-				"App Package Name", context.getPackageName(),
-				"App Version Name", versionName,
-				"App Version Code", versionCode,
-				"Apptentive SDK", com.apptentive.android.sdk.util.Constants.APPTENTIVE_SDK_VERSION,
-				"Device Model", Build.MODEL,
-				"Android OS Version", Build.VERSION.RELEASE,
-				"Android OS API Level", Build.VERSION.SDK_INT,
-				"Locale", Locale.getDefault().getDisplayName()
-		};
-
-		StringBuilder result = new StringBuilder();
-		result.append("This email may contain sensitive content. Please review before sending.\n\n");
-		for (int i = 0; i < info.length; i += 2) {
-			if (result.length() > 0) {
-				result.append("\n");
-			}
-			result.append(info[i]);
-			result.append(": ");
-			result.append(info[i + 1]);
-		}
-		return result.toString();
-	}
-
-	//endregion
-
-	//region Destroyable
-
-	@Override
-	public void destroy() {
-		// restoring old log level
-		if (oldLogLevel != null) {
-			ApptentiveLog.overrideLogLevel(oldLogLevel);
-		}
-
-		Context context = getContext();
-		if (context != null) {
-			// deleting saved session
-			deleteConfigurationFromPersistentStorage(context);
-			instance = null;
-		} else {
-			Log.e(TAG, "Unable to destroy session: context is lost");
-		}
-	}
-
-	//endregion
-
-	//region Helpers
-
-	private static SharedPreferences getPrefs(Context context) {
-		return context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-	}
-
-	private static File getLogFile(Context context) {
-		return new File(context.getCacheDir(), Constants.FILE_APPTENTIVE_LOG_FILE);
-	}
-
-	private static File getManifestFile(Context context) {
-		return new File(context.getCacheDir(), Constants.FILE_APPTENTIVE_ENGAGEMENT_MANIFEST);
-	}
-
-	//endregion
-
-	//region Getters/Setters
-
-	public static LogMonitor sharedInstance() {
-		return instance;
-	}
-
-	private Context getContext() {
-		return contextRef.get();
-	}
-
-	//endregion
-
-	//region Configuration
-
-	private static class Configuration {
-		/** Email recipients for the log email */
-		String[] emailRecipients = { "support@apptentive.com" };
-
-		/** New log level */
-		ApptentiveLog.Level logLevel = ApptentiveLog.Level.VERY_VERBOSE;
-
-		/** True if logcat output should be filtered by the process id */
-		boolean filterByPID = true;
-
-		/** True if configuration was restored from the persistent storage */
-		boolean restored;
-
-		@Override
-		public String toString() {
-			return String.format("logLevel=%s recipients=%s filterPID=%s restored=%s",
-					logLevel, Arrays.toString(emailRecipients), Boolean.toString(filterByPID),
-					Boolean.toString(restored));
-		}
+		return text.substring(DEBUG_TEXT_HEADER.length());
 	}
 
 	//endregion
 
 	//region Token Verification
 
-	private static boolean verifyToken(String apptentiveAppKey, String apptentiveAppSignature, String token) {
-
-		final Map<String, String> headers = new HashMap<>();
-		headers.put("X-API-Version", String.valueOf(Constants.API_VERSION));
-		headers.put("APPTENTIVE-KEY", apptentiveAppKey);
-		headers.put("APPTENTIVE-SIGNATURE", apptentiveAppSignature);
-		headers.put("Content-Type", "application/json");
-		headers.put("Accept", "application/json");
-		headers.put("User-Agent", String.format(USER_AGENT_STRING, Constants.APPTENTIVE_SDK_VERSION));
-
-		JSONObject postBodyJson;
-		try {
-			postBodyJson = new JSONObject();
-			postBodyJson.put("debug_token", token);
-		} catch (JSONException e) {
-			// Can't happen
-			throw new RuntimeException(e);
-		}
-
-		String response = loadFromURL(Constants.CONFIG_DEFAULT_SERVER_URL + "/debug_token/verify", headers, postBodyJson.toString());
-		if (!StringUtils.isNullOrEmpty(response)) {
-			try {
-				JSONObject debugTokenResponse = new JSONObject(response);
-				if (!debugTokenResponse.isNull("valid")) {
-					return debugTokenResponse.optBoolean("valid", false);
-				}
-				ApptentiveLog.e("Debug token response was missing \"valid\" field.");
-			} catch (Exception e) {
-				ApptentiveLog.e("Error parsing debug token validation response.");
-				return false;
-			}
-			return true;
-		}
-		return false;
+	private static HttpRequest createTokenVerificationRequest(String apptentiveAppKey, String apptentiveAppSignature, String token, HttpRequest.Listener<HttpJsonRequest> listener) {
+		// TODO: move this logic to ApptentiveHttpClient
+		String URL = Constants.CONFIG_DEFAULT_SERVER_URL + "/debug_token/verify";
+		HttpRequest request = new HttpJsonRequest(URL, createVerityRequestObject(token));
+		request.setTag(TAG_VERIFICATION_REQUEST);
+		request.setMethod(HttpRequestMethod.POST);
+		request.setRequestManager(HttpRequestManager.sharedManager());
+		request.setRequestProperty("X-API-Version", Constants.API_VERSION);
+		request.setRequestProperty("APPTENTIVE-KEY", apptentiveAppKey);
+		request.setRequestProperty("APPTENTIVE-SIGNATURE", apptentiveAppSignature);
+		request.setRequestProperty("Content-Type", "application/json");
+		request.setRequestProperty("Accept", "application/json");
+		request.setRequestProperty("User-Agent", String.format(USER_AGENT_STRING, Constants.getApptentiveSdkVersion()));
+		request.setRetryPolicy(createVerityRequestRetryPolicy());
+		request.addListener(listener);
+		return request;
 	}
 
-	private static String loadFromURL(final String urlString, final Map<String, String> headers, final String body) {
-		final StringBuilder responseString = new StringBuilder();
-		Thread networkThread = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				try {
-					loadFromURL(urlString, headers, responseString);
-				} catch (Exception e) {
-					ApptentiveLog.e("Error performing debug token validation request: %s", e.getMessage());
-				}
-			}
-
-			private void loadFromURL(String urlString, Map<String, String> headers, StringBuilder responseString) throws IOException {
-				ApptentiveLog.i("Performing debug token verification request: \"%s\"", body);
-				URL url = new URL(urlString);
-				BufferedReader reader = null;
-				try {
-					HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-					connection.setRequestMethod("POST");
-					connection.setConnectTimeout(ApptentiveHttpClient.DEFAULT_HTTP_CONNECT_TIMEOUT);
-					connection.setReadTimeout(ApptentiveHttpClient.DEFAULT_HTTP_SOCKET_TIMEOUT);
-
-					for (String key : headers.keySet()) {
-						connection.setRequestProperty(key, headers.get(key));
-					}
-
-					OutputStream outputStream = null;
-					try {
-						outputStream = connection.getOutputStream();
-						outputStream.write(body.getBytes());
-					} finally {
-						Util.ensureClosed(outputStream);
-					}
-
-					int responseCode = connection.getResponseCode();
-					ApptentiveLog.vv("Response code: %d", responseCode);
-
-					InputStream is;
-					StringBuilder buffer;
-					boolean successful;
-					// If successful, read the message into the response String. If not, read it into a buffer and throw it in an exception.
-					if (responseCode >= HttpURLConnection.HTTP_OK && responseCode < HttpURLConnection.HTTP_MULT_CHOICE) {
-						successful = true;
-						is = connection.getInputStream();
-						buffer = responseString;
-					} else {
-						successful = false;
-						is = connection.getErrorStream();
-						buffer = new StringBuilder();
-					}
-
-					reader = new BufferedReader(new InputStreamReader(is));
-					String line;
-					while ((line = reader.readLine()) != null) {
-						if (buffer.length() > 0) {
-							buffer.append('\n');
-						}
-						buffer.append(line);
-					}
-					ApptentiveLog.v("Debug Token verification response: %s", buffer);
-					if (!successful) {
-						throw new IOException(buffer.toString());
-					}
-				} finally {
-					Util.ensureClosed(reader);
-				}
-			}
-		});
-		networkThread.start();
+	private static JSONObject createVerityRequestObject(String token) {
 		try {
-			networkThread.join();
-		} catch (InterruptedException e) {
-			ApptentiveLog.e("Debug token validation thread interrupted.");
-			return null;
+			JSONObject postBodyJson = new JSONObject();
+			postBodyJson.put("debug_token", token);
+			return postBodyJson;
+		} catch (JSONException e) {
+			// should not happen but it's better to throw an exception
+			throw new IllegalArgumentException("Token is invalid:" + token, e);
 		}
-		return responseString.toString();
+	}
+
+	private static HttpRequestRetryPolicy createVerityRequestRetryPolicy() {
+		return new HttpRequestRetryPolicyDefault() {
+			@Override
+			public boolean shouldRetryRequest(int responseCode, int retryAttempt) {
+				return false; // fail fast: do not retry
+			}
+		};
 	}
 
 	//endregion
-
 }
