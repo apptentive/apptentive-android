@@ -59,7 +59,7 @@ import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTa
 
 public abstract class ApptentiveBaseFragment<T extends Interaction> extends DialogFragment implements InteractionManager.InteractionUpdateListener {
 
-	protected static final String EVENT_NAME_LAUNCH = "launch";
+	public static final String EVENT_NAME_LAUNCH = "launch";
 	private static final String HAS_LAUNCHED = "has_launched";
 
 	private final String fragmentName = getClass().getSimpleName();

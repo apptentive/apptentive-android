@@ -6,17 +6,9 @@
 
 package com.apptentive.android.sdk.model;
 
-import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
-
-import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.Util;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 
 /**
  * A combined payload of {@link SdkPayload} and {@link AppReleasePayload} payloads.
@@ -190,46 +182,6 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 
 	public void setDebug(boolean debug) {
 		put(KEY_DEBUG, debug);
-	}
-
-	public static AppReleasePayload generateCurrentAppRelease(Context context) {
-
-		AppReleasePayload appRelease = new AppReleasePayload();
-
-		String appPackageName = context.getPackageName();
-		PackageManager packageManager = context.getPackageManager();
-
-		int currentVersionCode = 0;
-		String currentVersionName = "0";
-		int targetSdkVersion = 0;
-		boolean isAppDebuggable = false;
-		try {
-			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
-			ApplicationInfo ai = packageInfo.applicationInfo;
-			currentVersionCode = packageInfo.versionCode;
-			currentVersionName = packageInfo.versionName;
-			targetSdkVersion = packageInfo.applicationInfo.targetSdkVersion;
-			Bundle metaData = ai.metaData;
-			if (metaData != null) {
-				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
-		}
-
-		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
-
-		appRelease.setType("android");
-		appRelease.setVersionName(currentVersionName);
-		appRelease.setIdentifier(appPackageName);
-		appRelease.setVersionCode(currentVersionCode);
-		appRelease.setTargetSdkVersion(String.valueOf(targetSdkVersion));
-		appRelease.setAppStore(Util.getInstallerPackageName(context));
-		appRelease.setInheritStyle(ApptentiveInternal.getInstance().isAppUsingAppCompatTheme());
-		appRelease.setOverrideStyle(themeOverrideResId != 0);
-		appRelease.setDebug(isAppDebuggable);
-
-		return appRelease;
 	}
 	//endregion
 }

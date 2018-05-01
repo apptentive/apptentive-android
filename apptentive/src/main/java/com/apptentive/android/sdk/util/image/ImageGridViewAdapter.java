@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.apptentive.android.sdk.util.Util.guarded;
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 
 
 public class ImageGridViewAdapter extends BaseAdapter {
@@ -485,7 +486,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 									}
 									image.setImageResource(R.drawable.apptentive_generic_file_thumbnail);
 									if (downloadItems.contains(data.originalPath)) {
-										ApptentiveLog.d("ApptentiveAttachmentLoader onLoaded callback");
+										ApptentiveLog.v(UTIL, "ApptentiveAttachmentLoader onLoaded callback");
 										downloadItems.remove(data.originalPath);
 										Util.openFileAttachment(view.getContext(), data.originalPath, data.localCachePath, data.mimeType);
 									}
@@ -519,7 +520,7 @@ public class ImageGridViewAdapter extends BaseAdapter {
 										} else if (progress >= 0) {
 											progressBarDownload.setVisibility(View.VISIBLE);
 											progressBarDownload.setProgress(progress);
-											ApptentiveLog.d("ApptentiveAttachmentLoader progress callback: " + progress);
+											ApptentiveLog.v(UTIL, "ApptentiveAttachmentLoader progress callback: " + progress);
 										}
 									}
 								}

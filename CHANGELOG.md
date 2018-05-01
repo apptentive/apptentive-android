@@ -1,3 +1,14 @@
+# 2018-05-01 - v5.1.0
+
+#### Major changes
+
+* Added support for notification-based interactions.
+
+#### Improvements
+
+* Better logging for interaction criteria evaluation.
+* Better troubleshooting support.
+
 # 2018-04-19 - v5.0.5
 
 #### Bugs Fixed

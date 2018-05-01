@@ -20,7 +20,7 @@ public class HttpRequestManagerTest extends TestCaseBase {
 	private MockDispatchQueue networkQueue;
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 
 		networkQueue = new MockDispatchQueue(false);

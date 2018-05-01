@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.tests.module.messagecenter;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
+import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -36,6 +37,7 @@ public class JsonObjectBindingTest extends ApptentiveTestCaseBase {
 	public void setUp() {
 		super.setUp();
 		ApptentiveInternal.setInstance(new ApptentiveInternal(targetContext));
+		ApptentiveLog.setShouldSanitizeLogMessages(false);
 	}
 
 	@Test

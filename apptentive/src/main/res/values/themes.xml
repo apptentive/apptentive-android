@@ -216,6 +216,9 @@
         <item name="windowActionModeOverlay">true</item>
 
         <item name="apptentiveCardElevation">2dp</item>
+
+        <item name="apptentiveInteractionNotificationSmallIcon">@drawable/apptentive_ic_stat_chat_bubble</item>
+        <item name="apptentiveInteractionNotificationColor">?attr/colorAccent</item>
     </style>
 
     <!-- This is THE apptentive default theme specified in AndroidManifest.xml of Apptentive SDK.

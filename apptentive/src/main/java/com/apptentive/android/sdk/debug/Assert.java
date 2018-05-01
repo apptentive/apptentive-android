@@ -21,7 +21,7 @@ public class Assert {
 	private static AssertImp imp = new AssertImp() {
 		@Override
 		public void assertFailed(String message) {
-			ApptentiveLog.e("Assertion failed: " + message + "\n" + getStackTrace(6));
+			ApptentiveLog.a("Assertion failed: " + message + "\n" + getStackTrace(6));
 		}
 	};
 

@@ -17,14 +17,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import java.io.File;
 import java.util.ArrayList;
 
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.ACTION_ABORT;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.ACTION_SEND_LOGS;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.EXTRA_EMAIL_RECIPIENTS;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.EXTRA_INFO;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.EXTRA_LOG_FILE;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.EXTRA_MANIFEST_FILE;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.EXTRA_SUBJECT;
-import static com.apptentive.android.sdk.debug.TroubleshootingNotification.NOTIFICATION_ID_KEY;
+import static com.apptentive.android.sdk.debug.TroubleshootingNotificationBuilder.*;
 
 public class LogBroadcastReceiver extends BroadcastReceiver {
 
@@ -42,16 +35,8 @@ public class LogBroadcastReceiver extends BroadcastReceiver {
 		Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
 		context.sendBroadcast(it);
 
-		// TODO: The app can be killed and this should still work. But it will be null if the app is killed when a user interacts with the notification.
-		LogMonitor instance = LogMonitor.sharedInstance();
-		if (instance == null) {
-			ApptentiveLog.e("LogMonitor was null");
-			return;
-		}
-
-		// stop collection logs and close the file
-		instance.stopWritingLogs();
-
+		// Stop log monitor
+		LogMonitor.stopSession(context);
 
 		// handle action
 		String action = intent.getAction();
@@ -63,15 +48,13 @@ public class LogBroadcastReceiver extends BroadcastReceiver {
 			email.putExtra(Intent.EXTRA_SUBJECT, intent.getStringExtra(EXTRA_SUBJECT));
 			email.putExtra(Intent.EXTRA_TEXT, intent.getStringExtra(EXTRA_INFO));
 
-			File logFile = (File) intent.getExtras().get(EXTRA_LOG_FILE);
-			File manifestFile = (File) intent.getExtras().get(EXTRA_MANIFEST_FILE);
+			File[] files = (File[]) intent.getExtras().get(EXTRA_ATTACHMENTS);
 
 			ArrayList<Uri> attachments = new ArrayList<>();
-			if (logFile != null && logFile.exists()) {
-				attachments.add(Uri.parse("content://" + ApptentiveAttachmentFileProvider.getAuthority(context) + "/" + logFile.getName()));
-			}
-			if (manifestFile != null && manifestFile.exists()) {
-				attachments.add(Uri.parse("content://" + ApptentiveAttachmentFileProvider.getAuthority(context) + "/" + manifestFile.getName()));
+			for (File file : files) {
+				if (file.exists()) {
+					attachments.add(Uri.parse("content://" + ApptentiveAttachmentFileProvider.getAuthority(context) + "/" + file.getName()));
+				}
 			}
 			email.putParcelableArrayListExtra(Intent.EXTRA_STREAM, attachments);
 
@@ -84,7 +67,5 @@ public class LogBroadcastReceiver extends BroadcastReceiver {
 		} else {
 			ApptentiveLog.e("Unexpected action: %s", action);
 		}
-
-		instance.destroy();
 	}
 }

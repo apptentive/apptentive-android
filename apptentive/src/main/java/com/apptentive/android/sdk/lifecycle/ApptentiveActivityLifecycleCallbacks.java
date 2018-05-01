@@ -97,7 +97,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 	 * @param activity
 	 */
 	@Override
-	public void onActivityStopped(Activity activity) {
+	public void onActivityStopped(final Activity activity) {
 		if (foregroundActivities.decrementAndGet() < 0) {
 			ApptentiveLog.e("Incorrect number of foreground Activities encountered. Resetting to 0.");
 			foregroundActivities.set(0);
@@ -125,6 +125,12 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 			}
 		}, CHECK_DELAY_SHORT);
 
+		dispatchOnConversationQueue(new DispatchTask() {
+			@Override
+			protected void execute() {
+				ApptentiveInternal.getInstance().onActivityStopped(activity);
+			}
+		});
 	}
 
 	@Override

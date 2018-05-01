@@ -49,6 +49,9 @@ import java.util.Map;
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.ApptentiveLogTag.PUSH;
 import static com.apptentive.android.sdk.util.StringUtils.trim;
 
 /**
@@ -58,23 +61,68 @@ public class Apptentive {
 
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
+	 * Note: application key and signature would be resolved from the AndroidManifest.xml
 	 *
 	 * @param application The {@link Application} object for this app.
+	 * @deprecated Please, use {@link #register(Application, String, String)} or {@link #register(Application, ApptentiveConfiguration)} instead
 	 */
+	@Deprecated
 	public static void register(Application application) {
-		register(application, null, null);
+		if (application == null) {
+			throw new IllegalArgumentException("Application is null");
+		}
+
+		String apptentiveKey = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_KEY);
+		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
+			ApptentiveLog.e("Unable to initialize Apptentive SDK: '%s' manifest key is missing", Constants.MANIFEST_KEY_APPTENTIVE_KEY);
+			return;
+		}
+
+		String apptentiveSignature = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_SIGNATURE);
+		if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
+			ApptentiveLog.e("Unable to initialize Apptentive SDK: '%s' manifest key is missing", Constants.MANIFEST_KEY_APPTENTIVE_SIGNATURE);
+			return;
+		}
+
+		ApptentiveConfiguration configuration = new ApptentiveConfiguration(apptentiveKey, apptentiveSignature);
+
+		String logLevelString = Util.getManifestMetadataString(application, Constants.MANIFEST_KEY_APPTENTIVE_LOG_LEVEL);
+		ApptentiveLog.Level logLevel = ApptentiveLog.Level.parse(logLevelString);
+		if (logLevel != ApptentiveLog.Level.UNKNOWN) {
+			configuration.setLogLevel(logLevel);
+		}
+
+		register(application, configuration);
 	}
 
+	/**
+	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
+	 * @param application Application object.
+	 * @param apptentiveKey Apptentive Key.
+	 * @param apptentiveSignature Apptentive Signature.
+	 */
 	public static void register(Application application, String apptentiveKey, String apptentiveSignature) {
-		register(application, apptentiveKey, apptentiveSignature, null);
+		register(application, new ApptentiveConfiguration(apptentiveKey, apptentiveSignature));
 	}
 
-	private static void register(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
+	/**
+	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
+	 * @param application Application object.
+	 * @param configuration Apptentive configuration containing SDK initialization data.
+	 */
+	public static void register(Application application, ApptentiveConfiguration configuration) {
+		if (application == null) {
+			throw new IllegalArgumentException("Application is null");
+		}
+
+		if (configuration == null) {
+			throw new IllegalArgumentException("Apptentive configuration is null");
+		}
+
 		try {
-			ApptentiveLog.i("Registering Apptentive.");
-			ApptentiveInternal.createInstance(application, apptentiveKey, apptentiveSignature, serverUrl);
+			ApptentiveInternal.createInstance(application, configuration);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while registering Apptentive");
+			ApptentiveLog.e(e, "Exception while registering Apptentive SDK");
 		}
 	}
 
@@ -114,7 +162,7 @@ public class Apptentive {
 				}
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Exception while getting person email");
+			ApptentiveLog.e(CONVERSATION,"Exception while getting person email");
 		}
 		return null;
 	}
@@ -153,7 +201,7 @@ public class Apptentive {
 				}
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e("Exception while getting person name");
+			ApptentiveLog.e(CONVERSATION, "Exception while getting person name");
 		}
 		return null;
 	}
@@ -435,7 +483,7 @@ public class Apptentive {
 			}
 			return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification intent");
+			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification intent");
 		}
 		return false;
 	}
@@ -454,7 +502,7 @@ public class Apptentive {
 			}
 			return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification bundle");
+			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification bundle");
 		}
 		return false;
 	}
@@ -472,7 +520,7 @@ public class Apptentive {
 			}
 			return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while checking for Apptentive push notification data");
+			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification data");
 		}
 		return false;
 	}
@@ -672,7 +720,7 @@ public class Apptentive {
 				return uaPushBundle.getString(ApptentiveInternal.TITLE_DEFAULT);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while getting title from Apptentive push");
+			ApptentiveLog.e(PUSH, e, "Exception while getting title from Apptentive push");
 		}
 		return null;
 	}
@@ -716,7 +764,7 @@ public class Apptentive {
 				return bundle.getString(ApptentiveInternal.BODY_UA);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while getting body from Apptentive push");
+			ApptentiveLog.e(PUSH, e, "Exception while getting body from Apptentive push");
 		}
 		return null;
 	}
@@ -740,7 +788,7 @@ public class Apptentive {
 			}
 			return data.get(ApptentiveInternal.TITLE_DEFAULT);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while getting title from Apptentive push");
+			ApptentiveLog.e(PUSH, e, "Exception while getting title from Apptentive push");
 		}
 		return null;
 	}
@@ -764,7 +812,7 @@ public class Apptentive {
 			}
 			return data.get(ApptentiveInternal.BODY_DEFAULT);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while getting body from Apptentive push");
+			ApptentiveLog.e(PUSH, e, "Exception while getting body from Apptentive push");
 		}
 		return null;
 	}
@@ -786,7 +834,7 @@ public class Apptentive {
 				ApptentiveInternal.getInstance().setRatingProvider(ratingProvider);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while setting rating provider");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while setting rating provider");
 		}
 	}
 
@@ -803,7 +851,7 @@ public class Apptentive {
 				ApptentiveInternal.getInstance().putRatingProviderArg(key, value);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while putting rating provider arg");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while putting rating provider arg");
 		}
 	}
 
@@ -950,7 +998,7 @@ public class Apptentive {
 				return conversationProxy != null ? conversationProxy.getUnreadMessageCount() : 0;
 			}
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.getUnreadMessageCount()");
+			ApptentiveLog.e(MESSAGES, e, "Exception while getting unread message count");
 			MetricModule.sendError(e, null, null);
 		}
 		return 0;
@@ -1325,7 +1373,7 @@ public class Apptentive {
 				try {
 					loginGuarded(token, callback);
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while trying to login");
+					ApptentiveLog.e(CONVERSATION, e, "Exception while trying to login");
 					notifyFailure(callback, "Exception while trying to login");
 					MetricModule.sendError(e, null, null);
 				}
@@ -1338,7 +1386,7 @@ public class Apptentive {
 
 		final ApptentiveInstance sharedInstance = ApptentiveInternal.getInstance();
 		if (sharedInstance.isNull()) {
-			ApptentiveLog.e("Unable to login: Apptentive instance is not properly initialized");
+			ApptentiveLog.e(CONVERSATION, "Unable to login: Apptentive instance is not properly initialized");
 			notifyFailure(callback, "Apptentive instance is not properly initialized");
 		} else {
 			sharedInstance.login(token, callback);
@@ -1404,7 +1452,7 @@ public class Apptentive {
 			}
 			ApptentiveInternal.getInstance().setAuthenticationFailedListener(listener);
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.setUnreadMessagesListener()");
+			ApptentiveLog.e(CONVERSATION, e, "Error in Apptentive.setUnreadMessagesListener()");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1416,7 +1464,7 @@ public class Apptentive {
 			}
 			ApptentiveInternal.getInstance().setAuthenticationFailedListener(null);
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error in Apptentive.clearUnreadMessagesListener()");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while clearing authentication listener");
 			MetricModule.sendError(e, null, null);
 		}
 	}
@@ -1502,7 +1550,7 @@ public class Apptentive {
 				ret.error = error;
 				return ret;
 			} catch (Exception e) {
-				ApptentiveLog.w("Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
+				ApptentiveLog.e(CONVERSATION, "Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
 			}
 			return UNKNOWN;
 		}

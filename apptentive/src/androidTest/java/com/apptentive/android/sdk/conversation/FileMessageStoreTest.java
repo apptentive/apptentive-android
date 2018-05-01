@@ -39,7 +39,7 @@ public class FileMessageStoreTest extends TestCaseBase {
 	public TemporaryFolder tempFolder = new TemporaryFolder();
 
 	@Before
-	public void setUp() {
+	public void setUp() throws Exception {
 		super.setUp();
 		ApptentiveInternal.setInstance(new ApptentiveInternal(InstrumentationRegistry.getTargetContext()));
 	}

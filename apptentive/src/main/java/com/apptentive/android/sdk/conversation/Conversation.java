@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.DevicePayload;
+import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PersonPayload;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -120,7 +121,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 			try {
 				saveConversationData();
 			} catch (Exception e) {
-				ApptentiveLog.e(e, "Exception while saving conversation data");
+				ApptentiveLog.e(CONVERSATION, e, "Exception while saving conversation data");
 			}
 		}
 	};
@@ -151,6 +152,11 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	//region Payloads
 
 	public void addPayload(Payload payload) {
+		// TODO: figure out a better way of detecting new events
+		if (payload instanceof EventPayload) {
+			notifyEventGenerated((EventPayload) payload);
+		}
+
 		payload.setLocalConversationIdentifier(notNull(getLocalIdentifier()));
 		payload.setConversationId(getConversationId());
 		payload.setToken(getConversationToken());
@@ -160,6 +166,11 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(payload);
 	}
 
+	private void notifyEventGenerated(EventPayload payload) {
+		ApptentiveNotificationCenter.defaultCenter()
+			.postNotification(NOTIFICATION_EVENT_GENERATED, NOTIFICATION_KEY_EVENT, payload);
+	}
+
 	//endregion
 
 	//region Interactions
@@ -167,12 +178,12 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	/**
 	 * Returns an Interaction for <code>eventLabel</code> if there is one that can be displayed.
 	 */
-	public Interaction getApplicableInteraction(String eventLabel) {
+	public Interaction getApplicableInteraction(String eventLabel, boolean verbose) {
 		String targetsString = getTargets();
 		if (targetsString != null) {
 			try {
 				Targets targets = new Targets(getTargets());
-				String interactionId = targets.getApplicableInteraction(eventLabel);
+				String interactionId = targets.getApplicableInteraction(eventLabel, verbose);
 				if (interactionId != null) {
 					String interactionsString = getInteractions();
 					if (interactionsString != null) {
@@ -181,13 +192,17 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 					}
 				}
 			} catch (JSONException e) {
-				ApptentiveLog.e(e, "Exception while getting applicable interaction: %s", eventLabel);
+				ApptentiveLog.e(INTERACTIONS, e, "Exception while getting applicable interaction: %s", eventLabel);
 			}
 		}
 		return null;
 	}
 
-	void fetchInteractions(Context context) {
+	public void fetchInteractions(Context context) {
+		if (!isPollForInteractions()) {
+			ApptentiveLog.d(CONVERSATION, "Interaction polling is turned off. Skipping fetch.");
+			return;
+		}
 		boolean cacheExpired = getInteractionExpiration() < Util.currentTimeSeconds();
 		if (cacheExpired || RuntimeUtils.isAppDebuggable(context)) {
 			ApptentiveHttpClient httpClient = ApptentiveInternal.getInstance().getApptentiveHttpClient();
@@ -218,7 +233,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 								ApptentiveLog.e(CONVERSATION, "Unable to save interactionManifest.");
 							}
 						} catch (JSONException e) {
-							ApptentiveLog.e(e, "Invalid InteractionManifest received.");
+							ApptentiveLog.e(CONVERSATION, e, "Invalid InteractionManifest received.");
 						}
 						ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished");
 
@@ -291,10 +306,10 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				setTargets(targets.toString());
 				setInteractions(interactions.toString());
 			} else {
-				ApptentiveLog.e("Unable to save InteractionManifest.");
+				ApptentiveLog.e(CONVERSATION, "Unable to save InteractionManifest.");
 			}
 		} catch (JSONException e) {
-			ApptentiveLog.w("Invalid InteractionManifest received.");
+			ApptentiveLog.w(CONVERSATION, "Invalid InteractionManifest received.");
 		}
 	}
 
@@ -305,7 +320,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	public void scheduleSaveConversationData() {
 		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
 		if (scheduled) {
-			ApptentiveLog.d(CONVERSATION, "Scheduling conversation save.");
+			ApptentiveLog.v(CONVERSATION, "Scheduling conversation save.");
 		} else {
 			ApptentiveLog.d(CONVERSATION, "Conversation save already scheduled.");
 		}
@@ -316,10 +331,10 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERY_VERBOSE)) {
-			ApptentiveLog.vv(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
-			ApptentiveLog.vv(CONVERSATION, "EventData: %s", getEventData().toString());
-			ApptentiveLog.vv(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
+		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
+			ApptentiveLog.v(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+			ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString());
+			ApptentiveLog.v(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
 		}
 		long start = System.currentTimeMillis();
 
@@ -333,7 +348,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		}
 
 		serializer.serialize(conversationData);
-		ApptentiveLog.vv(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
+		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
 	synchronized void loadConversationData() throws SerializerException {
@@ -637,11 +652,11 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		return messageManager;
 	}
 
-	synchronized File getConversationDataFile() {
+	public synchronized File getConversationDataFile() {
 		return conversationDataFile;
 	}
 
-	synchronized File getConversationMessagesFile() {
+	public synchronized File getConversationMessagesFile() {
 		return conversationMessagesFile;
 	}
 
@@ -653,7 +668,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		this.encryptionKey = encryptionKey;
 	}
 
-	String getUserId() {
+	public String getUserId() {
 		return userId;
 	}
 
@@ -680,7 +695,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				integrationConfig.setAmazonAwsSns(item);
 				break;
 			default:
-				ApptentiveLog.e("Invalid pushProvider: %d", pushProvider);
+				ApptentiveLog.e(CONVERSATION, "Invalid pushProvider: %d", pushProvider);
 				break;
 		}
 	}

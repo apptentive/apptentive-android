@@ -25,5 +25,7 @@
                   android:enabled="true"
                   android:exported="false"/>
 
+        <receiver android:name=".module.engagement.notification.ApptentiveNotificationInteractionBroadcastReceiver"
+                  android:exported="false"/>
     </application>
 </manifest>

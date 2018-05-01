@@ -10,14 +10,17 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.logic.Clause;
 import com.apptentive.android.sdk.module.engagement.logic.ClauseParser;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
+import com.apptentive.android.sdk.util.IndentBufferedPrinter;
+import com.apptentive.android.sdk.util.IndentPrinter;
 
 import org.json.JSONException;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 
 /**
  * @author Sky Kelsey
  */
 public class InteractionCriteria {
-
 	private String json;
 
 	public InteractionCriteria(String json) throws JSONException {
@@ -25,19 +28,28 @@ public class InteractionCriteria {
 	}
 
 	public boolean isMet(FieldManager fieldManager) {
+		return isMet(fieldManager, true);
+	}
+
+	public boolean isMet(FieldManager fieldManager, boolean verbose) {
 		try {
 			Clause rootClause = ClauseParser.parse(json);
-			ApptentiveLog.i("Evaluating Criteria");
 			boolean ret = false;
 			if (rootClause != null) {
-				ret = rootClause.evaluate(fieldManager);
+				IndentPrinter printer = verbose ? new IndentBufferedPrinter() : IndentPrinter.NULL;
+				ret = rootClause.evaluate(fieldManager, printer);
+				if (verbose) {
+					ApptentiveLog.i(INTERACTIONS, "Criteria evaluated => %b", ret);
+					ApptentiveLog.d(INTERACTIONS, "Criteria evaluation details:\n%s", printer);
+				}
+			} else {
+				if (verbose) {
+					ApptentiveLog.i(INTERACTIONS, "Criteria could not be evaluated: no clause found");
+				}
 			}
-			ApptentiveLog.i("- => %b", ret);
 			return ret;
-		} catch (JSONException e) {
-			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
 		} catch (Exception e) {
-			ApptentiveLog.w(e, "Error parsing and running InteractionCriteria predicate logic.");
+			ApptentiveLog.e(INTERACTIONS, e, "Exception while evaluating interaction criteria");
 		}
 		return false;
 	}

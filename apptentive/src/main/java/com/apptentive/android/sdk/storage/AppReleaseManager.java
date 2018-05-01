@@ -7,15 +7,14 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
-import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.model.*;
+import com.apptentive.android.sdk.util.ApplicationInfo;
+import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.Util;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 
 public class AppReleaseManager {
 
@@ -24,39 +23,21 @@ public class AppReleaseManager {
 		AppRelease appRelease = new AppRelease();
 
 		String appPackageName = context.getPackageName();
-		PackageManager packageManager = context.getPackageManager();
-
-		int currentVersionCode = 0;
-		String currentVersionName = "0";
-		int targetSdkVersion = 0;
-		boolean isAppDebuggable = false;
-		try {
-			PackageInfo packageInfo = packageManager.getPackageInfo(appPackageName, PackageManager.GET_META_DATA | PackageManager.GET_RECEIVERS);
-			ApplicationInfo ai = packageInfo.applicationInfo;
-			currentVersionCode = packageInfo.versionCode;
-			currentVersionName = packageInfo.versionName;
-			targetSdkVersion = packageInfo.applicationInfo.targetSdkVersion;
-			Bundle metaData = ai.metaData;
-			if (metaData != null) {
-				isAppDebuggable = (ai.flags & ApplicationInfo.FLAG_DEBUGGABLE) != 0;
-			}
-		} catch (PackageManager.NameNotFoundException e) {
-			ApptentiveLog.e("Failed to read app's PackageInfo.");
-		}
-
 		int themeOverrideResId = context.getResources().getIdentifier("ApptentiveThemeOverride", "style", appPackageName);
 
+		ApplicationInfo applicationInfo = RuntimeUtils.getApplicationInfo(context);
+
 		appRelease.setAppStore(Util.getInstallerPackageName(context));
-		appRelease.setDebug(isAppDebuggable);
+		appRelease.setDebug(applicationInfo.isDebuggable());
 		appRelease.setIdentifier(appPackageName);
 		if (apptentiveInternal != null) {
 			appRelease.setInheritStyle(apptentiveInternal.isAppUsingAppCompatTheme());
 		}
 		appRelease.setOverrideStyle(themeOverrideResId != 0);
-		appRelease.setTargetSdkVersion(String.valueOf(targetSdkVersion));
+		appRelease.setTargetSdkVersion(String.valueOf(applicationInfo.getTargetSdkVersion()));
 		appRelease.setType("android");
-		appRelease.setVersionCode(currentVersionCode);
-		appRelease.setVersionName(currentVersionName);
+		appRelease.setVersionCode(applicationInfo.getVersionCode());
+		appRelease.setVersionName(applicationInfo.getVersionName());
 
 		return appRelease;
 	}

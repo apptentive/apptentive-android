@@ -18,11 +18,15 @@ import android.util.AttributeSet;
 import android.widget.ImageView;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.io.IOException;
 import java.net.URL;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 
 
 /**
@@ -150,7 +154,7 @@ public class ApptentiveAvatarView extends ImageView {
 				d.draw(canvas);
 				return b;
 			} catch (OutOfMemoryError e) {
-				ApptentiveLog.w(e, "Error creating bitmap.");
+				ApptentiveLog.w(UTIL, e, "Error creating bitmap.");
 				return null;
 			}
 		}
@@ -222,7 +226,7 @@ public class ApptentiveAvatarView extends ImageView {
 					URL url = new URL(urlString);
 					bitmap = BitmapFactory.decodeStream(url.openStream());
 				} catch (IOException e) {
-					ApptentiveLog.d(e, "Error opening avatar from URL: \"%s\"", urlString);
+					ApptentiveLog.e(UTIL, e, "Error opening avatar from URL: \"%s\"", urlString);
 				}
 				if (bitmap != null) {
 					final Bitmap finalBitmap = bitmap;
@@ -237,7 +241,7 @@ public class ApptentiveAvatarView extends ImageView {
 		Thread.UncaughtExceptionHandler handler = new Thread.UncaughtExceptionHandler() {
 			@Override
 			public void uncaughtException(Thread thread, Throwable throwable) {
-				ApptentiveLog.w(throwable, "UncaughtException in AvatarView.");
+				ApptentiveLog.w(MESSAGES, throwable, "UncaughtException in AvatarView.");
 				MetricModule.sendError(throwable, null, null);
 			}
 		};
