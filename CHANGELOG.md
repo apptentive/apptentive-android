@@ -1,3 +1,9 @@
+# 2018-05-09 - v5.1.1
+
+#### Bugs Fixed
+
+* Don't export ApptentiveAttachmentFileProvider.
+
 # 2018-05-01 - v5.1.0
 
 #### Major changes

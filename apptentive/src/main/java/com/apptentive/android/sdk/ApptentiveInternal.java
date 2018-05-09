@@ -80,6 +80,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.ADVERTISER_ID;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PUSH;
+import static com.apptentive.android.sdk.ApptentiveLogTag.TROUBLESHOOT;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STOPPED;
@@ -249,11 +250,16 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		// set log level before we initialize log monitor since log monitor can override it as well
 		ApptentiveLog.overrideLogLevel(configuration.getLogLevel());
 
-		// initialize log writer
-		ApptentiveLog.initialize(application.getApplicationContext(), LOG_HISTORY_SIZE);
+		// troubleshooting mode
+		if (configuration.isTroubleshootingModeEnabled()) {
+			// initialize log writer
+			ApptentiveLog.initializeLogWriter(application.getApplicationContext(), LOG_HISTORY_SIZE);
 
-		// try initializing log monitor
-		LogMonitor.startSession(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
+			// try initializing log monitor
+			LogMonitor.startSession(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
+		} else {
+			ApptentiveLog.i(TROUBLESHOOT, "Troubleshooting is disabled in the app configuration");
+		}
 
 		synchronized (ApptentiveInternal.class) {
 			if (sApptentiveInternal == null) {
@@ -497,7 +503,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		checkConversationQueue();
 
 		// Try to initialize log monitor
-		LogMonitor.startSession(appContext, apptentiveKey, apptentiveSignature);
+		if (ApptentiveLog.isLogWriterInitialized()) {
+			LogMonitor.startSession(appContext, apptentiveKey, apptentiveSignature);
+		}
 
 		// Post a notification
 		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);

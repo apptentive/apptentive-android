@@ -28,12 +28,16 @@ public class ApptentiveLog {
 		return logLevel;
 	}
 
-	static void initialize(Context context, int logHistorySize) {
+	static void initializeLogWriter(Context context, int logHistorySize) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
 		logListener = new AsyncLogWriter(getLogsDirectory(context), logHistorySize);
+	}
+
+	static boolean isLogWriterInitialized() {
+		return logListener != null;
 	}
 
 	public static void overrideLogLevel(Level level) {
@@ -46,13 +50,6 @@ public class ApptentiveLog {
 
 	public static void setShouldSanitizeLogMessages(boolean shouldSanitizeLogMessages) {
 		ApptentiveLog.shouldSanitizeLogMessages = shouldSanitizeLogMessages;
-	}
-
-	/**
-	 * Sets a log listener which gets called every time SDK logs a message
-	 */
-	public static void setLogListener(LogListener logListener) {
-		ApptentiveLog.logListener = logListener;
 	}
 
 	public static Object hideIfSanitized(Object value) {
