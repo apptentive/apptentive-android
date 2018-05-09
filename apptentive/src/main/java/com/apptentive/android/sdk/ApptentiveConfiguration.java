@@ -16,6 +16,7 @@ public class ApptentiveConfiguration {
 	private String baseURL;
 	private ApptentiveLog.Level logLevel;
 	private boolean shouldSanitizeLogMessages;
+	private boolean troubleshootingModeEnabled;
 
 	public ApptentiveConfiguration(@NonNull String apptentiveKey, @NonNull String apptentiveSignature) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -30,6 +31,7 @@ public class ApptentiveConfiguration {
 		this.apptentiveSignature = apptentiveSignature.trim();
 		this.logLevel = ApptentiveLog.Level.INFO;
 		this.shouldSanitizeLogMessages = true;
+		this.troubleshootingModeEnabled = true;
 	}
 
 	public String getApptentiveKey() {
@@ -72,5 +74,20 @@ public class ApptentiveConfiguration {
 	 */
 	public void setShouldSanitizeLogMessages(boolean shouldSanitizeLogMessages) {
 		this.shouldSanitizeLogMessages = shouldSanitizeLogMessages;
+	}
+
+	/**
+	 * Indicates if the SDK troubleshooting mode should be enabled (<code>true</code> by default).
+	 */
+	public boolean isTroubleshootingModeEnabled() {
+		return troubleshootingModeEnabled;
+	}
+
+	/**
+	 * Overrides the SDK troubleshooting mode.
+	 */
+	public ApptentiveConfiguration setTroubleshootingModeEnabled(boolean troubleshootingModeEnabled) {
+		this.troubleshootingModeEnabled = troubleshootingModeEnabled;
+		return this;
 	}
 }
