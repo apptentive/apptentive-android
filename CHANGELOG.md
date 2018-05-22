@@ -1,3 +1,9 @@
+# 2018-05-22 - v5.1.2
+
+#### Bugs Fixed
+
+* Properly handle different app support library versions.
+
 # 2018-05-09 - v5.1.1
 
 #### Bugs Fixed

@@ -39,6 +39,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.IntentCompat;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -1191,5 +1192,25 @@ public class Util {
 	public static String currentDateAsFilename(String prefix, String suffix) {
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd_hh-mm-ss", Locale.US);
 		return prefix + df.format(new Date()) + suffix;
+	}
+
+	public static @Nullable Intent makeRestartActivityTask(ComponentName cn) {
+		try {
+			return makeRestartActivityTaskGuarded(cn);
+		}
+		catch (Exception e) {
+			ApptentiveLog.e(e, "Exception in makeRestartActivityTask");
+		}
+
+		return null;
+	}
+
+	private static Intent makeRestartActivityTaskGuarded(ComponentName cn) {
+		try {
+			return Intent.makeRestartActivityTask(cn);
+		} catch (NoSuchMethodError e) {
+			//noinspection deprecation
+			return IntentCompat.makeRestartActivityTask(cn);
+		}
 	}
 }
