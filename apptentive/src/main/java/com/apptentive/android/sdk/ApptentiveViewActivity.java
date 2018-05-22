@@ -19,6 +19,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.content.IntentCompat;
 import android.support.v4.content.res.ResourcesCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
@@ -358,22 +359,28 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 	 * activity, instead of desktop.
 	 * */
 	private void startLauncherActivityIfRoot() {
-		if (isTaskRoot()) {
-			PackageManager packageManager = getPackageManager();
-			Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
+		try {
+			if (isTaskRoot()) {
+				PackageManager packageManager = getPackageManager();
+				Intent intent = packageManager.getLaunchIntentForPackage(getPackageName());
 			/*
 			 Make this work with Instant Apps. It is possible and even likely to create an Instant App
 			 that doesn't have the Main Activity included in its APK. In such cases, this Intent is null,
 			 and we can't do anything apart from exiting our Activity.
 			  */
-			if (intent != null) {
-				ComponentName componentName = intent.getComponent();
-				/** Backwards compatible method that will clear all activities in the stack. */
-				Intent mainIntent = Intent.makeRestartActivityTask(componentName);
-				startActivity(mainIntent);
-			} else {
-				ApptentiveLog.w("Unable to start app's main activity: launch intent is missing");
+				if (intent != null) {
+					ComponentName componentName = intent.getComponent();
+					/* Backwards compatible method that will clear all activities in the stack. */
+					Intent mainIntent = Util.makeRestartActivityTask(componentName);
+					if (mainIntent != null) {
+						startActivity(mainIntent);
+					}
+				} else {
+					ApptentiveLog.w("Unable to start app's main activity: launch intent is missing");
+				}
 			}
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Exception while starting app's main activity");
 		}
 	}
 
