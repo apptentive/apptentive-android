@@ -30,33 +30,33 @@ public class MyFirebaseMessagingService extends FirebaseMessagingService {
 		super.onMessageReceived(remoteMessage);
 		Log.e(ExampleApplication.TAG, "onMessageReceived()");
 		logPushBundle(remoteMessage);
-		Map<String, String> data = remoteMessage.getData();
+		final Map<String, String> data = remoteMessage.getData();
 
 		if (Apptentive.isApptentivePushNotification(data)) {
-			PendingIntent pendingIntent = Apptentive.buildPendingIntentFromPushNotification(data);
-			if (pendingIntent != null) {
-				String title = Apptentive.getTitleFromApptentivePush(data);
-				String body = Apptentive.getBodyFromApptentivePush(data);
+			Apptentive.buildPendingIntentFromPushNotification(new Apptentive.PendingIntentCallback() {
+				@Override
+				public void onPendingIntent(PendingIntent pendingIntent) {
+					if (pendingIntent != null) {
+						String title = Apptentive.getTitleFromApptentivePush(data);
+						String body = Apptentive.getBodyFromApptentivePush(data);
 
 
-				ApptentiveLog.e("Title: " + title);
-				ApptentiveLog.e("Body: " + body);
+						ApptentiveLog.e("Title: " + title);
+						ApptentiveLog.e("Body: " + body);
 
-				Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-				NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-						.setSmallIcon(R.drawable.notification)
-						.setContentTitle(title)
-						.setContentText(body)
-						.setAutoCancel(true)
-						.setSound(defaultSoundUri)
-						.setContentIntent(pendingIntent);
-				NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-				notificationManager.notify(0, notificationBuilder.build());
-			} else {
-				// This push is from Apptentive, but not for the active conversation, so we can't safely display it.
-			}
-		} else {
-			// This push did not come from Apptentive, so handle it as your own push.
+						Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+						NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(MyFirebaseMessagingService.this)
+								.setSmallIcon(R.drawable.notification)
+								.setContentTitle(title)
+								.setContentText(body)
+								.setAutoCancel(true)
+								.setSound(defaultSoundUri)
+								.setContentIntent(pendingIntent);
+						NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+						notificationManager.notify(0, notificationBuilder.build());
+					}
+				}
+			}, data);
 		}
 	}
 

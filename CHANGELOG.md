@@ -1,3 +1,9 @@
+# 2018-05-22 - v5.1.3
+
+#### Improvements
+
+* Improved lifecycle management.
+
 # 2018-05-22 - v5.1.2
 
 #### Bugs Fixed

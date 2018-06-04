@@ -48,41 +48,6 @@ class ApptentiveNullInstance implements ApptentiveInstance {
 	}
 
 	@Override
-	public void onActivityStarted(Activity activity) {
-		failMethodCall("onActivityStarted");
-	}
-
-	@Override
-	public void onActivityResumed(Activity activity) {
-		failMethodCall("onActivityResumed");
-	}
-
-	@Override
-	public void onActivityStopped(Activity activity) {
-		failMethodCall("onActivityStopped");
-	}
-
-	@Override
-	public void onAppEnterForeground() {
-		failMethodCall("onAppEnterForeground");
-	}
-
-	@Override
-	public void onAppEnterBackground() {
-		failMethodCall("onAppEnterBackground");
-	}
-
-	@Override
-	public void onAppLaunch(Context context) {
-		failMethodCall("onAppLaunch");
-	}
-
-	@Override
-	public void onAppExit(Context context) {
-		failMethodCall("onAppExit");
-	}
-
-	@Override
 	public void updateApptentiveInteractionTheme(Context context, Resources.Theme theme) {
 		failMethodCall("updateApptentiveInteractionTheme");
 	}

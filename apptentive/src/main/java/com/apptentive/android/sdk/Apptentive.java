@@ -20,6 +20,7 @@ import android.webkit.MimeTypeMap;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
+import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.model.ExtendedData;
@@ -124,6 +125,14 @@ public class Apptentive {
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while registering Apptentive SDK");
 		}
+	}
+
+	/**
+	 * Register application callbacks. You only need to call this if you register Apptentive instance outside of your
+	 * Application class.
+	 */
+	public static void registerCallbacks(Application application) {
+		ApptentiveActivityLifecycleCallbacks.register(application);
 	}
 
 	//region Global Data Methods

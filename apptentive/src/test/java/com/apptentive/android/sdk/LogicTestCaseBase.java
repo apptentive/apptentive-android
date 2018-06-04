@@ -25,7 +25,7 @@ public class LogicTestCaseBase extends TestCaseBase {
 			overrideMainQueue(true);
 
 			// conversation queue
-			RuntimeUtils.overrideStaticFinalField(findHolderClass(ApptentiveHelper.class.getDeclaredClasses()), "INSTANCE", new MockDispatchQueue(true));
+			RuntimeUtils.overrideStaticFinalField(findHolderClass(ApptentiveHelper.class.getDeclaredClasses()), "CONVERSATION_QUEUE", new MockDispatchQueue(true));
 		} catch (Exception e) {
 			throw new AssertionError(e);
 		}

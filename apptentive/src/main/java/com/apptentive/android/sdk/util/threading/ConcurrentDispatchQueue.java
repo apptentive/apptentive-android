@@ -32,6 +32,7 @@ class ConcurrentDispatchQueue extends DispatchQueue implements ThreadFactory {
 	ConcurrentDispatchQueue(String name) {
 		super(name);
 		this.threadPoolExecutor = new ScheduledThreadPoolExecutor(NUMBER_OF_CORES, this);
+		this.threadPoolExecutor.setMaximumPoolSize(NUMBER_OF_CORES);
 		this.threadNumber = new AtomicInteger(1);
 	}
 

@@ -47,7 +47,6 @@ import com.apptentive.android.sdk.util.Destroyable;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONException;
@@ -55,6 +54,7 @@ import org.json.JSONException;
 import java.io.File;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationDataQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
@@ -318,7 +318,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	//region Saving
 
 	public void scheduleSaveConversationData() {
-		boolean scheduled = DispatchQueue.backgroundQueue().dispatchAsyncOnce(saveConversationTask, 100L);
+		boolean scheduled = conversationDataQueue().dispatchAsyncOnce(saveConversationTask, 100L);
 		if (scheduled) {
 			ApptentiveLog.v(CONVERSATION, "Scheduling conversation save.");
 		} else {
