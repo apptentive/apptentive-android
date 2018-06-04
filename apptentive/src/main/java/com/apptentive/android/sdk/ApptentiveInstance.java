@@ -34,14 +34,6 @@ public interface ApptentiveInstance extends Nullsafe {
 	void login(String token, LoginCallback callback);
 	void logout();
 
-	void onActivityStarted(Activity activity);
-	void onActivityResumed(Activity activity);
-	void onActivityStopped(Activity activity);
-	void onAppEnterForeground();
-	void onAppEnterBackground();
-	void onAppLaunch(Context context);
-	void onAppExit(Context context);
-
 	void updateApptentiveInteractionTheme(Context context, Resources.Theme theme);
 
 	void notifyInteractionUpdated(boolean successful); // TODO: remove this method and replace the call with a notification

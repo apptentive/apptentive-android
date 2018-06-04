@@ -1,3 +1,0 @@
-<component name="DependencyValidationManager">
-  <scope name="Project no build" pattern="((file[apptentive]:*/&amp;&amp;!file[apptentive]:build//*||file[ApptentiveDev]:*/)&amp;&amp;!file[ApptentiveDev]:build//*||file[internal-android-apps]:*/)&amp;&amp;!file[internal-android-apps]:build//*" />
-</component>

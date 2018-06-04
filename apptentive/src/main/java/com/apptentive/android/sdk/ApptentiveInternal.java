@@ -25,7 +25,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
-
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
@@ -47,21 +46,11 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
-import com.apptentive.android.sdk.storage.AppRelease;
-import com.apptentive.android.sdk.storage.AppReleaseManager;
-import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
-import com.apptentive.android.sdk.storage.Sdk;
-import com.apptentive.android.sdk.storage.SdkManager;
-import com.apptentive.android.sdk.storage.VersionHistoryItem;
-import com.apptentive.android.sdk.util.AdvertiserManager;
+import com.apptentive.android.sdk.storage.*;
+import com.apptentive.android.sdk.util.*;
 import com.apptentive.android.sdk.util.AdvertiserManager.AdvertisingIdClientInfo;
-import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.ObjectUtils;
-import com.apptentive.android.sdk.util.StringUtils;
-import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -73,33 +62,9 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
-import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
-import static com.apptentive.android.sdk.ApptentiveHelper.isConversationQueue;
-import static com.apptentive.android.sdk.ApptentiveLogTag.ADVERTISER_ID;
-import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
-import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
-import static com.apptentive.android.sdk.ApptentiveLogTag.PUSH;
-import static com.apptentive.android.sdk.ApptentiveLogTag.TROUBLESHOOT;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_RESUMED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STARTED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ACTIVITY_STOPPED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_BACKGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_APP_ENTERED_FOREGROUND;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_AUTHENTICATION_FAILED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_STATE_DID_CHANGE;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_CONVERSATION_WILL_LOGOUT;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_DID_FETCH;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTIONS_SHOULD_DISMISS;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_INTERACTION_MANIFEST_FETCHED;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ACTIVITY;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_AUTHENTICATION_FAILED_REASON;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONFIGURATION;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_CONVERSATION_ID;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_MANIFEST;
-import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.ApptentiveHelper.*;
+import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.assertTrue;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
@@ -110,7 +75,6 @@ import static com.apptentive.android.sdk.util.Constants.CONVERSATIONS_DIR;
 public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotificationObserver {
 	private final ApptentiveTaskManager taskManager;
 
-	private final ApptentiveActivityLifecycleCallbacks lifecycleCallbacks;
 	private final ApptentiveHttpClient apptentiveHttpClient;
 	private final ConversationManager conversationManager;
 
@@ -143,9 +107,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	private final LinkedBlockingQueue interactionUpdateListeners = new LinkedBlockingQueue();
 
 	private WeakReference<Apptentive.AuthenticationFailedListener> authenticationFailedListenerRef = null;
-
-	// Holds reference to the current foreground activity of the host app
-	private WeakReference<Activity> currentTaskStackTopActivity;
 
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
@@ -183,7 +144,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		conversationManager = null;
 		this.appContext = appContext;
 		appRelease = null;
-		lifecycleCallbacks = null;
 	}
 
 	private ApptentiveInternal(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
@@ -209,13 +169,13 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
 
-		lifecycleCallbacks = new ApptentiveActivityLifecycleCallbacks();
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
 			.addObserver(NOTIFICATION_CONVERSATION_WILL_LOGOUT, this)
 			.addObserver(NOTIFICATION_AUTHENTICATION_FAILED, this)
 			.addObserver(NOTIFICATION_INTERACTION_MANIFEST_FETCHED, this)
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, this)
+			.addObserver(NOTIFICATION_APP_ENTERED_BACKGROUND, this)
 			.addObserver(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH, this);
 	}
 
@@ -273,7 +233,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 							sApptentiveInternal.start();
 						}
 					});
-					application.registerActivityLifecycleCallbacks(sApptentiveInternal.lifecycleCallbacks);
+
+					ApptentiveActivityLifecycleCallbacks.register(application);
+
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
 				}
@@ -366,21 +328,14 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		return appRelease.getVersionName();
 	}
 
-	public ApptentiveActivityLifecycleCallbacks getRegisteredLifecycleCallbacks() {
-		return lifecycleCallbacks;
-	}
-
 	/* Get the foreground activity from the current application, i.e. at the top of the task
 	 * It is tracked through {@link #onActivityStarted(Activity)} and {@link #onActivityStopped(Activity)}
 	 *
 	 * If Apptentive interaction is to be launched from a non-activity context, use the current activity at
 	 * the top of the task stack, i.e. the foreground activity.
 	 */
-	public Activity getCurrentTaskStackTopActivity() {
-		if (currentTaskStackTopActivity != null) {
-			return currentTaskStackTopActivity.get();
-		}
-		return null;
+	public @Nullable Activity getCurrentTaskStackTopActivity() {
+		return ApptentiveActivityLifecycleCallbacks.getCurrentTopActivity();
 	}
 
 	public ApptentiveTaskManager getApptentiveTaskManager() {
@@ -445,7 +400,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		return apptentiveHttpClient;
 	}
 
-	public void onAppLaunch(final Context appContext) {
+	private void onAppLaunch(final Context appContext) {
 		checkConversationQueue();
 
 		if (isConversationActive()) {
@@ -453,8 +408,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		}
 	}
 
-	@Override
-	public void onAppExit(final Context appContext) {
+	private void onAppExit(final Context appContext) {
 		checkConversationQueue();
 
 		if (isConversationActive()) {
@@ -462,44 +416,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		}
 	}
 
-	public void onActivityStarted(Activity activity) {
-		checkConversationQueue();
-
-		if (activity != null) {
-			// Set current foreground activity reference whenever a new activity is started
-			currentTaskStackTopActivity = new WeakReference<>(activity);
-
-			// Post a notification
-			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STARTED,
-				NOTIFICATION_KEY_ACTIVITY, activity);
-		}
-	}
-
-	public void onActivityStopped(Activity activity) {
-		checkConversationQueue();
-
-		if (activity != null) {
-			// Post a notification
-			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_STOPPED,
-					NOTIFICATION_KEY_ACTIVITY, activity);
-		}
-	}
-
-	public void onActivityResumed(Activity activity) {
-		checkConversationQueue();
-
-		if (activity != null) {
-			// Set current foreground activity reference whenever a new activity is started
-			currentTaskStackTopActivity = new WeakReference<>(activity);
-
-			// Post a notification
-			ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_ACTIVITY_RESUMED,
-				NOTIFICATION_KEY_ACTIVITY, activity);
-		}
-	}
-
-	@Override
-	public void onAppEnterForeground() {
+	private void onAppEnterForeground() {
 		checkConversationQueue();
 
 		// Try to initialize log monitor
@@ -507,18 +424,12 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			LogMonitor.startSession(appContext, apptentiveKey, apptentiveSignature);
 		}
 
-		// Post a notification
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_FOREGROUND);
+		onAppLaunch(getApplicationContext());
 	}
 
-	@Override
-	public void onAppEnterBackground() {
+	private void onAppEnterBackground() {
 		checkConversationQueue();
-
-		currentTaskStackTopActivity = null;
-
-		// Post a notification
-		ApptentiveNotificationCenter.defaultCenter().postNotification(NOTIFICATION_APP_ENTERED_BACKGROUND);
+		onAppExit(getApplicationContext());
 	}
 
 	/* Apply Apptentive styling layers to the theme to be used by interaction. The layers include
@@ -1116,6 +1027,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			String manifest = notification.getRequiredUserInfo(NOTIFICATION_KEY_MANIFEST, String.class);
 			storeManifestResponse(appContext, manifest);
 		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
+			onAppEnterForeground();
+
 			if (Configuration.load().isCollectingAdID()) {
 				// update advertiser id every time we come back from the background
 				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
@@ -1126,6 +1039,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 					}
 				}
 			}
+		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_BACKGROUND)) {
+			onAppEnterBackground();
 		} else if (notification.hasName(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH)) {
 			Configuration configuration = notification.getUserInfo(NOTIFICATION_KEY_CONFIGURATION, Configuration.class);
 			if (configuration != null && configuration.isCollectingAdID()) {

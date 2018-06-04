@@ -19,7 +19,6 @@ import com.apptentive.android.sdk.network.HttpRequestRetryPolicyDefault;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONObject;
@@ -32,6 +31,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
+import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchOnConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
@@ -224,7 +224,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	private void retrySending(long delayMillis) {
 		ApptentiveLog.d(PAYLOADS, "Retry sending payloads in %d ms", delayMillis);
-		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
+		conversationQueue().dispatchAsync(new DispatchTask() {
 			@Override
 			protected void execute() {
 				singleThreadExecutor.execute(new Runnable() {
@@ -246,10 +246,14 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 	//region Payload Sending
 	private void sendNextPayload() {
-		DispatchQueue.backgroundQueue().dispatchAsync(new DispatchTask() {
+		singleThreadExecutor.execute(new Runnable() {
 			@Override
-			protected void execute() {
-				sendNextPayloadSync();
+			public void run() {
+				try {
+					sendNextPayloadSync();
+				} catch (Exception e) {
+					ApptentiveLog.e(e, "Exception while trying to send next payload");
+				}
 			}
 		});
 	}

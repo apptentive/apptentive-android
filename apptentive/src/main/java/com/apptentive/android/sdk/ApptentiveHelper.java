@@ -30,7 +30,11 @@ public final class ApptentiveHelper {
 	}
 
 	public static DispatchQueue conversationQueue() {
-		return Holder.INSTANCE;
+		return Holder.CONVERSATION_QUEUE;
+	}
+
+	public static DispatchQueue conversationDataQueue() {
+		return Holder.CONVERSATION_DATA_QUEUE;
 	}
 
 	public static boolean isConversationQueue() {
@@ -43,11 +47,20 @@ public final class ApptentiveHelper {
 
 	// Thread-safe singleton implementation
 	private static class Holder {
-		static DispatchQueue INSTANCE = createConversationQueue();
+		static DispatchQueue CONVERSATION_QUEUE = createConversationQueue();
+		static DispatchQueue CONVERSATION_DATA_QUEUE = createConversationDataQueue();
 
 		private static DispatchQueue createConversationQueue() {
 			try {
 				return DispatchQueue.createBackgroundQueue("Apptentive Queue", DispatchQueueType.Serial);
+			} catch (Exception e) {
+				return null; // let unit test handle this
+			}
+		}
+
+		private static DispatchQueue createConversationDataQueue() {
+			try {
+				return DispatchQueue.createBackgroundQueue("Apptentive Conversation Data Queue", DispatchQueueType.Serial);
 			} catch (Exception e) {
 				return null; // let unit test handle this
 			}
