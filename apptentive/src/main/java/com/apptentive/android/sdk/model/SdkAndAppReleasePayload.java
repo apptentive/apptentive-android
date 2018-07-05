@@ -183,5 +183,10 @@ public class SdkAndAppReleasePayload extends JsonPayload {
 	public void setDebug(boolean debug) {
 		put(KEY_DEBUG, debug);
 	}
+
+	@Override
+	protected String getJsonContainer() {
+		return "app_release";
+	}
 	//endregion
 }

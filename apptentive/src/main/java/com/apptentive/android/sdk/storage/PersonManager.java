@@ -74,6 +74,11 @@ public class PersonManager {
 			changed = true;
 		}
 
+		if (oldPerson == null || !equal(oldPerson.getMParticleId(), newPerson.getMParticleId())) {
+			ret.setMParticleId(newPerson.getMParticleId());
+			changed = true;
+		}
+
 		return changed ? ret : null;
 	}
 

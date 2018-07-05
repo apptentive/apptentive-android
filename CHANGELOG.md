@@ -1,3 +1,14 @@
+# 2018-07-05 - v5.1.4
+
+#### Fixes
+
+* Fixed implicit WRITE_EXTERNAL_STORAGE permission for Android O.
+* Fixed 'attr/textColorError' not found error for Android P.
+
+#### Improvements
+
+* Added support for mParticle user id.
+
 # 2018-05-22 - v5.1.3
 
 #### Improvements

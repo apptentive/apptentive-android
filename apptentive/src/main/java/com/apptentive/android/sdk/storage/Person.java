@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -24,6 +24,7 @@ public class Person implements Saveable, DataChangedListener {
 	private String zip;
 	private String country;
 	private String birthday;
+	private String mParticleId;
 	private CustomData customData;
 
 	public Person() {
@@ -168,6 +169,17 @@ public class Person implements Saveable, DataChangedListener {
 	public void setBirthday(String birthday) {
 		if (!StringUtils.equal(this.birthday, birthday)) {
 			this.birthday = birthday;
+			notifyDataChanged();
+		}
+	}
+
+	public @Nullable String getMParticleId() {
+		return mParticleId;
+	}
+
+	public void setMParticleId(String mParticleId) {
+		if (!StringUtils.equal(this.mParticleId, mParticleId)) {
+			this.mParticleId = mParticleId;
 			notifyDataChanged();
 		}
 	}

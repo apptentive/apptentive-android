@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -642,9 +644,17 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		getConversationData().setInteractionExpiration(interactionExpiration);
 	}
 
+	public @Nullable String getMParticleId() {
+		return getConversationData().getMParticleId();
+	}
+
+	public void setMParticleId(@Nullable String mParticleId) {
+		getConversationData().setMParticleId(mParticleId);
+	}
+
 	// this is a synchronization hack: both save/load conversation data are synchronized so we can't
 	// modify conversation data while it's being serialized/deserialized
-	private synchronized ConversationData getConversationData() {
+	private synchronized @NonNull ConversationData getConversationData() {
 		return conversationData;
 	}
 
