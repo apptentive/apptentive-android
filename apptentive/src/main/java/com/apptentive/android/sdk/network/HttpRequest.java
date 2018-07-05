@@ -312,7 +312,7 @@ public class HttpRequest {
 
 			// send request
 			responseCode = connection.getResponseCode();
-			ApptentiveLog.d(NETWORK, "Response: %d %s", responseCode, connection.getResponseMessage());
+			ApptentiveLog.d(NETWORK, "Response %s: %d %s", url, responseCode, connection.getResponseMessage());
 
 			if (isCancelled()) {
 				return;

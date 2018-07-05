@@ -300,6 +300,14 @@ public class ConversationDataTest {
 		data.getEventData().storeInteractionForCurrentAppVersion(100D, 10, "1.0", "foo");
 		assertTrue(listenerFired);
 		listenerFired = false;
+
+		data.setMParticleId("1234567890");
+		assertTrue(listenerFired);
+		listenerFired = false;
+
+		data.setMParticleId("1234567890");
+		assertFalse(listenerFired);
+		listenerFired = false;
 	}
 
 	// TODO: Add a test for verifying that setting an existing value doesn't fire listeners.

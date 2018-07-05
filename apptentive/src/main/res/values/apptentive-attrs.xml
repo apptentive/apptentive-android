@@ -29,6 +29,9 @@
         <attr name="apptentiveRadioButtonStyle" format="reference"/>
         <attr name="apptentiveFabStyle" format="reference"/>
 
+        <!-- We need to define it explicitly after Android-P release -->
+        <attr name="textColorError" format="color|reference"/>
+
         <attr name="apptentiveInteractionButtonStyle" format="reference"/>
         <attr name="apptentiveInteractionButtonColorStateList" format="color|reference"/>
         <attr name="apptentiveInteractionButtonColorDefault" format="color|reference"/>

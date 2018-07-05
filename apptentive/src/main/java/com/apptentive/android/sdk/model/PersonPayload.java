@@ -24,7 +24,10 @@ public class PersonPayload extends JsonPayload {
 	private static final String KEY_ZIP = "zip";
 	private static final String KEY_COUNTRY = "country";
 	private static final String KEY_BIRTHDAY = "birthday";
-	@SensitiveDataKey private static final String KEY_CUSTOM_DATA = "custom_data";
+	@SensitiveDataKey
+	private static final String KEY_M_PARTICLE_ID = "mparticle_id";
+	@SensitiveDataKey
+	private static final String KEY_CUSTOM_DATA = "custom_data";
 
 	static {
 		registerSensitiveKeys(PersonPayload.class);
@@ -119,5 +122,9 @@ public class PersonPayload extends JsonPayload {
 
 	public void setCustomData(CustomData customData) {
 		put(KEY_CUSTOM_DATA, customData);
+	}
+
+	public void setMParticleId(String mParticleId) {
+		put(KEY_M_PARTICLE_ID, mParticleId);
 	}
 }

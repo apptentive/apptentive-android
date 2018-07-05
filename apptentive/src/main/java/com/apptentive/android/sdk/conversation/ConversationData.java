@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
@@ -139,11 +142,11 @@ public class ConversationData implements Saveable, DataChangedListener, DeviceDa
 		}
 	}
 
-	public Device getDevice() {
+	public @NonNull Device getDevice() {
 		return device;
 	}
 
-	public void setDevice(Device device) {
+	public void setDevice(@NonNull Device device) {
 		Assert.assertNotNull(device, "Device may not be null.");
 		this.device = device;
 		device.setDataChangedListener(this);
@@ -161,11 +164,11 @@ public class ConversationData implements Saveable, DataChangedListener, DeviceDa
 		notifyDataChanged();
 	}
 
-	public Person getPerson() {
+	public @NonNull Person getPerson() {
 		return person;
 	}
 
-	public void setPerson(Person person) {
+	public void setPerson(@NonNull Person person) {
 		Assert.assertNotNull(person, "Person may not be null.");
 		this.person = person;
 		this.person.setDataChangedListener(this);
@@ -305,6 +308,14 @@ public class ConversationData implements Saveable, DataChangedListener, DeviceDa
 			this.interactionExpiration = interactionExpiration;
 			notifyDataChanged();
 		}
+	}
+
+	public @Nullable String getMParticleId() {
+		return getPerson().getMParticleId();
+	}
+
+	public void setMParticleId(@Nullable String mParticleId) {
+		getPerson().setMParticleId(mParticleId);
 	}
 
 	//endregion

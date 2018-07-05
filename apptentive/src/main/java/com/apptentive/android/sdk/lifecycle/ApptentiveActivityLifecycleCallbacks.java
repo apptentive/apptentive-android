@@ -209,6 +209,10 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 		});
 	}
 
+	public static ApptentiveActivityLifecycleCallbacks getInstance() {
+		return Holder.INSTANCE;
+	}
+
 	private static class Holder {
 		private static final ApptentiveActivityLifecycleCallbacks INSTANCE = new ApptentiveActivityLifecycleCallbacks();
 	}
