@@ -46,6 +46,8 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationObserver;
+import com.apptentive.android.sdk.partners.apptimize.ApptentiveApptimize;
+import com.apptentive.android.sdk.partners.apptimize.ApptentiveApptimizeTestInfo;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.*;
 import com.apptentive.android.sdk.util.AdvertiserManager.AdvertisingIdClientInfo;
@@ -529,6 +531,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				}
 			}
 
+			// Try initialize Apptimize SDK support
+			tryInitializeApptimizeSDK();
+
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
 			bRet = false;
@@ -988,6 +993,62 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	//endregion
 
+	//region Apptimize SDK
+
+	private void tryInitializeApptimizeSDK() {
+		checkConversationQueue();
+
+		// TODO: figure out how to register a listener
+
+		tryUpdateApptimizeData();
+	}
+
+	void tryUpdateApptimizeData() {
+		checkConversationQueue();
+
+		Configuration configuration = Configuration.load();
+		if (!configuration.isCollectingApptimizeData()) {
+			return;
+		}
+
+		Conversation conversation = getConversation();
+		if (conversation == null) {
+			ApptentiveLog.w(PARTNERS, "Unable to update Apptimize data: no active conversation");
+			return;
+		}
+
+		if (!ApptentiveApptimize.isApptimizeSDKAvailable()) {
+			ApptentiveLog.w(PARTNERS, "Unable to initialize Apptimize SDK support: SDK integration not found");
+			return;
+		}
+
+		if (!ApptentiveApptimize.isSupportedLibraryVersion()) {
+			ApptentiveLog.w(PARTNERS, "Unable to update Apptimize data: unsupported library version '%s'", ApptentiveApptimize.getLibraryVersion());
+			return;
+		}
+
+		Map<String, ApptentiveApptimizeTestInfo> experiments = ApptentiveApptimize.getTestInfo();
+		if (experiments == null || experiments.size() == 0) {
+			ApptentiveLog.w(PARTNERS, "Unable to update Apptimize data: no experiments");
+			return;
+		}
+
+		for (ApptentiveApptimizeTestInfo experiment : experiments.values()) {
+			if (experiment == null) {
+				continue;
+			}
+
+			String testName = experiment.getTestName();
+			String variantName = experiment.getEnrolledVariantName();
+
+			String participationState = experiment.userHasParticipated() ? "participated" : "enrolled";
+			String key = StringUtils.format("Apptimize: %s %s", testName, participationState);
+			conversation.getDevice().getCustomData().put(key, variantName);
+		}
+	}
+
+	//endregion
+
 	/**
 	 * Dismisses any currently-visible interactions. This method is for internal use and is subject to change.
 	 */
@@ -1043,7 +1104,11 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			onAppEnterBackground();
 		} else if (notification.hasName(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH)) {
 			Configuration configuration = notification.getUserInfo(NOTIFICATION_KEY_CONFIGURATION, Configuration.class);
-			if (configuration != null && configuration.isCollectingAdID()) {
+			if (configuration == null) {
+				return;
+			}
+
+			if (configuration.isCollectingAdID()) {
 				// update advertiser id since the current customer needs it
 				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
 					// update active conversation's device info
@@ -1052,6 +1117,10 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 						updateConversationAdvertiserIdentifier(conversation);
 					}
 				}
+			}
+
+			if (configuration.isCollectingApptimizeData()) {
+				tryUpdateApptimizeData();
 			}
 		}
 	}

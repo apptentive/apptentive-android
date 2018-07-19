@@ -33,6 +33,7 @@ import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
@@ -1571,6 +1572,49 @@ public class Apptentive {
 					"errorType='" + name() + '\'' +
 					'}';
 		}
+	}
+
+	//endregion
+
+	//region Apptimize SDK support
+
+	/**
+	 * Invoke this method from your Apptimize.OnExperimentRunListener when an A/B experiment is run.
+	 */
+	public static void onApptimizeExperimentRun(String experimentName,
+												String variantName,
+												boolean firstRun) {
+		// TODO: update specific experiment only
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal instance = ObjectUtils.as(ApptentiveInternal.getInstance(), ApptentiveInternal.class);
+				if (instance != null) {
+					instance.tryUpdateApptimizeData();
+					return true;
+				}
+
+				return false;
+			}
+		}, "update Apptimize experiment data");
+	}
+
+	/**
+	 * Invoke this method from your Apptimize.OnExperimentsProcessedListener when A/B experiment configuration is recalculated..
+	 */
+	public static void onApptimizeExperimentsProcessed() {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				ApptentiveInternal instance = ObjectUtils.as(ApptentiveInternal.getInstance(), ApptentiveInternal.class);
+				if (instance != null) {
+					instance.tryUpdateApptimizeData();
+					return true;
+				}
+
+				return false;
+			}
+		}, "update Apptimize experiments data");
 	}
 
 	//endregion

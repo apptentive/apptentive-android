@@ -34,6 +34,7 @@ public class Configuration extends JSONObject {
 	private static final String KEY_MESSAGE_CENTER_ENABLED = "message_center_enabled";
 	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP = "notification_popup";
 	private static final String KEY_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED = "enabled";
+	private static final String KEY_COLLECT_APPTIMIZE_DATA = "apptimize_integration";
 
 	private static final String KEY_HIDE_BRANDING = "hide_branding";
 
@@ -151,6 +152,10 @@ public class Configuration extends JSONObject {
 			}
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_NOTIFICATION_POPUP_ENABLED;
+	}
+
+	public boolean isCollectingApptimizeData() {
+		return optBoolean(KEY_COLLECT_APPTIMIZE_DATA, false);
 	}
 
 	public boolean isHideBranding(Context context) {

@@ -50,34 +50,30 @@ public class Invocation {
 	}
 
 	public boolean invokeBooleanMethod(String name) throws InvocationException {
-		return invokeBooleanMethod(name, EMPTY_PARAMETER_TYPES, EMPTY_ARGS);
-	}
-
-	public boolean invokeBooleanMethod(String name, Class<?>[] parameterTypes, Object[] args) throws InvocationException {
-		Object result = invokeMethod(name, parameterTypes, args);
+		Boolean result = invokeMethod(name, Boolean.class);
 		if (result == null) {
 			throw new InvocationException("Unable to invoke method '%s' on class '%s': null returned", name, cls);
 		}
 
-		if (!(result instanceof Boolean)) {
-			throw new InvocationException("Unable to invoke method '%s' on class '%s': mismatch return type '%s'", name, cls, result.getClass());
-		}
-
-		return (Boolean) result;
+		return result;
 	}
 
 	public String invokeStringMethod(String name) throws InvocationException {
-		return invokeStringMethod(name, EMPTY_PARAMETER_TYPES, EMPTY_ARGS);
+		return invokeMethod(name, String.class);
 	}
 
-	public String invokeStringMethod(String name, Class<?>[] parameterTypes, Object[] args) throws InvocationException {
-		Object result = invokeMethod(name, parameterTypes, args);
-		if (result != null && !(result instanceof String)) {
-			throw new InvocationException("Unable to invoke method '%s' on class '%s': mismatch return type '%s'", name, cls, result.getClass());
+	public <T> T invokeMethod(String name, Class<? extends T> cls) throws InvocationException {
+		return invokeMethod(name, EMPTY_PARAMETER_TYPES, EMPTY_ARGS, cls);
+	}
 
+	@SuppressWarnings("unchecked")
+	public <T> T invokeMethod(String name, Class<?>[] parameterTypes, Object[] args, Class<? extends T> cls) throws InvocationException {
+		Object result = invokeMethod(name, parameterTypes, args);
+		if (result != null && !cls.isInstance(result)) {
+			throw new InvocationException("Unable to invoke method '%s' on class '%s': mismatch return type '%s'", name, cls, result.getClass());
 		}
 
-		return (String) result;
+		return (T) result;
 	}
 
 	public Object invokeMethod(String name, Class<?>[] parameterTypes, Object[] args) throws InvocationException {

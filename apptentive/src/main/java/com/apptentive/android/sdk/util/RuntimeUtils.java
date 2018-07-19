@@ -64,6 +64,19 @@ public class RuntimeUtils {
 		return getApplicationInfo(context).isDebuggable();
 	}
 
+	/**
+	 * @return true if class exists
+	 */
+	public static boolean classExists(@NonNull String name) {
+		try {
+			Class.forName(name);
+			return true;
+		} catch (Exception ignored) {
+		}
+
+		return false;
+	}
+
 	public static Class<?> classForName(String name) {
 		try {
 			return Class.forName(name);
