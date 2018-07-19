@@ -13,3 +13,8 @@ project(':apptentive-example').projectDir = new File('samples/apptentive-example
 if (file('apptentive-internal-app/build.gradle').exists()) {
     include ':apptentive-internal-app'
 }
+
+// Apptimize App
+if (file('apptentive-apptimize/build.gradle').exists()) {
+    include ':apptentive-apptimize'
+}

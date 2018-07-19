@@ -1,3 +1,9 @@
+# 2018-07-19 - v5.1.5
+
+#### Improvements
+
+* Added support for Apptimize experiments.
+
 # 2018-07-05 - v5.1.4
 
 #### Fixes

@@ -247,4 +247,16 @@ public final class StringUtils {
 		result.append("\n").append(line);
 		return result.toString();
 	}
+
+	//region Parsing
+
+	public static int parseInt(String value, int defaultValue) {
+		try {
+			return Integer.parseInt(value);
+		} catch (Exception e) {
+			return defaultValue;
+		}
+	}
+
+	//endregion
 }
