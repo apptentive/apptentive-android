@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -60,6 +61,8 @@ import static com.apptentive.android.sdk.util.StringUtils.trim;
  * This class contains the complete public API for accessing Apptentive features from within your app.
  */
 public class Apptentive {
+
+	private static OnPreInteractionListener preInteractionListener;
 
 	/**
 	 * Must be called from the {@link Application#onCreate()} method in the {@link Application} object defined in your app's manifest.
@@ -1163,6 +1166,8 @@ public class Apptentive {
 
 	//endregion
 
+	//region Engagement
+
 	/**
 	 * This method takes a unique event string, stores a record of that event having been visited,
 	 * determines if there is an interaction that is able to run for this event, and then runs it. If
@@ -1315,10 +1320,32 @@ public class Apptentive {
 			throw new IllegalArgumentException("Event is null or empty");
 		}
 
+		// first, we check if there's an engagement callback to inject
+		final OnPreInteractionListener preInteractionListener = Apptentive.preInteractionListener; // capture variable to avoid concurrency issues
+		if (preInteractionListener != null) {
+			dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
+				@Override
+				protected boolean execute(Conversation conversation) {
+					if (!canShowLocalAppInteraction(conversation, event)) {
+						return false;
+					}
+
+					boolean allowsInteraction = preInteractionListener.shouldEngageInteraction(event, customData);
+					ApptentiveLog.i("Engagement callback allows interaction for event '%s': %b", event, allowsInteraction);
+					if (!allowsInteraction) {
+						return false;
+					}
+
+					return engageLocalAppEvent(context, conversation, event, customData, extendedData); // actually engage event
+				}
+			}, StringUtils.format("engage '%s' event", event));
+			return;
+		}
+
 		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
 			@Override
 			protected boolean execute(Conversation conversation) {
-				return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+				return engageLocalAppEvent(context, conversation, event, customData, extendedData);
 			}
 		}, StringUtils.format("engage '%s' event", event));
 	}
@@ -1337,10 +1364,27 @@ public class Apptentive {
 		dispatchConversationTask(new ConversationDispatchTask(callback, DispatchQueue.mainQueue()) {
 			@Override
 			protected boolean execute(Conversation conversation) {
-				return EngagementModule.canShowInteraction(conversation, "app", event, "local");
+				return canShowLocalAppInteraction(conversation, event);
 			}
 		}, "check if interaction can be shown");
 	}
+
+	/**
+	 * Sets an optional engagement callback.
+	 */
+	public static synchronized void setOnPreInteractionListener(@Nullable OnPreInteractionListener onPreInteractionListener) {
+		Apptentive.preInteractionListener = onPreInteractionListener;
+	}
+
+	private static boolean engageLocalAppEvent(Context context, Conversation conversation, String event, Map<String, Object> customData, ExtendedData[] extendedData) {
+		return EngagementModule.engage(context, conversation, "local", "app", null, event, null, customData, extendedData);
+	}
+
+	private static boolean canShowLocalAppInteraction(Conversation conversation, String event) {
+		return EngagementModule.canShowInteraction(conversation, "app", event, "local");
+	}
+
+	//endregion
 
 	/**
 	 * Pass in a listener. The listener will be called whenever a survey is finished.
@@ -1775,6 +1819,19 @@ public class Apptentive {
 			double thatDateTime = other.getDateTime();
 			return Double.compare(thisDateTime, thatDateTime);
 		}
+	}
+
+	/**
+	 * Represents a callback which will be invoked right before an interaction is engaged. Can be used
+	 * to intercept the default engagement flow.
+	 */
+	public interface OnPreInteractionListener {
+		/**
+		 * @param event event which triggered the interaction.
+		 * @param customData optional custom data map passed to the engagement call.
+		 * @return <code>true</code> if interaction should be engaged. Otherwise, it would be cancelled.
+		 */
+		boolean shouldEngageInteraction(String event, @Nullable Map<String, Object> customData);
 	}
 
 	/**
