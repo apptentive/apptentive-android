@@ -12,6 +12,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationState;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.StoredFile;
@@ -64,8 +65,8 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 	/*
 	 * Creates an asynchronous task manager with one worker thread. This constructor must be invoked on the UI thread.
 	 */
-	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient) {
-		dbHelper = new ApptentiveDatabaseHelper(context);
+	public ApptentiveTaskManager(Context context, ApptentiveHttpClient apptentiveHttpClient, EncryptionKey encryptionKey) {
+		dbHelper = new ApptentiveDatabaseHelper(context, encryptionKey);
 		/* When a new database task is submitted, the executor has the following behaviors:
 		 * 1. If the thread pool has no thread yet, it creates a single worker thread.
 		 * 2. If the single worker thread is running with tasks, it queues tasks.

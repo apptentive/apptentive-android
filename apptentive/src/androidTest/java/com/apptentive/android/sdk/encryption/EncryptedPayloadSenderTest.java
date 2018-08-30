@@ -4,10 +4,9 @@
  * under which redistribution and use of this file is permitted.
  */
 
-package com.apptentive.android.sdk.storage;
+package com.apptentive.android.sdk.encryption;
 
 import com.apptentive.android.sdk.TestCaseBase;
-import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.EventPayload;
 
 import org.json.JSONObject;
@@ -25,21 +24,16 @@ public class EncryptedPayloadSenderTest extends TestCaseBase {
 	@Test
 	public void testEncryptedPayload() throws Exception {
 
+		EncryptionKey encryptionKey = new EncryptionKey(ENCRYPTION_KEY);
+
 		final EventPayload original = new EventPayload(EVENT_LABEL, "trigger");
 		original.setToken(AUTH_TOKEN);
-		original.setEncryptionKey(ENCRYPTION_KEY);
+		original.setEncryptionKey(encryptionKey);
 
 		byte[] cipherText = original.renderData();
-
-		Encryptor encryptor = new Encryptor(ENCRYPTION_KEY);
-
-		try {
-			byte[] plainText = encryptor.decrypt(cipherText);
-			JSONObject result = new JSONObject(new String(plainText));
-			String label = result.getJSONObject("event").getString("label");
-			assertEquals(label, EVENT_LABEL);
-		} catch (Exception e) {
-			fail(e.getMessage());
-		}
+		byte[] plainText = Encryptor.decrypt(encryptionKey, cipherText);
+		JSONObject result = new JSONObject(new String(plainText));
+		String label = result.getJSONObject("event").getString("label");
+		assertEquals(label, EVENT_LABEL);
 	}
 }

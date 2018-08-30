@@ -20,10 +20,10 @@ public class PayloadData {
 	private final String contentType;
 	private final String httpRequestPath;
 	private final HttpRequestMethod httpRequestMethod;
-	private final boolean encrypted;
+	private final boolean authenticated;
 
 
-	public PayloadData(PayloadType type, String nonce, String conversationId, byte[] data, String authToken, String contentType, String httpRequestPath, HttpRequestMethod httpRequestMethod, boolean encrypted) {
+	public PayloadData(PayloadType type, String nonce, String conversationId, byte[] data, String authToken, String contentType, String httpRequestPath, HttpRequestMethod httpRequestMethod, boolean authenticated) {
 		if (type == null) {
 			throw new IllegalArgumentException("Payload type is null");
 		}
@@ -60,7 +60,7 @@ public class PayloadData {
 		this.contentType = contentType;
 		this.httpRequestPath = httpRequestPath;
 		this.httpRequestMethod = httpRequestMethod;
-		this.encrypted = encrypted;
+		this.authenticated = authenticated;
 	}
 
 	//region String representation
@@ -106,8 +106,8 @@ public class PayloadData {
 		return httpRequestMethod;
 	}
 
-	public boolean isEncrypted() {
-		return encrypted;
+	public boolean isAuthenticated() {
+		return authenticated;
 	}
 
 	//endregion

@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.conversation;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.Apptentive;
@@ -30,6 +31,7 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -43,7 +45,6 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONObject;
 
 import java.io.File;
-import java.io.IOException;
 import java.lang.ref.WeakReference;
 import java.util.List;
 
@@ -56,6 +57,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE;
+import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE_LEGACY_V1;
 import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
 
 /**
@@ -77,7 +79,12 @@ public class ConversationManager {
 	/**
 	 * A basic directory for storing conversation-related data.
 	 */
-	private final File apptentiveConversationsStorageDir;
+	private final File conversationsStorageDir;
+
+	/**
+	 * A private encryption key for securing SDK files.
+	 */
+	private final EncryptionKey encryptionKey; // FIXME: rename field
 
 	/**
 	 * Current state of conversation metadata.
@@ -87,13 +94,22 @@ public class ConversationManager {
 	private Conversation activeConversation;
 	private ConversationProxy activeConversationProxy;
 
-	public ConversationManager(Context context, File apptentiveConversationsStorageDir) {
+	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull EncryptionKey encryptionKey) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
+		if (conversationsStorageDir == null) {
+			throw new IllegalArgumentException("Conversation storage dir is null");
+		}
+
+		if (encryptionKey == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
+
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
-		this.apptentiveConversationsStorageDir = apptentiveConversationsStorageDir;
+		this.conversationsStorageDir = conversationsStorageDir;
+		this.encryptionKey = encryptionKey;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -173,11 +189,17 @@ public class ConversationManager {
 		return false;
 	}
 
-	private @Nullable Conversation loadActiveConversationGuarded() throws IOException {
+	private @Nullable Conversation loadActiveConversationGuarded() {
 		// try to load an active conversation from metadata first
 		try {
 			if (conversationMetadata.hasItems()) {
 				return loadConversationFromMetadata(conversationMetadata);
+			}
+
+			// try to load legacy conversation
+			Conversation legacyConversation = migrateLegacyConversation(getContext());
+			if (legacyConversation != null) {
+				return legacyConversation;
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while loading conversation");
@@ -185,16 +207,9 @@ public class ConversationManager {
 
 		// no active conversations: create a new one
 		ApptentiveLog.i(CONVERSATION, "Creating 'anonymous' conversation...");
-		File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-		File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-		Conversation conversation = new Conversation(dataFile, messagesFile);
-
-		// attempt to migrate a legacy conversation (if any)
-		if (migrateLegacyConversation(conversation)) {
-			return conversation;
-		}
-
-		// if there is no Legacy Conversation, then just connect it to the server.
+		File dataFile = generateConversationDataFilename();
+		File messagesFile = generateMessagesFilename();
+		Conversation conversation = new Conversation(dataFile, messagesFile, encryptionKey);
 		conversation.setState(ANONYMOUS_PENDING);
 		fetchConversationToken(conversation);
 		return conversation;
@@ -204,7 +219,7 @@ public class ConversationManager {
 	 * Attempts to load an existing conversation based on metadata file
 	 * @return <code>null</code> is only logged out conversations available
 	 */
-	private @Nullable Conversation loadConversationFromMetadata(ConversationMetadata metadata) throws SerializerException {
+	private @Nullable Conversation loadConversationFromMetadata(ConversationMetadata metadata) throws SerializerException, ConversationLoadException {
 		// we're going to scan metadata in attempt to find existing conversations
 		ConversationMetadataItem item;
 
@@ -245,59 +260,50 @@ public class ConversationManager {
 		return null;
 	}
 
-	/**
-	 * Attempts to migrate a legacy conversation
-	 * @return <code>true</code> is succeed
-	 */
-	private boolean migrateLegacyConversation(Conversation conversation) {
-		try {
-			return migrateLegacyConversationGuarded(conversation);
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while migrating legacy conversation");
-		}
-		return false;
-	}
-
-	private boolean migrateLegacyConversationGuarded(Conversation conversation) {
+	private @Nullable Conversation migrateLegacyConversation(Context context) {
 		// If there is a Legacy Conversation, migrate it into the new Conversation object.
 		// Check whether migration is needed.
 		// No Conversations exist in the meta-data.
 		// Do we have a Legacy Conversation or not?
 		final SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
 		String legacyConversationToken = prefs.getString(Constants.PREF_KEY_CONVERSATION_TOKEN, null);
-		if (!isNullOrEmpty(legacyConversationToken)) {
-			ApptentiveLog.i(CONVERSATION, "Migrating an existing legacy conversation to the new format...");
-
-			String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
-			Apptentive.Version version4 = new Apptentive.Version();
-			version4.setVersion("4.0.0");
-			Apptentive.Version lastSeenVersion = new Apptentive.Version();
-			lastSeenVersion.setVersion(lastSeenVersionString);
-			if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
-				conversation.setState(LEGACY_PENDING);
-				conversation.setConversationToken(legacyConversationToken);
-
-				Migrator migrator = new Migrator(getContext(), prefs, conversation);
-				migrator.migrate();
-
-				ApptentiveLog.v(CONVERSATION, "Fetching legacy conversation...");
-				fetchLegacyConversation(conversation)
-						// remove legacy key when request is finished
-						.addListener(new HttpRequest.Adapter<HttpRequest>() {
-							@Override
-							public void onFinish(HttpRequest request) {
-								prefs.edit()
-										.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
-										.apply();
-							}
-						});
-				return true;
-			}
-
-			ApptentiveLog.w(CONVERSATION, "Unable to migrate legacy conversation: data format is outdated!");
+		if (isNullOrEmpty(legacyConversationToken)) {
+			return null;
 		}
 
-		return false;
+		ApptentiveLog.i(CONVERSATION, "Migrating an existing legacy conversation to the new format...");
+
+		// remove the legacy data to avoid further migration
+		prefs.edit()
+			.remove(Constants.PREF_KEY_CONVERSATION_TOKEN)
+			.remove(Constants.PREF_KEY_POLL_FOR_INTERACTIONS)
+			.apply();
+
+		String lastSeenVersionString = prefs.getString(Constants.PREF_KEY_LAST_SEEN_SDK_VERSION, null);
+		Apptentive.Version version4 = new Apptentive.Version();
+		version4.setVersion("4.0.0");
+		Apptentive.Version lastSeenVersion = new Apptentive.Version();
+		lastSeenVersion.setVersion(lastSeenVersionString);
+		if (lastSeenVersionString != null && lastSeenVersion.compareTo(version4) < 0) {
+			ApptentiveLog.i(CONVERSATION, "Creating 'legacy' conversation...");
+
+			File dataFile = generateConversationDataFilename();
+			File messagesFile = generateMessagesFilename();
+			Conversation conversation = new Conversation(dataFile, messagesFile, encryptionKey);
+			conversation.setState(LEGACY_PENDING);
+			conversation.setConversationToken(legacyConversationToken);
+
+			// migrate conversation data (events, etc)
+			Migrator migrator = new Migrator(context, prefs, conversation);
+			migrator.migrate();
+
+			ApptentiveLog.v(CONVERSATION, "Fetching legacy conversation...");
+			fetchLegacyConversation(conversation);
+
+			return conversation;
+		}
+
+		return null;
 	}
 
 	private HttpRequest fetchLegacyConversation(final Conversation conversation) {
@@ -370,16 +376,33 @@ public class ConversationManager {
 		return request;
 	}
 
-	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException {
+	private Conversation loadConversation(ConversationMetadataItem item) throws SerializerException, ConversationLoadException {
 		checkConversationQueue();
 
+		// logged-in conversations should use an encryption key which was received from the backend.
+		EncryptionKey conversationEncryptionKey = encryptionKey;
+		if (LOGGED_IN.equals(item.getConversationState())) {
+			conversationEncryptionKey = item.getConversationEncryptionKey();
+			if (conversationEncryptionKey == null) {
+				throw new ConversationLoadException("Missing conversation encryption key");
+			}
+		}
+
 		// TODO: use same serialization logic across the project
-		final Conversation conversation = new Conversation(item.dataFile, item.messagesFile);
-		conversation.setEncryptionKey(item.getEncryptionKey()); // it's important to set encryption key before loading data
-		conversation.setState(item.getState()); // set the state same as the item's state
+		final Conversation conversation = new Conversation(item.getDataFile(), item.getMessagesFile(), conversationEncryptionKey);
+		conversation.setState(item.getConversationState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
 		conversation.setConversationToken(item.getConversationToken()); // TODO: this would be overwritten by the next call
-		conversation.loadConversationData();
+
+		// try to migrate legacy conversation first
+		boolean migrated = conversation.migrateConversationData();
+
+		// if failed - load from encrypted data
+		if (!migrated) {
+			conversation.loadConversationData();
+		}
+
+		// check inconsistency
 		conversation.checkInternalConsistency();
 
 		return conversation;
@@ -623,25 +646,21 @@ public class ConversationManager {
 	private void updateMetadataItems(Conversation conversation) {
 		checkConversationQueue();
 
-		ApptentiveLog.v(CONVERSATION, "Updating metadata: state=%s localId=%s conversationId=%s token=%s",
-				conversation.getState(),
-				conversation.getLocalIdentifier(),
-				conversation.getConversationId(),
-				hideIfSanitized(conversation.getConversationToken()));
+		ApptentiveLog.v(CONVERSATION, "Updating metadata: %s", conversation);
 
 		// if the conversation is 'logged-in' we should not have any other 'logged-in' items in metadata
 		if (conversation.hasState(LOGGED_IN)) {
 			for (ConversationMetadataItem item : conversationMetadata) {
-				if (item.state.equals(LOGGED_IN)) {
-					item.state = LOGGED_OUT;
+				if (LOGGED_IN.equals(item.getConversationState())) {
+					item.setConversationState(LOGGED_OUT);
 				}
 			}
 		}
 
 		// delete sensitive information
 		for (ConversationMetadataItem item : conversationMetadata) {
-			item.encryptionKey = null;
-			item.conversationToken = null;
+			item.setConversationEncryptionKey(null);
+			item.setConversationToken(null);
 		}
 
 		// update the state of the corresponding item
@@ -651,18 +670,17 @@ public class ConversationManager {
 			conversationMetadata.addItem(item);
 		} else {
 			assertTrue(conversation.getConversationId() != null || conversation.hasState(ANONYMOUS_PENDING) || conversation.hasState(LEGACY_PENDING), "Missing conversation id for state: %s", conversation.getState());
-			item.conversationId = conversation.getConversationId();
+			item.setConversationId(conversation.getConversationId());
 		}
 
-		item.state = conversation.getState();
+		item.setConversationState(conversation.getState());
 		if (conversation.hasActiveState()) {
-			item.conversationToken = notNull(conversation.getConversationToken());
+			item.setConversationToken(notNull(conversation.getConversationToken()));
 		}
 
-		// update encryption key (if necessary)
 		if (conversation.hasState(LOGGED_IN)) {
-			item.encryptionKey = notNull(conversation.getEncryptionKey());
-			item.userId = notNull(conversation.getUserId());
+			item.setConversationEncryptionKey(notNull(conversation.getEncryptionKey()));
+			item.setUserId(notNull(conversation.getUserId()));
 		}
 
 		// apply changes
@@ -677,13 +695,27 @@ public class ConversationManager {
 		checkConversationQueue();
 
 		try {
-			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_FILE);
+			// attempt to load the encrypted metadata file
+			File metaFile = new File(conversationsStorageDir, CONVERSATION_METADATA_FILE);
 			if (metaFile.exists()) {
 				ApptentiveLog.v(CONVERSATION, "Loading metadata file: %s", metaFile);
-				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
-			} else {
-				ApptentiveLog.v(CONVERSATION, "Metadata file not found: %s", metaFile);
+				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class, encryptionKey);
 			}
+
+			// attempt to load the legacy metadata file
+			metaFile = new File(conversationsStorageDir, CONVERSATION_METADATA_FILE_LEGACY_V1);
+			if (metaFile.exists()) {
+				ApptentiveLog.v(CONVERSATION, "Loading legacy v1 metadata file: %s", metaFile);
+				try {
+					return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class);
+				} finally {
+					// we need to delete the legacy file to avoid the data being loaded next time
+					boolean fileDeleted = metaFile.delete();
+					ApptentiveLog.v(CONVERSATION, "Legacy metadata file deleted: %b", fileDeleted);
+				}
+			}
+
+			ApptentiveLog.v(CONVERSATION, "No metadata files");
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading conversation metadata");
 		}
@@ -699,11 +731,11 @@ public class ConversationManager {
 				ApptentiveLog.v(CONVERSATION, "Saving metadata: ", conversationMetadata.toString());
 			}
 			long start = System.currentTimeMillis();
-			File metaFile = new File(apptentiveConversationsStorageDir, CONVERSATION_METADATA_FILE);
-			ObjectSerialization.serialize(metaFile, conversationMetadata);
+			File metaFile = new File(conversationsStorageDir, CONVERSATION_METADATA_FILE);
+			ObjectSerialization.serialize(metaFile, conversationMetadata, encryptionKey);
 			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {
-			ApptentiveLog.e(CONVERSATION, "Exception while saving metadata");
+			ApptentiveLog.e(CONVERSATION, e, "Exception while saving metadata");
 		}
 	}
 
@@ -766,7 +798,7 @@ public class ConversationManager {
 				return;
 			}
 
-			sendLoginRequest(conversationItem.conversationId, userId, token, callback);
+			sendLoginRequest(conversationItem.getConversationId(), userId, token, callback);
 			return;
 		}
 
@@ -837,9 +869,10 @@ public class ConversationManager {
 			public void onFinish(HttpJsonRequest request) {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
-					final String encryptionKey = responseObject.getString("encryption_key");
+					final String conversationEncryptionKeyHex = responseObject.getString("encryption_key");
+					final EncryptionKey conversationEncryptionKey = new EncryptionKey(conversationEncryptionKeyHex);
 					final String incomingConversationId = responseObject.getString("id");
-					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
+					handleLoginFinished(incomingConversationId, userId, token, conversationEncryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -856,9 +889,9 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final EncryptionKey conversationEncryptionKey) {
 				checkConversationQueue();
-				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+				assertNotNull(conversationEncryptionKey,"Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 
 				try {
@@ -873,14 +906,15 @@ public class ConversationManager {
 						});
 
 						if (conversationItem != null) {
-							conversationItem.conversationToken = token;
-							conversationItem.encryptionKey = encryptionKey;
+							conversationItem.setConversationState(LOGGED_IN);
+							conversationItem.setConversationToken(token);
+							conversationItem.setConversationEncryptionKey(conversationEncryptionKey);
 							setActiveConversation(loadConversation(conversationItem));
 						} else {
 							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
-							File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-							File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-							setActiveConversation(new Conversation(dataFile, messagesFile));
+							File dataFile = generateConversationDataFilename();
+							File messagesFile = generateMessagesFilename();
+							setActiveConversation(new Conversation(dataFile, messagesFile, conversationEncryptionKey));
 
 							// TODO: if we don't set these here - device payload would return 4xx error code
 							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
@@ -889,7 +923,7 @@ public class ConversationManager {
 						}
 					}
 
-					activeConversation.setEncryptionKey(encryptionKey);
+					activeConversation.setEncryptionKey(conversationEncryptionKey);
 					activeConversation.setConversationToken(token);
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
@@ -928,9 +962,9 @@ public class ConversationManager {
 			public void onFinish(HttpJsonRequest request) {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
-					final String encryptionKey = responseObject.getString("encryption_key");
+					final EncryptionKey payloadEncryptionKey = new EncryptionKey(responseObject.getString("encryption_key"));
 					final String incomingConversationId = responseObject.getString("id");
-					handleLoginFinished(incomingConversationId, userId, token, encryptionKey);
+					handleLoginFinished(incomingConversationId, userId, token, payloadEncryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
 					handleLoginFailed("Internal error");
@@ -947,10 +981,10 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String encryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final EncryptionKey conversationEncryptionKey) {
 				checkConversationQueue();
 				assertNull(activeConversation, "Finished logging into new conversation, but one was already active.");
-				assertFalse(isNullOrEmpty(encryptionKey),"Login finished with missing encryption key.");
+				assertNotNull(conversationEncryptionKey,"Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
 
 				try {
@@ -963,21 +997,23 @@ public class ConversationManager {
 					});
 
 					if (conversationItem != null) {
-						conversationItem.conversationToken = token;
-						conversationItem.encryptionKey = encryptionKey;
+						conversationItem.setConversationState(LOGGED_IN);
+						conversationItem.setConversationToken(token);
+						conversationItem.setConversationEncryptionKey(conversationEncryptionKey);
 						setActiveConversation(loadConversation(conversationItem));
 					} else {
 						ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
-						File dataFile = new File(apptentiveConversationsStorageDir, "conversation-" + Util.generateRandomFilename());
-						File messagesFile = new File(apptentiveConversationsStorageDir, "messages-" + Util.generateRandomFilename());
-						setActiveConversation(new Conversation(dataFile, messagesFile));
+						File dataFile = generateConversationDataFilename();
+						File messagesFile = generateMessagesFilename();
+						Conversation conversation = new Conversation(dataFile, messagesFile, conversationEncryptionKey);
+						setActiveConversation(conversation);
 
 						activeConversation.setAppRelease(appRelease);
 						activeConversation.setSdk(sdk);
 						activeConversation.setDevice(device);
 					}
 
-					activeConversation.setEncryptionKey(encryptionKey);
+					activeConversation.setEncryptionKey(conversationEncryptionKey);
 					activeConversation.setConversationToken(token);
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
@@ -1049,23 +1085,41 @@ public class ConversationManager {
 			"dataFile",
 			"messagesFile",
 			"conversationToken",
-			"encryptionKey"
+			"payloadEncryptionKey"
 		};
 		int index = 1;
 		for (ConversationMetadataItem item : items) {
 			rows[index++] = new Object[] {
-				item.state,
-				item.localConversationId,
-				item.conversationId,
-				item.userId,
-				hideIfSanitized(item.dataFile),
-				hideIfSanitized(item.messagesFile),
-				hideIfSanitized(item.conversationToken),
-				hideIfSanitized(item.encryptionKey)
+				item.getConversationState(),
+				item.getLocalConversationId(),
+				item.getConversationId(),
+				item.getUserId(),
+				hideIfSanitized(item.getDataFile()),
+				hideIfSanitized(item.getMessagesFile()),
+				hideIfSanitized(item.getConversationToken()),
+				hideIfSanitized(item.getConversationEncryptionKey())
 			};
 		}
 
 		ApptentiveLog.v(CONVERSATION, "%s (%d item(s))\n%s", title, items.size(), StringUtils.table(rows));
+	}
+
+	//endregion
+
+	//region Helpers
+
+	/**
+	 * Generates a random name for a conversation data file
+	 */
+	private @NonNull File generateConversationDataFilename() {
+		return Util.getEncryptedFilename(new File(conversationsStorageDir, "conversation-" + Util.generateRandomFilename()));
+	}
+
+	/**
+	 * Generates a random name for a conversation messages file
+	 */
+	private @NonNull File generateMessagesFilename() {
+		return Util.getEncryptedFilename(new File(conversationsStorageDir, "messages-" + Util.generateRandomFilename()));
 	}
 
 	//endregion

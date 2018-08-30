@@ -1,9 +1,14 @@
 package com.apptentive.android.sdk.serialization;
 
+import android.support.annotation.NonNull;
 import android.support.v4.util.AtomicFile;
 
+import com.apptentive.android.sdk.encryption.EncryptionKey;
+import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.util.Util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -35,6 +40,27 @@ public class ObjectSerialization {
 	}
 
 	/**
+	 * Writes an object ot an encrypted file
+	 */
+	public static void serialize(File file, SerializableObject object, @NonNull EncryptionKey encryptionKey) throws IOException {
+		ByteArrayOutputStream bos = null;
+		DataOutputStream dos = null;
+		try {
+			bos = new ByteArrayOutputStream();
+			dos = new DataOutputStream(bos);
+			object.writeExternal(dos);
+			final byte[] unencryptedBytes = bos.toByteArray();
+			final byte[] encryptedBytes = Encryptor.encrypt(encryptionKey, unencryptedBytes);
+			Util.writeAtomically(file, encryptedBytes);
+		} catch (Exception e) {
+			throw new IOException(e);
+		} finally {
+			Util.ensureClosed(bos);
+			Util.ensureClosed(dos);
+		}
+	}
+
+	/**
 	 * Reads an object from a file
 	 */
 	public static <T extends SerializableObject> T deserialize(File file, Class<T> cls) throws IOException {
@@ -52,6 +78,26 @@ public class ObjectSerialization {
 			}
 		} finally {
 			Util.ensureClosed(stream);
+		}
+	}
+
+	public static <T extends SerializableObject> T deserialize(File file, Class<T> cls, EncryptionKey encryptionKey) throws IOException {
+		try {
+			final byte[] encryptedBytes = Util.readBytes(file);
+			final byte[] unencryptedBytes = Encryptor.decrypt(encryptionKey, encryptedBytes);
+
+			ByteArrayInputStream stream = null;
+			try {
+				stream = new ByteArrayInputStream(unencryptedBytes);
+				DataInputStream in = new DataInputStream(stream);
+				Constructor<T> constructor = cls.getDeclaredConstructor(DataInput.class);
+				constructor.setAccessible(true);
+				return constructor.newInstance(in);
+			} finally {
+				Util.ensureClosed(stream);
+			}
+		} catch (Exception e) {
+			throw new IOException("Unable to instantiate class: " + cls, e);
 		}
 	}
 }

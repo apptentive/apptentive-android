@@ -25,8 +25,7 @@ import java.util.List;
 public class RuntimeUtils {
 	private static ApplicationInfo cachedApplicationInfo;
 
-	public synchronized static @NonNull
-	ApplicationInfo getApplicationInfo(Context context) {
+	public synchronized static @NonNull ApplicationInfo getApplicationInfo(Context context) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}

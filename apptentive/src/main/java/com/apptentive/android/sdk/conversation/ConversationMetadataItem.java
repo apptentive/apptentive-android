@@ -1,13 +1,18 @@
 package com.apptentive.android.sdk.conversation;
 
+import android.support.annotation.Nullable;
+
+import com.apptentive.android.sdk.encryption.SecurityManager;
 import com.apptentive.android.sdk.serialization.SerializableObject;
-import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 
 import java.io.DataInput;
 import java.io.DataOutput;
 import java.io.File;
 import java.io.IOException;
 
+import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
+import static com.apptentive.android.sdk.util.Util.getEncryptedFilename;
 import static com.apptentive.android.sdk.util.Util.readNullableUTF;
 import static com.apptentive.android.sdk.util.Util.writeNullableUTF;
 
@@ -19,42 +24,43 @@ public class ConversationMetadataItem implements SerializableObject {
 	/**
 	 * The state of the target conversation
 	 */
-	ConversationState state = ConversationState.UNDEFINED;
+	private ConversationState conversationState = ConversationState.UNDEFINED;
 
 	/**
 	 * Local conversation ID
 	 */
-	final String localConversationId;
-
-	/**
-	 * Conversation ID which was received from the backend
-	 */
-	String conversationId;
-
-	/**
-	 * The token for active conversations
-	 */
-	String conversationToken;
+	private final String localConversationId;
 
 	/**
 	 * Storage filename for conversation serialized data
 	 */
-	final File dataFile;
+	private final File dataFile;
 
 	/**
 	 * Storage filename for conversation serialized messages
 	 */
-	final File messagesFile;
+	private final File messagesFile;
 
 	/**
-	 * Key for encrypting payloads
+	 * Conversation ID which was received from the backend
 	 */
-	String encryptionKey;
+	private @Nullable String conversationId;
+
+	/**
+	 * The token for active conversations
+	 */
+	private @Nullable String conversationToken;
+
+	/**
+	 * Key for encrypting logged-in conversations. We receive it from the server. Anonymous conversations
+	 * would not have this key.
+	 */
+	private @Nullable EncryptionKey conversationEncryptionKey;
 
 	/**
 	 * An optional user ID for logged in conversations
 	 */
-	String userId;
+	private @Nullable String userId;
 
 	public ConversationMetadataItem(String localConversationId, String conversationId, File dataFile, File messagesFile) {
 		if (localConversationId == null) {
@@ -79,10 +85,11 @@ public class ConversationMetadataItem implements SerializableObject {
 		localConversationId = in.readUTF();
 		conversationId = readNullableUTF(in);
 		conversationToken = readNullableUTF(in);
-		dataFile = new File(in.readUTF());
-		messagesFile = new File(in.readUTF());
-		state = ConversationState.valueOf(in.readByte());
-		encryptionKey = readNullableUTF(in);
+		dataFile = getEncryptedFilename(new File(in.readUTF()));
+		messagesFile = getEncryptedFilename(new File(in.readUTF()));
+		conversationState = ConversationState.valueOf(in.readByte());
+		String conversationEncryptionKeyHex = readNullableUTF(in);
+		conversationEncryptionKey = conversationEncryptionKeyHex != null ? new EncryptionKey(conversationEncryptionKeyHex) : null;
 		userId = readNullableUTF(in);
 	}
 
@@ -93,45 +100,73 @@ public class ConversationMetadataItem implements SerializableObject {
 		writeNullableUTF(out, conversationToken);
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
-		out.writeByte(state.ordinal());
-		writeNullableUTF(out, encryptionKey);
+		out.writeByte(conversationState.ordinal());
+		writeNullableUTF(out, conversationEncryptionKey != null ? conversationEncryptionKey.getHexKey() : null);
 		writeNullableUTF(out, userId);
+	}
+
+	public @Nullable String getConversationId() {
+		return conversationId;
 	}
 
 	public String getLocalConversationId() {
 		return localConversationId;
 	}
 
-	public String getConversationId() {
-		return conversationId;
+	public void setConversationId(String conversationId) {
+		this.conversationId = conversationId;
 	}
 
-	public ConversationState getState() {
-		return state;
+	public ConversationState getConversationState() {
+		return conversationState;
 	}
 
-	public String getEncryptionKey() {
-		return encryptionKey;
+	public void setConversationState(ConversationState conversationState) {
+		this.conversationState = conversationState;
 	}
 
-	public String getUserId() {
+	public @Nullable EncryptionKey getConversationEncryptionKey() {
+		return conversationEncryptionKey;
+	}
+
+	public void setConversationEncryptionKey(EncryptionKey conversationEncryptionKey) {
+		this.conversationEncryptionKey = conversationEncryptionKey;
+	}
+
+	public @Nullable String getUserId() {
 		return userId;
 	}
 
-	public String getConversationToken() {
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public @Nullable String getConversationToken() {
 		return conversationToken;
+	}
+
+	public void setConversationToken(String conversationToken) {
+		this.conversationToken = conversationToken;
+	}
+
+	public File getDataFile() {
+		return dataFile;
+	}
+
+	public File getMessagesFile() {
+		return messagesFile;
 	}
 
 	@Override
 	public String toString() {
 		return "ConversationMetadataItem{" +
-			       "state=" + state +
+			       "conversationState=" + conversationState +
 			       ", localConversationId='" + localConversationId + '\'' +
 			       ", conversationId='" + conversationId + '\'' +
-			       ", conversationToken='" + conversationToken + '\'' +
+			       ", conversationToken='" + hideIfSanitized(conversationToken) + '\'' +
 			       ", dataFile=" + dataFile +
 			       ", messagesFile=" + messagesFile +
-			       ", encryptionKey='" + encryptionKey + '\'' +
+			       ", conversationEncryptionKey='" + hideIfSanitized(conversationEncryptionKey) + '\'' +
 			       ", userId='" + userId + '\'' +
 			       '}';
 	}

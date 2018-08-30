@@ -6,6 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.util.Util;
 
@@ -13,18 +14,17 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
-import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class EncryptedFileSerializer extends FileSerializer {
-	private final String encryptionKey;
+	private final EncryptionKey encryptionKey;
 
-	public EncryptedFileSerializer(File file, String encryptionKey) {
+	public EncryptedFileSerializer(File file, EncryptionKey encryptionKey) {
 		super(file);
 
 		if (encryptionKey == null) {
-			throw new IllegalArgumentException("'encryptionKey' is null");
+			throw new IllegalArgumentException("'encryptionKey' is null or empty");
 		}
 
 		this.encryptionKey = encryptionKey;
@@ -39,8 +39,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 			oos = new ObjectOutputStream(bos);
 			oos.writeObject(object);
 			final byte[] unencryptedBytes = bos.toByteArray();
-			Encryptor encryptor = new Encryptor(encryptionKey);
-			final byte[] encryptedBytes = encryptor.encrypt(unencryptedBytes);
+			final byte[] encryptedBytes = Encryptor.encrypt(encryptionKey, unencryptedBytes);
 			stream.write(encryptedBytes); // TODO: should we write using a buffer?
 		} finally {
 			Util.ensureClosed(bos);
@@ -52,8 +51,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 	protected Object deserialize(File file) throws SerializerException {
 		try {
 			final byte[] encryptedBytes = Util.readBytes(file);
-			Encryptor encryptor = new Encryptor(encryptionKey);
-			final byte[] unencryptedBytes = encryptor.decrypt(encryptedBytes);
+			final byte[] unencryptedBytes = Encryptor.decrypt(encryptionKey, encryptedBytes);
 
 			ByteArrayInputStream bis = null;
 			ObjectInputStream ois = null;

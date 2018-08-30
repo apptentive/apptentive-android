@@ -1,3 +1,9 @@
+# 2018-08-30 - v5.3.0
+
+#### Improvements
+
+* Improved SDK security with encryption and KeyStore.
+
 # 2018-08-23 - v5.2.0
 
 #### Improvements

@@ -25,7 +25,6 @@ import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONObject;
 
-import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -125,43 +124,6 @@ public final class StringUtils {
 	}
 
 	/**
-	 * Create URL encoded params string from the map of key-value pairs
-	 *
-	 * @throws IllegalArgumentException if map, any key or value appears to be null
-	 */
-	public static String createQueryString(Map<String, Object> params) {
-		if (params == null) {
-			throw new IllegalArgumentException("Params are null");
-		}
-
-		StringBuilder result = new StringBuilder();
-		for (Map.Entry<String, Object> e : params.entrySet()) {
-			String key = e.getKey();
-			if (key == null) {
-				throw new IllegalArgumentException("key is null");
-			}
-
-			Object valueObj = e.getValue();
-			if (valueObj == null) {
-				throw new IllegalArgumentException("value is null for key '" + key + "'");
-			}
-
-			String value = valueObj.toString();
-
-			@SuppressWarnings("deprecation")
-			String encodedKey = URLEncoder.encode(key);
-			@SuppressWarnings("deprecation")
-			String encodedValue = URLEncoder.encode(value);
-
-			result.append(result.length() == 0 ? "?" : "&");
-			result.append(encodedKey);
-			result.append("=");
-			result.append(encodedValue);
-		}
-		return result.toString();
-	}
-
-	/**
 	 * Checks is string is null or empty
 	 */
 	public static boolean isNullOrEmpty(String str) {
@@ -208,6 +170,8 @@ public final class StringUtils {
 		return ret;
 	}
 
+	//region Pretty print
+
 	public static String table(Object[][] rows) {
 		return table(rows, null);
 	}
@@ -247,6 +211,8 @@ public final class StringUtils {
 		result.append("\n").append(line);
 		return result.toString();
 	}
+
+	//endregion
 
 	//region Parsing
 
