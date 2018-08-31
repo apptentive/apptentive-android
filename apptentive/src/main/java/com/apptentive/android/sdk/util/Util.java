@@ -40,6 +40,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.IntentCompat;
+import android.support.v4.util.AtomicFile;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -87,6 +88,8 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 
 // TODO: this class does too much - split into smaller classes and clean up
 public class Util {
+	private static final String ENCRYPTED_FILENAME_SUFFIX = ".encrypted";
+
 	public static int getStatusBarHeight(Window window) {
 		Rect rectangle = new Rect();
 		window.getDecorView().getWindowVisibleDisplayFrame(rectangle);
@@ -823,6 +826,22 @@ public class Util {
 		}
 	}
 
+	/**
+	 * Performs an 'atomic' write to a file (to avoid data corruption)
+	 */
+	public static void writeAtomically(File file, byte[] bytes) throws IOException {
+		AtomicFile atomicFile = new AtomicFile(file);
+		FileOutputStream stream = null;
+		try {
+			stream = atomicFile.startWrite();
+			stream.write(bytes);
+			atomicFile.finishWrite(stream); // serialization was successful
+		} catch (Exception e) {
+			atomicFile.failWrite(stream); // serialization failed
+			throw new IOException(e); // throw exception up the chain
+		}
+	}
+
 	private static void copy(InputStream input, OutputStream output) throws IOException {
 		byte[] buffer = new byte[4096];
 		int bytesRead;
@@ -831,7 +850,7 @@ public class Util {
 		}
 	}
 
-	public static void writeNullableUTF(DataOutput out, String value) throws IOException {
+	public static void writeNullableUTF(DataOutput out, @Nullable String value) throws IOException {
 		out.writeBoolean(value != null);
 		if (value != null) {
 			out.writeUTF(value);
@@ -1212,5 +1231,15 @@ public class Util {
 			//noinspection deprecation
 			return IntentCompat.makeRestartActivityTask(cn);
 		}
+	}
+
+	public static File getEncryptedFilename(File file) {
+		String filename = file.getName();
+		return filename.endsWith(ENCRYPTED_FILENAME_SUFFIX) ? file : new File(file.getParent(), filename + ENCRYPTED_FILENAME_SUFFIX);
+	}
+
+	public static File getUnencryptedFilename(File file) {
+		String filename = file.getName();
+		return filename.endsWith(ENCRYPTED_FILENAME_SUFFIX) ? new File(file.getParent(), filename.substring(0, filename.length() - ENCRYPTED_FILENAME_SUFFIX.length())) : file;
 	}
 }

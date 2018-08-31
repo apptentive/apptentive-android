@@ -6,10 +6,10 @@
 
 package com.apptentive.android.sdk.conversation;
 
-import android.support.v4.util.AtomicFile;
-
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
+import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.serialization.SerializableObject;
@@ -17,17 +17,26 @@ import com.apptentive.android.sdk.storage.MessageStore;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInput;
 import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.util.Util.readNullableBoolean;
 import static com.apptentive.android.sdk.util.Util.readNullableDouble;
@@ -44,10 +53,20 @@ class FileMessageStore implements MessageStore {
 
 	private final File file;
 	private final List<MessageEntry> messageEntries;
+	private final EncryptionKey encryptionKey;
 	private boolean shouldFetchFromFile;
 
-	FileMessageStore(File file) {
+	FileMessageStore(File file, EncryptionKey encryptionKey) {
+		if (file == null) {
+			throw new IllegalArgumentException("File is null");
+		}
+
+		if (encryptionKey == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
+
 		this.file = file;
+		this.encryptionKey = encryptionKey;
 		this.messageEntries = new ArrayList<>(); // we need a random access
 		this.shouldFetchFromFile = true; // we would lazily read it from a file later
 	}
@@ -64,7 +83,7 @@ class FileMessageStore implements MessageStore {
 				// Update
 				existing.id = apptentiveMessage.getId();
 				existing.state = apptentiveMessage.getState().name();
-				if (apptentiveMessage.isRead()) { // A apptentiveMessage can't be unread after being read.
+				if (apptentiveMessage.isRead()) { // A message can't be unread after being read.
 					existing.isRead = true;
 				}
 				existing.json = apptentiveMessage.getJsonObject().toString();
@@ -135,7 +154,7 @@ class FileMessageStore implements MessageStore {
 	}
 
 	@Override
-	public synchronized int getUnreadMessageCount() throws Exception {
+	public synchronized int getUnreadMessageCount() {
 		fetchEntries();
 
 		int count = 0;
@@ -203,23 +222,21 @@ class FileMessageStore implements MessageStore {
 		}
 	}
 
-	private List<MessageEntry> readFromFileGuarded() throws IOException {
-		DataInputStream dis = null;
-		try {
-			dis = new DataInputStream(new FileInputStream(file));
-			byte version = dis.readByte();
-			if (version != VERSION) {
-				throw new IOException("Unsupported binary version: " + version);
-			}
-			int entryCount = dis.readInt();
-			List<MessageEntry> entries = new ArrayList<>();
-			for (int i = 0; i < entryCount; ++i) {
-				entries.add(new MessageEntry(dis));
-			}
-			return entries;
-		} finally {
-			Util.ensureClosed(dis);
+	private List<MessageEntry> readFromFileGuarded() throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+		byte[] bytes = Encryptor.readFromEncryptedFile(encryptionKey, file);
+		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+
+		DataInputStream dis = new DataInputStream(bis);
+		byte version = dis.readByte();
+		if (version != VERSION) {
+			throw new IOException("Unsupported binary version: " + version);
 		}
+		int entryCount = dis.readInt();
+		List<MessageEntry> entries = new ArrayList<>();
+		for (int i = 0; i < entryCount; ++i) {
+			entries.add(new MessageEntry(dis));
+		}
+		return entries;
 	}
 
 	private synchronized void writeToFile() {
@@ -231,22 +248,15 @@ class FileMessageStore implements MessageStore {
 		shouldFetchFromFile = false; // mark it as not shouldFetchFromFile to keep a memory version
 	}
 
-	private void writeToFileGuarded() throws IOException {
-		AtomicFile atomicFile = new AtomicFile(file);
-		FileOutputStream stream = null;
-		try {
-			stream = atomicFile.startWrite();
-			DataOutputStream dos = new DataOutputStream(stream);
-			dos.writeByte(VERSION);
-			dos.writeInt(messageEntries.size());
-			for (MessageEntry entry : messageEntries) {
-				entry.writeExternal(dos);
-			}
-			atomicFile.finishWrite(stream);
-		} catch (Exception e) {
-			atomicFile.failWrite(stream);
-			throw new IOException(e);
+	private void writeToFileGuarded() throws IOException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		DataOutputStream dos = new DataOutputStream(bos);
+		dos.writeByte(VERSION);
+		dos.writeInt(messageEntries.size());
+		for (MessageEntry entry : messageEntries) {
+			entry.writeExternal(dos);
 		}
+		Encryptor.writeToEncryptedFile(encryptionKey, file, bos.toByteArray());
 	}
 
 	//endregion
@@ -311,6 +321,47 @@ class FileMessageStore implements MessageStore {
 				       ", isRead=" + isRead +
 				       ", json='" + json + '\'' +
 				       '}';
+		}
+	}
+
+	//endregion
+
+	//region Migration
+
+	public void migrateLegacyStorage() {
+		try {
+			File unencryptedFile = Util.getUnencryptedFilename(file);
+			if (unencryptedFile.exists()) {
+				try {
+					List<MessageEntry> entries = readFromLegacyFile(unencryptedFile);
+					messageEntries.addAll(entries);
+					writeToFile();
+				} finally {
+					boolean deleted = unencryptedFile.delete();
+					ApptentiveLog.d(CONVERSATION, "Deleted legacy message storage: %b", deleted);
+				}
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(CONVERSATION, e, "Exception while migrating messages");
+		}
+	}
+
+	private static List<MessageEntry> readFromLegacyFile(File file) throws IOException {
+		DataInputStream dis = null;
+		try {
+			dis = new DataInputStream(new FileInputStream(file));
+			byte version = dis.readByte();
+			if (version != VERSION) {
+				throw new IOException("Unsupported binary version: " + version);
+			}
+			int entryCount = dis.readInt();
+			List<MessageEntry> entries = new ArrayList<>();
+			for (int i = 0; i < entryCount; ++i) {
+				entries.add(new MessageEntry(dis));
+			}
+			return entries;
+		} finally {
+			Util.ensureClosed(dis);
 		}
 	}
 

@@ -52,11 +52,11 @@ public abstract class JsonPayload extends Payload {
 		String jsonString = marshallForSending().toString();
 		ApptentiveLog.v(PAYLOADS, jsonString);
 
-		if (encryptionKey != null) {
+		// authenticated payloads get encrypted before sending
+		if (isAuthenticated()) {
 			byte[] bytes = jsonString.getBytes();
-			Encryptor encryptor = new Encryptor(encryptionKey);
 			try {
-				return encryptor.encrypt(bytes);
+				return Encryptor.encrypt(getEncryptionKey(), bytes);
 			} catch (Exception e) {
 				ApptentiveLog.e(PAYLOADS, "Error encrypting payload data", e);
 			}
@@ -206,7 +206,7 @@ public abstract class JsonPayload extends Payload {
 
 	@Override
 	public String getHttpRequestContentType() {
-		if (encryptionKey != null) {
+		if (isAuthenticated()) {
 			return "application/octet-stream";
 		} else {
 			return "application/json";
@@ -235,8 +235,8 @@ public abstract class JsonPayload extends Payload {
 			result = jsonObject;
 		}
 
-		if (encryptionKey != null) {
-			result.put("token", token);
+		if (isAuthenticated()) {
+			result.put("token", getConversationToken());
 		}
 
 		return result;

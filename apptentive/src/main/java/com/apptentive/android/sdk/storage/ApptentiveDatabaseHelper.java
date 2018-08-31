@@ -12,40 +12,38 @@ import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.text.TextUtils;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.conversation.Conversation;
-import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
-import com.apptentive.android.sdk.model.ApptentiveMessage;
-import com.apptentive.android.sdk.model.CompoundMessage;
-import com.apptentive.android.sdk.model.JsonPayload;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
+import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
 import com.apptentive.android.sdk.model.StoredFile;
-import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
-import com.apptentive.android.sdk.storage.legacy.LegacyPayloadFactory;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.io.File;
+import java.io.IOException;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
-import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import javax.crypto.BadPaddingException;
+import javax.crypto.IllegalBlockSizeException;
+import javax.crypto.NoSuchPaddingException;
+
 import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
-import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
-import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
@@ -54,13 +52,14 @@ import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX
  */
 public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
-	private static final int DATABASE_VERSION = 3;
+	private static final int DATABASE_VERSION = 4;
 	public static final String DATABASE_NAME = "apptentive";
 	private static final int TRUE = 1;
 	private static final int FALSE = 0;
 	private final File fileDir; // data dir of the application
 
 	private final File payloadDataDir;
+	private final EncryptionKey encryptionKey;
 
 	//region Payload SQL
 
@@ -74,45 +73,33 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		static final DatabaseColumn COLUMN_CONVERSATION_ID = new DatabaseColumn(5, "conversationId");
 		static final DatabaseColumn COLUMN_REQUEST_METHOD = new DatabaseColumn(6, "requestMethod");
 		static final DatabaseColumn COLUMN_PATH = new DatabaseColumn(7, "path");
-		static final DatabaseColumn COLUMN_ENCRYPTED = new DatabaseColumn(8, "encrypted");
+		static final DatabaseColumn COLUMN_AUTHENTICATED = new DatabaseColumn(8, "authenticated");
 		static final DatabaseColumn COLUMN_LOCAL_CONVERSATION_ID = new DatabaseColumn(9, "localConversationId");
 	}
 
-	private static final class LegacyPayloadEntry {
-		static final String TABLE_NAME = "legacy_payload";
-		static final DatabaseColumn PAYLOAD_KEY_DB_ID = new DatabaseColumn(0, "_id");
-		static final DatabaseColumn PAYLOAD_KEY_BASE_TYPE = new DatabaseColumn(1, "base_type");
-		static final DatabaseColumn PAYLOAD_KEY_JSON = new DatabaseColumn(2, "json");
-	}
-
-	private static final String BACKUP_LEGACY_PAYLOAD_TABLE = String.format("ALTER TABLE %s RENAME TO %s;", PayloadEntry.TABLE_NAME, LegacyPayloadEntry.TABLE_NAME);
-	private static final String DELETE_LEGACY_PAYLOAD_TABLE = String.format("DROP TABLE %s;", LegacyPayloadEntry.TABLE_NAME);
-
-	private static final String TABLE_CREATE_PAYLOAD =
+	static final String SQL_CREATE_PAYLOAD_TABLE =
 		"CREATE TABLE " + PayloadEntry.TABLE_NAME +
 			" (" +
 			PayloadEntry.COLUMN_PRIMARY_KEY + " INTEGER PRIMARY KEY, " +
 			PayloadEntry.COLUMN_PAYLOAD_TYPE + " TEXT, " +
 			PayloadEntry.COLUMN_IDENTIFIER + " TEXT, " +
 			PayloadEntry.COLUMN_CONTENT_TYPE + " TEXT," +
-			PayloadEntry.COLUMN_AUTH_TOKEN + " TEXT," +
+			PayloadEntry.COLUMN_AUTH_TOKEN + " BLOB," +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " TEXT," +
 			PayloadEntry.COLUMN_REQUEST_METHOD + " TEXT," +
 			PayloadEntry.COLUMN_PATH + " TEXT," +
-			PayloadEntry.COLUMN_ENCRYPTED + " INTEGER," +
+			PayloadEntry.COLUMN_AUTHENTICATED + " INTEGER," +
 			PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID + " TEXT" +
 			");";
 
-	private static final String SQL_QUERY_PAYLOAD_LIST_LEGACY =
-		"SELECT * FROM " + LegacyPayloadEntry.TABLE_NAME +
-			" ORDER BY " + LegacyPayloadEntry.PAYLOAD_KEY_DB_ID;
+	static final String SQL_DELETE_PAYLOAD_TABLE = "DROP TABLE " + PayloadEntry.TABLE_NAME + ";";
 
-	private static final String SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER =
+	private static final String SQL_SELECT_PAYLOADS_IN_SEND_ORDER =
 		"SELECT * FROM " + PayloadEntry.TABLE_NAME +
 			" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY +
 			" ASC";
 
-	private static final String SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS =
+	private static final String SQL_UPDATE_INCOMPLETE_PAYLOADS =
 		"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " = ? " +
@@ -121,7 +108,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
 
-	private static final String SQL_QUERY_UPDATE_LEGACY_PAYLOADS =
+	private static final String SQL_UPDATE_LEGACY_PAYLOADS =
 			"UPDATE " + PayloadEntry.TABLE_NAME + " SET " +
 					PayloadEntry.COLUMN_AUTH_TOKEN + " = ?, " +
 					PayloadEntry.COLUMN_CONVERSATION_ID + " = ?, " +
@@ -130,17 +117,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL AND " +
 					PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
 
-	private static final String SQL_QUERY_REMOVE_INCOMPLETE_PAYLOADS =
+	private static final String SQL_REMOVE_INCOMPLETE_PAYLOADS =
 		"DELETE FROM " + PayloadEntry.TABLE_NAME + " " +
 			"WHERE " +
 			PayloadEntry.COLUMN_AUTH_TOKEN + " IS NULL OR " +
 			PayloadEntry.COLUMN_CONVERSATION_ID + " IS NULL";
-
-	private static final String SQL_QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER =
-		"SELECT * FROM " + PayloadEntry.TABLE_NAME +
-			" WHERE " + LegacyPayloadEntry.PAYLOAD_KEY_BASE_TYPE + " = ?" +
-			" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY +
-			" ASC";
 
 	//endregion
 
@@ -166,9 +147,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			MESSAGE_KEY_READ + " INTEGER, " +
 			MESSAGE_KEY_JSON + " TEXT" +
 			");";
-
-	// Coalesce returns the second arg if the first is null. This forces the entries with null IDs to be ordered last in the list until they do have IDs because they were sent and retrieved from the server.
-	private static final String QUERY_MESSAGE_GET_ALL_IN_ORDER = "SELECT * FROM " + TABLE_MESSAGE + " ORDER BY COALESCE(" + MESSAGE_KEY_ID + ", 'z') ASC";
 
 	//endregion
 
@@ -224,10 +202,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// endregion
 
-	ApptentiveDatabaseHelper(Context context) {
+	ApptentiveDatabaseHelper(Context context, EncryptionKey encryptionKey) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		if (encryptionKey == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
+
 		this.fileDir = context.getFilesDir();
 		this.payloadDataDir = new File(fileDir, Constants.PAYLOAD_DATA_DIR);
+		this.encryptionKey = encryptionKey;
 	}
 
 	//region Create & Upgrade
@@ -239,7 +222,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onCreate(db)");
-		db.execSQL(TABLE_CREATE_PAYLOAD);
+		db.execSQL(SQL_CREATE_PAYLOAD_TABLE);
 
 		// Leave legacy tables in place for now.
 		db.execSQL(TABLE_CREATE_MESSAGE);
@@ -253,276 +236,34 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 */
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		ApptentiveLog.d(DATABASE, "ApptentiveDatabase.onUpgrade(db, %d, %d)", oldVersion, newVersion);
+		ApptentiveLog.d(DATABASE, "Upgrade database from %d to %d", oldVersion, newVersion);
+		try {
+			DatabaseMigrator migrator = createDatabaseMigrator(oldVersion, newVersion);
+			if (migrator != null) {
+				migrator.onUpgrade(db, oldVersion, newVersion);
+			}
+		} catch (Exception e) {
+			ApptentiveLog.e(DATABASE, e, "Exception while trying to migrate database from %d to %d", oldVersion, newVersion);
+
+			// if migration failed - create new table
+			db.execSQL(SQL_DELETE_PAYLOAD_TABLE);
+			onCreate(db);
+		}
+	}
+
+	private @Nullable DatabaseMigrator createDatabaseMigrator(int oldVersion, int newVersion) {
 		switch (oldVersion) {
 			case 1:
-				upgradeVersion1to2(db);
+				return new DatabaseMigratorV1(encryptionKey, payloadDataDir);
 			case 2:
-				upgradeVersion2to3(db);
+				return new DatabaseMigratorV2(encryptionKey, payloadDataDir);
+			case 3:
+				return new DatabaseMigratorV3(encryptionKey, payloadDataDir);
 		}
+
+		assertFail("Missing database migrator version: %d", oldVersion);
+		return null;
 	}
-
-	private void upgradeVersion1to2(SQLiteDatabase db) {
-		Cursor cursor = null;
-		// Migrate legacy stored files to compound message associated files
-		try {
-			cursor = db.rawQuery("SELECT * FROM " + TABLE_FILESTORE, null);
-			if (cursor.moveToFirst()) {
-				do {
-					String file_nonce = cursor.getString(0);
-					// Stored File id was in the format of "apptentive-file-nonce"
-					String patten = "apptentive-file-";
-					String nonce = file_nonce.substring(file_nonce.indexOf(patten) + patten.length());
-					ContentValues values = new ContentValues();
-					values.put(COMPOUND_FILESTORE_KEY_MESSAGE_NONCE, nonce);
-					// Legacy file was stored in db by name only. Need to get the full path when migrated
-					String localFileName = cursor.getString(3);
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_CACHE_PATH, (new File(fileDir, localFileName).getAbsolutePath()));
-					values.put(COMPOUND_FILESTORE_KEY_MIME_TYPE, cursor.getString(1));
-					// Original file name might not be stored, i.e. sent by API, in which case, local stored file name will be used.
-					String originalFileName = cursor.getString(2);
-					if (TextUtils.isEmpty(originalFileName)) {
-						originalFileName = localFileName;
-					}
-					values.put(COMPOUND_FILESTORE_KEY_LOCAL_ORIGINAL_URI, originalFileName);
-					values.put(COMPOUND_FILESTORE_KEY_REMOTE_URL, cursor.getString(4));
-					values.put(COMPOUND_FILESTORE_KEY_CREATION_TIME, 0); // we didn't store creation time of legacy file message
-					db.insert(TABLE_COMPOUND_MESSAGE_FILESTORE, null, values);
-
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-		// Migrate legacy message types to CompoundMessage Type
-		try {
-			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
-			if (cursor.moveToFirst()) {
-				do {
-					String json = cursor.getString(6);
-					JSONObject root;
-					boolean bUpdateRecord = false;
-					try {
-						root = new JSONObject(json);
-						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
-						switch (type) {
-							case TextMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								bUpdateRecord = true;
-								break;
-							case FileMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
-								bUpdateRecord = true;
-								break;
-							case AutomatedMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
-								bUpdateRecord = true;
-								break;
-							default:
-								break;
-						}
-						if (bUpdateRecord) {
-							String databaseId = cursor.getString(0);
-							ContentValues messageValues = new ContentValues();
-							messageValues.put(MESSAGE_KEY_JSON, root.toString());
-							db.update(TABLE_MESSAGE, messageValues, MESSAGE_KEY_DB_ID + " = ?", new String[]{databaseId});
-						}
-					} catch (JSONException e) {
-						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
-					}
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-
-		// Migrate all pending payload messages
-		// Migrate legacy message types to CompoundMessage Type
-		try {
-			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_ALL_MESSAGE_IN_ORDER, new String[]{PayloadType.message.name()});
-			if (cursor.moveToFirst()) {
-				do {
-					String json = cursor.getString(2);
-					JSONObject root;
-					boolean bUpdateRecord = false;
-					try {
-						root = new JSONObject(json);
-						ApptentiveMessage.Type type = ApptentiveMessage.Type.valueOf(root.getString(ApptentiveMessage.KEY_TYPE));
-						switch (type) {
-							case TextMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								bUpdateRecord = true;
-								break;
-							case FileMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, false);
-								bUpdateRecord = true;
-								break;
-							case AutomatedMessage:
-								root.put(ApptentiveMessage.KEY_TYPE, ApptentiveMessage.Type.CompoundMessage.name());
-								root.put(CompoundMessage.KEY_TEXT_ONLY, true);
-								root.put(ApptentiveMessage.KEY_AUTOMATED, true);
-								bUpdateRecord = true;
-								break;
-							default:
-								break;
-						}
-						if (bUpdateRecord) {
-							String databaseId = cursor.getString(LegacyPayloadEntry.PAYLOAD_KEY_DB_ID.index);
-							ContentValues messageValues = new ContentValues();
-							messageValues.put(LegacyPayloadEntry.PAYLOAD_KEY_JSON.name, root.toString());
-							db.update(PayloadEntry.TABLE_NAME, messageValues, PayloadEntry.COLUMN_PRIMARY_KEY + " = ?", new String[]{databaseId});
-						}
-					} catch (JSONException e) {
-						ApptentiveLog.v(DATABASE, "Error parsing json as Message: %s", e, json);
-					}
-				} while (cursor.moveToNext());
-			}
-		} catch (SQLException sqe) {
-			ApptentiveLog.e(DATABASE, "migrateToCompoundMessage EXCEPTION: " + sqe.getMessage());
-		} finally {
-			ensureClosed(cursor);
-		}
-	}
-
-	/**
-	 * 1. Rename payload table to legacy_payload
-	 * 2. Create new payload table with new columns
-	 * 2. select all payloads in temp_payload
-	 * 3.   load each into a the new payload object format
-	 * 4.   Save each into the new payload table
-	 * 5. Drop temp_payload
-	 */
-	private void upgradeVersion2to3(SQLiteDatabase db) {
-		ApptentiveLog.i(DATABASE, "Upgrading Database from v2 to v3");
-
-		Cursor cursor = null;
-		try {
-			db.beginTransaction();
-
-			// 1. Rename existing "payload" table to "legacy_payload"
-			ApptentiveLog.v(DATABASE, "\t1. Backing up \"payloads\" database to \"legacy_payloads\"");
-			db.execSQL(BACKUP_LEGACY_PAYLOAD_TABLE);
-
-			// 2. Create new Payload table as "payload"
-			ApptentiveLog.v(DATABASE, "\t2. Creating new \"payloads\" database.");
-			db.execSQL(TABLE_CREATE_PAYLOAD);
-
-			// 3. Load legacy payloads
-			ApptentiveLog.v(DATABASE, "\t3. Loading legacy payloads.");
-			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST_LEGACY, null);
-
-			ApptentiveLog.v(DATABASE, "4. Save payloads into new table.");
-			JsonPayload payload;
-			while (cursor.moveToNext()) {
-				PayloadType payloadType = PayloadType.parse(cursor.getString(1));
-				String json = cursor.getString(LegacyPayloadEntry.PAYLOAD_KEY_JSON.index);
-
-				payload = LegacyPayloadFactory.createPayload(payloadType, json);
-				if (payload == null) {
-					ApptentiveLog.d(DATABASE, "Unable to construct payload of type %s. Continuing.", payloadType.name());
-					continue;
-				}
-
-				// the legacy payload format didn't store 'nonce' in the database so we need to extract if from json
-				String nonce = payload.optString("nonce", null);
-				if (nonce == null) {
-					nonce = UUID.randomUUID().toString(); // if 'nonce' is missing - generate a new one
-				}
-				payload.setNonce(nonce);
-
-				// 4. Save each payload in the new table.
-				ApptentiveLog.v(DATABASE, "Payload of type %s:, %s", payload.getPayloadType().name(), payload);
-				ContentValues values = new ContentValues();
-				values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
-				values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
-				values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
-				// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
-				if (!payload.hasEncryptionKey()) {
-					values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
-				}
-				values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
-				values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
-				values.put(PayloadEntry.COLUMN_PATH.name, payload.getHttpEndPoint(
-					StringUtils.isNullOrEmpty(payload.getConversationId()) ? "${conversationId}" : payload.getConversationId()) // if conversation id is missing we replace it with a place holder and update it later
-				);
-
-				File dest = getPayloadBodyFile(payload.getNonce());
-				ApptentiveLog.v(DATABASE, "Saving payload body to: %s", hideIfSanitized(dest));
-				Util.writeBytes(dest, payload.renderData());
-
-				values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
-
-				db.insert(PayloadEntry.TABLE_NAME, null, values);
-			}
-
-			// 5. Migrate messages
-			ApptentiveLog.v(DATABASE, "\t6. Migrating messages.");
-			migrateMessages(db);
-
-			// 6. Finally, delete the temporary legacy table
-			ApptentiveLog.v(DATABASE, "\t6. Delete temporary \"legacy_payloads\" database.");
-			db.execSQL(DELETE_LEGACY_PAYLOAD_TABLE);
-			db.setTransactionSuccessful();
-		} catch (Exception e) {
-			ApptentiveLog.e(DATABASE, e, "Error in upgradeVersion2to3()");
-		} finally {
-			ensureClosed(cursor);
-			if (db != null) {
-				db.endTransaction();
-			}
-		}
-	}
-
-	private void migrateMessages(SQLiteDatabase db) {
-		try {
-			final List<ApptentiveMessage> messages = getAllMessages(db);
-			dispatchConversationTask(new ConversationDispatchTask() {
-				@Override
-				protected boolean execute(Conversation conversation) {
-					conversation.getMessageManager().addMessages(messages.toArray(new ApptentiveMessage[messages.size()]));
-					return true;
-				}
-			}, "migrate messages");
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while trying to migrate messages");
-		}
-	}
-
-	private List<ApptentiveMessage> getAllMessages(SQLiteDatabase db) {
-		List<ApptentiveMessage> messages = new ArrayList<>();
-		Cursor cursor = null;
-		try {
-			cursor = db.rawQuery(QUERY_MESSAGE_GET_ALL_IN_ORDER, null);
-			while (cursor.moveToNext()) {
-				String json = cursor.getString(6);
-				ApptentiveMessage message = MessageFactory.fromJson(json);
-				if (message == null) {
-					ApptentiveLog.e(MESSAGES, "Error parsing Record json from database: %s", json);
-					continue;
-				}
-				message.setId(cursor.getString(1));
-				message.setCreatedAt(cursor.getDouble(2));
-				message.setNonce(cursor.getString(3));
-				message.setState(ApptentiveMessage.State.parse(cursor.getString(4)));
-				message.setRead(cursor.getInt(5) == TRUE);
-				messages.add(message);
-			}
-		} finally {
-			ensureClosed(cursor);
-		}
-		return messages;
-	}
-
 
 	//endregion
 
@@ -542,9 +283,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			values.put(PayloadEntry.COLUMN_IDENTIFIER.name, notNull(payload.getNonce()));
 			values.put(PayloadEntry.COLUMN_PAYLOAD_TYPE.name, notNull(payload.getPayloadType().name()));
 			values.put(PayloadEntry.COLUMN_CONTENT_TYPE.name, notNull(payload.getHttpRequestContentType()));
-			// The token is encrypted inside the payload body for Logged In Conversations. In that case, don't store it here.
-			if (!payload.hasEncryptionKey()) {
-				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, payload.getToken()); // might be null
+			// The token is encrypted inside the payload body for authenticated conversations. In that case, don't store it here.
+			if (!payload.isAuthenticated()) {
+				values.put(PayloadEntry.COLUMN_AUTH_TOKEN.name, encrypt(payload.getConversationToken())); // might be null
 			}
 			values.put(PayloadEntry.COLUMN_CONVERSATION_ID.name, payload.getConversationId()); // might be null
 			values.put(PayloadEntry.COLUMN_REQUEST_METHOD.name, payload.getHttpRequestMethod().name());
@@ -553,10 +294,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			);
 
 			File dest = getPayloadBodyFile(payload.getNonce());
-			ApptentiveLog.v(DATABASE, "Saving payload body to: %s", hideIfSanitized(dest));
-			Util.writeBytes(dest, payload.renderData());
+			ApptentiveLog.v(DATABASE, "Saving payload body to: %s", dest);
+			writeToFile(dest, payload.renderData(), !payload.isAuthenticated());  // only anonymous payloads get encrypted upon write (authenticated payloads get encrypted on serialization)
 
-			values.put(PayloadEntry.COLUMN_ENCRYPTED.name, payload.hasEncryptionKey() ? TRUE : FALSE);
+			values.put(PayloadEntry.COLUMN_AUTHENTICATED.name, payload.isAuthenticated() ? TRUE : FALSE);
 			values.put(PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID.name, notNull(payload.getLocalConversationIdentifier()));
 
 			db.insert(PayloadEntry.TABLE_NAME, null, values);
@@ -620,7 +361,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
+			cursor = db.rawQuery(SQL_SELECT_PAYLOADS_IN_SEND_ORDER, null);
 			int count = cursor.getCount();
 			ApptentiveLog.v(PAYLOADS, "Unsent payloads count: %d", count);
 
@@ -631,7 +372,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					return null;
 				}
 
-				final String authToken = cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index);
+				final String authToken = decryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index));
 				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
 
 				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
@@ -652,11 +393,12 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					deletePayload(nonce);
 					continue;
 				}
-				byte[] data = Util.readBytes(file);
+
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
-				final boolean encrypted = cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index) == TRUE;
-				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, encrypted);
+				final boolean authenticated = cursor.getInt(PayloadEntry.COLUMN_AUTHENTICATED.index) == TRUE;
+				byte[] data = readFromFile(file, !authenticated); // only anonymous payloads get encrypted upon write (authenticated payloads get encrypted on serialization)
+				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, authenticated);
 			}
 			return null;
 		} catch (Exception e) {
@@ -682,18 +424,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		if (StringUtils.isNullOrEmpty(authToken)) {
 			throw new IllegalArgumentException("Token is null or empty");
 		}
-		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(legacyPayloads ? SQL_QUERY_UPDATE_LEGACY_PAYLOADS : SQL_QUERY_UPDATE_INCOMPLETE_PAYLOADS, new String[] {
-				authToken, conversationId, localConversationId
+			db.execSQL(legacyPayloads ? SQL_UPDATE_LEGACY_PAYLOADS : SQL_UPDATE_INCOMPLETE_PAYLOADS, new Object[] {
+				encrypt(authToken), conversationId, localConversationId
 			});
-			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
-		} catch (SQLException e) {
+		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while updating missing conversation ids");
-		} finally {
-			ensureClosed(cursor);
 		}
 
 		// remove incomplete payloads which don't belong to an active conversation
@@ -708,7 +446,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			SQLiteDatabase db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_REMOVE_INCOMPLETE_PAYLOADS, null);
+			cursor = db.rawQuery(SQL_REMOVE_INCOMPLETE_PAYLOADS, null);
 			cursor.moveToFirst(); // we need to move a cursor in order to update database
 			ApptentiveLog.v(DATABASE, "Removed incomplete payloads");
 		} catch (SQLException e) {
@@ -822,11 +560,53 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		context.deleteDatabase(DATABASE_NAME);
 	}
 
+	private byte[] encrypt(@Nullable String value) throws NoSuchPaddingException,
+	                                                      InvalidKeyException,
+	                                                      NoSuchAlgorithmException,
+	                                                      IllegalBlockSizeException,
+	                                                      BadPaddingException,
+	                                                      InvalidAlgorithmParameterException {
+		return Encryptor.encrypt(encryptionKey, value);
+	}
+
+	private String decryptString(byte[] bytes) throws NoSuchPaddingException,
+	                                                  InvalidKeyException,
+	                                                  NoSuchAlgorithmException,
+	                                                  IllegalBlockSizeException,
+	                                                  BadPaddingException,
+	                                                  InvalidAlgorithmParameterException {
+		return Encryptor.decryptString(encryptionKey, bytes);
+	}
+
+	private void writeToFile(File file, byte[] data, boolean encrypted) throws NoSuchPaddingException,
+	                                                                           InvalidKeyException,
+	                                                                           NoSuchAlgorithmException,
+	                                                                           IOException,
+	                                                                           BadPaddingException,
+	                                                                           IllegalBlockSizeException,
+	                                                                           InvalidAlgorithmParameterException {
+		if (encrypted) {
+			Encryptor.writeToEncryptedFile(encryptionKey, file, data);
+		} else {
+			Util.writeAtomically(file, data);
+		}
+	}
+
+	private byte[] readFromFile(File file, boolean encrypted) throws NoSuchPaddingException,
+	                                                                 InvalidAlgorithmParameterException,
+	                                                                 NoSuchAlgorithmException,
+	                                                                 IOException,
+	                                                                 BadPaddingException,
+	                                                                 IllegalBlockSizeException,
+	                                                                 InvalidKeyException {
+		return encrypted ? Encryptor.readFromEncryptedFile(encryptionKey, file) : Util.readBytes(file);
+	}
+
 	//endregion
 
 	//region Helper classes
 
-	private static final class DatabaseColumn {
+	static final class DatabaseColumn {
 		public final String name;
 		final int index;
 
@@ -850,7 +630,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		Cursor cursor = null;
 		try {
 			db = getWritableDatabase();
-			cursor = db.rawQuery(SQL_QUERY_PAYLOAD_GET_IN_SEND_ORDER, null);
+			cursor = db.rawQuery(SQL_SELECT_PAYLOADS_IN_SEND_ORDER, null);
 			int payloadCount = cursor.getCount();
 			if (payloadCount == 0) {
 				ApptentiveLog.v(PAYLOADS, "%s (%d payload(s))", title, payloadCount);
@@ -866,14 +646,13 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					PayloadEntry.COLUMN_CONVERSATION_ID,
 					PayloadEntry.COLUMN_REQUEST_METHOD,
 					PayloadEntry.COLUMN_PATH,
-					PayloadEntry.COLUMN_ENCRYPTED,
+					PayloadEntry.COLUMN_AUTHENTICATED,
 					PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID,
 					PayloadEntry.COLUMN_AUTH_TOKEN
 			};
 
 			int index = 1;
 			while(cursor.moveToNext()) {
-
 				rows[index++] = new Object[] {
 						cursor.getInt(PayloadEntry.COLUMN_PRIMARY_KEY.index),
 						cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index),
@@ -882,14 +661,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 						cursor.getString(PayloadEntry.COLUMN_CONVERSATION_ID.index),
 						cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index),
 						hideIfSanitized(cursor.getString(PayloadEntry.COLUMN_PATH.index)),
-						cursor.getInt(PayloadEntry.COLUMN_ENCRYPTED.index),
+						cursor.getInt(PayloadEntry.COLUMN_AUTHENTICATED.index),
 						cursor.getString(PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID.index),
-						hideIfSanitized(cursor.getString(PayloadEntry.COLUMN_AUTH_TOKEN.index))
+						hideIfSanitized(decryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index)))
 				};
 			}
 			ApptentiveLog.v(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));
-		} catch (Exception ignored) {
-			ignored.printStackTrace();
+		} catch (Exception e) {
+			ApptentiveLog.e(CONVERSATION, e, "Exception while printing metadata");
 		} finally {
 			ensureClosed(cursor);
 		}

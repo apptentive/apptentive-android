@@ -21,8 +21,10 @@ android:
     - platform-tools
     - tools # not a mistakenly duplicated line: used above api 25.x
     - build-tools-27.0.3
+    - build-tools-28.0.2
     - android-19
     - android-27
+    - android-28
     - extra-google-google_play_services
     - extra-google-m2repository
     - extra-android-m2repository
@@ -30,6 +32,7 @@ android:
     - sys-img-armeabi-v7a-android-19
 before_install:
 - yes | sdkmanager "platforms;android-27"
+- yes | sdkmanager "platforms;android-28"
 install: true
 before_script:
   - echo no | android create avd --force -n test -t android-19 --abi armeabi-v7a

@@ -216,7 +216,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 			request.setRequestProperty("Authorization", "Bearer " + authToken);
 		}
 
-		if (payload.isEncrypted()) {
+		if (payload.isAuthenticated()) {
 			request.setRequestProperty("APPTENTIVE-ENCRYPTED", Boolean.TRUE);
 		}
 

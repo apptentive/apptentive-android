@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	private static final String APPTENTIVE_SDK_VERSION = "5.2.0";
+	private static final String APPTENTIVE_SDK_VERSION = "5.3.0";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -64,7 +64,8 @@ public class Constants {
 
 	//region Database and File Storage
 	public static final String CONVERSATIONS_DIR = "apptentive/conversations";
-	public static final String CONVERSATION_METADATA_FILE = "conversation-v1.meta";
+	public static final String CONVERSATION_METADATA_FILE = "conversation-v2.meta";
+	public static final String CONVERSATION_METADATA_FILE_LEGACY_V1 = "conversation-v1.meta";
 	public static final String PAYLOAD_DATA_DIR = "payloads";
 	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".data";
 	//endregion

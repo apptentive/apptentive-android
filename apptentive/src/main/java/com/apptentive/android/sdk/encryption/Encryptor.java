@@ -6,9 +6,14 @@
 
 package com.apptentive.android.sdk.encryption;
 
-import com.apptentive.android.sdk.util.StringUtils;
+import android.support.annotation.Nullable;
+import android.support.v4.util.AtomicFile;
 
-import java.io.UnsupportedEncodingException;
+import com.apptentive.android.sdk.util.Util;
+
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -20,77 +25,127 @@ import javax.crypto.Cipher;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 
 public class Encryptor {
-
+	/**
+	 * Initialization vector size
+	 */
 	private static final int IV_SIZE = 16;
 
-	private SecretKeySpec key;
+	//region Encryption
 
-	/**
-	 * Initializes the Encryptor
-	 * @param hexKey A hex encoded String with the key data.
-	 */
-	public Encryptor(String hexKey) {
-		this.key = new SecretKeySpec(StringUtils.hexToBytes(hexKey), "AES");
+	public static @Nullable byte[] encrypt(EncryptionKey encryptionKey, @Nullable String value) throws NoSuchPaddingException,
+	                                                                                                   InvalidKeyException,
+	                                                                                                   NoSuchAlgorithmException,
+	                                                                                                   IllegalBlockSizeException,
+                                                                                                     BadPaddingException,
+                                                                                                     InvalidAlgorithmParameterException {
+		return value != null ? encrypt(encryptionKey, value.getBytes()) : null;
 	}
 
-	Encryptor(byte[] keyBytes) {
-		this.key = new SecretKeySpec(keyBytes, "AES");
-	}
+	public static @Nullable byte[] encrypt(EncryptionKey key, @Nullable byte[] plainText) throws NoSuchPaddingException,
+	                                                                                             NoSuchAlgorithmException,
+                                                                                               IllegalBlockSizeException,
+	                                                                                             BadPaddingException,
+                                                                                               InvalidAlgorithmParameterException,
+                                                                                               InvalidKeyException {
+		if (key == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
 
-	public byte[] encrypt(byte[] plainText) throws UnsupportedEncodingException,
-	                                               NoSuchPaddingException,
-	                                               NoSuchAlgorithmException,
-	                                               IllegalBlockSizeException,
-	                                               BadPaddingException,
-	                                               InvalidAlgorithmParameterException,
-	                                               InvalidKeyException {
+		if (plainText == null || key.isNull()) {
+			return plainText;
+		}
+
 		byte[] iv = new byte[IV_SIZE];
 		new SecureRandom().nextBytes(iv);
-		byte[] cipherText = encrypt(iv, plainText);
+		byte[] cipherText = encrypt(key, plainText, iv);
 		byte[] ret = new byte[iv.length + cipherText.length];
 		System.arraycopy(iv, 0, ret, 0, iv.length);
 		System.arraycopy(cipherText, 0, ret, iv.length, cipherText.length);
 		return ret;
 	}
 
-	private byte[] encrypt(byte[] iv, byte[] plainText) throws NoSuchAlgorithmException,
-	                                                          NoSuchPaddingException,
-	                                                          InvalidAlgorithmParameterException,
-	                                                          InvalidKeyException,
-	                                                          BadPaddingException,
-	                                                          IllegalBlockSizeException {
+	private static byte[] encrypt(EncryptionKey key, byte[] plainText, byte[] iv) throws NoSuchAlgorithmException,
+	                                                                                     NoSuchPaddingException,
+	                                                                                     InvalidAlgorithmParameterException,
+	                                                                                     InvalidKeyException,
+	                                                                                     BadPaddingException,
+	                                                                                     IllegalBlockSizeException {
 
 		AlgorithmParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		cipher.init(Cipher.ENCRYPT_MODE, key, ivParameterSpec);
+		Cipher cipher = Cipher.getInstance(key.getTransformation());
+		cipher.init(Cipher.ENCRYPT_MODE, key.getSecretKey(), ivParameterSpec);
 		return cipher.doFinal(plainText);
 	}
 
-	private byte[] decrypt(byte[] iv, byte[] cipherText) throws NoSuchPaddingException,
-	                                                           NoSuchAlgorithmException,
-	                                                           BadPaddingException,
-	                                                           IllegalBlockSizeException,
-	                                                           InvalidAlgorithmParameterException,
-	                                                           InvalidKeyException {
-		AlgorithmParameterSpec ivParameterSpec = new IvParameterSpec(iv);
-		Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-		cipher.init(Cipher.DECRYPT_MODE, key, ivParameterSpec);
-		return cipher.doFinal(cipherText);
+	//endregion
+
+	//region Decrypt
+
+	public static @Nullable String decryptString(EncryptionKey encryptionKey, @Nullable byte[] encryptedBytes) throws NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+		byte[] decrypted = decrypt(encryptionKey, encryptedBytes);
+		return decrypted != null ? new String(decrypted) : null;
 	}
 
-	public byte[] decrypt(byte[] ivAndCipherText) throws NoSuchPaddingException,
-	                                                     InvalidKeyException,
-	                                                     NoSuchAlgorithmException,
-	                                                     IllegalBlockSizeException,
-	                                                     BadPaddingException,
-	                                                     InvalidAlgorithmParameterException {
+	public static @Nullable byte[] decrypt(EncryptionKey key, @Nullable byte[] ivAndCipherText) throws NoSuchPaddingException,
+		                                                                                                 InvalidKeyException,
+	                                                                                                   NoSuchAlgorithmException,
+		                                                                                                 IllegalBlockSizeException,
+	                                                                                                   BadPaddingException,
+	                                                                                                   InvalidAlgorithmParameterException {
+		if (key == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
+
+		if (ivAndCipherText == null || key.isNull()) {
+			return ivAndCipherText;
+		}
+
+
 		byte[] iv = new byte[IV_SIZE];
 		byte[] cipherText = new byte[ivAndCipherText.length - IV_SIZE];
 		System.arraycopy(ivAndCipherText, 0, iv, 0, IV_SIZE);
 		System.arraycopy(ivAndCipherText, IV_SIZE, cipherText, 0, ivAndCipherText.length - IV_SIZE);
-		return decrypt(iv, cipherText);
+		return decrypt(key, cipherText, iv);
 	}
+
+	private static byte[] decrypt(EncryptionKey key, byte[] cipherText, byte[] iv) throws NoSuchPaddingException,
+		                                                                                      NoSuchAlgorithmException,
+		                                                                                      BadPaddingException,
+		                                                                                      IllegalBlockSizeException,
+		                                                                                      InvalidAlgorithmParameterException,
+		                                                                                      InvalidKeyException {
+		AlgorithmParameterSpec ivParameterSpec = new IvParameterSpec(iv);
+		Cipher cipher = Cipher.getInstance(key.getTransformation());
+		cipher.init(Cipher.DECRYPT_MODE, key.getSecretKey(), ivParameterSpec);
+		return cipher.doFinal(cipherText);
+	}
+
+	//endregion
+
+	//region File IO
+
+	public static void writeToEncryptedFile(EncryptionKey encryptionKey, File file, byte[] data) throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+		AtomicFile atomicFile = new AtomicFile(file);
+		FileOutputStream stream = null;
+		boolean successful = false;
+		try {
+			stream = atomicFile.startWrite();
+			stream.write(encrypt(encryptionKey, data));
+			atomicFile.finishWrite(stream);
+			successful = true;
+		} finally {
+			if (!successful) {
+				atomicFile.failWrite(stream);
+			}
+		}
+	}
+
+	public static byte[] readFromEncryptedFile(EncryptionKey encryptionKey, File file) throws IOException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+		final byte[] bytes = Util.readBytes(file);
+		return decrypt(encryptionKey, bytes);
+	}
+
+	//endregion
 }

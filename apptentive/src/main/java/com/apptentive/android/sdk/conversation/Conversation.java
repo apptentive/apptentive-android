@@ -15,7 +15,6 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
-import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.Payload;
@@ -34,6 +33,7 @@ import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceDataChangedListener;
 import com.apptentive.android.sdk.storage.DeviceManager;
 import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
 import com.apptentive.android.sdk.storage.IntegrationConfig;
@@ -58,8 +58,8 @@ import java.io.File;
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationDataQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
+import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
-import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
@@ -75,19 +75,14 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	private ConversationData conversationData;
 
 	/**
-	 * Encryption key for payloads. A hex encoded String.
+	 * Encryption key for storing conversation data on disk.
 	 */
-	private String encryptionKey;
+	private @NonNull EncryptionKey encryptionKey;
 
 	/**
 	 * Optional user id for logged-in conversations
 	 */
 	private String userId;
-
-	/**
-	 * Optional JWT for active conversations
-	 */
-	private String JWT;
 
 	/**
 	 * File which represents serialized conversation data on the disk
@@ -128,20 +123,25 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		}
 	};
 
-	public Conversation(File conversationDataFile, File conversationMessagesFile) {
+	public Conversation(File conversationDataFile, File conversationMessagesFile, @NonNull EncryptionKey encryptionKey) {
 		if (conversationDataFile == null) {
 			throw new IllegalArgumentException("Data file is null");
 		}
 		if (conversationMessagesFile == null) {
 			throw new IllegalArgumentException("Messages file is null");
 		}
+		if (encryptionKey == null) {
+			throw new IllegalArgumentException("Data encryption key is null");
+		}
 
 		this.conversationDataFile = conversationDataFile;
 		this.conversationMessagesFile = conversationMessagesFile;
+		this.encryptionKey = encryptionKey;
 
 		conversationData = new ConversationData();
 
-		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile);
+		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile, encryptionKey);
+		messageStore.migrateLegacyStorage();
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
 
@@ -163,6 +163,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		payload.setConversationId(getConversationId());
 		payload.setToken(getConversationToken());
 		payload.setEncryptionKey(getEncryptionKey());
+		payload.setAuthenticated(isAuthenticated());
 
 		// TODO: don't use singleton here
 		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(payload);
@@ -334,36 +335,47 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
 		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
-			ApptentiveLog.v(CONVERSATION, "Saving %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+			ApptentiveLog.v(CONVERSATION, "Saving conversation data...");
 			ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString());
 			ApptentiveLog.v(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
 		}
 		long start = System.currentTimeMillis();
 
-		FileSerializer serializer;
-		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
-			Assert.assertFalse(hasState(ANONYMOUS, ANONYMOUS_PENDING, LEGACY_PENDING));
-			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
-		} else {
-			Assert.assertTrue(hasState(ANONYMOUS, ANONYMOUS_PENDING, LEGACY_PENDING), "Unexpected conversation state: %s", getState());
-			serializer = new FileSerializer(conversationDataFile);
-		}
-
+		FileSerializer serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
 		serializer.serialize(conversationData);
 		ApptentiveLog.v(CONVERSATION, "Conversation data saved (took %d ms)", System.currentTimeMillis() - start);
 	}
 
-	synchronized void loadConversationData() throws SerializerException {
+	/**
+	 * Attempts to migrate from the legacy clear text format.
+	 *
+	 * @return <code>false</code> if failed.
+	 */
+	boolean migrateConversationData() throws SerializerException {
 		long start = System.currentTimeMillis();
-
-		FileSerializer serializer;
-		if (!StringUtils.isNullOrEmpty(encryptionKey)) {
-			serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
-		} else {
-			serializer = new FileSerializer(conversationDataFile);
+		File legacyConversationDataFile = Util.getUnencryptedFilename(conversationDataFile);
+		if (legacyConversationDataFile.exists()) {
+			try {
+				ApptentiveLog.d(CONVERSATION, "Migrating %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+				FileSerializer serializer = isAuthenticated() ? new EncryptedFileSerializer(legacyConversationDataFile, getEncryptionKey()) :
+					                                              new FileSerializer(legacyConversationDataFile);
+				conversationData = (ConversationData) serializer.deserialize();
+				ApptentiveLog.d(CONVERSATION, "Conversation data migrated (took %d ms)", System.currentTimeMillis() - start);
+				return true;
+			} finally {
+				boolean deleted = legacyConversationDataFile.delete();
+				ApptentiveLog.d(CONVERSATION, "Legacy conversation file deleted: %b", deleted);
+			}
 		}
 
-		ApptentiveLog.d(CONVERSATION, "Loading %sconversation data...", hasState(LOGGED_IN) ? "encrypted " : "");
+		return false;
+	}
+
+	void loadConversationData() throws SerializerException {
+		long start = System.currentTimeMillis();
+
+		FileSerializer serializer = new EncryptedFileSerializer(conversationDataFile, encryptionKey);
+		ApptentiveLog.d(CONVERSATION, "Loading conversation data...");
 		conversationData = (ConversationData) serializer.deserialize();
 		ApptentiveLog.d(CONVERSATION, "Conversation data loaded (took %d ms)", System.currentTimeMillis() - start);
 	}
@@ -491,6 +503,13 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Returns true if this conversation belongs to a logged-in user.
+	 */
+	public boolean isAuthenticated() {
+		return hasState(LOGGED_IN);
 	}
 
 	/**
@@ -670,12 +689,12 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		return conversationMessagesFile;
 	}
 
-	public String getEncryptionKey() {
-		return encryptionKey;
+	public void setEncryptionKey(@NonNull EncryptionKey encryptionKey) {
+		this.encryptionKey = encryptionKey;
 	}
 
-	void setEncryptionKey(String encryptionKey) {
-		this.encryptionKey = encryptionKey;
+	public @NonNull EncryptionKey getEncryptionKey() {
+		return encryptionKey;
 	}
 
 	public String getUserId() {
@@ -714,21 +733,31 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 * Checks the internal consistency of the conversation object (temporary solution)
 	 */
 	void checkInternalConsistency() throws IllegalStateException {
+		if (encryptionKey == null) {
+			throw new IllegalStateException("Missing encryption key");
+		}
+
 		switch (state) {
 			case LOGGED_IN:
-				if (StringUtils.isNullOrEmpty(encryptionKey)) {
-					assertFail("Missing encryption key");
-					throw new IllegalStateException("Missing encryption key");
-				}
 				if (StringUtils.isNullOrEmpty(userId)) {
-					assertFail("Missing user id");
 					throw new IllegalStateException("Missing user id");
 				}
 				break;
+			case LOGGED_OUT:
+				throw new IllegalStateException("Invalid conversation state: " + state);
 			default:
 				break;
 		}
 	}
 
 	//endregion
+
+	@Override
+	public String toString() {
+		return StringUtils.format("Conversation: localId=%s id=%s state=%s token=%s",
+			getLocalIdentifier(),
+			getConversationId(),
+			getState(),
+			hideIfSanitized(getConversationToken()));
+	}
 }

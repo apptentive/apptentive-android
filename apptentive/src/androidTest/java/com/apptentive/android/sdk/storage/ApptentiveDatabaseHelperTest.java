@@ -12,6 +12,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.model.AppReleasePayload;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.EventPayload;
@@ -88,7 +89,7 @@ public class ApptentiveDatabaseHelperTest {
 				" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY;
 
 		ApptentiveDatabaseMockHelper(Context context) {
-			super(context);
+			super(context, EncryptionKey.NULL);
 		}
 
 		List<Payload> listPayloads(SQLiteDatabase db) throws JSONException {

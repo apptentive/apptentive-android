@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.model;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
@@ -86,7 +87,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 	@Override
 	public String getHttpRequestContentType() {
-		return String.format("%s;boundary=%s", encryptionKey != null ? "multipart/encrypted" : "multipart/mixed", boundary);
+		return String.format("%s;boundary=%s", isAuthenticated() ? "multipart/encrypted" : "multipart/mixed", boundary);
 	}
 
 	//endregion
@@ -291,11 +292,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	@Override
 	public byte[] renderData() {
 		try {
-			boolean encrypted = encryptionKey != null;
-			Encryptor encryptor = null;
-			if (encrypted) {
-				encryptor = new Encryptor(encryptionKey);
-			}
+			boolean shouldEncrypt = isAuthenticated();
 			ByteArrayOutputStream data = new ByteArrayOutputStream();
 
 			// First write the message body out as the first "part".
@@ -310,13 +307,14 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 				.append(marshallForSending().toString()).append(lineEnd);
 			byte[] partBytes = part.toString().getBytes();
 
-			if (encrypted) {
+			final EncryptionKey encryptionKey = getEncryptionKey();
+			if (shouldEncrypt) {
 				header
 					.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
 					.append("Content-Type: application/octet-stream").append(lineEnd)
 					.append(lineEnd);
 				data.write(header.toString().getBytes());
-				data.write(encryptor.encrypt(partBytes));
+				data.write(Encryptor.encrypt(encryptionKey, partBytes));
 				data.write("\r\n".getBytes());
 			} else {
 				data.write(header.toString().getBytes());
@@ -353,7 +351,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 							Util.ensureClosed(fileInputStream);
 						}
 
-						if (encrypted) {
+						if (shouldEncrypt) {
 							// If encrypted, each part must be encrypted, and wrapped in a plain text set of headers.
 							StringBuilder encryptionEnvelope = new StringBuilder();
 							encryptionEnvelope
@@ -363,7 +361,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 							ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
 							data.write(encryptionEnvelope.toString().getBytes());
 							ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
-							byte[] encryptedAttachment = encryptor.encrypt(attachmentBytes.toByteArray());
+							byte[] encryptedAttachment = Encryptor.encrypt(encryptionKey, attachmentBytes.toByteArray());
 							ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
 							data.write(encryptedAttachment);
 						} else {

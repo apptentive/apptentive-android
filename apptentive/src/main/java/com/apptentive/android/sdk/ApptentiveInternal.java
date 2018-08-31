@@ -31,6 +31,7 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.debug.LogMonitor;
+import com.apptentive.android.sdk.encryption.SecurityManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.EventPayload;
@@ -161,15 +162,17 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		this.apptentiveSignature = apptentiveSignature;
 		this.serverUrl = serverUrl;
 
+		SecurityManager.init(application.getApplicationContext());
+
 		appContext = application.getApplicationContext();
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
 
-		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true));
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), SecurityManager.getMasterKey());
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
-		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient);
+		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient, SecurityManager.getMasterKey());
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)

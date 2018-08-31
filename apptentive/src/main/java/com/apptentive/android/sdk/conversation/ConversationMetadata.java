@@ -58,7 +58,7 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 		return findItem(new Filter() {
 			@Override
 			public boolean accept(ConversationMetadataItem item) {
-				return state.equals(item.state);
+				return state.equals(item.getConversationState());
 			}
 		});
 	}
@@ -67,7 +67,7 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 		return findItem(new Filter() {
 			@Override
 			public boolean accept(ConversationMetadataItem item) {
-				return StringUtils.equal(item.localConversationId, conversation.getLocalIdentifier());
+				return StringUtils.equal(item.getLocalConversationId(), conversation.getLocalIdentifier());
 			}
 		});
 	}
