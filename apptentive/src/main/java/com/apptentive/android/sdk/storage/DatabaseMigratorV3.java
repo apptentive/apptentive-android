@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.DatabaseColumn;
 import com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.PayloadEntry;
@@ -59,7 +60,8 @@ class DatabaseMigratorV3 extends DatabaseMigrator {
 	                                                                                NoSuchAlgorithmException,
 	                                                                                IllegalBlockSizeException,
 	                                                                                BadPaddingException,
-	                                                                                InvalidKeyException {
+	                                                                                InvalidKeyException,
+	                                                                                EncryptionException {
 		Cursor cursor = null;
 		try {
 			db.beginTransaction();

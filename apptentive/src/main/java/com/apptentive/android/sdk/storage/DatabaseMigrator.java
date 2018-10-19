@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.util.Util;
@@ -43,21 +44,23 @@ abstract class DatabaseMigrator {
 	}
 
 	protected byte[] encrypt(@Nullable String value) throws NoSuchPaddingException,
-		                                                      InvalidKeyException,
-		                                                      NoSuchAlgorithmException,
-		                                                      IllegalBlockSizeException,
-		                                                      BadPaddingException,
-		                                                      InvalidAlgorithmParameterException {
+	                                                        InvalidKeyException,
+	                                                        NoSuchAlgorithmException,
+	                                                        IllegalBlockSizeException,
+	                                                        BadPaddingException,
+	                                                        InvalidAlgorithmParameterException,
+	                                                        EncryptionException {
 		return Encryptor.encrypt(encryptionKey, value);
 	}
 
 	protected void writeToFile(File file, byte[] data, boolean encrypted) throws NoSuchPaddingException,
 	                                                                             InvalidKeyException,
 	                                                                             NoSuchAlgorithmException,
-	                                                                             IOException,
+                                                                               IOException,
 	                                                                             BadPaddingException,
 	                                                                             IllegalBlockSizeException,
-	                                                                             InvalidAlgorithmParameterException {
+	                                                                             InvalidAlgorithmParameterException,
+	                                                                             EncryptionException {
 		if (encrypted) {
 			Encryptor.writeToEncryptedFile(encryptionKey, file, data);
 		} else {

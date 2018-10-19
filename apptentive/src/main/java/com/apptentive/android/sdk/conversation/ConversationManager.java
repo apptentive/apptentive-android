@@ -94,6 +94,9 @@ public class ConversationManager {
 	private Conversation activeConversation;
 	private ConversationProxy activeConversationProxy;
 
+	// TODO: this is a temporary solution until we restore conversation state
+	private boolean activeConversationLoaded;
+
 	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull EncryptionKey encryptionKey) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
@@ -173,6 +176,7 @@ public class ConversationManager {
 
 				activeConversation.startListeningForChanges();
 				activeConversation.scheduleSaveConversationData();
+				activeConversationLoaded = true;
 
 				handleConversationStateChange(activeConversation);
 				return true;
@@ -189,7 +193,7 @@ public class ConversationManager {
 		return false;
 	}
 
-	private @Nullable Conversation loadActiveConversationGuarded() {
+	private @Nullable Conversation loadActiveConversationGuarded() throws ConversationLoadException {
 		// try to load an active conversation from metadata first
 		try {
 			if (conversationMetadata.hasItems()) {
@@ -203,6 +207,9 @@ public class ConversationManager {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while loading conversation");
+
+			// do not re-create a conversation if the last loading was unsuccessful
+			throw new ConversationLoadException("Unable to load conversation", e);
 		}
 
 		// no active conversations: create a new one
@@ -691,7 +698,7 @@ public class ConversationManager {
 
 	//region Metadata
 
-	private ConversationMetadata resolveMetadata() {
+	private ConversationMetadata resolveMetadata() throws ConversationMetadataLoadException {
 		checkConversationQueue();
 
 		try {
@@ -718,6 +725,9 @@ public class ConversationManager {
 			ApptentiveLog.v(CONVERSATION, "No metadata files");
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading conversation metadata");
+
+			// if we fail to load the metadata - we would not create a new one - just throw an exception
+			throw new ConversationMetadataLoadException("Unable to load metadata", e);
 		}
 
 		return new ConversationMetadata();
@@ -777,6 +787,13 @@ public class ConversationManager {
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while extracting user id");
 			callback.onLoginFail("Exception while extracting user id");
+			return;
+		}
+
+		// Check if we have metadata
+		if (!activeConversationLoaded) {
+			ApptentiveLog.e(CONVERSATION, "Unable to login: active conversation was not loaded");
+			callback.onLoginFail("Unable to login: active conversation was not loaded");
 			return;
 		}
 

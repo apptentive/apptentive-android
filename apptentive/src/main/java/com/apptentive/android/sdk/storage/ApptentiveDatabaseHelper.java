@@ -15,6 +15,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.Payload;
@@ -273,7 +274,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	 * If an item with the same nonce as an item passed in already exists, it is overwritten by the item. Otherwise
 	 * a new message is added.
 	 */
-	void addPayload(Payload payload) {
+	void addPayload(Payload payload) throws Exception {
 		SQLiteDatabase db = null;
 		try {
 			db = getWritableDatabase();
@@ -302,8 +303,6 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 			db.insert(PayloadEntry.TABLE_NAME, null, values);
 			db.setTransactionSuccessful();
-		} catch (Exception e) {
-			ApptentiveLog.e(DATABASE, e, "Error adding payload.");
 		} finally {
 			if (db != null) {
 				db.endTransaction();
@@ -372,24 +371,30 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 					return null;
 				}
 
-				final String authToken = decryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index));
 				final String nonce = notNull(cursor.getString(PayloadEntry.COLUMN_IDENTIFIER.index));
+
+				// if we failed to decrypt auth token - delete it
+				final String authToken = tryDecryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index), "");
+				if (authToken != null && authToken.length() == 0) {
+					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload auth token can't be decrypted. Deleting...");
+					deletePayload(nonce);
+					continue;
+				}
 
 				final PayloadType payloadType = PayloadType.parse(cursor.getString(PayloadEntry.COLUMN_PAYLOAD_TYPE.index));
 				assertFalse(PayloadType.unknown.equals(payloadType), "Oldest unsent payload has unknown type");
 
 				if (PayloadType.unknown.equals(payloadType)) {
+					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload type is undefined. Deleting...");
 					deletePayload(nonce);
 					continue;
 				}
 
 				final String httpRequestPath = updatePayloadRequestPath(cursor.getString(PayloadEntry.COLUMN_PATH.index), conversationId);
 
-				// TODO: We need a migration for existing payload bodies to put them into files.
-
 				File file = getPayloadBodyFile(nonce);
 				if (!file.exists()) {
-					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload had no data file. Deleting.");
+					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload had no data file. Deleting...");
 					deletePayload(nonce);
 					continue;
 				}
@@ -397,12 +402,20 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 				final String contentType = notNull(cursor.getString(PayloadEntry.COLUMN_CONTENT_TYPE.index));
 				final HttpRequestMethod httpRequestMethod = HttpRequestMethod.valueOf(notNull(cursor.getString(PayloadEntry.COLUMN_REQUEST_METHOD.index)));
 				final boolean authenticated = cursor.getInt(PayloadEntry.COLUMN_AUTHENTICATED.index) == TRUE;
-				byte[] data = readFromFile(file, !authenticated); // only anonymous payloads get encrypted upon write (authenticated payloads get encrypted on serialization)
+
+				byte[] data = tryReadFromFile(file, !authenticated); // only anonymous payloads get encrypted upon write (authenticated payloads get encrypted on serialization)
+				if (data == null) {
+					ApptentiveLog.w(PAYLOADS, "Oldest unsent payload file can't be read. Deleting...");
+					deletePayload(nonce);
+					continue;
+				}
+
 				return new PayloadData(payloadType, nonce, conversationId, data, authToken, contentType, httpRequestPath, httpRequestMethod, authenticated);
 			}
 			return null;
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error getting oldest unsent payload.");
+			// TODO: delete all payloads???
 			return null;
 		} finally {
 			ensureClosed(cursor);
@@ -565,8 +578,24 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	                                                      NoSuchAlgorithmException,
 	                                                      IllegalBlockSizeException,
 	                                                      BadPaddingException,
-	                                                      InvalidAlgorithmParameterException {
+	                                                      InvalidAlgorithmParameterException,
+	                                                      EncryptionException {
 		return Encryptor.encrypt(encryptionKey, value);
+	}
+
+	private String tryDecryptString(byte[] bytes, String defaultValue) {
+		return tryDecryptString(bytes, defaultValue, true);
+	}
+
+	private String tryDecryptString(byte[] bytes, String defaultValue, boolean printError) {
+		try {
+			return decryptString(bytes);
+		} catch (Exception e) {
+			if (printError) {
+				ApptentiveLog.e(e, "Failed to decrypt string");
+			}
+			return defaultValue;
+		}
 	}
 
 	private String decryptString(byte[] bytes) throws NoSuchPaddingException,
@@ -574,7 +603,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	                                                  NoSuchAlgorithmException,
 	                                                  IllegalBlockSizeException,
 	                                                  BadPaddingException,
-	                                                  InvalidAlgorithmParameterException {
+	                                                  InvalidAlgorithmParameterException,
+	                                                  EncryptionException {
 		return Encryptor.decryptString(encryptionKey, bytes);
 	}
 
@@ -584,11 +614,21 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	                                                                           IOException,
 	                                                                           BadPaddingException,
 	                                                                           IllegalBlockSizeException,
-	                                                                           InvalidAlgorithmParameterException {
+	                                                                           InvalidAlgorithmParameterException,
+	                                                                           EncryptionException {
 		if (encrypted) {
 			Encryptor.writeToEncryptedFile(encryptionKey, file, data);
 		} else {
 			Util.writeAtomically(file, data);
+		}
+	}
+
+	private @Nullable byte[] tryReadFromFile(File file, boolean encrypted) {
+		try {
+			return readFromFile(file, encrypted);
+		} catch (Exception e) {
+			ApptentiveLog.e(PAYLOADS, e, "Unable to read% file: %s", encrypted ? " encrypted" : "", file);
+			return null;
 		}
 	}
 
@@ -598,7 +638,8 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	                                                                 IOException,
 	                                                                 BadPaddingException,
 	                                                                 IllegalBlockSizeException,
-	                                                                 InvalidKeyException {
+	                                                                 InvalidKeyException,
+	                                                                 EncryptionException {
 		return encrypted ? Encryptor.readFromEncryptedFile(encryptionKey, file) : Util.readBytes(file);
 	}
 
@@ -663,7 +704,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 						hideIfSanitized(cursor.getString(PayloadEntry.COLUMN_PATH.index)),
 						cursor.getInt(PayloadEntry.COLUMN_AUTHENTICATED.index),
 						cursor.getString(PayloadEntry.COLUMN_LOCAL_CONVERSATION_ID.index),
-						hideIfSanitized(decryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index)))
+						hideIfSanitized(tryDecryptString(cursor.getBlob(PayloadEntry.COLUMN_AUTH_TOKEN.index), "<CORRUPTED>", false))
 				};
 			}
 			ApptentiveLog.v(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));

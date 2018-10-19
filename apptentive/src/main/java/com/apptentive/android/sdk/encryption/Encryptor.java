@@ -38,19 +38,25 @@ public class Encryptor {
 	                                                                                                   InvalidKeyException,
 	                                                                                                   NoSuchAlgorithmException,
 	                                                                                                   IllegalBlockSizeException,
-                                                                                                     BadPaddingException,
-                                                                                                     InvalidAlgorithmParameterException {
+	                                                                                                   BadPaddingException,
+	                                                                                                   InvalidAlgorithmParameterException,
+	                                                                                                   EncryptionException {
 		return value != null ? encrypt(encryptionKey, value.getBytes()) : null;
 	}
 
 	public static @Nullable byte[] encrypt(EncryptionKey key, @Nullable byte[] plainText) throws NoSuchPaddingException,
 	                                                                                             NoSuchAlgorithmException,
-                                                                                               IllegalBlockSizeException,
+	                                                                                             IllegalBlockSizeException,
 	                                                                                             BadPaddingException,
-                                                                                               InvalidAlgorithmParameterException,
-                                                                                               InvalidKeyException {
+	                                                                                             InvalidAlgorithmParameterException,
+	                                                                                             InvalidKeyException,
+	                                                                                             EncryptionException {
 		if (key == null) {
 			throw new IllegalArgumentException("Encryption key is null");
+		}
+
+		if (key.isCorrupted()) {
+			throw new EncryptionException("Can't encrypt data: key is corrupted");
 		}
 
 		if (plainText == null || key.isNull()) {
@@ -83,19 +89,30 @@ public class Encryptor {
 
 	//region Decrypt
 
-	public static @Nullable String decryptString(EncryptionKey encryptionKey, @Nullable byte[] encryptedBytes) throws NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+	public static @Nullable String decryptString(EncryptionKey encryptionKey, @Nullable byte[] encryptedBytes) throws NoSuchPaddingException,
+	                                                                                                                  InvalidAlgorithmParameterException,
+	                                                                                                                  NoSuchAlgorithmException,
+	                                                                                                                  IllegalBlockSizeException,
+	                                                                                                                  BadPaddingException,
+	                                                                                                                  InvalidKeyException,
+	                                                                                                                  EncryptionException {
 		byte[] decrypted = decrypt(encryptionKey, encryptedBytes);
 		return decrypted != null ? new String(decrypted) : null;
 	}
 
 	public static @Nullable byte[] decrypt(EncryptionKey key, @Nullable byte[] ivAndCipherText) throws NoSuchPaddingException,
-		                                                                                                 InvalidKeyException,
+	                                                                                                   InvalidKeyException,
 	                                                                                                   NoSuchAlgorithmException,
-		                                                                                                 IllegalBlockSizeException,
+	                                                                                                   IllegalBlockSizeException,
 	                                                                                                   BadPaddingException,
-	                                                                                                   InvalidAlgorithmParameterException {
+	                                                                                                   InvalidAlgorithmParameterException,
+	                                                                                                   EncryptionException {
 		if (key == null) {
 			throw new IllegalArgumentException("Encryption key is null");
+		}
+
+		if (key.isCorrupted()) {
+			throw new EncryptionException("Can't decrypt data: key is corrupted");
 		}
 
 		if (ivAndCipherText == null || key.isNull()) {
@@ -126,7 +143,14 @@ public class Encryptor {
 
 	//region File IO
 
-	public static void writeToEncryptedFile(EncryptionKey encryptionKey, File file, byte[] data) throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+	public static void writeToEncryptedFile(EncryptionKey encryptionKey, File file, byte[] data) throws IOException,
+	                                                                                                    NoSuchPaddingException,
+	                                                                                                    InvalidAlgorithmParameterException,
+	                                                                                                    NoSuchAlgorithmException,
+	                                                                                                    IllegalBlockSizeException,
+	                                                                                                    BadPaddingException,
+	                                                                                                    InvalidKeyException,
+	                                                                                                    EncryptionException {
 		AtomicFile atomicFile = new AtomicFile(file);
 		FileOutputStream stream = null;
 		boolean successful = false;
@@ -142,7 +166,14 @@ public class Encryptor {
 		}
 	}
 
-	public static byte[] readFromEncryptedFile(EncryptionKey encryptionKey, File file) throws IOException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+	public static byte[] readFromEncryptedFile(EncryptionKey encryptionKey, File file) throws IOException,
+	                                                                                          NoSuchPaddingException,
+	                                                                                          InvalidKeyException,
+	                                                                                          NoSuchAlgorithmException,
+	                                                                                          IllegalBlockSizeException,
+	                                                                                          BadPaddingException,
+	                                                                                          InvalidAlgorithmParameterException,
+	                                                                                          EncryptionException {
 		final byte[] bytes = Util.readBytes(file);
 		return decrypt(encryptionKey, bytes);
 	}

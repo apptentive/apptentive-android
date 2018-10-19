@@ -57,7 +57,7 @@ public abstract class Payload {
 	/**
 	 * Binary data to be stored in database
 	 */
-	public abstract byte[] renderData() throws JSONException;
+	public abstract @NonNull byte[] renderData() throws Exception;
 
 	//region
 

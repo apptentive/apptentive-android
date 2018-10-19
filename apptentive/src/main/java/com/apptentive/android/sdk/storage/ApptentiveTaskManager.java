@@ -110,7 +110,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					dbHelper.addPayload(payload);
 					sendNextPayloadSync();
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while adding a payload: %s", payload);
+					ApptentiveLog.e(PAYLOADS, e, "Exception while adding a payload: %s", payload);
 				}
 			}
 		});
@@ -125,7 +125,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 						dbHelper.deletePayload(payloadIdentifier);
 						sendNextPayloadSync();
 					} catch (Exception e) {
-						ApptentiveLog.e(e, "Exception while deleting a payload: %s", payloadIdentifier);
+						ApptentiveLog.e(PAYLOADS, e, "Exception while deleting a payload: %s", payloadIdentifier);
 					}
 				}
 			});
@@ -139,7 +139,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				try {
 					dbHelper.deleteAllPayloads();
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while deleting all payloads");
+					ApptentiveLog.e(PAYLOADS, e, "Exception while deleting all payloads");
 				}
 			}
 		});
@@ -156,7 +156,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 				try {
 					dbHelper.deleteAssociatedFiles(messageNonce);
 				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while deleting associated file: %s", messageNonce);
+					ApptentiveLog.e(PAYLOADS, e, "Exception while deleting associated file: %s", messageNonce);
 				}
 			}
 		});
@@ -235,7 +235,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 							ApptentiveLog.d(PAYLOADS, "Retrying sending payloads");
 							sendNextPayloadSync();
 						} catch (Exception e) {
-							ApptentiveLog.e(e, "Exception while trying to retry sending payloads");
+							ApptentiveLog.e(PAYLOADS, e, "Exception while trying to retry sending payloads");
 						}
 					}
 				});

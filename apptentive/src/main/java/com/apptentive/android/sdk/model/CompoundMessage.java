@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.model;
 
+import android.support.annotation.NonNull;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
@@ -290,98 +292,88 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 	 * TODO: Refactor this API so that the resulting byte array is streamed to a file for later retrieval.
 	 */
 	@Override
-	public byte[] renderData() {
-		try {
-			boolean shouldEncrypt = isAuthenticated();
-			ByteArrayOutputStream data = new ByteArrayOutputStream();
+	public @NonNull byte[] renderData() throws Exception {
+		boolean shouldEncrypt = isAuthenticated();
+		ByteArrayOutputStream data = new ByteArrayOutputStream();
 
-			// First write the message body out as the first "part".
-			StringBuilder header = new StringBuilder();
-			header.append(twoHyphens).append(boundary).append(lineEnd);
+		// First write the message body out as the first "part".
+		StringBuilder header = new StringBuilder();
+		header.append(twoHyphens).append(boundary).append(lineEnd);
 
-			StringBuilder part = new StringBuilder();
-			part
+		StringBuilder part = new StringBuilder();
+		part
+			.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
+			.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
+			.append(lineEnd)
+			.append(marshallForSending().toString()).append(lineEnd);
+		byte[] partBytes = part.toString().getBytes();
+
+		final EncryptionKey encryptionKey = getEncryptionKey();
+		if (shouldEncrypt) {
+			header
 				.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
-				.append("Content-Type: application/json;charset=UTF-8").append(lineEnd)
-				.append(lineEnd)
-				.append(marshallForSending().toString()).append(lineEnd);
-			byte[] partBytes = part.toString().getBytes();
-
-			final EncryptionKey encryptionKey = getEncryptionKey();
-			if (shouldEncrypt) {
-				header
-					.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
-					.append("Content-Type: application/octet-stream").append(lineEnd)
-					.append(lineEnd);
-				data.write(header.toString().getBytes());
-				data.write(Encryptor.encrypt(encryptionKey, partBytes));
-				data.write("\r\n".getBytes());
-			} else {
-				data.write(header.toString().getBytes());
-				data.write(partBytes);
-			}
-
-			// Then append attachments
-			if (attachedFiles != null) {
-				for (StoredFile storedFile : attachedFiles) {
-					ApptentiveLog.v(PAYLOADS, "Starting to write an attachment part.");
-					data.write(("--" + boundary + lineEnd).getBytes());
-					StringBuilder attachmentEnvelope = new StringBuilder();
-					attachmentEnvelope.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd)
-						.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd)
-						.append(lineEnd);
-					ByteArrayOutputStream attachmentBytes = new ByteArrayOutputStream();
-					FileInputStream fileInputStream = null;
-					try {
-						ApptentiveLog.v(PAYLOADS, "Writing attachment envelope: %s", attachmentEnvelope.toString());
-						attachmentBytes.write(attachmentEnvelope.toString().getBytes());
-
-						try {
-							if (Util.isMimeTypeImage(storedFile.getMimeType())) {
-								ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
-								ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
-							} else {
-								ApptentiveLog.v(PAYLOADS, "Appending non-image attachment.");
-								Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
-							}
-						} catch (Exception e) {
-							ApptentiveLog.e(PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
-							continue;
-						} finally {
-							Util.ensureClosed(fileInputStream);
-						}
-
-						if (shouldEncrypt) {
-							// If encrypted, each part must be encrypted, and wrapped in a plain text set of headers.
-							StringBuilder encryptionEnvelope = new StringBuilder();
-							encryptionEnvelope
-								.append("Content-Disposition: form-data; name=\"file[]\"").append(lineEnd)
-								.append("Content-Type: application/octet-stream").append(lineEnd)
-								.append(lineEnd);
-							ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
-							data.write(encryptionEnvelope.toString().getBytes());
-							ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
-							byte[] encryptedAttachment = Encryptor.encrypt(encryptionKey, attachmentBytes.toByteArray());
-							ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
-							data.write(encryptedAttachment);
-						} else {
-							ApptentiveLog.v(PAYLOADS, "Writing attachment bytes: %d", attachmentBytes.size());
-							data.write(attachmentBytes.toByteArray());
-						}
-						data.write("\r\n".getBytes());
-					} catch (Exception e) {
-						ApptentiveLog.e(PAYLOADS, "Error getting data for Message Payload attachments.", e);
-						return null;
-					}
-				}
-			}
-			data.write(("--" + boundary + "--").getBytes());
-
-			ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
-			return data.toByteArray();
-		} catch (Exception e) {
-			ApptentiveLog.e(PAYLOADS, "Error assembling Message Payload.", e);
-			return null;
+				.append("Content-Type: application/octet-stream").append(lineEnd)
+				.append(lineEnd);
+			data.write(header.toString().getBytes());
+			data.write(Encryptor.encrypt(encryptionKey, partBytes));
+			data.write("\r\n".getBytes());
+		} else {
+			data.write(header.toString().getBytes());
+			data.write(partBytes);
 		}
+
+		// Then append attachments
+		if (attachedFiles != null) {
+			for (StoredFile storedFile : attachedFiles) {
+				ApptentiveLog.v(PAYLOADS, "Starting to write an attachment part.");
+				data.write(("--" + boundary + lineEnd).getBytes());
+				StringBuilder attachmentEnvelope = new StringBuilder();
+				attachmentEnvelope.append(String.format("Content-Disposition: form-data; name=\"file[]\"; filename=\"%s\"", storedFile.getFileName())).append(lineEnd)
+					.append("Content-Type: ").append(storedFile.getMimeType()).append(lineEnd)
+					.append(lineEnd);
+				ByteArrayOutputStream attachmentBytes = new ByteArrayOutputStream();
+				FileInputStream fileInputStream = null;
+				ApptentiveLog.v(PAYLOADS, "Writing attachment envelope: %s", attachmentEnvelope.toString());
+				attachmentBytes.write(attachmentEnvelope.toString().getBytes());
+
+				try {
+					if (Util.isMimeTypeImage(storedFile.getMimeType())) {
+						ApptentiveLog.v(PAYLOADS, "Appending image attachment.");
+						ImageUtil.appendScaledDownImageToStream(storedFile.getSourceUriOrPath(), attachmentBytes);
+					} else {
+						ApptentiveLog.v(PAYLOADS, "Appending non-image attachment.");
+						Util.appendFileToStream(new File(storedFile.getSourceUriOrPath()), attachmentBytes);
+					}
+				} catch (Exception e) {
+					ApptentiveLog.e(PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
+					continue;
+				} finally {
+					Util.ensureClosed(fileInputStream);
+				}
+
+				if (shouldEncrypt) {
+					// If encrypted, each part must be encrypted, and wrapped in a plain text set of headers.
+					StringBuilder encryptionEnvelope = new StringBuilder();
+					encryptionEnvelope
+						.append("Content-Disposition: form-data; name=\"file[]\"").append(lineEnd)
+						.append("Content-Type: application/octet-stream").append(lineEnd)
+						.append(lineEnd);
+					ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
+					data.write(encryptionEnvelope.toString().getBytes());
+					ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
+					byte[] encryptedAttachment = Encryptor.encrypt(encryptionKey, attachmentBytes.toByteArray());
+					ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
+					data.write(encryptedAttachment);
+				} else {
+					ApptentiveLog.v(PAYLOADS, "Writing attachment bytes: %d", attachmentBytes.size());
+					data.write(attachmentBytes.toByteArray());
+				}
+				data.write("\r\n".getBytes());
+			}
+		}
+		data.write(("--" + boundary + "--").getBytes());
+
+		ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
+		return data.toByteArray();
 	}
 }

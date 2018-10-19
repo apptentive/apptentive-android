@@ -10,7 +10,16 @@ import java.security.Key;
 import javax.crypto.spec.SecretKeySpec;
 
 public class EncryptionKey {
-	public static final EncryptionKey NULL = new EncryptionKey();
+	/**
+	 * A no-op encryption key for API versions without key chain access (17 and below)
+	 */
+	public static final EncryptionKey NULL = new EncryptionKey(false);
+
+	/**
+	 * A special instance of the encryption key which will fail every attempt to encrypt and decrypt data.
+	 * Used for the cases when the original encryption key cannot be loaded for the key store.
+	 */
+	static final EncryptionKey CORRUPTED = new EncryptionKey(true);
 
 	static final String DEFAULT_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 	private static final String ALGORITHM = "AES";
@@ -18,6 +27,15 @@ public class EncryptionKey {
 	private final Key key;
 	private final String hexKey;
 	private final String transformation;
+
+	private boolean corrupted;
+
+	private EncryptionKey(boolean corrupted) {
+		this.corrupted = corrupted;
+		this.key = null;
+		this.hexKey = null;
+		this.transformation = "";
+	}
 
 	public EncryptionKey(@NonNull Key key, @NonNull String transformation) {
 		if (key == null) {
@@ -41,14 +59,12 @@ public class EncryptionKey {
 		this.hexKey = hexKey;
 	}
 
-	private EncryptionKey() {
-		this.key = null;
-		this.hexKey = null;
-		this.transformation = "";
+	boolean isNull() {
+		return key == null;
 	}
 
-	public boolean isNull() {
-		return key == null;
+	boolean isCorrupted() {
+		return corrupted;
 	}
 
 	@Nullable Key getSecretKey() {
@@ -59,7 +75,7 @@ public class EncryptionKey {
 		return hexKey;
 	}
 
-	public @NonNull String getTransformation() {
+	@NonNull String getTransformation() {
 		return transformation;
 	}
 }
