@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.model;
 
+import android.support.annotation.NonNull;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
@@ -48,22 +50,17 @@ public abstract class JsonPayload extends Payload {
 	//region Data
 
 	@Override
-	public byte[] renderData() throws JSONException {
+	public @NonNull byte[] renderData() throws Exception {
 		String jsonString = marshallForSending().toString();
 		ApptentiveLog.v(PAYLOADS, jsonString);
 
 		// authenticated payloads get encrypted before sending
 		if (isAuthenticated()) {
 			byte[] bytes = jsonString.getBytes();
-			try {
-				return Encryptor.encrypt(getEncryptionKey(), bytes);
-			} catch (Exception e) {
-				ApptentiveLog.e(PAYLOADS, "Error encrypting payload data", e);
-			}
-			return null;
-		} else {
-			return jsonString.getBytes();
+			return Encryptor.encrypt(getEncryptionKey(), bytes);
 		}
+
+		return jsonString.getBytes();
 	}
 
 	//endregion

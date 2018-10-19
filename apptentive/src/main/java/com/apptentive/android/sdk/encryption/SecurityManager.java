@@ -69,9 +69,8 @@ public final class SecurityManager {
 			return keyResolver.resolveKey(context, keyInfo.alias);
 		} catch (Exception e) {
 			ApptentiveLog.e(SECURITY, e, "Exception while resolving secret key for alias '%s'. Encryption might not work correctly!", hideIfSanitized(keyInfo.alias));
+			return EncryptionKey.CORRUPTED;
 		}
-
-		return EncryptionKey.NULL;
 	}
 
 	//endregion

@@ -1,3 +1,11 @@
+# 2018-08-30 - v5.3.1
+
+#### Fixes
+
+* Fixed SDK state restoration logic.
+* Fixed 422 http errors.
+* Fixed corrupted payloads if encryption key could not be resolved from the KeyStore.
+
 # 2018-08-30 - v5.3.0
 
 #### Improvements

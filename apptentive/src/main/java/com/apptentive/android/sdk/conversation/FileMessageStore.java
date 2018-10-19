@@ -8,6 +8,7 @@ package com.apptentive.android.sdk.conversation;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
@@ -222,7 +223,14 @@ class FileMessageStore implements MessageStore {
 		}
 	}
 
-	private List<MessageEntry> readFromFileGuarded() throws IOException, NoSuchPaddingException, InvalidAlgorithmParameterException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidKeyException {
+	private List<MessageEntry> readFromFileGuarded() throws IOException,
+	                                                        NoSuchPaddingException,
+	                                                        InvalidAlgorithmParameterException,
+	                                                        NoSuchAlgorithmException,
+	                                                        IllegalBlockSizeException,
+	                                                        BadPaddingException,
+	                                                        InvalidKeyException,
+	                                                        EncryptionException {
 		byte[] bytes = Encryptor.readFromEncryptedFile(encryptionKey, file);
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 
@@ -248,7 +256,14 @@ class FileMessageStore implements MessageStore {
 		shouldFetchFromFile = false; // mark it as not shouldFetchFromFile to keep a memory version
 	}
 
-	private void writeToFileGuarded() throws IOException, NoSuchPaddingException, InvalidKeyException, NoSuchAlgorithmException, IllegalBlockSizeException, BadPaddingException, InvalidAlgorithmParameterException {
+	private void writeToFileGuarded() throws IOException,
+	                                         NoSuchPaddingException,
+	                                         InvalidKeyException,
+	                                         NoSuchAlgorithmException,
+	                                         IllegalBlockSizeException,
+	                                         BadPaddingException,
+	                                         InvalidAlgorithmParameterException,
+	                                         EncryptionException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		dos.writeByte(VERSION);
