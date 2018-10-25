@@ -94,8 +94,11 @@ public class ConversationManager {
 	private Conversation activeConversation;
 	private ConversationProxy activeConversationProxy;
 
-	// TODO: this is a temporary solution until we restore conversation state
-	private boolean activeConversationLoaded;
+	/**
+	 * Indicate a failure in resolving active conversation (there was an exception while loading
+	 * metadata or conversation). Used to disable conversation-related SDK functionality (like login)
+	 */
+	private boolean activeConversationFailedToResolve; // TODO: this is a temporary solution until we restore conversation state
 
 	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull EncryptionKey encryptionKey) {
 		if (context == null) {
@@ -176,7 +179,6 @@ public class ConversationManager {
 
 				activeConversation.startListeningForChanges();
 				activeConversation.scheduleSaveConversationData();
-				activeConversationLoaded = true;
 
 				handleConversationStateChange(activeConversation);
 				return true;
@@ -184,6 +186,7 @@ public class ConversationManager {
 
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading active conversation");
+			activeConversationFailedToResolve = true;
 		}
 
 		ApptentiveNotificationCenter.defaultCenter()
@@ -791,7 +794,7 @@ public class ConversationManager {
 		}
 
 		// Check if we have metadata
-		if (!activeConversationLoaded) {
+		if (activeConversationFailedToResolve) {
 			ApptentiveLog.e(CONVERSATION, "Unable to login: active conversation was not loaded");
 			callback.onLoginFail("Unable to login: active conversation was not loaded");
 			return;

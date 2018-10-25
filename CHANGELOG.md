@@ -1,3 +1,10 @@
+# 2018-08-30 - v5.3.2
+
+#### Fixes
+
+* Fixed encrypted message store for logged-in users.
+* Fixed the bug which prevented users from logging-in back after a logout.
+
 # 2018-08-30 - v5.3.1
 
 #### Fixes

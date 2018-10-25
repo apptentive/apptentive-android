@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.conversation;
 
+import android.support.annotation.NonNull;
+
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.encryption.EncryptionException;
@@ -54,7 +56,7 @@ class FileMessageStore implements MessageStore {
 
 	private final File file;
 	private final List<MessageEntry> messageEntries;
-	private final EncryptionKey encryptionKey;
+	private EncryptionKey encryptionKey;
 	private boolean shouldFetchFromFile;
 
 	FileMessageStore(File file, EncryptionKey encryptionKey) {
@@ -271,7 +273,9 @@ class FileMessageStore implements MessageStore {
 		for (MessageEntry entry : messageEntries) {
 			entry.writeExternal(dos);
 		}
+		long start = System.currentTimeMillis();
 		Encryptor.writeToEncryptedFile(encryptionKey, file, bos.toByteArray());
+		ApptentiveLog.v(MESSAGES, "Messages saved. Took %d ms", System.currentTimeMillis() - start);
 	}
 
 	//endregion
@@ -290,6 +294,16 @@ class FileMessageStore implements MessageStore {
 			}
 		}
 		return null;
+	}
+
+	void updateEncryptionKey(@NonNull EncryptionKey encryptionKey) {
+		if (encryptionKey == null) {
+			throw new IllegalArgumentException("Encryption key is null");
+		}
+		this.encryptionKey = encryptionKey;
+
+		// update storage
+		writeToFile();
 	}
 
 	//endregion

@@ -111,6 +111,9 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 
 	private final MessageManager messageManager;
 
+	// we keep a reference to the message store in order to update encryption key (not the best solution but works for now)
+	private final FileMessageStore messageStore;
+
 	// we keep references to the tasks in order to dispatch them only once
 	private final DispatchTask saveConversationTask = new DispatchTask() {
 		@Override
@@ -140,7 +143,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 
 		conversationData = new ConversationData();
 
-		FileMessageStore messageStore = new FileMessageStore(conversationMessagesFile, encryptionKey);
+		messageStore = new FileMessageStore(conversationMessagesFile, encryptionKey);
 		messageStore.migrateLegacyStorage();
 		messageManager = new MessageManager(this, messageStore); // it's important to initialize message manager in a constructor since other SDK parts depend on it via Apptentive singleton
 	}
@@ -691,6 +694,9 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 
 	public void setEncryptionKey(@NonNull EncryptionKey encryptionKey) {
 		this.encryptionKey = encryptionKey;
+
+		// we need to update the old message store encryption key and overwrite current data file
+		messageStore.updateEncryptionKey(encryptionKey);
 	}
 
 	public @NonNull EncryptionKey getEncryptionKey() {
