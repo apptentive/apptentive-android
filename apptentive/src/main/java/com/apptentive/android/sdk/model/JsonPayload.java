@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public abstract class JsonPayload extends Payload {
 
@@ -72,6 +73,7 @@ public abstract class JsonPayload extends Payload {
 			jsonObject.put(key, toNullableValue(value));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, value);
+			logException(e);
 		}
 	}
 
@@ -80,6 +82,7 @@ public abstract class JsonPayload extends Payload {
 			jsonObject.put(key, value);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, value);
+			logException(e);
 		}
 	}
 
@@ -88,6 +91,7 @@ public abstract class JsonPayload extends Payload {
 			jsonObject.put(key, value);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, value);
+			logException(e);
 		}
 	}
 
@@ -96,6 +100,7 @@ public abstract class JsonPayload extends Payload {
 			jsonObject.put(key, value);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, value);
+			logException(e);
 		}
 	}
 
@@ -104,6 +109,7 @@ public abstract class JsonPayload extends Payload {
 			jsonObject.put(key, toNullableValue(object));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while putting json pair '%s'='%s'", key, object);
+			logException(e);
 		}
 	}
 
@@ -134,7 +140,7 @@ public abstract class JsonPayload extends Payload {
 		try {
 			return jsonObject.getDouble(key);
 		} catch (Exception e) {
-			// Ignore.
+			logException(e);
 		}
 		return null;
 	}
@@ -183,6 +189,7 @@ public abstract class JsonPayload extends Payload {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while creating safe json object");
+			logException(e);
 		}
 
 		return null;
@@ -222,7 +229,7 @@ public abstract class JsonPayload extends Payload {
 
 	//endregion
 
-	protected final JSONObject marshallForSending() throws JSONException {
+	final JSONObject marshallForSending() throws JSONException {
 		JSONObject result;
 		String container = getJsonContainer();
 		if (container != null) {
@@ -234,6 +241,10 @@ public abstract class JsonPayload extends Payload {
 
 		if (isAuthenticated()) {
 			result.put("token", getConversationToken());
+		}
+
+		if (hasSessionId()) {
+			result.put("session_id", getSessionId());
 		}
 
 		return result;
@@ -266,6 +277,7 @@ public abstract class JsonPayload extends Payload {
 				SENSITIVE_KEYS_LOOKUP.put(cls, keys);
 			} catch (Exception e) {
 				ApptentiveLog.e(e, "Exception while registering sensitive keys");
+				logException(e);
 			}
 		}
 	}

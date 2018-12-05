@@ -10,6 +10,7 @@ import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
@@ -159,6 +160,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			bRet = future.get();
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Unable to set associated images in worker thread");
+			logException(e);
 		} finally {
 			return bRet;
 		}
@@ -182,6 +184,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			bRet = future.get();
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Unable to set associated files in worker thread");
+			logException(e);
 		} finally {
 			return bRet;
 		}
@@ -197,6 +200,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			associatedFiles = future.get();
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Unable to get associated files in worker thread");
+			logException(e);
 		} finally {
 			return associatedFiles;
 		}
@@ -219,6 +223,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			ApptentiveInternal.getInstance().getApptentiveTaskManager().deleteAssociatedFiles(getNonce());
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Unable to delete associated files in worker thread");
+			logException(e);
 		}
 	}
 
@@ -346,6 +351,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 					}
 				} catch (Exception e) {
 					ApptentiveLog.e(PAYLOADS, "Error reading Message Payload attachment: \"%s\".", e, storedFile.getLocalFilePath());
+					logException(e);
 					continue;
 				} finally {
 					Util.ensureClosed(fileInputStream);
@@ -375,5 +381,9 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 
 		ApptentiveLog.d(PAYLOADS, "Total payload body bytes: %d", data.size());
 		return data.toByteArray();
+	}
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 }

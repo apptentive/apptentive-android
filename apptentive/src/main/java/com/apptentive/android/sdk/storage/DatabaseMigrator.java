@@ -21,6 +21,7 @@ import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
 abstract class DatabaseMigrator {
@@ -75,6 +76,7 @@ abstract class DatabaseMigrator {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(DATABASE, "Error closing SQLite cursor.", e);
+			logException(e);
 		}
 	}
 

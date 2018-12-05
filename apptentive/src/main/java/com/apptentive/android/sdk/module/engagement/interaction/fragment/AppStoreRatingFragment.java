@@ -73,6 +73,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 			displayError(activity, activity.getString(R.string.apptentive_rating_error));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreate()", getClass().getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -110,6 +111,7 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 			ApptentiveAlertDialog.show(this, bundle, 0);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while displaying an error");
+			logException(e);
 		}
 	}
 

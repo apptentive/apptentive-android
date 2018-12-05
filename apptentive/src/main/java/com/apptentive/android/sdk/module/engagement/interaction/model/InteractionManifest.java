@@ -13,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class InteractionManifest extends JSONObject {
 
@@ -45,6 +46,7 @@ public class InteractionManifest extends JSONObject {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.w(INTERACTIONS, e, "Unable to load Interactions from InteractionManifest.");
+			logException(e);
 		}
 		return null;
 	}
@@ -57,6 +59,7 @@ public class InteractionManifest extends JSONObject {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.w(INTERACTIONS, e, "Unable to load Targets from InteractionManifest.");
+			logException(e);
 		}
 		return null;
 	}

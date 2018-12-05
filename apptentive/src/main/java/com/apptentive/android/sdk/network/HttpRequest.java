@@ -10,6 +10,7 @@ import android.util.Base64;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -34,6 +35,7 @@ import java.util.zip.GZIPInputStream;
 import static com.apptentive.android.sdk.ApptentiveLog.Level.VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * Class representing async HTTP request
@@ -180,6 +182,7 @@ public class HttpRequest {
 						listener.onFinish(this);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception in request onFinish() listener");
+						logException(e);
 					}
 				}
 			} else if (isCancelled()) {
@@ -188,6 +191,7 @@ public class HttpRequest {
 						listener.onCancel(this);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception in request onCancel() listener");
+						logException(e);
 					}
 				}
 			} else {
@@ -196,6 +200,7 @@ public class HttpRequest {
 						listener.onFail(this, errorMessage);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception in request onFail() listener");
+						logException(e);
 					}
 				}
 			}
@@ -240,6 +245,8 @@ public class HttpRequest {
 			if (!isCancelled()) {
 				ApptentiveLog.e(NETWORK, "Unable to perform request: %s", this);
 			}
+
+			// TODO: send error metrics with the details of the request
 		}
 
 		ApptentiveLog.d(NETWORK, "Request finished in %d ms", System.currentTimeMillis() - requestStartTime);
@@ -625,6 +632,7 @@ public class HttpRequest {
 				return Apptentive.AuthenticationFailedReason.parse(errorType, error);
 			} catch (Exception e) {
 				ApptentiveLog.w(NETWORK, e, "Error parsing authentication failure object.");
+				logException(e);
 			}
 		}
 		return Apptentive.AuthenticationFailedReason.UNKNOWN;
@@ -680,6 +688,10 @@ public class HttpRequest {
 	//endregion
 
 	//region Debug
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
+	}
 
 	public static class Injector {
 		public void onBeforeSend(HttpRequest request) throws Exception {

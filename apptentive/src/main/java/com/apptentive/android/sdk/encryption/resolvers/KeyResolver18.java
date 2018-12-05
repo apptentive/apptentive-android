@@ -47,7 +47,6 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.SECURITY;
 	private static final String DEFAULT_TRANSFORMATION = "AES/CBC/PKCS7Padding";
 	private static final String WRAPPER_TRANSFORMATION = "RSA/ECB/PKCS1Padding";
 
-	private static final String DEFAULT_PROVIDER = "BC";
 	private static final String KEYSTORE_PROVIDER = "AndroidKeyStore";
 
 	private static final String PREFS_NAME_SYMMETRIC_KEY = "com.apptentive.sdk.security.keys";
@@ -93,8 +92,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.SECURITY;
 		return generateSymmetricKey(context, wrapperKey);
 	}
 
-	private SecretKey generateSymmetricKey(Context context, KeyPair wrapperKey) throws NoSuchProviderException,
-	                                                                                   NoSuchAlgorithmException,
+	private SecretKey generateSymmetricKey(Context context, KeyPair wrapperKey) throws NoSuchAlgorithmException,
 	                                                                                   NoSuchPaddingException,
 	                                                                                   InvalidKeyException,
 	                                                                                   IllegalBlockSizeException {
@@ -103,9 +101,8 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.SECURITY;
 		return secretKey;
 	}
 
-	private static SecretKey generateSymmetricKey() throws NoSuchProviderException,
-		                                                       NoSuchAlgorithmException {
-		KeyGenerator keyGenerator = KeyGenerator.getInstance(DEFAULT_KEY_ALGORITHM, DEFAULT_PROVIDER);
+	private static SecretKey generateSymmetricKey() throws NoSuchAlgorithmException {
+		KeyGenerator keyGenerator = KeyGenerator.getInstance(DEFAULT_KEY_ALGORITHM);
 		return keyGenerator.generateKey();
 	}
 

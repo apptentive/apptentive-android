@@ -104,13 +104,7 @@ public class ApptentiveLog {
 
 		log0(level, message);
 		if (throwable != null) {
-			if (throwable.getMessage() != null) {
-				log0(level, throwable.getMessage());
-			}
-			while (throwable != null) {
-				log0(level, Util.getStackTraceString(throwable));
-				throwable = throwable.getCause();
-			}
+			log0(level, StringUtils.getStackTrace(throwable));
 		}
 	}
 

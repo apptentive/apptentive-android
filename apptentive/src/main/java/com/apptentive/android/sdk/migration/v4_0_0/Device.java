@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class Device extends JSONObject {
 
@@ -51,7 +52,7 @@ public class Device extends JSONObject {
 				return getString(KEY_UUID);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -61,6 +62,7 @@ public class Device extends JSONObject {
 			put(KEY_UUID, uuid);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_UUID);
+			logException(e);
 		}
 	}
 
@@ -70,7 +72,7 @@ public class Device extends JSONObject {
 				return getString(KEY_OS_NAME);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -80,6 +82,7 @@ public class Device extends JSONObject {
 			put(KEY_OS_NAME, osName);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_OS_NAME);
+			logException(e);
 		}
 	}
 
@@ -89,7 +92,7 @@ public class Device extends JSONObject {
 				return getString(KEY_OS_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -99,6 +102,7 @@ public class Device extends JSONObject {
 			put(KEY_OS_VERSION, osVersion);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_OS_VERSION);
+			logException(e);
 		}
 	}
 
@@ -108,7 +112,7 @@ public class Device extends JSONObject {
 				return getString(KEY_OS_BUILD);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -118,6 +122,7 @@ public class Device extends JSONObject {
 			put(KEY_OS_BUILD, osBuild);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_OS_BUILD);
+			logException(e);
 		}
 	}
 
@@ -127,7 +132,7 @@ public class Device extends JSONObject {
 				return getString(KEY_OS_API_LEVEL);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -137,6 +142,7 @@ public class Device extends JSONObject {
 			put(KEY_OS_API_LEVEL, osApiLevel);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_OS_API_LEVEL);
+			logException(e);
 		}
 	}
 
@@ -146,7 +152,7 @@ public class Device extends JSONObject {
 				return getString(KEY_MANUFACTURER);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -156,6 +162,7 @@ public class Device extends JSONObject {
 			put(KEY_MANUFACTURER, manufacturer);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_MANUFACTURER);
+			logException(e);
 		}
 	}
 
@@ -165,7 +172,7 @@ public class Device extends JSONObject {
 				return getString(KEY_MODEL);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -175,6 +182,7 @@ public class Device extends JSONObject {
 			put(KEY_MODEL, model);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_MODEL);
+			logException(e);
 		}
 	}
 
@@ -184,7 +192,7 @@ public class Device extends JSONObject {
 				return getString(KEY_BOARD);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -194,6 +202,7 @@ public class Device extends JSONObject {
 			put(KEY_BOARD, board);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_BOARD);
+			logException(e);
 		}
 	}
 
@@ -203,7 +212,7 @@ public class Device extends JSONObject {
 				return getString(KEY_PRODUCT);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -213,6 +222,7 @@ public class Device extends JSONObject {
 			put(KEY_PRODUCT, product);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_PRODUCT);
+			logException(e);
 		}
 	}
 
@@ -222,7 +232,7 @@ public class Device extends JSONObject {
 				return getString(KEY_BRAND);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -232,6 +242,7 @@ public class Device extends JSONObject {
 			put(KEY_BRAND, brand);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_BRAND);
+			logException(e);
 		}
 	}
 
@@ -241,7 +252,7 @@ public class Device extends JSONObject {
 				return getString(KEY_CPU);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -251,6 +262,7 @@ public class Device extends JSONObject {
 			put(KEY_CPU, cpu);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_CPU);
+			logException(e);
 		}
 	}
 
@@ -260,7 +272,7 @@ public class Device extends JSONObject {
 				return getString(KEY_DEVICE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -270,6 +282,7 @@ public class Device extends JSONObject {
 			put(KEY_DEVICE, device);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_DEVICE);
+			logException(e);
 		}
 	}
 
@@ -279,7 +292,7 @@ public class Device extends JSONObject {
 				return getString(KEY_CARRIER);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -289,6 +302,7 @@ public class Device extends JSONObject {
 			put(KEY_CARRIER, carrier);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_CARRIER);
+			logException(e);
 		}
 	}
 
@@ -298,7 +312,7 @@ public class Device extends JSONObject {
 				return getString(KEY_CURRENT_CARRIER);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -308,6 +322,7 @@ public class Device extends JSONObject {
 			put(KEY_CURRENT_CARRIER, currentCarrier);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_CURRENT_CARRIER);
+			logException(e);
 		}
 	}
 
@@ -317,7 +332,7 @@ public class Device extends JSONObject {
 				return getString(KEY_NETWORK_TYPE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -327,6 +342,7 @@ public class Device extends JSONObject {
 			put(KEY_NETWORK_TYPE, networkType);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_NETWORK_TYPE);
+			logException(e);
 		}
 	}
 
@@ -336,7 +352,7 @@ public class Device extends JSONObject {
 				return getString(KEY_BUILD_TYPE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -346,6 +362,7 @@ public class Device extends JSONObject {
 			put(KEY_BUILD_TYPE, buildType);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_BUILD_TYPE);
+			logException(e);
 		}
 	}
 
@@ -355,7 +372,7 @@ public class Device extends JSONObject {
 				return getString(KEY_BUILD_ID);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -365,6 +382,7 @@ public class Device extends JSONObject {
 			put(KEY_BUILD_ID, buildId);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_BUILD_ID);
+			logException(e);
 		}
 	}
 
@@ -374,7 +392,7 @@ public class Device extends JSONObject {
 				return getString(KEY_BOOTLOADER_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -384,6 +402,7 @@ public class Device extends JSONObject {
 			put(KEY_BOOTLOADER_VERSION, bootloaderVersion);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_BOOTLOADER_VERSION);
+			logException(e);
 		}
 	}
 
@@ -393,7 +412,7 @@ public class Device extends JSONObject {
 				return getString(KEY_RADIO_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -403,6 +422,7 @@ public class Device extends JSONObject {
 			put(KEY_RADIO_VERSION, radioVersion);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_RADIO_VERSION);
+			logException(e);
 		}
 	}
 
@@ -412,7 +432,7 @@ public class Device extends JSONObject {
 			try {
 				return getJSONObject(KEY_CUSTOM_DATA);
 			} catch (JSONException e) {
-				// Ignore
+				logException(e);
 			}
 		}
 		return null;
@@ -423,6 +443,7 @@ public class Device extends JSONObject {
 			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_CUSTOM_DATA);
+			logException(e);
 		}
 	}
 
@@ -432,7 +453,7 @@ public class Device extends JSONObject {
 			try {
 				return getJSONObject(KEY_INTEGRATION_CONFIG);
 			} catch (JSONException e) {
-				// Ignore
+				logException(e);
 			}
 		}
 		return null;
@@ -443,6 +464,7 @@ public class Device extends JSONObject {
 			put(KEY_INTEGRATION_CONFIG, integrationConfig);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_INTEGRATION_CONFIG);
+			logException(e);
 		}
 	}
 
@@ -452,7 +474,7 @@ public class Device extends JSONObject {
 				return getString(KEY_LOCALE_COUNTRY_CODE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -462,6 +484,7 @@ public class Device extends JSONObject {
 			put(KEY_LOCALE_COUNTRY_CODE, localeCountryCode);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_LOCALE_COUNTRY_CODE);
+			logException(e);
 		}
 	}
 
@@ -471,7 +494,7 @@ public class Device extends JSONObject {
 				return getString(KEY_LOCALE_LANGUAGE_CODE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -481,6 +504,7 @@ public class Device extends JSONObject {
 			put(KEY_LOCALE_LANGUAGE_CODE, localeLanguageCode);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_LOCALE_LANGUAGE_CODE);
+			logException(e);
 		}
 	}
 
@@ -490,7 +514,7 @@ public class Device extends JSONObject {
 				return getString(KEY_LOCALE_RAW);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -500,6 +524,7 @@ public class Device extends JSONObject {
 			put(KEY_LOCALE_RAW, localeRaw);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_LOCALE_RAW);
+			logException(e);
 		}
 	}
 
@@ -509,7 +534,7 @@ public class Device extends JSONObject {
 				return getString(KEY_UTC_OFFSET);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -519,6 +544,7 @@ public class Device extends JSONObject {
 			put(KEY_UTC_OFFSET, utcOffset);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Device.", KEY_UTC_OFFSET);
+			logException(e);
 		}
 	}
 

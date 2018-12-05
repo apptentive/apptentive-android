@@ -14,11 +14,13 @@ import android.os.Bundle;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * @author Sky Kelsey
@@ -75,6 +77,7 @@ public class Configuration extends JSONObject {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Error loading Configuration from SharedPreferences.");
+			logException(e);
 		}
 		return new Configuration();
 	}
@@ -93,7 +96,7 @@ public class Configuration extends JSONObject {
 				return getString(KEY_APP_DISPLAY_NAME);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return ApptentiveInternal.getInstance().getDefaultAppDisplayName();
 	}
@@ -104,7 +107,7 @@ public class Configuration extends JSONObject {
 				return getJSONObject(KEY_MESSAGE_CENTER);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -118,7 +121,7 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_FG_POLL_SECONDS;
 	}
@@ -132,7 +135,7 @@ public class Configuration extends JSONObject {
 				}
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return Constants.CONFIG_DEFAULT_MESSAGE_CENTER_BG_POLL_SECONDS;
 	}
@@ -164,7 +167,7 @@ public class Configuration extends JSONObject {
 				return getBoolean(KEY_HIDE_BRANDING);
 			}
 		} catch (JSONException e) {
-			// Move on.
+			logException(e);
 		}
 
 		try {
@@ -173,6 +176,7 @@ public class Configuration extends JSONObject {
 			return metaData.getBoolean(Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING, Constants.CONFIG_DEFAULT_HIDE_BRANDING);
 		} catch (Exception e) {
 			ApptentiveLog.w(CONVERSATION, e, "Unexpected error while reading %s manifest setting.", Constants.MANIFEST_KEY_INITIALLY_HIDE_BRANDING);
+			logException(e);
 		}
 
 		return Constants.CONFIG_DEFAULT_HIDE_BRANDING;
@@ -184,7 +188,7 @@ public class Configuration extends JSONObject {
 				return getLong(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_MILLIS;
 	}
@@ -194,6 +198,7 @@ public class Configuration extends JSONObject {
 			put(KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS, configurationCacheExpirationMillis);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Configuration.", KEY_CONFIGURATION_CACHE_EXPIRATION_MILLIS);
+			logException(e);
 		}
 	}
 
@@ -208,8 +213,13 @@ public class Configuration extends JSONObject {
 			return optBoolean(key, defaultValue);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while getting boolean key '%s'", key);
+			logException(e);
 			return defaultValue;
 		}
+	}
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 
 	//endregion

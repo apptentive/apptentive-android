@@ -26,6 +26,7 @@ import com.apptentive.android.sdk.util.Util;
 import java.math.BigDecimal;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class FieldManager {
 
@@ -552,6 +553,7 @@ public class FieldManager {
 					return QueryPart.valueOf(name);
 				} catch (IllegalArgumentException e) {
 					ApptentiveLog.e(INTERACTIONS, "Unrecognized QueryPart: \"%s\". Defaulting to \"unknown\"", name);
+					logException(e);
 				}
 			}
 			return other;

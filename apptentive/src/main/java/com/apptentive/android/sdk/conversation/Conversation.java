@@ -15,6 +15,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.model.DevicePayload;
 import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.Payload;
@@ -54,6 +55,7 @@ import com.apptentive.android.sdk.util.threading.DispatchTask;
 import org.json.JSONException;
 
 import java.io.File;
+import java.util.UUID;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationDataQueue;
@@ -61,6 +63,7 @@ import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
 import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.Assert.assertNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
@@ -83,6 +86,11 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 * Optional user id for logged-in conversations
 	 */
 	private String userId;
+
+	/**
+	 * Unique session id for tracking all the events for a single app launch
+	 */
+	private @Nullable String sessionId;
 
 	/**
 	 * File which represents serialized conversation data on the disk
@@ -122,6 +130,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				saveConversationData();
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, e, "Exception while saving conversation data");
+				logException(e);
 			}
 		}
 	};
@@ -167,6 +176,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		payload.setToken(getConversationToken());
 		payload.setEncryptionKey(getEncryptionKey());
 		payload.setAuthenticated(isAuthenticated());
+		payload.setSessionId(getSessionId());
 
 		// TODO: don't use singleton here
 		ApptentiveInternal.getInstance().getApptentiveTaskManager().addPayload(payload);
@@ -199,6 +209,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				}
 			} catch (JSONException e) {
 				ApptentiveLog.e(INTERACTIONS, e, "Exception while getting applicable interaction: %s", eventLabel);
+				logException(e);
 			}
 		}
 		return null;
@@ -240,6 +251,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 							}
 						} catch (JSONException e) {
 							ApptentiveLog.e(CONVERSATION, e, "Invalid InteractionManifest received.");
+							logException(e);
 						}
 						ApptentiveLog.v(CONVERSATION, "Fetching new Interactions task finished");
 
@@ -316,7 +328,37 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Invalid InteractionManifest received.");
+			logException(e);
 		}
+	}
+
+	//endregion
+
+	//region Session
+
+	public void startSession() {
+		assertNull(sessionId, "Another session is active");
+		sessionId = generateSessionId();
+		ApptentiveLog.d(CONVERSATION, "Started session '%s'", sessionId);
+	}
+
+	public void endSession() {
+		assertNotNull(sessionId, "Session was not started");
+		ApptentiveLog.d(CONVERSATION, "Ended session '%s'", sessionId);
+		sessionId = null;
+	}
+
+	public boolean hasSession() {
+		return !StringUtils.isNullOrEmpty(sessionId);
+	}
+
+	public @Nullable String getSessionId() {
+		return sessionId;
+	}
+
+	private static String generateSessionId() {
+		String randomUUID = UUID.randomUUID().toString().replace("-", "");
+		return randomUUID.length() > 32 ? randomUUID.substring(0, 32) : randomUUID;
 	}
 
 	//endregion
@@ -324,7 +366,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	//region Saving
 
 	public void scheduleSaveConversationData() {
-		boolean scheduled = conversationDataQueue().dispatchAsyncOnce(saveConversationTask, 100L);
+		boolean scheduled = conversationDataQueue().dispatchAsyncOnce(saveConversationTask);
 		if (scheduled) {
 			ApptentiveLog.v(CONVERSATION, "Scheduling conversation save.");
 		} else {
@@ -465,6 +507,14 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 
 	private void scheduleDeviceUpdate() {
 		conversationQueue().dispatchAsyncOnce(deviceUpdateTask);
+	}
+
+	//endregion
+
+	//region Error Reporting
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 
 	//endregion

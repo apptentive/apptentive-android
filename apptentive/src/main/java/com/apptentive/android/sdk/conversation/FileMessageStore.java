@@ -11,6 +11,8 @@ import android.support.annotation.NonNull;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.encryption.EncryptionException;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
+
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
@@ -222,6 +224,7 @@ class FileMessageStore implements MessageStore {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, e, "Exception while reading entries");
+			logException(e);
 		}
 	}
 
@@ -254,6 +257,7 @@ class FileMessageStore implements MessageStore {
 			writeToFileGuarded();
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, e, "Exception while saving messages");
+			logException(e);
 		}
 		shouldFetchFromFile = false; // mark it as not shouldFetchFromFile to keep a memory version
 	}
@@ -372,6 +376,7 @@ class FileMessageStore implements MessageStore {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while migrating messages");
+			logException(e);
 		}
 	}
 
@@ -392,6 +397,14 @@ class FileMessageStore implements MessageStore {
 		} finally {
 			Util.ensureClosed(dis);
 		}
+	}
+
+	//endregion
+
+	//region Error Reporting
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 
 	//endregion

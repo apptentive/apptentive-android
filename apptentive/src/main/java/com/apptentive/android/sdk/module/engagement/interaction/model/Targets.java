@@ -16,6 +16,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * @author Sky Kelsey
@@ -43,7 +44,7 @@ public class Targets extends JSONObject {
 							return invocation.getInteractionId();
 						}
 					} catch (JSONException e) {
-						//
+						logException(e);
 					}
 				}
 			}

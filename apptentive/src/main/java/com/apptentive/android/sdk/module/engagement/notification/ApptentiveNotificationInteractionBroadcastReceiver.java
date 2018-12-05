@@ -13,6 +13,7 @@ import android.content.Intent;
 import com.apptentive.android.sdk.ApptentiveLog;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.NOTIFICATION_INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class ApptentiveNotificationInteractionBroadcastReceiver extends BroadcastReceiver {
 
@@ -24,6 +25,7 @@ public class ApptentiveNotificationInteractionBroadcastReceiver extends Broadcas
 			DEFAULT_HANDLER.handleBroadcast(context, intent);
 		} catch (Exception e) {
 			ApptentiveLog.w(NOTIFICATION_INTERACTIONS, e, "Error handling Apptentive Interaction Notification broadcast.");
+			logException(e);
 		}
 	}
 }

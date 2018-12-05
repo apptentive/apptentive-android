@@ -69,6 +69,7 @@ public class MessageCenterErrorFragment extends ApptentiveBaseFragment<Interacti
 			updateStatus();
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onResume()", MessageCenterErrorFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 

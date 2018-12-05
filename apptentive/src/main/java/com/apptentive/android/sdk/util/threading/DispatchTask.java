@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.util.threading;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * A basic class for any dispatch runnable task. Tracks its "schedule" state
  */
@@ -38,7 +40,7 @@ public abstract class DispatchTask implements Runnable {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while executing task");
-
+			logException(e);
 		} finally {
 			setCancelled(false);
 		}

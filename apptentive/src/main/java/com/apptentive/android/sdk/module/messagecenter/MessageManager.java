@@ -64,6 +64,7 @@ import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ME
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_DID_FINISH_SEND;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_PAYLOAD_WILL_START_SEND;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class MessageManager implements Destroyable, ApptentiveNotificationObserver {
 
@@ -141,7 +142,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			fetchAndStoreMessages(updateMC, false, null);
 		} catch (final Exception e) {
 			ApptentiveLog.w(MESSAGES, e, "Unhandled Exception thrown from fetching new message task");
-			MetricModule.sendError(e, null, null);
+			logException(e);
 		}
 	}
 
@@ -200,6 +201,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			});
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Error retrieving last received message id from worker thread");
+			logException(e);
 		}
 	}
 
@@ -215,6 +217,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES,"Error getting all messages in worker thread");
+			logException(e);
 		}
 
 		return messagesToShow;
@@ -249,6 +252,8 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 					notifyFinished(listener, parseMessages(request.getResponseObject()));
 				} catch (Exception e) {
 					ApptentiveLog.e(MESSAGES, e, "Exception while parsing messages");
+					logException(e);
+
 					notifyFinished(listener, null);
 				}
 			}
@@ -350,6 +355,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 				apptentiveMessage.setCreatedAt(responseJson.getDouble(ApptentiveMessage.KEY_CREATED_AT));
 			} catch (JSONException e) {
 				ApptentiveLog.e(MESSAGES, e, "Error parsing sent apptentiveMessage response.");
+				logException(e);
 			}
 			messageStore.updateMessage(apptentiveMessage);
 
@@ -365,6 +371,7 @@ public class MessageManager implements Destroyable, ApptentiveNotificationObserv
 			msgCount = messageStore.getUnreadMessageCount();
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, "Error getting unread messages count in worker thread");
+			logException(e);
 		}
 		return msgCount;
 	}

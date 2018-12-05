@@ -25,11 +25,13 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.ContextCompat;
 import android.text.TextUtils;
+
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationManager;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.debug.LogMonitor;
 import com.apptentive.android.sdk.encryption.SecurityManager;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
@@ -54,6 +56,7 @@ import com.apptentive.android.sdk.util.*;
 import com.apptentive.android.sdk.util.AdvertiserManager.AdvertisingIdClientInfo;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -127,6 +130,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				return PushAction.valueOf(name);
 			} catch (IllegalArgumentException e) {
 				ApptentiveLog.w(PUSH, "This version of the SDK can't handle push action '%s'", name);
+				logException(e);
 			}
 			return unknown;
 		}
@@ -243,6 +247,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
+					logException(e);
 				}
 			} else {
 				ApptentiveLog.w("Apptentive instance is already initialized");
@@ -306,6 +311,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			}
 		} catch (Resources.NotFoundException e) {
 			ApptentiveLog.e("Theme Res id not found");
+			logException(e);
 		}
 		return false;
 	}
@@ -409,6 +415,10 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		checkConversationQueue();
 
 		if (isConversationActive()) {
+			Conversation conversation = getConversation();
+			if (!conversation.hasSession()) {
+				conversation.startSession();
+			}
 			engageInternal(appContext, EventPayload.EventLabel.app__launch.getLabelName());
 		}
 	}
@@ -418,6 +428,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		if (isConversationActive()) {
 			engageInternal(appContext, EventPayload.EventLabel.app__exit.getLabelName());
+			getConversation().endSession();
 		}
 	}
 
@@ -476,8 +487,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		// Step 5: Update status bar color
 		/* Obtain the default status bar color. When an Apptentive Modal interaction is shown,
-		*  a translucent overlay would be applied on top of statusBarColorDefault
-		*/
+		 *  a translucent overlay would be applied on top of statusBarColorDefault
+		 */
 		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
 			int transparentColor = ContextCompat.getColor(context, android.R.color.transparent);
 			TypedArray a = interactionTheme.obtainStyledAttributes(new int[]{android.R.attr.statusBarColor});
@@ -539,6 +550,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
+			logException(e);
 			bRet = false;
 		}
 
@@ -728,6 +740,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 					return parseJson.optString(APPTENTIVE_PUSH_EXTRA_KEY, null);
 				} catch (JSONException e) {
 					ApptentiveLog.e(PUSH, "com.parse.Data is corrupt: %s", parseDataString);
+					logException(e);
 					return null;
 				}
 			} else if (pushBundle.containsKey(PUSH_EXTRA_KEY_UA)) { // Urban Airship
@@ -806,7 +819,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				}
 			} catch (Exception e) {
 				ApptentiveLog.e(PUSH, e, "Error parsing JSON from push notification.");
-				MetricModule.sendError(e, "Parsing Apptentive Push", apptentivePushData);
+				logException(e);
 			}
 		}
 		return null;
@@ -1076,11 +1089,16 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		if (notification.hasName(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE)) {
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			if (conversation.hasActiveState()) {
+
+				// if conversation was just created - start a new session
+				if (!conversation.hasSession()) {
+					conversation.startSession();
+				}
+
 				checkSendVersionChanges(conversation);
 				updateConversationAdvertiserIdentifier(conversation);
 			}
-		}
-		else if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
+		} else if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
 			conversation.addPayload(new LogoutPayload());
 		} else if (notification.hasName(NOTIFICATION_AUTHENTICATION_FAILED)) {
@@ -1146,6 +1164,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			Util.writeText(file, manifest);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while trying to save engagement manifest data");
+			logException(e);
 		}
 	}
 
@@ -1164,8 +1183,17 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				conversation.getDevice().setAdvertiserId(advertiserId);
 			}
 		} catch (Exception e) {
-			ApptentiveLog.e(ADVERTISER_ID, e,"Exception while updating conversation advertiser id");
+			ApptentiveLog.e(ADVERTISER_ID, e, "Exception while updating conversation advertiser id");
+			logException(e);
 		}
+	}
+
+	//endregion
+
+	//region Error Reporting
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 
 	//endregion

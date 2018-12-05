@@ -16,6 +16,8 @@ import org.json.JSONObject;
 
 import java.util.Map;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class SurveyResponsePayload extends ConversationItem {
 
 	private static final String KEY_RESPONSE = "response";
@@ -36,6 +38,7 @@ public class SurveyResponsePayload extends ConversationItem {
 			put(KEY_SURVEY_ANSWERS, answersJson);
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Unable to construct survey payload.");
+			logException(e);
 		}
 	}
 

@@ -14,6 +14,7 @@ import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.debug.Assert;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
@@ -80,7 +81,7 @@ public class EngagementModule {
 			return doEngage(conversation, context, eventLabel);
 		} catch (Exception e) {
 			ApptentiveLog.e(INTERACTIONS, e, "Exception while engaging event '%s'", eventName);
-			MetricModule.sendError(e, null, null);
+			logException(e);
 		}
 		return false;
 	}
@@ -132,6 +133,7 @@ public class EngagementModule {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while launching interaction: %s", interaction);
+			logException(e);
 		}
 	}
 
@@ -181,5 +183,9 @@ public class EngagementModule {
 	 */
 	private static String encodeEventLabelPart(String input) {
 		return input.replace("%", "%25").replace("/", "%2F").replace("#", "%23");
+	}
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: more context data
 	}
 }

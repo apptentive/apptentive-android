@@ -20,6 +20,8 @@ import com.apptentive.android.sdk.util.Constants;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class MessageCenterInteraction extends Interaction {
 
 	public static final String KEY_TITLE = "title";
@@ -155,7 +157,7 @@ public class MessageCenterInteraction extends Interaction {
 		try {
 			return new WhoCard(getProfile().toString());
 		} catch (JSONException e) {
-			// Never happens.
+			logException(e);
 		}
 		return null;
 	}
@@ -200,7 +202,7 @@ public class MessageCenterInteraction extends Interaction {
 			configuration.put(KEY_AUTOMATED_MESSAGE, auto_msg);
 			put(Interaction.KEY_CONFIGURATION, configuration);
 		} catch (JSONException e) {
-			// catch and do nothing
+			logException(e);
 		}
 	}
 

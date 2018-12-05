@@ -56,6 +56,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.*;
 import static com.apptentive.android.sdk.ApptentiveNotifications.*;
 import static com.apptentive.android.sdk.conversation.ConversationState.*;
 import static com.apptentive.android.sdk.debug.Assert.*;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE_LEGACY_V1;
 import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
@@ -186,6 +187,8 @@ public class ConversationManager {
 
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading active conversation");
+      logException(e);
+      
 			activeConversationFailedToResolve = true;
 		}
 
@@ -210,7 +213,7 @@ public class ConversationManager {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while loading conversation");
-
+			logException(e);
 			// do not re-create a conversation if the last loading was unsuccessful
 			throw new ConversationLoadException("Unable to load conversation", e);
 		}
@@ -367,6 +370,7 @@ public class ConversationManager {
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
 						ApptentiveLog.e(CONVERSATION, e, "Exception while handling legacy conversation id");
+						logException(e);
 					}
 				}
 
@@ -506,6 +510,8 @@ public class ConversationManager {
 						handleConversationStateChange(conversation);
 					} catch (Exception e) {
 						ApptentiveLog.e(CONVERSATION, e, "Exception while handling conversation token");
+						logException(e);
+
 						notifyFetchFinished(conversation, false);
 					}
 				}
@@ -590,6 +596,7 @@ public class ConversationManager {
 			fetchAppConfigurationGuarded(conversation);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while fetching app configuration");
+			logException(e);
 		}
 	}
 
@@ -634,6 +641,8 @@ public class ConversationManager {
 
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing app configuration response");
+					logException(e);
+
 					ApptentiveNotificationCenter.defaultCenter()
 						.postNotification(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH, NOTIFICATION_KEY_CONFIGURATION, null);
 				}
@@ -728,7 +737,7 @@ public class ConversationManager {
 			ApptentiveLog.v(CONVERSATION, "No metadata files");
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading conversation metadata");
-
+			logException(e);
 			// if we fail to load the metadata - we would not create a new one - just throw an exception
 			throw new ConversationMetadataLoadException("Unable to load metadata", e);
 		}
@@ -749,6 +758,7 @@ public class ConversationManager {
 			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while saving metadata");
+			logException(e);
 		}
 	}
 
@@ -789,6 +799,8 @@ public class ConversationManager {
 
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while extracting user id");
+			logException(e);
+
 			callback.onLoginFail("Exception while extracting user id");
 			return;
 		}
@@ -869,8 +881,8 @@ public class ConversationManager {
 				break;
 			case LOGGED_IN:
 				if (StringUtils.equal(activeConversation.getUserId(), userId)) {
-					ApptentiveLog.w(CONVERSATION, "Already logged in as \"%s\"", userId);
-					callback.onLoginFinish();
+					ApptentiveLog.w(CONVERSATION, "Refreshing auth token for logged in user: \"%s\"", userId);
+					sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 					return;
 				}
 				// TODO: If they are attempting to login to a different conversation, we need to gracefully end the active conversation here and kick off a login request to the desired conversation.
@@ -895,6 +907,8 @@ public class ConversationManager {
 					handleLoginFinished(incomingConversationId, userId, token, conversationEncryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
+					logException(e);
+
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -958,6 +972,8 @@ public class ConversationManager {
 					callback.onLoginFinish();
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while creating logged-in conversation");
+					logException(e);
+
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -987,6 +1003,8 @@ public class ConversationManager {
 					handleLoginFinished(incomingConversationId, userId, token, payloadEncryptionKey);
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing login response");
+					logException(e);
+
 					handleLoginFailed("Internal error");
 				}
 			}
@@ -1048,6 +1066,8 @@ public class ConversationManager {
 					callback.onLoginFinish();
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while creating logged-in conversation");
+					logException(e);
+
 					handleLoginFailed("Internal error");
 				}
 			}

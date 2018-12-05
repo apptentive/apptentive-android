@@ -14,6 +14,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public abstract class Interaction extends JSONObject {
 
@@ -47,7 +48,7 @@ public abstract class Interaction extends JSONObject {
 				return getString(KEY_ID);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -66,7 +67,7 @@ public abstract class Interaction extends JSONObject {
 				return Type.parse(getString(KEY_TYPE));
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return Type.unknown;
 	}
@@ -78,7 +79,7 @@ public abstract class Interaction extends JSONObject {
 			}
 			return DisplayType.parse(getString(KEY_DISPLAY_TYPE));
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return DisplayType.unknown;
 	}
@@ -93,7 +94,7 @@ public abstract class Interaction extends JSONObject {
 				return getInt(KEY_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -104,7 +105,7 @@ public abstract class Interaction extends JSONObject {
 				return new InteractionConfiguration(getJSONObject(KEY_CONFIGURATION).toString());
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return new InteractionConfiguration();
 	}
@@ -125,6 +126,7 @@ public abstract class Interaction extends JSONObject {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
 				ApptentiveLog.v(INTERACTIONS, "Error parsing unknown Interaction.Type: " + type);
+				logException(e);
 			}
 			return unknown;
 		}
@@ -139,6 +141,7 @@ public abstract class Interaction extends JSONObject {
 				return DisplayType.valueOf(type);
 			} catch (Exception e) {
 				ApptentiveLog.e(e, "Error parsing interaction display_type: " + type);
+				logException(e);
 			}
 			return unknown;
 		}
@@ -177,7 +180,7 @@ public abstract class Interaction extends JSONObject {
 				}
 			} catch (JSONException e) {
 				ApptentiveLog.w(INTERACTIONS, e, "Error parsing Interaction");
-				// Ignore
+				logException(e);
 			}
 			return null;
 		}

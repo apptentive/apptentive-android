@@ -30,6 +30,7 @@ import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ImageItem;
 import com.apptentive.android.sdk.util.image.PreviewImageView;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Util.guarded;
 
 
@@ -135,8 +136,8 @@ public class AttachmentPreviewDialog extends DialogFragment implements DialogInt
 					});
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", AttachmentPreviewDialog.class.getSimpleName());
+			logException(e); // TODO: add more context info
 		}
-
 
 		return rootView;
 	}

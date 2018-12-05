@@ -11,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class Sdk extends JSONObject {
 
@@ -32,7 +33,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -42,6 +43,7 @@ public class Sdk extends JSONObject {
 			put(KEY_VERSION, version);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_VERSION);
+			logException(e);
 		}
 	}
 
@@ -51,7 +53,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_PROGRAMMING_LANGUAGE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -61,6 +63,7 @@ public class Sdk extends JSONObject {
 			put(KEY_PROGRAMMING_LANGUAGE, programmingLanguage);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_PROGRAMMING_LANGUAGE);
+			logException(e);
 		}
 	}
 
@@ -70,7 +73,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_AUTHOR_NAME);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -80,6 +83,7 @@ public class Sdk extends JSONObject {
 			put(KEY_AUTHOR_NAME, authorName);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_AUTHOR_NAME);
+			logException(e);
 		}
 	}
 
@@ -89,7 +93,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_AUTHOR_EMAIL);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -99,6 +103,7 @@ public class Sdk extends JSONObject {
 			put(KEY_AUTHOR_EMAIL, authorEmail);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_AUTHOR_EMAIL);
+			logException(e);
 		}
 	}
 
@@ -108,7 +113,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_PLATFORM);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -118,6 +123,7 @@ public class Sdk extends JSONObject {
 			put(KEY_PLATFORM, platform);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_PLATFORM);
+			logException(e);
 		}
 	}
 
@@ -127,7 +133,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_DISTRIBUTION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -137,6 +143,7 @@ public class Sdk extends JSONObject {
 			put(KEY_DISTRIBUTION, distribution);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_DISTRIBUTION);
+			logException(e);
 		}
 	}
 
@@ -146,7 +153,7 @@ public class Sdk extends JSONObject {
 				return getString(KEY_DISTRIBUTION_VERSION);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -156,6 +163,7 @@ public class Sdk extends JSONObject {
 			put(KEY_DISTRIBUTION_VERSION, distributionVersion);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to Sdk.", KEY_DISTRIBUTION_VERSION);
+			logException(e);
 		}
 	}
 }

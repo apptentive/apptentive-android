@@ -51,6 +51,7 @@ import static com.apptentive.android.sdk.conversation.ConversationState.UNDEFINE
 import static com.apptentive.android.sdk.debug.Assert.assertNotEquals;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 
@@ -80,7 +81,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 
 		// If no new task arrives in 30 seconds, the worker thread terminates; otherwise it will be reused
 		singleThreadExecutor.allowCoreThreadTimeOut(true);
-		
+
 		// Create payload sender object with a custom 'retry' policy
 		payloadSender = new PayloadSender(apptentiveHttpClient, new HttpRequestRetryPolicyDefault() {
 			@Override
@@ -111,6 +112,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					sendNextPayloadSync();
 				} catch (Exception e) {
 					ApptentiveLog.e(PAYLOADS, e, "Exception while adding a payload: %s", payload);
+					logException(e);
 				}
 			}
 		});
@@ -126,6 +128,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 						sendNextPayloadSync();
 					} catch (Exception e) {
 						ApptentiveLog.e(PAYLOADS, e, "Exception while deleting a payload: %s", payloadIdentifier);
+						logException(e);
 					}
 				}
 			});
@@ -140,6 +143,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					dbHelper.deleteAllPayloads();
 				} catch (Exception e) {
 					ApptentiveLog.e(PAYLOADS, e, "Exception while deleting all payloads");
+					logException(e);
 				}
 			}
 		});
@@ -157,6 +161,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					dbHelper.deleteAssociatedFiles(messageNonce);
 				} catch (Exception e) {
 					ApptentiveLog.e(PAYLOADS, e, "Exception while deleting associated file: %s", messageNonce);
+					logException(e);
 				}
 			}
 		});
@@ -236,6 +241,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 							sendNextPayloadSync();
 						} catch (Exception e) {
 							ApptentiveLog.e(PAYLOADS, e, "Exception while trying to retry sending payloads");
+							logException(e);
 						}
 					}
 				});
@@ -254,6 +260,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 					sendNextPayloadSync();
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception while trying to send next payload");
+					logException(e);
 				}
 			}
 		});
@@ -275,6 +282,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 			payload = getOldestUnsentPayloadSync();
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while peeking the next payload for sending");
+			logException(e);
 			return;
 		}
 
@@ -325,6 +333,7 @@ public class ApptentiveTaskManager implements PayloadStore, EventStore, Apptenti
 								sendNextPayloadSync(); // after we've updated payloads - we need to send them
 							} catch (Exception e) {
 								ApptentiveLog.e(CONVERSATION, e, "Exception while trying to update incomplete payloads");
+								logException(e);
 							}
 						}
 					});

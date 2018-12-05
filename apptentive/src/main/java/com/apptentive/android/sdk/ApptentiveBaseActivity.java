@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.notifications.ApptentiveNotification;
@@ -61,6 +62,10 @@ public abstract class ApptentiveBaseActivity extends AppCompatActivity implement
 	//endregion
 
 	//region Helpers
+
+	protected void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
+	}
 
 	protected void engageInternal(final String eventName) {
 		dispatchConversationTask(new ConversationDispatchTask() {

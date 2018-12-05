@@ -13,6 +13,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.migration.v4_0_0.CodePointStore;
 import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryEntry;
 import com.apptentive.android.sdk.migration.v4_0_0.VersionHistoryStore;
@@ -149,6 +150,7 @@ public class Migrator {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Error migrating Device.");
+			logException(e);
 		}
 	}
 
@@ -168,6 +170,7 @@ public class Migrator {
 				conversation.setSdk(sdk);
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, e, "Error migrating Sdk.");
+				logException(e);
 			}
 		}
 	}
@@ -190,6 +193,7 @@ public class Migrator {
 				conversation.setAppRelease(appRelease);
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, e, "Error migrating AppRelease.");
+				logException(e);
 			}
 		}
 	}
@@ -230,6 +234,7 @@ public class Migrator {
 				conversation.setPerson(person);
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, e, "Error migrating Person.");
+				logException(e);
 			}
 		}
 	}
@@ -254,6 +259,7 @@ public class Migrator {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(CONVERSATION, e, "Error migrating VersionHistory entries V2 to V3.");
+			logException(e);
 		}
 	}
 
@@ -272,6 +278,7 @@ public class Migrator {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(CONVERSATION, e, "Error migrating Event Data.");
+			logException(e);
 		}
 	}
 
@@ -290,7 +297,12 @@ public class Migrator {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e(CONVERSATION, e, "Error migrating JSONObject.");
+			logException(e);
 		}
 		return null;
+	}
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context
 	}
 }

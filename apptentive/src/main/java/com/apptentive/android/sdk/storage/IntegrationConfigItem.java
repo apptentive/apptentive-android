@@ -13,6 +13,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Set;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class IntegrationConfigItem implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -42,7 +44,7 @@ public class IntegrationConfigItem implements Serializable {
 			}
 			return ret;
 		} catch (JSONException e) {
-			// This can't happen.
+			logException(e);
 		}
 		return null;
 	}

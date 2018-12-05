@@ -15,6 +15,8 @@ import com.apptentive.android.sdk.util.Util;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView implements SurveyQuestionChoice.OnCheckedChangeListener {
 
 	public static MultiselectSurveyQuestionView newInstance(MultiselectQuestion question) {
@@ -34,7 +36,7 @@ public class MultiselectSurveyQuestionView extends MultichoiceSurveyQuestionView
 				// Must cast question to "MultiselectQuestion" each time it's used.
 				question = new MultiselectQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
-				//
+				logException(e);
 			}
 		}
 	}

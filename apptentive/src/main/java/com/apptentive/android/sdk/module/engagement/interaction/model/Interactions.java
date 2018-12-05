@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * A map of "interaction_id" => {Interaction}
@@ -39,6 +40,7 @@ public class Interactions extends JSONObject {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.w(INTERACTIONS, e, "Exception parsing interactions array.");
+			logException(e);
 		}
 		return null;
 	}

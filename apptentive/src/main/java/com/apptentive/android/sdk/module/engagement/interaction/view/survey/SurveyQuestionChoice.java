@@ -25,6 +25,8 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Que
 
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * Used by both Multichoice and Multiselect survey questions, since they are 99% the same UI.
  */
@@ -144,6 +146,7 @@ public class SurveyQuestionChoice extends FrameLayout implements CompoundButton.
 			return answer;
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error producing survey answer.");
+			logException(e);
 		}
 		return null;
 	}

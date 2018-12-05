@@ -27,6 +27,7 @@ import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.SQL_CREATE_PAYLOAD_TABLE;
 
 class DatabaseMigratorV2 extends DatabaseMigrator {
@@ -129,6 +130,7 @@ class DatabaseMigratorV2 extends DatabaseMigrator {
 			db.setTransactionSuccessful();
 		} catch (Exception e) {
 			ApptentiveLog.e(DATABASE, e, "Error in upgradeVersion2to3()");
+			logException(e);
 		} finally {
 			ensureClosed(cursor);
 			if (db != null) {
@@ -149,6 +151,7 @@ class DatabaseMigratorV2 extends DatabaseMigrator {
 			}, "migrate messages");
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while trying to migrate messages");
+			logException(e);
 		}
 	}
 

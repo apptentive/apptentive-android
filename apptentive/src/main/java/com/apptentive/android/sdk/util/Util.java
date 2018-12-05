@@ -85,6 +85,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 // TODO: this class does too much - split into smaller classes and clean up
 public class Util {
@@ -143,6 +144,7 @@ public class Util {
 			Toast.makeText(context, message, duration).show();
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while trying to display toast message");
+			logException(e);
 		}
 	}
 
@@ -167,7 +169,7 @@ public class Util {
 			try {
 				stream.close();
 			} catch (IOException e) {
-				// Ignore
+				logException(e);
 			}
 		}
 	}
@@ -206,6 +208,7 @@ public class Util {
 							return ret;
 						} catch (NumberFormatException e) {
 							ApptentiveLog.e(e, "Error parsing cache expiration as number: %s", expiration);
+							logException(e);
 						}
 					}
 				}
@@ -326,6 +329,7 @@ public class Util {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(UTIL, e, "Error getting major OS version");
+			logException(e);
 		}
 		return -1;
 	}
@@ -343,7 +347,7 @@ public class Util {
 			}
 			return ret;
 		} catch (IllegalArgumentException e) {
-			//
+			logException(e);
 		}
 		return null;
 	}
@@ -384,6 +388,7 @@ public class Util {
 		try {
 			d = ContextCompat.getDrawable(c, drawableRes);
 		} catch (Exception ex) {
+			logException(ex);
 		}
 		return d;
 	}
@@ -570,6 +575,7 @@ public class Util {
 
 		} catch (NoSuchAlgorithmException e) {
 			e.printStackTrace();
+			logException(e);
 		}
 		return null;
 	}
@@ -677,6 +683,7 @@ public class Util {
 					return true;
 				} catch (ActivityNotFoundException e) {
 					ApptentiveLog.e(e, "Activity not found to open attachment: ");
+					logException(e);
 				}
 			}
 		} else {
@@ -961,6 +968,7 @@ public class Util {
 			ApptentiveLog.v(UTIL, "File saved, size = " + (cos.getBytesWritten() / 1024) + "k");
 		} catch (IOException e) {
 			ApptentiveLog.e(UTIL, "Error creating local copy of file attachment.");
+			logException(e);
 			return null;
 		} finally {
 			Util.ensureClosed(cos);
@@ -1030,8 +1038,10 @@ public class Util {
 					staticField.set(null, newMap);
 				} catch (NoSuchFieldException e) {
 					ApptentiveLog.e(e, "Exception replacing system font");
+					logException(e);
 				} catch (IllegalAccessException e) {
 					ApptentiveLog.e(e, "Exception replacing system font");
+					logException(e);
 				}
 			}
 		} else {
@@ -1050,8 +1060,10 @@ public class Util {
 					staticField.set(null, newTypeface);
 				} catch (NoSuchFieldException e) {
 					ApptentiveLog.e(e, "Exception replacing system font");
+					logException(e);
 				} catch (IllegalAccessException e) {
 					ApptentiveLog.e(e, "Exception replacing system font");
+					logException(e);
 				}
 			}
 		}
@@ -1151,6 +1163,7 @@ public class Util {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Unexpected error while reading application or package info.");
+			logException(e);
 		}
 
 		return null;
@@ -1200,6 +1213,7 @@ public class Util {
 						listener.onClick(v);
 					} catch (Exception e) {
 						ApptentiveLog.e(e, "Exception while handling click listener");
+						logException(e);
 					}
 				}
 			};
@@ -1219,6 +1233,7 @@ public class Util {
 		}
 		catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in makeRestartActivityTask");
+			logException(e);
 		}
 
 		return null;

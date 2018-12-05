@@ -16,6 +16,7 @@ import com.apptentive.android.sdk.util.IndentPrinter;
 import org.json.JSONException;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.*;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * @author Sky Kelsey
@@ -50,6 +51,7 @@ public class InteractionCriteria {
 			return ret;
 		} catch (Exception e) {
 			ApptentiveLog.e(INTERACTIONS, e, "Exception while evaluating interaction criteria");
+			logException(e);
 		}
 		return false;
 	}

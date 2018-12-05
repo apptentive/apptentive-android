@@ -66,6 +66,7 @@ public final class LogMonitor {
 					startSessionGuarded(context, appKey, appSignature);
 				} catch (Exception e) {
 					ApptentiveLog.e(TROUBLESHOOT, e, "Unable to start Apptentive Log Monitor");
+					logException(e);
 				}
 			}
 		});
@@ -227,6 +228,14 @@ public final class LogMonitor {
 				return false; // fail fast: do not retry
 			}
 		};
+	}
+
+	//endregion
+
+	//region Error Reporting
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 
 	//endregion

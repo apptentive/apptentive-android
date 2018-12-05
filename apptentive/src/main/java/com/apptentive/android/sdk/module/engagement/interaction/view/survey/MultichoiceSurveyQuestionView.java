@@ -25,6 +25,8 @@ import org.json.JSONObject;
 
 import java.util.*;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<MultichoiceQuestion> implements SurveyQuestionChoice.OnCheckedChangeListener, SurveyQuestionChoice.OnOtherTextChangedListener {
 
@@ -54,7 +56,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			try {
 				question = new MultichoiceQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
-				//
+				logException(e);
 			}
 		}
 	}
@@ -90,6 +92,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", MultichoiceSurveyQuestionView.class);
+			logException(e);
 		}
 		return v;
 	}
@@ -158,6 +161,7 @@ public class MultichoiceSurveyQuestionView extends BaseSurveyQuestionView<Multic
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error getting survey answer.");
+			logException(e);
 		}
 		return null;
 	}

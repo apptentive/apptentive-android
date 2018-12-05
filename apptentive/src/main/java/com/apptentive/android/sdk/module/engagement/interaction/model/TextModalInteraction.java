@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import org.json.JSONException;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * @author Sky Kelsey
  */
@@ -38,7 +40,7 @@ public class TextModalInteraction extends Interaction {
 				return configuration.getString(KEY_TITLE);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -50,7 +52,7 @@ public class TextModalInteraction extends Interaction {
 				return configuration.getString(KEY_BODY);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -62,7 +64,7 @@ public class TextModalInteraction extends Interaction {
 				return new Actions(configuration.getString(KEY_ACTIONS));
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}

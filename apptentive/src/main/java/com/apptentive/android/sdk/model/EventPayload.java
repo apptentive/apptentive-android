@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * @author Sky Kelsey
@@ -58,6 +59,7 @@ public class EventPayload extends ConversationItem {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Unable to construct Event.");
+			logException(e);
 		}
 	}
 
@@ -86,6 +88,7 @@ public class EventPayload extends ConversationItem {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Unable to construct Event.");
+			logException(e);
 		}
 	}
 
@@ -102,6 +105,7 @@ public class EventPayload extends ConversationItem {
 					ret.put(key, value);
 				} catch (Exception e) {
 					ApptentiveLog.w(PAYLOADS, "Error adding custom data to Event: \"%s\" = \"%s\"", key, value.toString(), e);
+					logException(e);
 				}
 			}
 		}
@@ -152,6 +156,7 @@ public class EventPayload extends ConversationItem {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Unable to add data to Event.");
+			logException(e);
 		}
 	}
 

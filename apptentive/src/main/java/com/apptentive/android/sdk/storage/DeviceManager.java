@@ -20,6 +20,8 @@ import com.apptentive.android.sdk.util.Util;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * A helper class with static methods for and diffing information about the current device.
  */
@@ -56,6 +58,7 @@ public class DeviceManager {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while collecting advertising ID");
+			logException(e);
 		}
 
 		// Second, set the stuff that requires querying system services.
@@ -68,7 +71,7 @@ public class DeviceManager {
 		try {
 			device.setBootloaderVersion((String) Build.class.getField("BOOTLOADER").get(null));
 		} catch (Exception e) {
-			//
+			logException(e);
 		}
 		device.setRadioVersion(Build.getRadioVersion());
 

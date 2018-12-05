@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -167,6 +168,7 @@ public class ApptentiveActivityLifecycleCallbacks implements Application.Activit
 					}
 				} catch (Exception e) {
 					ApptentiveLog.e(e, "Exception in delayed checking");
+					ErrorMetrics.logException(e);
 				}
 			}
 		}, CHECK_DELAY_SHORT);

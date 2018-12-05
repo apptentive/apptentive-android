@@ -21,6 +21,7 @@ import android.webkit.MimeTypeMap;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.lifecycle.ApptentiveActivityLifecycleCallbacks;
 import com.apptentive.android.sdk.model.CommerceExtendedData;
 import com.apptentive.android.sdk.model.CompoundMessage;
@@ -128,6 +129,7 @@ public class Apptentive {
 			ApptentiveInternal.createInstance(application, configuration);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while registering Apptentive SDK");
+			logException(e);
 		}
 	}
 
@@ -176,6 +178,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION,"Exception while getting person email");
+			logException(e);
 		}
 		return null;
 	}
@@ -215,6 +218,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, "Exception while getting person name");
+			logException(e);
 		}
 		return null;
 	}
@@ -497,6 +501,7 @@ public class Apptentive {
 			return ApptentiveInternal.getApptentivePushNotificationData(intent) != null;
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification intent");
+			logException(e);
 		}
 		return false;
 	}
@@ -516,6 +521,7 @@ public class Apptentive {
 			return ApptentiveInternal.getApptentivePushNotificationData(bundle) != null;
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification bundle");
+			logException(e);
 		}
 		return false;
 	}
@@ -534,6 +540,7 @@ public class Apptentive {
 			return ApptentiveInternal.getApptentivePushNotificationData(data) != null;
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while checking for Apptentive push notification data");
+			logException(e);
 		}
 		return false;
 	}
@@ -722,6 +729,7 @@ public class Apptentive {
 						JSONObject parseJson = new JSONObject(parseDataString);
 						return parseJson.optString(ApptentiveInternal.TITLE_DEFAULT, null);
 					} catch (JSONException e) {
+						logException(e);
 						return null;
 					}
 				}
@@ -734,6 +742,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while getting title from Apptentive push");
+			logException(e);
 		}
 		return null;
 	}
@@ -764,6 +773,7 @@ public class Apptentive {
 						JSONObject parseJson = new JSONObject(parseDataString);
 						return parseJson.optString(ApptentiveInternal.BODY_PARSE, null);
 					} catch (JSONException e) {
+						logException(e);
 						return null;
 					}
 				}
@@ -778,6 +788,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while getting body from Apptentive push");
+			logException(e);
 		}
 		return null;
 	}
@@ -802,6 +813,7 @@ public class Apptentive {
 			return data.get(ApptentiveInternal.TITLE_DEFAULT);
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while getting title from Apptentive push");
+			logException(e);
 		}
 		return null;
 	}
@@ -826,6 +838,7 @@ public class Apptentive {
 			return data.get(ApptentiveInternal.BODY_DEFAULT);
 		} catch (Exception e) {
 			ApptentiveLog.e(PUSH, e, "Exception while getting body from Apptentive push");
+			logException(e);
 		}
 		return null;
 	}
@@ -848,6 +861,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while setting rating provider");
+			logException(e);
 		}
 	}
 
@@ -865,6 +879,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while putting rating provider arg");
+			logException(e);
 		}
 	}
 
@@ -1012,7 +1027,7 @@ public class Apptentive {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, e, "Exception while getting unread message count");
-			MetricModule.sendError(e, null, null);
+			logException(e);
 		}
 		return 0;
 	}
@@ -1428,8 +1443,9 @@ public class Apptentive {
 					loginGuarded(token, callback);
 				} catch (Exception e) {
 					ApptentiveLog.e(CONVERSATION, e, "Exception while trying to login");
+					logException(e);
+
 					notifyFailure(callback, "Exception while trying to login");
-					MetricModule.sendError(e, null, null);
 				}
 			}
 		});
@@ -1507,7 +1523,7 @@ public class Apptentive {
 			ApptentiveInternal.getInstance().setAuthenticationFailedListener(listener);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Error in Apptentive.setUnreadMessagesListener()");
-			MetricModule.sendError(e, null, null);
+			logException(e);
 		}
 	}
 
@@ -1519,7 +1535,7 @@ public class Apptentive {
 			ApptentiveInternal.getInstance().setAuthenticationFailedListener(null);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while clearing authentication listener");
-			MetricModule.sendError(e, null, null);
+			logException(e);
 		}
 	}
 
@@ -1605,6 +1621,7 @@ public class Apptentive {
 				return ret;
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, "Error parsing unknown Apptentive.AuthenticationFailedReason: %s", errorType);
+				logException(e);
 			}
 			return UNKNOWN;
 		}
@@ -1659,6 +1676,14 @@ public class Apptentive {
 				return false;
 			}
 		}, "update Apptimize experiments data");
+	}
+
+	//endregion
+
+	//region Error Reporting
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 
 	//endregion
@@ -1727,6 +1752,7 @@ public class Apptentive {
 				ret.put(TYPE, version);
 			} catch (JSONException e) {
 				ApptentiveLog.e(e, "Error creating Apptentive.Version.");
+				logException(e);
 			}
 		}
 
@@ -1804,6 +1830,7 @@ public class Apptentive {
 				ret.put(SEC, sec);
 			} catch (JSONException e) {
 				ApptentiveLog.e(e, "Error creating Apptentive.DateTime.");
+				logException(e);
 			}
 			return ret;
 		}

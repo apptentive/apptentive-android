@@ -11,6 +11,7 @@ import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
@@ -43,6 +44,11 @@ public abstract class Payload {
 	 * <code>true</code> if payload belongs to an authenticated (logged-in) conversation
 	 */
 	private boolean authenticated;
+
+	/**
+	 * Session id which this payload belongs to
+	 */
+	private @Nullable String sessionId;
 
 	protected Payload(PayloadType type) {
 		if (type == null) {
@@ -139,6 +145,18 @@ public abstract class Payload {
 
 	public void setAuthenticated(boolean authenticated) {
 		this.authenticated = authenticated;
+	}
+
+	public void setSessionId(String sessionId) {
+		this.sessionId = sessionId;
+	}
+
+	public String getSessionId() {
+		return sessionId;
+	}
+
+	public boolean hasSessionId() {
+		return !StringUtils.isNullOrEmpty(sessionId);
 	}
 
 	//endregion

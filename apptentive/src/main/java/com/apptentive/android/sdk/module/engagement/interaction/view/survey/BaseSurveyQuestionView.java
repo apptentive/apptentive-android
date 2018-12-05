@@ -21,6 +21,8 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragment implements SurveyQuestionView {
 
@@ -66,6 +68,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 			sentMetric = (savedInstanceState != null) && savedInstanceState.getBoolean(SENT_METRIC, false);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", BaseSurveyQuestionView.class.getSimpleName());
+			logException(e);
 		}
 	}
 

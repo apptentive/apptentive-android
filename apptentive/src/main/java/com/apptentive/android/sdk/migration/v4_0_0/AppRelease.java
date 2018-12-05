@@ -12,6 +12,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class AppRelease extends JSONObject {
 
@@ -41,6 +42,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_TYPE, type);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_TYPE);
+			logException(e);
 		}
 	}
 
@@ -56,6 +58,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_VERSION_NAME, versionName);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_VERSION_NAME);
+			logException(e);
 		}
 	}
 
@@ -71,6 +74,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_VERSION_CODE, versionCode);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_VERSION_CODE);
+			logException(e);
 		}
 	}
 
@@ -86,6 +90,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_IDENTIFIER, identifier);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_IDENTIFIER);
+			logException(e);
 		}
 	}
 
@@ -101,6 +106,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_TARGET_SDK_VERSION, targetSdkVersion);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_TARGET_SDK_VERSION);
+			logException(e);
 		}
 	}
 
@@ -116,6 +122,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_APP_STORE, appStore);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_APP_STORE);
+			logException(e);
 		}
 	}
 
@@ -129,6 +136,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_STYLE_INHERIT, inheritStyle);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_STYLE_INHERIT);
+			logException(e);
 		}
 	}
 
@@ -142,6 +150,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_STYLE_OVERRIDE, overrideStyle);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_STYLE_OVERRIDE);
+			logException(e);
 		}
 	}
 
@@ -154,6 +163,7 @@ public class AppRelease extends JSONObject {
 			put(KEY_DEBUG, debug);
 		} catch (JSONException e) {
 			ApptentiveLog.w(CONVERSATION, "Error adding %s to AppRelease.", KEY_DEBUG);
+			logException(e);
 		}
 	}
 }

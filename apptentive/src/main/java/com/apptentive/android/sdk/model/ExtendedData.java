@@ -14,6 +14,7 @@ import org.json.JSONObject;
 import java.io.Serializable;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public abstract class ExtendedData implements Serializable {
 
@@ -64,6 +65,7 @@ public abstract class ExtendedData implements Serializable {
 				return Type.valueOf(type);
 			} catch (IllegalArgumentException e) {
 				ApptentiveLog.v(PAYLOADS, "Error parsing unknown ExtendedData.PayloadType: " + type);
+				logException(e);
 			}
 			return unknown;
 		}
