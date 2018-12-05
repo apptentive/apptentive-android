@@ -14,6 +14,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * @author Sky Kelsey
  */
@@ -39,7 +41,7 @@ public class LaunchInteractionAction extends Action {
 				}
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return invocations;
 	}

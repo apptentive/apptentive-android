@@ -1,3 +1,14 @@
+# 2018-12-05 - v5.3.3
+
+#### Fixes
+
+* Fixed rare Message Center crash due to concurrency issues.
+
+#### Changes
+
+* Improved encryption stability.
+* Allow users to make sequential `login` calls for the same user name.
+
 # 2018-08-30 - v5.3.2
 
 #### Fixes

@@ -234,6 +234,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreate()", ApptentiveViewActivity.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -256,6 +257,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			exitActivityGuarded(exitType);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while trying to exit activity (type=%s)", exitType);
+			logException(e);
 		}
 	}
 
@@ -339,6 +341,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error apply Apptentive Theme.");
+			logException(e);
 		}
 	}
 
@@ -381,6 +384,7 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while starting app's main activity");
+			logException(e);
 		}
 	}
 

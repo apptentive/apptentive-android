@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.util.Constants;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
@@ -39,11 +40,13 @@ public class VersionHistoryStoreMigrator {
 					);
 				} catch (Exception e) {
 					ApptentiveLog.w(CONVERSATION, "Error migrating old version history entry: %s", entryOld);
+					logException(e);
 				}
 			}
 			ApptentiveLog.i(CONVERSATION, "V2: %s", VersionHistoryStore.getBaseArray().toString());
 		} catch (Exception e) {
 			ApptentiveLog.w(CONVERSATION, "Error migrating old version history entries: %s", oldFormat);
+			logException(e);
 		}
 	}
 
@@ -67,5 +70,9 @@ public class VersionHistoryStoreMigrator {
 				prefs.edit().putBoolean(Constants.PREF_KEY_VERSION_HISTORY_V2_MIGRATED, true).apply();
 			}
 		}
+	}
+
+	private static void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 }

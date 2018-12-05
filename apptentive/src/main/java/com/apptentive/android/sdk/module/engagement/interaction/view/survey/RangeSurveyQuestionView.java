@@ -27,6 +27,8 @@ import org.json.JSONObject;
 
 import java.text.NumberFormat;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestion> implements RadioButton.OnCheckedChangeListener {
 
@@ -60,7 +62,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			try {
 				question = new RangeQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
-				// Nothing
+				logException(e);
 			}
 		}
 		min = question.getMin();
@@ -101,6 +103,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", RangeSurveyQuestionView.class.getSimpleName());
+			logException(e);
 		}
 		return v;
 	}
@@ -146,7 +149,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 				jsonObject.put("value", selectedValue);
 				return jsonArray;
 			} catch (JSONException e) {
-				// Return null;
+				logException(e);
 			}
 		}
 		return null;

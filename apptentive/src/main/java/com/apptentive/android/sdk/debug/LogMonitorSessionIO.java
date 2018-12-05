@@ -17,6 +17,8 @@ import com.apptentive.android.sdk.util.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 class LogMonitorSessionIO {
 	private static final String PREFS_NAME = "com.apptentive.debug";
 	private static final String PREFS_KEY_EMAIL_RECIPIENTS = "com.apptentive.debug.EmailRecipients";
@@ -100,6 +102,7 @@ class LogMonitorSessionIO {
 			return config;
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while parsing access token: '%s'", token);
+			logException(e);
 			return null;
 		}
 	}

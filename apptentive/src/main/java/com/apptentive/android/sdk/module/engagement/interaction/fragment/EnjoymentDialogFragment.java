@@ -86,6 +86,7 @@ public class EnjoymentDialogFragment extends ApptentiveBaseFragment<EnjoymentDia
 			dismissButton.setOnClickListener(guarded(this));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", EnjoymentDialogFragment.class.getSimpleName());
+			logException(e);
 		}
 		return v;
 	}

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 
 import static com.apptentive.android.sdk.util.Util.guarded;
 
@@ -96,6 +97,7 @@ public class ApptentiveAlertDialog extends DialogFragment {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error:");
+			ErrorMetrics.logException(e);
 		}
 		AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
 		if (view != null) {

@@ -30,6 +30,7 @@ import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.Util;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, ApptentiveHttpResponse> {
 
@@ -69,6 +70,7 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 			finished = downloadBitmap((String) params[0], (String) params[1], (String) params[2]);
 		} catch (Exception e) {
 			ApptentiveLog.e(UTIL, e, "Error downloading bitmap");
+			logException(e);
 		}
 		return finished;
 	}
@@ -227,17 +229,21 @@ public class ApptentiveDownloaderTask extends AsyncTask<Object, Integer, Apptent
 			}
 		} catch (IllegalArgumentException e) {
 			ApptentiveLog.w(UTIL, e, "Error communicating with server.");
+			logException(e);
 		} catch (SocketTimeoutException e) {
 			ApptentiveLog.w(UTIL, e, "Timeout communicating with server.");
+			logException(e);
 		} catch (final MalformedURLException e) {
 			ApptentiveLog.w(UTIL, e, "ClientProtocolException");
+			logException(e);
 		} catch (final IOException e) {
 			ApptentiveLog.w(UTIL, e, "ClientProtocolException");
-			// Read the error response.
+			logException(e);
 			try {
 				ret.setContent(ApptentiveClient.getErrorResponse(connection, ret.isZipped()));
 			} catch (IOException ex) {
 				ApptentiveLog.w(UTIL, ex, "Can't read error stream.");
+				logException(e);
 			}
 		}
 

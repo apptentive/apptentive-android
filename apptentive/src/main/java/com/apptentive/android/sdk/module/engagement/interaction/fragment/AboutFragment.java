@@ -95,6 +95,7 @@ public class AboutFragment extends ApptentiveBaseFragment<Interaction> {
 			}));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", AboutFragment.class.getSimpleName());
+			logException(e);
 		}
 
 		return root;

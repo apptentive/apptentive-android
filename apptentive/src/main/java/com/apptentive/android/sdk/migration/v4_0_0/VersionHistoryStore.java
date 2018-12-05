@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Set;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * Stores version history in JSON, in SharedPreferences.
@@ -60,6 +61,7 @@ public class VersionHistoryStore {
 					}
 				} catch (Exception e) {
 					ApptentiveLog.w(CONVERSATION, e, "Error loading VersionHistoryStore.");
+					logException(e);
 				}
 			}
 		}
@@ -93,6 +95,7 @@ public class VersionHistoryStore {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(CONVERSATION, e, "Error updating VersionHistoryStore.");
+			logException(e);
 		}
 	}
 

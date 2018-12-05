@@ -19,6 +19,8 @@ import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * Collection of helper functions for Android runtime queries.
  */
@@ -42,6 +44,7 @@ public class RuntimeUtils {
 				ApptentiveLog.v("Resolved application info: %s", cachedApplicationInfo);
 			} catch (Exception e) {
 				ApptentiveLog.e(e, "Exception while getting app info");
+				logException(e);
 				cachedApplicationInfo = ApplicationInfo.NULL;
 			}
 		}
@@ -81,6 +84,7 @@ public class RuntimeUtils {
 			return Class.forName(name);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Unable to get class with name '%s'", name);
+			logException(e);
 		}
 		return null;
 	}

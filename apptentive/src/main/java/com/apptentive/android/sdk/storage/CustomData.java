@@ -15,6 +15,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class CustomData extends HashMap<String, Serializable> implements Saveable {
 
 	private static final long serialVersionUID = 1L;
@@ -75,6 +77,7 @@ public class CustomData extends HashMap<String, Serializable> implements Saveabl
 			return ret;
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Exception while creating custom data");
+			logException(e);
 		}
 		return null;
 	}

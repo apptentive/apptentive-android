@@ -31,6 +31,7 @@ import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue
 import static com.apptentive.android.sdk.ApptentiveLog.Level.VERBOSE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.TROUBLESHOOT;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.LOG_FILE_EXT;
 import static com.apptentive.android.sdk.util.Constants.LOG_FILE_PREFIX;
 
@@ -94,6 +95,7 @@ class LogMonitorSession {
 			subject = String.format("%s (Android)", ai.loadLabel(context.getPackageManager()).toString());
 		} catch (Exception e) {
 			ApptentiveLog.e(TROUBLESHOOT, e, "Unable to load troubleshooting email status line");
+			logException(e);
 		}
 		return subject;
 	}
@@ -106,8 +108,9 @@ class LogMonitorSession {
 			// TODO: list activities, permissions, etc
 			versionName = packageInfo.versionName;
 			versionCode = packageInfo.versionCode;
-		} catch (PackageManager.NameNotFoundException e) {
-			e.printStackTrace();
+		} catch (Exception e) {
+			ApptentiveLog.e(e, "Unable to get app version info");
+			logException(e);
 		}
 
 		Object[] info = {

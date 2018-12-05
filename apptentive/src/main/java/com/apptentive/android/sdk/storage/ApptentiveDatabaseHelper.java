@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.encryption.EncryptionException;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.model.Payload;
@@ -46,6 +47,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
 /**
@@ -245,6 +247,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(DATABASE, e, "Exception while trying to migrate database from %d to %d", oldVersion, newVersion);
+			logException(e);
 
 			// if migration failed - create new table
 			db.execSQL(SQL_DELETE_PAYLOAD_TABLE);
@@ -329,6 +332,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "deletePayload EXCEPTION: " + sqe.getMessage());
+			logException(sqe);
 		}
 
 		// Then delete the data file
@@ -348,6 +352,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.delete(PayloadEntry.TABLE_NAME, "", null);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "deleteAllPayloads EXCEPTION: " + sqe.getMessage());
+			logException(sqe);
 		}
 	}
 
@@ -416,6 +421,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error getting oldest unsent payload.");
 			// TODO: delete all payloads???
+			logException(e);
 			return null;
 		} finally {
 			ensureClosed(cursor);
@@ -445,6 +451,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			ApptentiveLog.v(DATABASE, "Updated missing conversation ids");
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while updating missing conversation ids");
+			logException(e);
 		}
 
 		// remove incomplete payloads which don't belong to an active conversation
@@ -464,6 +471,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			ApptentiveLog.v(DATABASE, "Removed incomplete payloads");
 		} catch (SQLException e) {
 			ApptentiveLog.e(e, "Exception while removing incomplete payloads");
+			logException(e);
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -481,6 +489,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			ApptentiveLog.d(DATABASE, "Deleted %d stored files.", deleted);
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "deleteAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			logException(sqe);
 		}
 	}
 
@@ -506,6 +515,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "getAssociatedFiles EXCEPTION: " + sqe.getMessage());
+			logException(sqe);
 		} finally {
 			ensureClosed(cursor);
 		}
@@ -543,6 +553,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			db.endTransaction();
 		} catch (SQLException sqe) {
 			ApptentiveLog.e(DATABASE, "addCompoundMessageFiles EXCEPTION: " + sqe.getMessage());
+			logException(sqe);
 		}
 		return ret != -1;
 	}
@@ -562,6 +573,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.w(DATABASE, "Error closing SQLite cursor.", e);
+			logException(e);
 		}
 	}
 
@@ -628,6 +640,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			return readFromFile(file, encrypted);
 		} catch (Exception e) {
 			ApptentiveLog.e(PAYLOADS, e, "Unable to read% file: %s", encrypted ? " encrypted" : "", file);
+			logException(e);
 			return null;
 		}
 	}
@@ -665,6 +678,10 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	//endregion
 
 	//region Debug
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add additional context information
+	}
 
 	private void printPayloadTable(String title) {
 		SQLiteDatabase db;
@@ -710,6 +727,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 			ApptentiveLog.v(PAYLOADS, "%s (%d payload(s)):\n%s", title, payloadCount, StringUtils.table(rows));
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while printing metadata");
+			logException(e);
 		} finally {
 			ensureClosed(cursor);
 		}

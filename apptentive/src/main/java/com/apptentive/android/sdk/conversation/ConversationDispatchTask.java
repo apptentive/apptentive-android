@@ -12,6 +12,7 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInstance;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
@@ -43,6 +44,8 @@ public abstract class ConversationDispatchTask extends DispatchTask {
 			executeGuarded();
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while trying to %s", description);
+			logException(e);
+
 			notifyFailure(e);
 		}
 	}
@@ -83,6 +86,7 @@ public abstract class ConversationDispatchTask extends DispatchTask {
 				}
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, "Exception while invoking callback");
+				logException(e);
 			}
 		}
 	}
@@ -96,6 +100,7 @@ public abstract class ConversationDispatchTask extends DispatchTask {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, "Exception while handling task failure");
+			logException(e);
 		}
 	}
 
@@ -114,5 +119,9 @@ public abstract class ConversationDispatchTask extends DispatchTask {
 		}
 		this.description = description;
 		return this;
+	}
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 }

@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.module.engagement.interaction.model.survey;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 abstract public class BaseQuestion extends JSONObject implements Question {
 
 	public static final String KEY_NAME = "question";
@@ -54,7 +56,7 @@ abstract public class BaseQuestion extends JSONObject implements Question {
 		try {
 			put(KEY_REQUIRED_TEXT, requiredText);
 		} catch (Exception e) {
-			// Do nothing
+			logException(e);
 		}
 	}
 

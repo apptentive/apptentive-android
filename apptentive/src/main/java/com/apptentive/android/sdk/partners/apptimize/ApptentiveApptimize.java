@@ -11,6 +11,8 @@ import com.apptentive.android.sdk.util.StringUtils;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class ApptentiveApptimize {
     private static final String CLASS_APPTIMIZE = "com.apptimize.Apptimize";
     private static final String METHOD_GET_TEST_INFO = "getTestInfo";
@@ -74,6 +76,7 @@ public class ApptentiveApptimize {
             return experiments;
         } catch (Exception e) {
             ApptentiveLog.e(ApptentiveLogTag.PARTNERS, "Error while getting Apptimize experiment info: %s", e.getMessage());
+            logException(e); // TODO: add more context info
             return null;
         }
 

@@ -8,6 +8,8 @@ package com.apptentive.android.sdk.storage;
 
 import org.json.JSONException;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 public class IntegrationConfig implements Saveable {
 
@@ -97,7 +99,7 @@ public class IntegrationConfig implements Saveable {
 			}
 			return ret;
 		} catch (JSONException e) {
-			// This can't happen.
+			logException(e);
 		}
 		return null;
 	}

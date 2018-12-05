@@ -13,6 +13,8 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * Utility class for storing weak/strong references to {@link ApptentiveNotificationObserverList}
  * and posting notification. Lost reference cleanup is done automatically.
@@ -52,6 +54,7 @@ class ApptentiveNotificationObserverList {
 				temp.get(i).onReceiveNotification(notification);
 			} catch (Exception e) {
 				ApptentiveLog.e(e, "Exception while posting notification: %s", notification);
+				logException(e); // TODO: add more context info
 			}
 		}
 

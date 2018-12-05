@@ -62,6 +62,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", UpgradeMessageFragment.class.getSimpleName());
+			logException(e);
 		}
 
 		return v;
@@ -81,6 +82,7 @@ public class UpgradeMessageFragment extends ApptentiveBaseFragment<UpgradeMessag
 			return ContextCompat.getDrawable(getContext(), pi.applicationInfo.icon);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Error loading app icon.");
+			logException(e);
 		}
 		return null;
 	}

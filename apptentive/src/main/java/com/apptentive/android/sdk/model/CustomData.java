@@ -7,6 +7,7 @@ import org.json.JSONObject;
 import java.util.*;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 /**
  * @author Sky Kelsey
@@ -57,6 +58,7 @@ public class CustomData extends JSONObject {
 				}
 			} catch (JSONException e) {
 				ApptentiveLog.e(CONVERSATION, "Error comparing two device data entries: \"%s\"  AND  \"%s\"", left.toString(), right.toString());
+				logException(e);
 			}
 			return leftMap.equals(rightMap);
 		}

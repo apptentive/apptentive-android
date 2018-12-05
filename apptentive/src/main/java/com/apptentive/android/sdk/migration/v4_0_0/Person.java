@@ -9,6 +9,8 @@ package com.apptentive.android.sdk.migration.v4_0_0;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class Person extends JSONObject {
 
 	private static final String KEY_ID = "id";
@@ -33,7 +35,7 @@ public class Person extends JSONObject {
 				return getString(KEY_ID);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -42,7 +44,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_ID, id);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -52,7 +54,7 @@ public class Person extends JSONObject {
 				return getString(KEY_EMAIL);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -61,7 +63,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_EMAIL, email);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -71,7 +73,7 @@ public class Person extends JSONObject {
 				return getString(KEY_NAME);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -80,7 +82,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_NAME, name);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -90,7 +92,7 @@ public class Person extends JSONObject {
 				return getString(KEY_FACEBOOK_ID);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -99,7 +101,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_FACEBOOK_ID, facebookId);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -109,7 +111,7 @@ public class Person extends JSONObject {
 				return getString(KEY_PHONE_NUMBER);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -118,7 +120,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_PHONE_NUMBER, phoneNumber);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -128,7 +130,7 @@ public class Person extends JSONObject {
 				return getString(KEY_STREET);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -137,7 +139,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_STREET, street);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -147,7 +149,7 @@ public class Person extends JSONObject {
 				return getString(KEY_CITY);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -156,7 +158,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_CITY, city);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -166,7 +168,7 @@ public class Person extends JSONObject {
 				return getString(KEY_ZIP);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -175,7 +177,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_ZIP, zip);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -185,7 +187,7 @@ public class Person extends JSONObject {
 				return getString(KEY_COUNTRY);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -194,7 +196,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_COUNTRY, country);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -204,7 +206,7 @@ public class Person extends JSONObject {
 				return getString(KEY_BIRTHDAY);
 			}
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 		return null;
 	}
@@ -213,7 +215,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_BIRTHDAY, birthday);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 
@@ -223,7 +225,7 @@ public class Person extends JSONObject {
 			try {
 				return getJSONObject(KEY_CUSTOM_DATA);
 			} catch (JSONException e) {
-				// Can't happen
+				logException(e);
 			}
 		}
 		return null;
@@ -233,7 +235,7 @@ public class Person extends JSONObject {
 		try {
 			put(KEY_CUSTOM_DATA, customData);
 		} catch (JSONException e) {
-			// Can't happen
+			logException(e);
 		}
 	}
 }

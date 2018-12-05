@@ -15,6 +15,7 @@ import org.json.JSONObject;
 import java.util.Map;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public abstract class ApptentiveMessage extends ConversationItem implements MessageCenterListItem {
 
@@ -111,6 +112,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			put(KEY_CUSTOM_DATA, customDataJson);
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Exception setting ApptentiveMessage's %s field.", KEY_CUSTOM_DATA);
+			logException(e);
 		}
 	}
 
@@ -146,6 +148,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 			sender.put(KEY_SENDER_ID, senderId);
 		} catch (JSONException e) {
 			ApptentiveLog.e(e, "Exception setting ApptentiveMessage's %s field.", KEY_SENDER_ID);
+			logException(e);
 		}
 	}
 
@@ -158,7 +161,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 				}
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -172,7 +175,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 				}
 			}
 		} catch (JSONException e) {
-			// Should not happen.
+			logException(e);
 		}
 		return null;
 	}
@@ -235,6 +238,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 				return Type.valueOf(rawType);
 			} catch (IllegalArgumentException e) {
 				ApptentiveLog.v(MESSAGES, "Error parsing unknown ApptentiveMessage.Type: " + rawType);
+				logException(e);
 			}
 			return unknown;
 		}
@@ -251,6 +255,7 @@ public abstract class ApptentiveMessage extends ConversationItem implements Mess
 				return State.valueOf(state);
 			} catch (IllegalArgumentException e) {
 				ApptentiveLog.v(MESSAGES, "Error parsing unknown ApptentiveMessage.State: " + state);
+				logException(e);
 			}
 			return unknown;
 		}

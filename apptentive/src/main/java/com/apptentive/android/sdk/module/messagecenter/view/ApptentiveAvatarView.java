@@ -20,6 +20,7 @@ import android.widget.ImageView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.module.metric.MetricModule;
 
 import java.io.IOException;
@@ -155,6 +156,7 @@ public class ApptentiveAvatarView extends ImageView {
 				return b;
 			} catch (OutOfMemoryError e) {
 				ApptentiveLog.w(UTIL, e, "Error creating bitmap.");
+				logException(e);
 				return null;
 			}
 		}
@@ -227,6 +229,7 @@ public class ApptentiveAvatarView extends ImageView {
 					bitmap = BitmapFactory.decodeStream(url.openStream());
 				} catch (IOException e) {
 					ApptentiveLog.e(UTIL, e, "Error opening avatar from URL: \"%s\"", urlString);
+					logException(e);
 				}
 				if (bitmap != null) {
 					final Bitmap finalBitmap = bitmap;
@@ -279,5 +282,9 @@ public class ApptentiveAvatarView extends ImageView {
 		public String toString() {
 			return String.format("scale = %f, deltaX = %f, deltaY = %f", scale, deltaX, deltaY);
 		}
+	}
+
+	private void logException(Throwable e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 }

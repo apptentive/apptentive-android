@@ -27,6 +27,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQuestion> implements TextWatcher {
 
@@ -56,7 +58,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			try {
 				question = new SinglelineQuestion(bundle.getString("question"));
 			} catch (JSONException e) {
-
+				logException(e);
 			}
 		}
 	}
@@ -68,6 +70,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 			inflater.inflate(R.layout.apptentive_survey_question_singleline, getAnswerContainer(v));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView", TextSurveyQuestionView.class.getSimpleName());
+			logException(e);
 		}
 
 		return v;
@@ -160,7 +163,7 @@ public class TextSurveyQuestionView extends BaseSurveyQuestionView<SinglelineQue
 				return jsonArray;
 			}
 		} catch (JSONException e) {
-			// Return null;
+			logException(e);
 		}
 		return null;
 	}

@@ -209,6 +209,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", SurveyFragment.class.getSimpleName());
+			logException(e);
 		}
 		return v;
 	}
@@ -262,6 +263,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onViewCreated()", SurveyFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -307,7 +309,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		try {
 			answerData.put("id", questionId);
 		} catch (JSONException e) {
-			// Never happens.
+			logException(e);
 		}
 		engageInternal(EVENT_QUESTION_RESPONSE, answerData.toString());
 	}
@@ -322,6 +324,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while calling listener");
+			logException(e);
 		}
 	}
 

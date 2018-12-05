@@ -91,6 +91,7 @@ public class RatingDialogFragment extends ApptentiveBaseFragment<RatingDialogInt
 			}));
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", RatingDialogFragment.class.getSimpleName());
+			logException(e);
 		}
 		return v;
 	}

@@ -10,6 +10,8 @@ import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONException;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class DevicePayload extends JsonPayload {
 
 	public static final String KEY = "device";
@@ -152,7 +154,7 @@ public class DevicePayload extends JsonPayload {
 			try {
 				return new CustomData(getJSONObject(KEY_CUSTOM_DATA));
 			} catch (JSONException e) {
-				// Ignore
+				logException(e);
 			}
 		}
 		return null;

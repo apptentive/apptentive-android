@@ -25,6 +25,9 @@ import com.apptentive.android.sdk.ApptentiveLog;
 
 import org.json.JSONObject;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -51,6 +54,12 @@ public final class StringUtils {
 		}
 
 		return format;
+	}
+
+	public static String getStackTrace(Throwable t) {
+		Writer writer = new StringWriter();
+		t.printStackTrace(new PrintWriter(writer));
+		return writer.toString();
 	}
 
 	/**

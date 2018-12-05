@@ -12,6 +12,8 @@ import android.os.Parcelable;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class ImageItem implements Parcelable{
 	public String originalPath;
 	public String localCachePath;
@@ -47,7 +49,7 @@ public class ImageItem implements Parcelable{
 			json.put(KEY_MIME, this.mimeType);
 			json.put(KEY_TIME, this.time);
 		} catch (JSONException e) {
-			// Ignored
+			logException(e);
 		}
 		return  json;
 	}
@@ -58,7 +60,7 @@ public class ImageItem implements Parcelable{
 			ImageItem other = (ImageItem) o;
 			return this.originalPath.equals(other.originalPath);
 		} catch (ClassCastException e) {
-			e.printStackTrace();
+			logException(e);
 		}
 		return super.equals(o);
 	}

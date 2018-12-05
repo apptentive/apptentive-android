@@ -11,6 +11,8 @@ import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * @author Sky Kelsey
  */
@@ -29,7 +31,7 @@ public class Invocation extends JSONObject {
 				return getString(KEY_INTERACTION_ID);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}
@@ -42,7 +44,7 @@ public class Invocation extends JSONObject {
 				return criteria.isMet(fieldManager, verbose);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return false;
 	}

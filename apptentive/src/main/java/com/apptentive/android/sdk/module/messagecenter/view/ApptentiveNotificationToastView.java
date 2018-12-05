@@ -21,6 +21,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.apptentive.android.sdk.R;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.module.messagecenter.ApptentiveToastNotificationManager;
 import com.apptentive.android.sdk.module.messagecenter.model.ApptentiveToastNotification;
 import com.apptentive.android.sdk.util.image.ImageUtil;
@@ -68,6 +69,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 					countDown--;
 				} catch (InterruptedException e) {
 					e.printStackTrace();
+					logException(e);
 				}
 			}
 
@@ -76,9 +78,6 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 			}
 		}
 	}
-
-	;
-
 
 	private ScrollOrientationEnum scrollOrientationEnum = ScrollOrientationEnum.NONE;
 
@@ -153,6 +152,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 							dismiss();
 						} catch (PendingIntent.CanceledException e) {
 							e.printStackTrace();
+							logException(e);
 						}
 					}
 					break;
@@ -236,7 +236,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 						try {
 							velocityTracker.recycle();
 						} catch (IllegalStateException e) {
-
+							logException(e);
 						}
 					}
 
@@ -314,7 +314,7 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 				velocityTracker.clear();
 				velocityTracker.recycle();
 			} catch (IllegalStateException e) {
-
+				logException(e);
 			}
 		}
 	}
@@ -322,5 +322,9 @@ public class ApptentiveNotificationToastView extends LinearLayout {
 
 	enum ScrollOrientationEnum {
 		VERTICAL, HORIZONTAL, NONE
+	}
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add more context info
 	}
 }

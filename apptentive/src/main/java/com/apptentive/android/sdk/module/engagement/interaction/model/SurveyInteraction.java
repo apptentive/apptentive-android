@@ -19,6 +19,8 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 public class SurveyInteraction extends Interaction {
 
 	// Configuration
@@ -109,7 +111,7 @@ public class SurveyInteraction extends Interaction {
 				return questions;
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return null;
 	}

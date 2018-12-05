@@ -34,6 +34,7 @@ import java.lang.ref.WeakReference;
 import java.net.URL;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class ImageUtil {
 
@@ -292,9 +293,11 @@ public class ImageUtil {
 			System.gc();
 		} catch (FileNotFoundException e) {
 			ApptentiveLog.e(UTIL, e, "File not found while storing image.");
+			logException(e);
 			return false;
 		} catch (Exception e) {
 			ApptentiveLog.a(UTIL, e, "Error storing image.");
+			logException(e);
 			return false;
 		} finally {
 			Util.ensureClosed(cos);
@@ -310,6 +313,7 @@ public class ImageUtil {
 			ExifInterface exif = new ExifInterface(sourcePath);
 			imageOrientation = exif.getAttributeInt(ExifInterface.TAG_ORIENTATION, ExifInterface.ORIENTATION_NORMAL);
 		} catch (IOException e) {
+			logException(e);
 		}
 
 		// Copy the file contents over.
@@ -325,6 +329,7 @@ public class ImageUtil {
 			return true;
 		} catch (Exception e) {
 			ApptentiveLog.a(UTIL, e, "Error storing image.");
+			logException(e);
 			return false;
 		} finally {
 			Util.ensureClosed(cos);
@@ -344,7 +349,7 @@ public class ImageUtil {
 			try {
 				bmp = this.loadImageFromNetwork(urls[0]);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logException(e);
 			}
 			return bmp;
 		}

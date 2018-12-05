@@ -112,6 +112,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 										data.put(TextModalInteraction.EVENT_KEY_ACTION_POSITION, position);
 									} catch (JSONException e) {
 										ApptentiveLog.e(e, "Error creating Event data object.");
+										logException(e);
 									}
 									engageInternal(TextModalInteraction.EVENT_NAME_DISMISS, data.toString());
 									transit();
@@ -144,7 +145,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 													Interactions interactions = new Interactions(interactionsString);
 													invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 												}catch (JSONException e) {
-													// Should never happen.
+													logException(e);
 												}
 											}
 										}
@@ -158,6 +159,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 										data.put(TextModalInteraction.EVENT_KEY_INVOKED_INTERACTION_ID, invokedInteraction == null ? JSONObject.NULL : invokedInteraction.getId());
 									} catch (JSONException e) {
 										ApptentiveLog.e(e, "Error creating Event data object.");
+										logException(e);
 									}
 
 									engageInternal(TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
@@ -177,6 +179,7 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreateView()", NoteFragment.class.getSimpleName());
+			logException(e);
 		}
 		return v;
 	}

@@ -19,6 +19,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
+import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -67,6 +68,7 @@ import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
 import com.apptentive.android.sdk.util.image.ApptentiveImageGridView;
 import com.apptentive.android.sdk.util.image.ImageGridViewAdapter;
 import com.apptentive.android.sdk.util.image.ImageItem;
+import com.apptentive.android.sdk.util.threading.DispatchTask;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -83,6 +85,7 @@ import java.util.ListIterator;
 import java.util.Set;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
 import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
 import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
@@ -206,40 +209,58 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		return inflater.inflate(R.layout.apptentive_message_center, container, false);
 	}
 
-	public void onViewCreated(View view, Bundle onSavedInstanceState) {
+	public void onViewCreated(final View view, final Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
 
-		try {
-			boolean isInitialViewCreation = (onSavedInstanceState == null);
-			/* When isInitialViewCreation is false, the view is being recreated after orientation change.
-			 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
-			 */
-			setup(view, isInitialViewCreation);
+		fetchMessages(new FetchCallback() {
+			@Override
+			public void onFetchFinish(@Nullable List<MessageCenterListItem> items) {
+				boolean isInitialViewCreation = (onSavedInstanceState == null);
+				/* When isInitialViewCreation is false, the view is being recreated after orientation change.
+				 * Because the fragment is set to be retained after orientation change, setup() will reuse the retained states
+				 */
+				setup(view, isInitialViewCreation, items);
 
-			dispatchConversationTask(new ConversationDispatchTask() {
-				@Override
-				protected boolean execute(Conversation conversation) {
-					MessageManager mgr = conversation.getMessageManager();
-					// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
-					mgr.addInternalOnMessagesUpdatedListener(MessageCenterFragment.this);
-					// Give the MessageCenterView a callback when a message is sent.
-					mgr.setAfterSendMessageListener(MessageCenterFragment.this);
-					return true;
+				dispatchConversationTask(new ConversationDispatchTask() {
+					@Override
+					protected boolean execute(Conversation conversation) {
+						MessageManager mgr = conversation.getMessageManager();
+						// This listener will run when messages are retrieved from the server, and will start a new thread to update the view.
+						mgr.addInternalOnMessagesUpdatedListener(MessageCenterFragment.this);
+						// Give the MessageCenterView a callback when a message is sent.
+						mgr.setAfterSendMessageListener(MessageCenterFragment.this);
+						return true;
+					}
+				}, "set message listeners");
+
+				// Restore listview scroll offset to where it was before rotation
+				if (listViewSavedTopIndex != -1) {
+					messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
+				} else {
+					messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 				}
-			}, "set message listeners");
-
-			// Needed to prevent the window from being pushed up when a text input area is focused.
-			getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
-
-			// Restore listview scroll offset to where it was before rotation
-			if (listViewSavedTopIndex != -1) {
-				messagingActionHandler.sendMessageDelayed(messagingActionHandler.obtainMessage(MSG_SCROLL_FROM_TOP, listViewSavedTopIndex, listViewSavedTopOffset), DEFAULT_DELAYMILLIS);
-			} else {
-				messagingActionHandler.sendEmptyMessageDelayed(MSG_SCROLL_TO_BOTTOM, DEFAULT_DELAYMILLIS);
 			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception in %s.onViewCreated()", MessageCenterFragment.class.getSimpleName());
-		}
+		});
+
+		// Needed to prevent the window from being pushed up when a text input area is focused.
+		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+	}
+
+	private void fetchMessages(final FetchCallback callback) {
+		dispatchConversationTask(new ConversationDispatchTask() {
+			@Override
+			protected boolean execute(Conversation conversation) {
+				final List<MessageCenterListItem> items = conversation.getMessageManager().getMessageCenterListItems();
+				dispatchOnMainQueue(new DispatchTask() {
+					@Override
+					protected void execute() {
+						callback.onFetchFinish(items);
+					}
+				});
+
+				return true;
+			}
+		}, "prepare messages");
 	}
 
 	@Override
@@ -251,6 +272,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			messagingActionHandler = new MessagingActionHandler(this);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while attaching");
+			logException(e);
 		}
 	}
 
@@ -260,13 +282,16 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			super.onDetach();
 			// messageCenterRecyclerViewAdapter holds a reference to fragment context. Need to set it to null in this and other Views to prevent a memory leak.
 			messageCenterRecyclerViewAdapter = null;
-			messageCenterRecyclerView.setAdapter(null);
+			if (messageCenterRecyclerView != null) {
+				messageCenterRecyclerView.setAdapter(null);
+			}
 			composer = null;
 			composerEditText = null;
 			whoCardNameEditText = null;
 			whoCardEmailEditText = null;
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onDetach()", getClass().getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -279,6 +304,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e("Exception in %s.onStart()", MessageCenterFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -291,6 +317,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e("Exception in %s.onStop()", MessageCenterFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -385,6 +412,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onResume()", MessageCenterFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -405,7 +433,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		profileMenuItem.setEnabled(bShowProfileMenuItem);
 	}
 
-	private void setup(View rootView, boolean isInitialViewCreation) {
+	private void setup(View rootView, boolean isInitialViewCreation, List<MessageCenterListItem> items) {
 		boolean addedAnInteractiveCard = false;
 
 		messageCenterRecyclerView = (MessageCenterRecyclerView) rootView.findViewById(R.id.message_center_recycler_view);
@@ -428,18 +456,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 		messageCenterRecyclerViewAdapter = new MessageCenterRecyclerViewAdapter(this, this, interaction, listItems);
 
 		if (isInitialViewCreation) {
-			dispatchConversationTask(new ConversationDispatchTask() {
-				@Override
-				protected boolean execute(Conversation conversation) {
-					List<MessageCenterListItem> items = conversation.getMessageManager().getMessageCenterListItems();
-					if (items != null) {
-						// Get message list from DB, and use this as the starting point for the listItems array.
-						prepareMessages(items);
-					}
-					return true;
-				}
-			}, "prepare messages");
-
+			prepareMessages(items);
 
 			String contextMessageBody = interaction.getContextualMessageBody();
 			if (contextMessageBody != null) {
@@ -503,6 +520,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				savedAttachmentsJsonArray = new JSONArray(pendingAttachmentsString);
 			} catch (JSONException e) {
 				e.printStackTrace();
+				logException(e);
 			}
 			if (savedAttachmentsJsonArray != null && savedAttachmentsJsonArray.length() > 0) {
 				if (pendingAttachments == null) {
@@ -517,6 +535,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							pendingAttachments.add(new ImageItem(savedAttachmentJson));
 						}
 					} catch (JSONException e) {
+						logException(e);
 						continue;
 					}
 				}
@@ -536,7 +555,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				data.put("required", interaction.getWhoCardRequired());
 				data.put("trigger", "button");
 			} catch (JSONException e) {
-				//
+				logException(e);
 			}
 			engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 
@@ -567,6 +586,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			super.onSaveInstanceState(outState);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onSaveInstanceState()", getClass().getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -642,7 +662,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				data.put("required", interaction.getWhoCardRequired());
 				data.put("trigger", "automatic");
 			} catch (JSONException e) {
-				//
+				logException(e);
 			}
 			engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 			return true;
@@ -767,6 +787,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, e, "Error loading attachment");
+			logException(e);
 		}
 	}
 
@@ -792,6 +813,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		} catch (Exception e) {
 			ApptentiveLog.e(MESSAGES, e, "Error loading attachment preview.");
+			logException(e);
 		}
 	}
 
@@ -923,7 +945,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			int bodyLength = (content != null) ? content.toString().trim().length() : 0;
 			data.put("body_length", bodyLength);
 		} catch (JSONException e) {
-			//
+			logException(e);
 		}
 		engageInternal(MessageCenterInteraction.EVENT_NAME_COMPOSE_CLOSE, data.toString());
 		messagingActionHandler.sendMessage(messagingActionHandler.obtainMessage(MSG_REMOVE_COMPOSER));
@@ -974,7 +996,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			data.put("required", interaction.getWhoCardRequired());
 			data.put("button_label", buttonLabel);
 		} catch (JSONException e) {
-			//
+			logException(e);
 		}
 		engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_SUBMIT, data.toString());
 
@@ -996,7 +1018,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			data.put("required", interaction.getWhoCardRequired());
 			data.put("button_label", buttonLabel);
 		} catch (JSONException e) {
-			//
+			logException(e);
 		}
 		engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_CLOSE, data.toString());
 
@@ -1071,9 +1093,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			}
 			imagePickerStillOpen = true;
 		} catch (Exception e) {
-			e.printStackTrace();
 			imagePickerStillOpen = false;
 			ApptentiveLog.w(MESSAGES, "can't launch image picker");
+			logException(e);
 		}
 	}
 
@@ -1251,6 +1273,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	 * This method uses insertion sort to re-sort the messages retrieved from the database
 	 */
 	private void prepareMessages(final List<MessageCenterListItem> originalItems) {
+		assertMainThread();
+
 		listItems.clear();
 		unsentMessagesCount = 0;
 		// Loop through each message item retrieved from database
@@ -1454,7 +1478,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 							data.put("required", fragment.interaction.getWhoCardRequired());
 							data.put("trigger", "automatic");
 						} catch (JSONException e) {
-							//
+							logException(e);
 						}
 						fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_PROFILE_OPEN, data.toString());
 						fragment.forceShowKeyboard = true;
@@ -1638,5 +1662,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public String getToolbarNavigationContentDescription() {
 		return getContext().getString(R.string.apptentive_message_center_content_description_back_button);
+	}
+
+	private interface FetchCallback {
+		void onFetchFinish(@Nullable List<MessageCenterListItem> items);
 	}
 }

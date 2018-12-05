@@ -43,6 +43,7 @@ import java.util.Random;
 import static android.content.Context.NOTIFICATION_SERVICE;
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 import static com.apptentive.android.sdk.ApptentiveLogTag.NOTIFICATION_INTERACTIONS;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_ACTION_DELETE;
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_ACTION_DISPLAY;
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_ACTION_NOTE_BUTTON_PRESSED;
@@ -64,6 +65,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 			interaction = new TextModalInteraction(intent.getStringExtra(NOTIFICATION_EXTRA_INTERACTION_DEFINITION));
 		} catch (JSONException e) {
 			ApptentiveLog.w(NOTIFICATION_INTERACTIONS, "Unable to parse interaction: %s", interactionString);
+			logException(e);
 			return;
 		}
 		if (StringUtils.equal(action, NOTIFICATION_ACTION_DISPLAY)) {
@@ -168,6 +170,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 			data.put(TextModalInteraction.KEY_DISPLAY_TYPE, interaction.getDisplayType().name());
 		} catch (JSONException e) {
 			ApptentiveLog.e(NOTIFICATION_INTERACTIONS, e, "Error creating Event data object.");
+			logException(e);
 		}
 		dispatchConversationTask(new ConversationDispatchTask() {
 			@Override
@@ -220,7 +223,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 									Interactions interactions = new Interactions(interactionsString);
 									invokedInteraction = interactions.getInteraction(interactionIdToLaunch);
 								} catch (JSONException e) {
-									// Should never happen.
+									logException(e);
 								}
 							}
 						}
@@ -235,6 +238,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 							data.put(TextModalInteraction.KEY_DISPLAY_TYPE, interaction.getDisplayType().name());
 						} catch (JSONException e) {
 							ApptentiveLog.e(NOTIFICATION_INTERACTIONS, e, "Error creating Event data object.");
+							logException(e);
 						}
 						EngagementModule.engageInternal(context, conversation, interaction, TextModalInteraction.EVENT_NAME_INTERACTION, data.toString());
 
@@ -262,6 +266,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 					data.put(TextModalInteraction.KEY_DISPLAY_TYPE, interaction.getDisplayType().name());
 				} catch (JSONException e) {
 					ApptentiveLog.e(NOTIFICATION_INTERACTIONS, e, "Error creating Event data object.");
+					logException(e);
 				}
 				dispatchConversationTask(new ConversationDispatchTask() {
 					@Override
@@ -287,6 +292,7 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 			data.put(TextModalInteraction.KEY_DISPLAY_TYPE, interaction.getDisplayType().name());
 		} catch (JSONException e) {
 			ApptentiveLog.e(NOTIFICATION_INTERACTIONS, e, "Error creating Event data object.");
+			logException(e);
 		}
 		dispatchConversationTask(new ConversationDispatchTask() {
 			@Override

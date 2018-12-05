@@ -16,6 +16,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.ADVERTISER_ID;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_ADVERTISER_ID_DID_RESOLVE;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_ADVERTISER_CLIENT_INFO;
 import static com.apptentive.android.sdk.ApptentiveNotifications.NOTIFICATION_KEY_SUCCESSFUL;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class AdvertiserManager {
 	private static final String CLASS_ADVERTISING_ID_CLIENT = "com.google.android.gms.ads.identifier.AdvertisingIdClient";
@@ -74,6 +75,7 @@ public class AdvertiserManager {
 			}
 
 			ApptentiveLog.e(e, "Unable to resolve advertising ID");
+			logException(e);
 			return null;
 		}
 	}

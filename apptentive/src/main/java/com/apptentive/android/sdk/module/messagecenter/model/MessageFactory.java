@@ -15,6 +15,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class MessageFactory {
 
@@ -39,8 +40,10 @@ public class MessageFactory {
 			}
 		} catch (JSONException e) {
 			ApptentiveLog.v(MESSAGES, e, "Error parsing json as Message: %s", json);
+			logException(e);
 		} catch (IllegalArgumentException e) {
 			// Exception treated as unknown type
+			logException(e);
 		}
 		return null;
 	}

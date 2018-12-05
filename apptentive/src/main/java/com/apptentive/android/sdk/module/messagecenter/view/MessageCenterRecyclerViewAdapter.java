@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.CompoundMessage;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.MessageCenterFragment;
@@ -196,6 +197,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception while binding view holder");
+			logException(e);
 		}
 	}
 
@@ -260,7 +262,7 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 				data.put("message_id", message.getId());
 				data.put("message_type", message.getMessageType().name());
 			} catch (JSONException e) {
-				//
+				logException(e);
 			}
 			fragment.engageInternal(MessageCenterInteraction.EVENT_NAME_READ, data.toString());
 
@@ -288,5 +290,9 @@ public class MessageCenterRecyclerViewAdapter extends RecyclerView.Adapter {
 		protected void onPostExecute(Void result) {
 			messagesWithPendingReadStatusUpdate.remove(message);
 		}
+	}
+
+	private void logException(Exception e) {
+		ErrorMetrics.logException(e);
 	}
 }

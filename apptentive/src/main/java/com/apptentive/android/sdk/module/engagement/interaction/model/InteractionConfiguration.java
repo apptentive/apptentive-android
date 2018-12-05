@@ -3,6 +3,8 @@ package com.apptentive.android.sdk.module.engagement.interaction.model;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * @author Sky Kelsey
  */
@@ -24,7 +26,7 @@ public class InteractionConfiguration extends JSONObject {
 				return getBoolean(KEY_SHOW_POWERED_BY);
 			}
 		} catch (JSONException e) {
-			// Ignore
+			logException(e);
 		}
 		return false;
 	}

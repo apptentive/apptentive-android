@@ -39,6 +39,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
@@ -140,6 +141,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e("Exception in %s.transit()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -170,6 +172,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onAttach()", getClass().getSimpleName());
+			logException(e);
 		}
 
 	}
@@ -191,6 +194,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 						mHostField.set(fragment, currentHost);
 					} catch (Exception e) {
 						ApptentiveLog.w(e, e.getMessage());
+						logException(e);
 					}
 					if (fragment.getChildFragmentManager() != null) {
 						updateHosts(fragment.getChildFragmentManager(), currentHost);
@@ -258,6 +262,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onCreate()", getClass().getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -312,6 +317,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onViewCreated()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -322,6 +328,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			ApptentiveInternal.getInstance().addInteractionUpdateListener(this);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onResume()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 		super.onResume();
 	}
@@ -332,6 +339,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			ApptentiveInternal.getInstance().removeInteractionUpdateListener(this);
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onPause()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 		super.onPause();
 	}
@@ -349,6 +357,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onStop()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 	}
 
@@ -369,6 +378,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			}
 		} catch (Exception e) {
 			ApptentiveLog.e(e, "Exception in %s.onDestroyView()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 
 	}
@@ -390,6 +400,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			attachFragmentMenuListeners(menu);
 		} catch (Exception e) {
 			ApptentiveLog.e("Exception in %s.onCreateOptionsMenu()", ApptentiveBaseFragment.class.getSimpleName());
+			logException(e);
 		}
 		super.onCreateOptionsMenu(menu, inflater);
 	}
@@ -594,6 +605,10 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	protected void dispatchOnMainQueue(DispatchTask task) {
 		DispatchQueue.mainQueue().dispatchAsync(task);
+	}
+
+	protected static void logException(Exception e) {
+		ErrorMetrics.logException(e); // TODO: add context data
 	}
 
 	//endregion

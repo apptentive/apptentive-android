@@ -6,6 +6,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.encryption.resolvers.KeyResolver;
 import com.apptentive.android.sdk.encryption.resolvers.KeyResolverFactory;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -21,6 +22,11 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.SECURITY;
 public final class SecurityManager {
 	private static final String PREFS_KEY_ALIAS = "alias";
 	private static final String PREFS_SDK_VERSION_CODE = "version_code";
+
+	/**
+	 * We would force Key Store API version to this
+	 */
+	private static final int LEGACY_KEY_STORE_API = 18;
 
 	private static EncryptionKey masterKey;
 
@@ -52,7 +58,11 @@ public final class SecurityManager {
 		int versionCode = prefs.getInt(PREFS_SDK_VERSION_CODE, 0);
 		if (StringUtils.isNullOrEmpty(keyAlias) || versionCode == 0) {
 			keyAlias = generateUniqueKeyAlias();
-			versionCode = Build.VERSION.SDK_INT;
+			// We need to force the legacy KeyStore API on new installs since the modern 23+ API randomly
+			// fails on both devices and emulators. All the existing clients would continue using the version
+			// originally assigned on the first launch.
+			// more info: https://stackoverflow.com/questions/36488219/android-security-keystoreexception-invalid-key-blob
+			versionCode = Math.min(LEGACY_KEY_STORE_API, Build.VERSION.SDK_INT); // we still want to keep API version less than 18 (no-op)
 			prefs.edit()
 				.putString(PREFS_KEY_ALIAS, keyAlias)
 				.putInt(PREFS_SDK_VERSION_CODE, versionCode)
@@ -69,6 +79,7 @@ public final class SecurityManager {
 			return keyResolver.resolveKey(context, keyInfo.alias);
 		} catch (Exception e) {
 			ApptentiveLog.e(SECURITY, e, "Exception while resolving secret key for alias '%s'. Encryption might not work correctly!", hideIfSanitized(keyInfo.alias));
+			ErrorMetrics.logException(e); // TODO: add more context info
 			return EncryptionKey.CORRUPTED;
 		}
 	}

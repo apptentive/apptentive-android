@@ -170,7 +170,7 @@ public class AsyncLogWriter implements ApptentiveLog.LogListener {
 				Util.writeText(file, queuedMessagesTemp, true);
 			} catch (Exception e) {
 				ApptentiveLog.e(e, "Exception while writing log file: " + destDir);
-				// TODO: disable writing all together?
+				ErrorMetrics.logException(e);
 			}
 			queuedMessagesTemp.clear();
 		}

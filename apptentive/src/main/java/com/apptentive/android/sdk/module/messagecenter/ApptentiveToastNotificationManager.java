@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 
 public class ApptentiveToastNotificationManager {
 
@@ -139,7 +141,7 @@ public class ApptentiveToastNotificationManager {
 		try {
 			wManager.addView(tContainer, params);
 		} catch (Exception e) {
-			e.printStackTrace();
+			logException(e);
 		}
 		ObjectAnimator a = ObjectAnimator.ofFloat(tContainer.rootView, "translationY", -700, 0);
 		a.setDuration(600);

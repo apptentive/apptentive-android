@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.module.engagement.logic;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 /**
  * @author Sky Kelsey
  */
@@ -22,7 +24,7 @@ public enum LogicalOperator {
 			try {
 				return LogicalOperator.valueOf(name);
 			} catch (IllegalArgumentException e) {
-				// Ignore
+				logException(e);
 			}
 		}
 		return unknown;
