@@ -4,7 +4,7 @@ buildscript {
         jcenter()
     }
     dependencies {
-        classpath 'com.google.gms:google-services:3.1.1'
+        classpath 'com.google.gms:google-services:4.2.0'
     }
 }
 
@@ -16,13 +16,13 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.apptentive:apptentive-android:5.3.1'
-    implementation 'com.google.firebase:firebase-messaging:11.6.0'
+    implementation 'com.apptentive:apptentive-android:5.3.3'
+    implementation 'com.google.firebase:firebase-messaging:17.3.4'
 }
 
 android {
     compileSdkVersion 28
-    buildToolsVersion '28.0.2'
+    buildToolsVersion '28.0.3'
 
     defaultConfig {
         minSdkVersion 14

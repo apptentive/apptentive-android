@@ -12,7 +12,6 @@ import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
 import android.support.test.InstrumentationRegistry;
-import android.test.RenamingDelegatingContext;
 
 import com.apptentive.android.sdk.ApptentiveInstance;
 import com.apptentive.android.sdk.ApptentiveInternal;
@@ -40,7 +39,7 @@ public abstract class ApptentiveTestCaseBase {
 
 	@Before
 	public void initializeApptentiveSdk() throws PackageManager.NameNotFoundException {
-		targetContext = new RenamingDelegatingContext(InstrumentationRegistry.getTargetContext(), "test_");
+		targetContext = InstrumentationRegistry.getTargetContext();
 		apptentiveInternal = ApptentiveInternal.getInstance();
 		ApptentiveLog.overrideLogLevel(ApptentiveLog.Level.VERBOSE);
 		PackageInfo packageInfo = targetContext.getPackageManager().getPackageInfo(targetContext.getPackageName(), 0);

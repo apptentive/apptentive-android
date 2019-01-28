@@ -1,3 +1,10 @@
+# 2019-01-28 - v5.4.0
+
+#### Changes
+
+* Made encrypted storage configurable on the client.
+* Updated SDK dependencies to Android-P
+
 # 2018-12-05 - v5.3.3
 
 #### Fixes

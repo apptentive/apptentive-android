@@ -153,7 +153,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		appRelease = null;
 	}
 
-	private ApptentiveInternal(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl) {
+	private ApptentiveInternal(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl, boolean shouldEncryptStorage) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
 			throw new IllegalArgumentException("Apptentive Key is null or empty");
 		}
@@ -166,7 +166,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		this.apptentiveSignature = apptentiveSignature;
 		this.serverUrl = serverUrl;
 
-		SecurityManager.init(application.getApplicationContext());
+		SecurityManager.init(application.getApplicationContext(), shouldEncryptStorage);
 
 		appContext = application.getApplicationContext();
 
@@ -212,6 +212,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		final String apptentiveKey = configuration.getApptentiveKey();
 		final String apptentiveSignature = configuration.getApptentiveSignature();
 		final String baseURL = configuration.getBaseURL();
+		final boolean shouldEncryptStorage = configuration.shouldEncryptStorage();
 
 		// set log message sanitizing
 		ApptentiveLog.setShouldSanitizeLogMessages(configuration.shouldSanitizeLogMessages());
@@ -235,7 +236,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				try {
 					ApptentiveLog.i("Registering Apptentive Android SDK %s", Constants.getApptentiveSdkVersion());
 					ApptentiveLog.v("ApptentiveKey=%s ApptentiveSignature=%s", apptentiveKey, apptentiveSignature);
-					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, baseURL);
+					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, baseURL, shouldEncryptStorage);
 					dispatchOnConversationQueue(new DispatchTask() {
 						@Override
 						protected void execute() {

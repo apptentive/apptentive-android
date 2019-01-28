@@ -16,7 +16,7 @@ public class SecurityManagerTest extends InstrumentationTestCaseBase {
 	@Before
 	public void setup() {
 		SecurityManager.clear(getContext());
-		SecurityManager.init(getContext());
+		SecurityManager.init(getContext(), true);
 	}
 
 	@Test

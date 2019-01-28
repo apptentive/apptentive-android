@@ -15,6 +15,7 @@ public class ApptentiveConfiguration {
 	private final String apptentiveSignature;
 	private String baseURL;
 	private ApptentiveLog.Level logLevel;
+	private boolean shouldEncryptStorage;
 	private boolean shouldSanitizeLogMessages;
 	private boolean troubleshootingModeEnabled;
 
@@ -30,6 +31,7 @@ public class ApptentiveConfiguration {
 		this.apptentiveKey = apptentiveKey.trim();
 		this.apptentiveSignature = apptentiveSignature.trim();
 		this.logLevel = ApptentiveLog.Level.INFO;
+		this.shouldEncryptStorage = false;
 		this.shouldSanitizeLogMessages = true;
 		this.troubleshootingModeEnabled = true;
 	}
@@ -61,7 +63,21 @@ public class ApptentiveConfiguration {
 	}
 
 	/**
-	 * Returns <code>true</code> is SDK should hide user sensitive information (user name, email,
+	 * Enables/disables encrypted on-device storage. Disabled by default.
+	 */
+	public void setShouldEncryptStorage(boolean shouldEncryptStorage) {
+		this.shouldEncryptStorage = shouldEncryptStorage;
+	}
+
+	/**
+	 * Returns <code>true</code> if SDK should use encrypted on-device storage.
+	 */
+	public boolean shouldEncryptStorage() {
+		return shouldEncryptStorage;
+	}
+
+	/**
+	 * Returns <code>true</code> if SDK should hide user sensitive information (user name, email,
 	 * custom data, etc). Useful for debugging.
 	 */
 	public boolean shouldSanitizeLogMessages() {
