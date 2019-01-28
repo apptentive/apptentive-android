@@ -28,17 +28,22 @@ public final class SecurityManager {
 	 */
 	private static final int LEGACY_KEY_STORE_API = 18;
 
+	/**
+	 * The highest API version which would resolve in no encryption operations
+	 */
+	private static final int LEGACY_KEY_STORE_API_NO_OP = 17;
+
 	private static EncryptionKey masterKey;
 
 	//region Initialization
 
-	public static void init(Context context) {
+	public static void init(Context context, boolean shouldEncryptStorage) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
 
 		// get the name of the alias
-		KeyInfo keyInfo = resolveKeyInfo(context);
+		KeyInfo keyInfo = resolveKeyInfo(context, shouldEncryptStorage);
 		ApptentiveLog.v(SECURITY, "Secret key info: %s", keyInfo);
 
 		// load or generate the key
@@ -50,10 +55,11 @@ public final class SecurityManager {
 		prefs.edit().clear().apply();
 	}
 
-	private static KeyInfo resolveKeyInfo(Context context) {
+	private static KeyInfo resolveKeyInfo(Context context, boolean shouldEncryptStorage) {
 		// in order to avoid potential naming collisions we would generate a unique name for the alias and
 		// store it in the SharedPreferences
 		SharedPreferences prefs = getPrefs(context);
+
 		String keyAlias = prefs.getString(PREFS_KEY_ALIAS, null);
 		int versionCode = prefs.getInt(PREFS_SDK_VERSION_CODE, 0);
 		if (StringUtils.isNullOrEmpty(keyAlias) || versionCode == 0) {
@@ -62,7 +68,11 @@ public final class SecurityManager {
 			// fails on both devices and emulators. All the existing clients would continue using the version
 			// originally assigned on the first launch.
 			// more info: https://stackoverflow.com/questions/36488219/android-security-keystoreexception-invalid-key-blob
-			versionCode = Math.min(LEGACY_KEY_STORE_API, Build.VERSION.SDK_INT); // we still want to keep API version less than 18 (no-op)
+			if (shouldEncryptStorage) {
+				versionCode = Math.min(LEGACY_KEY_STORE_API, Build.VERSION.SDK_INT); // we still want to keep API version less than 18 (no-op)
+			} else {
+				versionCode = LEGACY_KEY_STORE_API_NO_OP; // if user opts out of encryption - use no-op API
+			}
 			prefs.edit()
 				.putString(PREFS_KEY_ALIAS, keyAlias)
 				.putInt(PREFS_SDK_VERSION_CODE, versionCode)

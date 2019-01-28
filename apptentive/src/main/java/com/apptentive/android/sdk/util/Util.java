@@ -1239,12 +1239,13 @@ public class Util {
 		return null;
 	}
 
-	private static Intent makeRestartActivityTaskGuarded(ComponentName cn) {
+	private static Intent makeRestartActivityTaskGuarded(ComponentName cn) throws InvocationException {
 		try {
 			return Intent.makeRestartActivityTask(cn);
 		} catch (NoSuchMethodError e) {
-			//noinspection deprecation
-			return IntentCompat.makeRestartActivityTask(cn);
+			//return IntentCompat.makeRestartActivityTask(cn);
+			Invocation invocation = Invocation.fromClass(IntentCompat.class);
+			return (Intent) invocation.invokeMethod("makeRestartActivityTask", new Class<?>[]{ComponentName.class}, new Object[]{cn});
 		}
 	}
 

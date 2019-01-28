@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.tests.misc;
 
 import android.support.test.runner.AndroidJUnit4;
-import android.test.AndroidTestCase;
 
 import com.apptentive.android.sdk.util.Util;
 
@@ -18,8 +17,10 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import static org.junit.Assert.*;
+
 @RunWith(AndroidJUnit4.class)
-public class RandomTests extends AndroidTestCase {
+public class RandomTests {
 
 	@Test
 	public void getMajorOsVersion() {
