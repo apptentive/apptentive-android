@@ -55,7 +55,7 @@ public class ConversationMetadataItem implements SerializableObject {
 	 * Key for encrypting logged-in conversations. We receive it from the server. Anonymous conversations
 	 * would not have this key.
 	 */
-	private @Nullable EncryptionKey conversationEncryptionKey;
+	private @Nullable String conversationEncryptionKey;
 
 	/**
 	 * An optional user ID for logged in conversations
@@ -88,8 +88,7 @@ public class ConversationMetadataItem implements SerializableObject {
 		dataFile = getEncryptedFilename(new File(in.readUTF()));
 		messagesFile = getEncryptedFilename(new File(in.readUTF()));
 		conversationState = ConversationState.valueOf(in.readByte());
-		String conversationEncryptionKeyHex = readNullableUTF(in);
-		conversationEncryptionKey = conversationEncryptionKeyHex != null ? new EncryptionKey(conversationEncryptionKeyHex) : null;
+		conversationEncryptionKey = readNullableUTF(in);
 		userId = readNullableUTF(in);
 	}
 
@@ -101,7 +100,7 @@ public class ConversationMetadataItem implements SerializableObject {
 		out.writeUTF(dataFile.getAbsolutePath());
 		out.writeUTF(messagesFile.getAbsolutePath());
 		out.writeByte(conversationState.ordinal());
-		writeNullableUTF(out, conversationEncryptionKey != null ? conversationEncryptionKey.getHexKey() : null);
+		writeNullableUTF(out, conversationEncryptionKey);
 		writeNullableUTF(out, userId);
 	}
 
@@ -125,11 +124,11 @@ public class ConversationMetadataItem implements SerializableObject {
 		this.conversationState = conversationState;
 	}
 
-	public @Nullable EncryptionKey getConversationEncryptionKey() {
+	public @Nullable String getConversationEncryptionKey() {
 		return conversationEncryptionKey;
 	}
 
-	public void setConversationEncryptionKey(EncryptionKey conversationEncryptionKey) {
+	public void setConversationEncryptionKey(@Nullable String conversationEncryptionKey) {
 		this.conversationEncryptionKey = conversationEncryptionKey;
 	}
 

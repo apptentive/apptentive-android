@@ -15,8 +15,10 @@ import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.ConversationMetadata.Filter;
+import com.apptentive.android.sdk.encryption.EncryptionFactory;
 import com.apptentive.android.sdk.migration.Migrator;
 import com.apptentive.android.sdk.model.Configuration;
 import com.apptentive.android.sdk.model.ConversationTokenRequest;
@@ -31,7 +33,6 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
-import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -59,6 +60,7 @@ import static com.apptentive.android.sdk.debug.Assert.*;
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE;
 import static com.apptentive.android.sdk.util.Constants.CONVERSATION_METADATA_FILE_LEGACY_V1;
+import static com.apptentive.android.sdk.util.Constants.PAYLOAD_ENCRYPTION_KEY_TRANSFORMATION;
 import static com.apptentive.android.sdk.util.StringUtils.isNullOrEmpty;
 
 /**
@@ -83,9 +85,9 @@ public class ConversationManager {
 	private final File conversationsStorageDir;
 
 	/**
-	 * A private encryption key for securing SDK files.
+	 * An encryption for securing SDK files.
 	 */
-	private final EncryptionKey encryptionKey; // FIXME: rename field
+	private final Encryption encryption;
 
 	/**
 	 * Current state of conversation metadata.
@@ -101,7 +103,7 @@ public class ConversationManager {
 	 */
 	private boolean activeConversationFailedToResolve; // TODO: this is a temporary solution until we restore conversation state
 
-	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull EncryptionKey encryptionKey) {
+	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull Encryption encryption) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
@@ -110,13 +112,13 @@ public class ConversationManager {
 			throw new IllegalArgumentException("Conversation storage dir is null");
 		}
 
-		if (encryptionKey == null) {
-			throw new IllegalArgumentException("Encryption key is null");
+		if (encryption == null) {
+			throw new IllegalArgumentException("Encryption is null");
 		}
 
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
 		this.conversationsStorageDir = conversationsStorageDir;
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -187,8 +189,8 @@ public class ConversationManager {
 
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading active conversation");
-      logException(e);
-      
+			logException(e);
+
 			activeConversationFailedToResolve = true;
 		}
 
@@ -222,7 +224,7 @@ public class ConversationManager {
 		ApptentiveLog.i(CONVERSATION, "Creating 'anonymous' conversation...");
 		File dataFile = generateConversationDataFilename();
 		File messagesFile = generateMessagesFilename();
-		Conversation conversation = new Conversation(dataFile, messagesFile, encryptionKey);
+		Conversation conversation = new Conversation(dataFile, messagesFile, encryption, null);
 		conversation.setState(ANONYMOUS_PENDING);
 		fetchConversationToken(conversation);
 		return conversation;
@@ -230,6 +232,7 @@ public class ConversationManager {
 
 	/**
 	 * Attempts to load an existing conversation based on metadata file
+	 *
 	 * @return <code>null</code> is only logged out conversations available
 	 */
 	private @Nullable Conversation loadConversationFromMetadata(ConversationMetadata metadata) throws SerializerException, ConversationLoadException {
@@ -302,7 +305,7 @@ public class ConversationManager {
 
 			File dataFile = generateConversationDataFilename();
 			File messagesFile = generateMessagesFilename();
-			Conversation conversation = new Conversation(dataFile, messagesFile, encryptionKey);
+			Conversation conversation = new Conversation(dataFile, messagesFile, encryption, null);
 			conversation.setState(LEGACY_PENDING);
 			conversation.setConversationToken(legacyConversationToken);
 
@@ -338,51 +341,51 @@ public class ConversationManager {
 		}
 
 		HttpRequest request = getHttpClient()
-			.createLegacyConversationIdRequest(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
-				@Override
-				public void onFinish(HttpJsonRequest request) {
-					checkConversationQueue();
+			                      .createLegacyConversationIdRequest(conversationToken, new HttpRequest.Listener<HttpJsonRequest>() {
+				                      @Override
+				                      public void onFinish(HttpJsonRequest request) {
+					                      checkConversationQueue();
 
-					try {
-						JSONObject root = request.getResponseObject();
-						String conversationId = root.getString("conversation_id");
-						ApptentiveLog.d(CONVERSATION, "Conversation id: %s", conversationId);
+					                      try {
+						                      JSONObject root = request.getResponseObject();
+						                      String conversationId = root.getString("conversation_id");
+						                      ApptentiveLog.d(CONVERSATION, "Conversation id: %s", conversationId);
 
-						if (isNullOrEmpty(conversationId)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'id'");
-							return;
-						}
+						                      if (isNullOrEmpty(conversationId)) {
+							                      ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'id'");
+							                      return;
+						                      }
 
-						String conversationJWT = root.getString("anonymous_jwt_token");
-						if (isNullOrEmpty(conversationId)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'anonymous_jwt_token'");
-							return;
-						}
+						                      String conversationJWT = root.getString("anonymous_jwt_token");
+						                      if (isNullOrEmpty(conversationId)) {
+							                      ApptentiveLog.e(CONVERSATION, "Can't fetch legacy conversation: missing 'anonymous_jwt_token'");
+							                      return;
+						                      }
 
-						ApptentiveLog.d(CONVERSATION, "Conversation JWT: %s", conversationJWT);
+						                      ApptentiveLog.d(CONVERSATION, "Conversation JWT: %s", conversationJWT);
 
-						// set conversation data
-						conversation.setState(ANONYMOUS);
-						conversation.setConversationToken(conversationJWT);
-						conversation.setConversationId(conversationId);
+						                      // set conversation data
+						                      conversation.setState(ANONYMOUS);
+						                      conversation.setConversationToken(conversationJWT);
+						                      conversation.setConversationId(conversationId);
 
-						// handle state change
-						handleConversationStateChange(conversation);
-					} catch (Exception e) {
-						ApptentiveLog.e(CONVERSATION, e, "Exception while handling legacy conversation id");
-						logException(e);
-					}
-				}
+						                      // handle state change
+						                      handleConversationStateChange(conversation);
+					                      } catch (Exception e) {
+						                      ApptentiveLog.e(CONVERSATION, e, "Exception while handling legacy conversation id");
+						                      logException(e);
+					                      }
+				                      }
 
-				@Override
-				public void onCancel(HttpJsonRequest request) {
-				}
+				                      @Override
+				                      public void onCancel(HttpJsonRequest request) {
+				                      }
 
-				@Override
-				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.e(CONVERSATION, "Failed to fetch legacy conversation id: %s", reason);
-				}
-			});
+				                      @Override
+				                      public void onFail(HttpJsonRequest request, String reason) {
+					                      ApptentiveLog.e(CONVERSATION, "Failed to fetch legacy conversation id: %s", reason);
+				                      }
+			                      });
 
 		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
@@ -394,16 +397,18 @@ public class ConversationManager {
 		checkConversationQueue();
 
 		// logged-in conversations should use an encryption key which was received from the backend.
-		EncryptionKey conversationEncryptionKey = encryptionKey;
+		Encryption conversationEncryption = encryption;
+		String payloadEncryptionKey = null;
 		if (LOGGED_IN.equals(item.getConversationState())) {
-			conversationEncryptionKey = item.getConversationEncryptionKey();
-			if (conversationEncryptionKey == null) {
+			payloadEncryptionKey = item.getConversationEncryptionKey();
+			if (payloadEncryptionKey == null) {
 				throw new ConversationLoadException("Missing conversation encryption key");
 			}
+			conversationEncryption = createPayloadEncryption(payloadEncryptionKey);
 		}
 
 		// TODO: use same serialization logic across the project
-		final Conversation conversation = new Conversation(item.getDataFile(), item.getMessagesFile(), conversationEncryptionKey);
+		final Conversation conversation = new Conversation(item.getDataFile(), item.getMessagesFile(), conversationEncryption, payloadEncryptionKey);
 		conversation.setState(item.getConversationState()); // set the state same as the item's state
 		conversation.setUserId(item.getUserId());
 		conversation.setConversationToken(item.getConversationToken()); // TODO: this would be overwritten by the next call
@@ -467,66 +472,66 @@ public class ConversationManager {
 		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
 
 		HttpRequest request = getHttpClient()
-			.createConversationTokenRequest(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
-				@Override
-				public void onFinish(HttpJsonRequest request) {
-					checkConversationQueue();
+			                      .createConversationTokenRequest(conversationTokenRequest, new HttpRequest.Listener<HttpJsonRequest>() {
+				                      @Override
+				                      public void onFinish(HttpJsonRequest request) {
+					                      checkConversationQueue();
 
-					try {
-						JSONObject root = request.getResponseObject();
-						String conversationToken = root.getString("token");
-						ApptentiveLog.d(CONVERSATION, "ConversationToken: " + hideIfSanitized(conversationToken));
-						String conversationId = root.getString("id");
-						ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
+					                      try {
+						                      JSONObject root = request.getResponseObject();
+						                      String conversationToken = root.getString("token");
+						                      ApptentiveLog.d(CONVERSATION, "ConversationToken: " + hideIfSanitized(conversationToken));
+						                      String conversationId = root.getString("id");
+						                      ApptentiveLog.d(CONVERSATION, "New Conversation id: %s", conversationId);
 
-						if (isNullOrEmpty(conversationToken)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
-							notifyFetchFinished(conversation, false);
-							return;
-						}
+						                      if (isNullOrEmpty(conversationToken)) {
+							                      ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'token'");
+							                      notifyFetchFinished(conversation, false);
+							                      return;
+						                      }
 
-						if (isNullOrEmpty(conversationId)) {
-							ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
-							notifyFetchFinished(conversation, false);
-							return;
-						}
+						                      if (isNullOrEmpty(conversationId)) {
+							                      ApptentiveLog.e(CONVERSATION, "Can't fetch conversation: missing 'id'");
+							                      notifyFetchFinished(conversation, false);
+							                      return;
+						                      }
 
-						// set conversation data
-						conversation.setState(ANONYMOUS);
-						conversation.setConversationToken(conversationToken);
-						conversation.setConversationId(conversationId);
-						conversation.setDevice(device);
-						conversation.setLastSentDevice(device.clone());
-						conversation.setAppRelease(appRelease);
-						conversation.setSdk(sdk);
-						conversation.setLastSeenSdkVersion(sdk.getVersion());
+						                      // set conversation data
+						                      conversation.setState(ANONYMOUS);
+						                      conversation.setConversationToken(conversationToken);
+						                      conversation.setConversationId(conversationId);
+						                      conversation.setDevice(device);
+						                      conversation.setLastSentDevice(device.clone());
+						                      conversation.setAppRelease(appRelease);
+						                      conversation.setSdk(sdk);
+						                      conversation.setLastSeenSdkVersion(sdk.getVersion());
 
-						String personId = root.getString("person_id");
-						ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
-						conversation.getPerson().setId(personId);
+						                      String personId = root.getString("person_id");
+						                      ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);
+						                      conversation.getPerson().setId(personId);
 
-						notifyFetchFinished(conversation, true);
+						                      notifyFetchFinished(conversation, true);
 
-						handleConversationStateChange(conversation);
-					} catch (Exception e) {
-						ApptentiveLog.e(CONVERSATION, e, "Exception while handling conversation token");
-						logException(e);
+						                      handleConversationStateChange(conversation);
+					                      } catch (Exception e) {
+						                      ApptentiveLog.e(CONVERSATION, e, "Exception while handling conversation token");
+						                      logException(e);
 
-						notifyFetchFinished(conversation, false);
-					}
-				}
+						                      notifyFetchFinished(conversation, false);
+					                      }
+				                      }
 
-				@Override
-				public void onCancel(HttpJsonRequest request) {
-					notifyFetchFinished(conversation, false);
-				}
+				                      @Override
+				                      public void onCancel(HttpJsonRequest request) {
+					                      notifyFetchFinished(conversation, false);
+				                      }
 
-				@Override
-				public void onFail(HttpJsonRequest request, String reason) {
-					ApptentiveLog.w(CONVERSATION, "Failed to fetch conversation token: %s", reason);
-					notifyFetchFinished(conversation, false);
-				}
-			});
+				                      @Override
+				                      public void onFail(HttpJsonRequest request, String reason) {
+					                      ApptentiveLog.w(CONVERSATION, "Failed to fetch conversation token: %s", reason);
+					                      notifyFetchFinished(conversation, false);
+				                      }
+			                      });
 
 		request.setCallbackQueue(conversationQueue()); // we only deal with conversation on a selected queue
 		request.setTag(TAG_FETCH_CONVERSATION_TOKEN_REQUEST);
@@ -619,44 +624,44 @@ public class ConversationManager {
 		}
 
 		HttpJsonRequest request = getHttpClient()
-				.createAppConfigurationRequest(conversation.getConversationId(), conversation.getConversationToken(),
-						new HttpRequest.Listener<HttpJsonRequest>() {
-			@Override
-			public void onFinish(HttpJsonRequest request) {
-				try {
-					String cacheControl = request.getResponseHeader("Cache-Control");
-					Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
-					if (cacheSeconds == null) {
-						cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
-					}
-					ApptentiveLog.d(APP_CONFIGURATION, "Caching configuration for %d seconds.", cacheSeconds);
-					Configuration config = new Configuration(request.getResponseObject().toString());
-					config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
-					config.save();
+			                          .createAppConfigurationRequest(conversation.getConversationId(), conversation.getConversationToken(),
+				                          new HttpRequest.Listener<HttpJsonRequest>() {
+					                          @Override
+					                          public void onFinish(HttpJsonRequest request) {
+						                          try {
+							                          String cacheControl = request.getResponseHeader("Cache-Control");
+							                          Integer cacheSeconds = Util.parseCacheControlHeader(cacheControl);
+							                          if (cacheSeconds == null) {
+								                          cacheSeconds = Constants.CONFIG_DEFAULT_APP_CONFIG_EXPIRATION_DURATION_SECONDS;
+							                          }
+							                          ApptentiveLog.d(APP_CONFIGURATION, "Caching configuration for %d seconds.", cacheSeconds);
+							                          Configuration config = new Configuration(request.getResponseObject().toString());
+							                          config.setConfigurationCacheExpirationMillis(System.currentTimeMillis() + cacheSeconds * 1000);
+							                          config.save();
 
-					ApptentiveNotificationCenter.defaultCenter()
-						.postNotification(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH,
-							NOTIFICATION_KEY_CONFIGURATION, config,
-							NOTIFICATION_KEY_CONVERSATION, conversation);
+							                          ApptentiveNotificationCenter.defaultCenter()
+								                          .postNotification(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH,
+									                          NOTIFICATION_KEY_CONFIGURATION, config,
+									                          NOTIFICATION_KEY_CONVERSATION, conversation);
 
-				} catch (Exception e) {
-					ApptentiveLog.e(CONVERSATION, e, "Exception while parsing app configuration response");
-					logException(e);
+						                          } catch (Exception e) {
+							                          ApptentiveLog.e(CONVERSATION, e, "Exception while parsing app configuration response");
+							                          logException(e);
 
-					ApptentiveNotificationCenter.defaultCenter()
-						.postNotification(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH, NOTIFICATION_KEY_CONFIGURATION, null);
-				}
-			}
+							                          ApptentiveNotificationCenter.defaultCenter()
+								                          .postNotification(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH, NOTIFICATION_KEY_CONFIGURATION, null);
+						                          }
+					                          }
 
-			@Override
-			public void onCancel(HttpJsonRequest request) {
-			}
+					                          @Override
+					                          public void onCancel(HttpJsonRequest request) {
+					                          }
 
-			@Override
-			public void onFail(HttpJsonRequest request, String reason) {
-				ApptentiveLog.e(APP_CONFIGURATION, "App configuration request failed: %s", reason);
-			}
-		});
+					                          @Override
+					                          public void onFail(HttpJsonRequest request, String reason) {
+						                          ApptentiveLog.e(APP_CONFIGURATION, "App configuration request failed: %s", reason);
+					                          }
+				                          });
 		request.setTag(TAG_FETCH_APP_CONFIGURATION_REQUEST);
 		request.setCallbackQueue(conversationQueue());
 		request.start();
@@ -698,7 +703,7 @@ public class ConversationManager {
 		}
 
 		if (conversation.hasState(LOGGED_IN)) {
-			item.setConversationEncryptionKey(notNull(conversation.getEncryptionKey()));
+			item.setConversationEncryptionKey(notNull(conversation.getPayloadEncryptionKey()));
 			item.setUserId(notNull(conversation.getUserId()));
 		}
 
@@ -718,7 +723,7 @@ public class ConversationManager {
 			File metaFile = new File(conversationsStorageDir, CONVERSATION_METADATA_FILE);
 			if (metaFile.exists()) {
 				ApptentiveLog.v(CONVERSATION, "Loading metadata file: %s", metaFile);
-				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class, encryptionKey);
+				return ObjectSerialization.deserialize(metaFile, ConversationMetadata.class, encryption);
 			}
 
 			// attempt to load the legacy metadata file
@@ -754,7 +759,7 @@ public class ConversationManager {
 			}
 			long start = System.currentTimeMillis();
 			File metaFile = new File(conversationsStorageDir, CONVERSATION_METADATA_FILE);
-			ObjectSerialization.serialize(metaFile, conversationMetadata, encryptionKey);
+			ObjectSerialization.serialize(metaFile, conversationMetadata, encryption);
 			ApptentiveLog.v(CONVERSATION, "Saved metadata (took %d ms)", System.currentTimeMillis() - start);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while saving metadata");
@@ -837,45 +842,45 @@ public class ConversationManager {
 		switch (activeConversation.getState()) {
 			case ANONYMOUS_PENDING:
 			case LEGACY_PENDING: {
-					// start fetching conversation token (if not yet fetched)
-					final HttpRequest fetchRequest = activeConversation.hasState(ANONYMOUS_PENDING) ?
-								fetchConversationToken(activeConversation) :
-								fetchLegacyConversation(activeConversation);
-					if (fetchRequest == null) {
-						ApptentiveLog.e(CONVERSATION, "Unable to login: fetch request failed to send");
-						callback.onLoginFail("fetch request failed to send");
-						return;
+				// start fetching conversation token (if not yet fetched)
+				final HttpRequest fetchRequest = activeConversation.hasState(ANONYMOUS_PENDING) ?
+					                                 fetchConversationToken(activeConversation) :
+					                                 fetchLegacyConversation(activeConversation);
+				if (fetchRequest == null) {
+					ApptentiveLog.e(CONVERSATION, "Unable to login: fetch request failed to send");
+					callback.onLoginFail("fetch request failed to send");
+					return;
+				}
+
+				// attach a listener to an active request
+				fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
+					@Override
+					public void onFinish(HttpRequest request) {
+						checkConversationQueue();
+						assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
+
+						if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
+							ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
+							sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
+						} else {
+							callback.onLoginFail("Conversation fetching completed abnormally");
+						}
 					}
 
-					// attach a listener to an active request
-					fetchRequest.addListener(new HttpRequest.Listener<HttpRequest>() {
-						@Override
-						public void onFinish(HttpRequest request) {
-							checkConversationQueue();
-							assertTrue(activeConversation != null && activeConversation.hasState(ANONYMOUS), "Active conversation is missing or in a wrong state: %s", activeConversation);
+					@Override
+					public void onCancel(HttpRequest request) {
+						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching cancelled.");
+						callback.onLoginFail("Conversation fetching was cancelled");
+					}
 
-							if (activeConversation != null && activeConversation.hasState(ANONYMOUS)) {
-								ApptentiveLog.d(CONVERSATION, "Conversation fetching complete. Performing login...");
-								sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
-							} else {
-								callback.onLoginFail("Conversation fetching completed abnormally");
-							}
-						}
-
-						@Override
-						public void onCancel(HttpRequest request) {
-							ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching cancelled.");
-							callback.onLoginFail("Conversation fetching was cancelled");
-						}
-
-						@Override
-						public void onFail(HttpRequest request, String reason) {
-							ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching failed.");
-							callback.onLoginFail("Conversation fetching failed: " + reason);
-						}
-					});
-				}
-				break;
+					@Override
+					public void onFail(HttpRequest request, String reason) {
+						ApptentiveLog.d(CONVERSATION, "Unable to login: conversation fetching failed.");
+						callback.onLoginFail("Conversation fetching failed: " + reason);
+					}
+				});
+			}
+			break;
 			case ANONYMOUS:
 				sendLoginRequest(activeConversation.getConversationId(), userId, token, callback);
 				break;
@@ -901,8 +906,7 @@ public class ConversationManager {
 			public void onFinish(HttpJsonRequest request) {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
-					final String conversationEncryptionKeyHex = responseObject.getString("encryption_key");
-					final EncryptionKey conversationEncryptionKey = new EncryptionKey(conversationEncryptionKeyHex);
+					final String conversationEncryptionKey = responseObject.getString("encryption_key");
 					final String incomingConversationId = responseObject.getString("id");
 					handleLoginFinished(incomingConversationId, userId, token, conversationEncryptionKey);
 				} catch (Exception e) {
@@ -923,10 +927,12 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String conversationId, final String userId, final String token, final EncryptionKey conversationEncryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String payloadEncryptionKey) {
 				checkConversationQueue();
-				assertNotNull(conversationEncryptionKey,"Login finished with missing encryption key.");
+				assertNotNull(payloadEncryptionKey, "Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+
+				Encryption conversationEncryption = createPayloadEncryption(payloadEncryptionKey);
 
 				try {
 					// if we were previously logged out we might end up with no active conversation
@@ -942,13 +948,13 @@ public class ConversationManager {
 						if (conversationItem != null) {
 							conversationItem.setConversationState(LOGGED_IN);
 							conversationItem.setConversationToken(token);
-							conversationItem.setConversationEncryptionKey(conversationEncryptionKey);
+							conversationItem.setConversationEncryptionKey(payloadEncryptionKey);
 							setActiveConversation(loadConversation(conversationItem));
 						} else {
 							ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
 							File dataFile = generateConversationDataFilename();
 							File messagesFile = generateMessagesFilename();
-							setActiveConversation(new Conversation(dataFile, messagesFile, conversationEncryptionKey));
+							setActiveConversation(new Conversation(dataFile, messagesFile, conversationEncryption, payloadEncryptionKey));
 
 							// TODO: if we don't set these here - device payload would return 4xx error code
 							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
@@ -957,7 +963,8 @@ public class ConversationManager {
 						}
 					}
 
-					activeConversation.setEncryptionKey(conversationEncryptionKey);
+					activeConversation.setEncryption(conversationEncryption);
+					activeConversation.setPayloadEncryptionKey(payloadEncryptionKey);
 					activeConversation.setConversationToken(token);
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
@@ -998,7 +1005,7 @@ public class ConversationManager {
 			public void onFinish(HttpJsonRequest request) {
 				try {
 					final JSONObject responseObject = request.getResponseObject();
-					final EncryptionKey payloadEncryptionKey = new EncryptionKey(responseObject.getString("encryption_key"));
+					final String payloadEncryptionKey = responseObject.getString("encryption_key");
 					final String incomingConversationId = responseObject.getString("id");
 					handleLoginFinished(incomingConversationId, userId, token, payloadEncryptionKey);
 				} catch (Exception e) {
@@ -1019,11 +1026,13 @@ public class ConversationManager {
 				handleLoginFailed(reason);
 			}
 
-			private void handleLoginFinished(final String conversationId, final String userId, final String token, final EncryptionKey conversationEncryptionKey) {
+			private void handleLoginFinished(final String conversationId, final String userId, final String token, final String payloadEncryptionKey) {
 				checkConversationQueue();
 				assertNull(activeConversation, "Finished logging into new conversation, but one was already active.");
-				assertNotNull(conversationEncryptionKey,"Login finished with missing encryption key.");
+				assertNotNull(payloadEncryptionKey, "Login finished with missing encryption key.");
 				assertFalse(isNullOrEmpty(token), "Login finished with missing token.");
+
+				Encryption conversationEncryption = createPayloadEncryption(payloadEncryptionKey);
 
 				try {
 					// attempt to find previous logged out conversation
@@ -1037,13 +1046,13 @@ public class ConversationManager {
 					if (conversationItem != null) {
 						conversationItem.setConversationState(LOGGED_IN);
 						conversationItem.setConversationToken(token);
-						conversationItem.setConversationEncryptionKey(conversationEncryptionKey);
+						conversationItem.setConversationEncryptionKey(payloadEncryptionKey);
 						setActiveConversation(loadConversation(conversationItem));
 					} else {
 						ApptentiveLog.v(CONVERSATION, "Creating new logged in conversation...");
 						File dataFile = generateConversationDataFilename();
 						File messagesFile = generateMessagesFilename();
-						Conversation conversation = new Conversation(dataFile, messagesFile, conversationEncryptionKey);
+						Conversation conversation = new Conversation(dataFile, messagesFile, conversationEncryption, payloadEncryptionKey);
 						setActiveConversation(conversation);
 
 						activeConversation.setAppRelease(appRelease);
@@ -1051,7 +1060,8 @@ public class ConversationManager {
 						activeConversation.setDevice(device);
 					}
 
-					activeConversation.setEncryptionKey(conversationEncryptionKey);
+					activeConversation.setEncryption(conversationEncryption);
+					activeConversation.setPayloadEncryptionKey(payloadEncryptionKey);
 					activeConversation.setConversationToken(token);
 					activeConversation.setConversationId(conversationId);
 					activeConversation.setUserId(userId);
@@ -1117,7 +1127,7 @@ public class ConversationManager {
 		}
 
 		Object[][] rows = new Object[1 + items.size()][];
-		rows[0] = new Object[] {
+		rows[0] = new Object[]{
 			"state",
 			"localId",
 			"conversationId",
@@ -1129,7 +1139,7 @@ public class ConversationManager {
 		};
 		int index = 1;
 		for (ConversationMetadataItem item : items) {
-			rows[index++] = new Object[] {
+			rows[index++] = new Object[]{
 				item.getConversationState(),
 				item.getLocalConversationId(),
 				item.getConversationId(),
@@ -1147,6 +1157,10 @@ public class ConversationManager {
 	//endregion
 
 	//region Helpers
+
+	private Encryption createPayloadEncryption(String payloadEncryptionKey) {
+		return EncryptionFactory.createEncryption(payloadEncryptionKey, PAYLOAD_ENCRYPTION_KEY_TRANSFORMATION);
+	}
 
 	/**
 	 * Generates a random name for a conversation data file

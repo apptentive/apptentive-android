@@ -6,12 +6,14 @@
 
 package com.apptentive.android.sdk.encryption;
 
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.TestCaseBase;
 import com.apptentive.android.sdk.model.EventPayload;
 
 import org.json.JSONObject;
 import org.junit.Test;
 
+import static com.apptentive.android.sdk.util.Constants.PAYLOAD_ENCRYPTION_KEY_TRANSFORMATION;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.fail;
 
@@ -24,14 +26,15 @@ public class EncryptedPayloadSenderTest extends TestCaseBase {
 	@Test
 	public void testEncryptedPayload() throws Exception {
 
-		EncryptionKey encryptionKey = new EncryptionKey(ENCRYPTION_KEY);
+		Encryption encryption = EncryptionFactory.createEncryption(ENCRYPTION_KEY, PAYLOAD_ENCRYPTION_KEY_TRANSFORMATION);
 
 		final EventPayload original = new EventPayload(EVENT_LABEL, "trigger");
 		original.setToken(AUTH_TOKEN);
-		original.setEncryptionKey(encryptionKey);
+		original.setEncryption(encryption);
+		original.setAuthenticated(true);
 
 		byte[] cipherText = original.renderData();
-		byte[] plainText = Encryptor.decrypt(encryptionKey, cipherText);
+		byte[] plainText = encryption.decrypt(cipherText);
 		JSONObject result = new JSONObject(new String(plainText));
 		String label = result.getJSONObject("event").getString("label");
 		assertEquals(label, EVENT_LABEL);

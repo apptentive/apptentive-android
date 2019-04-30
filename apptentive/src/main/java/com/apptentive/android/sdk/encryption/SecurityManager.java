@@ -4,8 +4,10 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Build;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.debug.ErrorMetrics;
 import com.apptentive.android.sdk.encryption.resolvers.KeyResolver;
 import com.apptentive.android.sdk.encryption.resolvers.KeyResolverFactory;
@@ -24,22 +26,31 @@ public final class SecurityManager {
 	private static final String PREFS_SDK_VERSION_CODE = "version_code";
 
 	/**
-	 * We would force Key Store API version to this
-	 */
-	private static final int LEGACY_KEY_STORE_API = 18;
-
-	/**
 	 * The highest API version which would resolve in no encryption operations
 	 */
 	private static final int LEGACY_KEY_STORE_API_NO_OP = 17;
 
-	private static EncryptionKey masterKey;
-
 	//region Initialization
 
-	public static void init(Context context, boolean shouldEncryptStorage) {
+	/**
+	 * Resolves the "master" encryption object (the one used for secure on device storage)
+	 *
+	 * @param encryption           - user-specified encryption object (comes from the SDK configuration). Has precedence over anything else.
+	 * @param shouldEncryptStorage - indicates if encrypted storage should be used on device. Once this flag is set - it won't be changed again.
+	 * @throws EncryptionInitializationException - if encryption key could not be resolved.
+	 */
+	public static @NonNull Encryption getEncryption(Context context, @Nullable Encryption encryption, boolean shouldEncryptStorage) throws EncryptionInitializationException {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
+		}
+
+		// if the developer passes an encryption object - it would have precedence over anything else
+		if (encryption != null) {
+			if (!hasEncryptionInfo(context)) {
+				ApptentiveLog.i(SECURITY, "Using an external encryption for secure storage");
+				return EncryptionFactory.wrapNullSafe(encryption);
+			}
+			ApptentiveLog.w(SECURITY, "The client already has its storage encrypted and can't transit to a custom encryption implementation.");
 		}
 
 		// get the name of the alias
@@ -47,12 +58,22 @@ public final class SecurityManager {
 		ApptentiveLog.v(SECURITY, "Secret key info: %s", keyInfo);
 
 		// load or generate the key
-		masterKey = resolveMasterKey(context, keyInfo);
+		EncryptionKey masterKey = resolveMasterKey(context, keyInfo);
+
+		// create an encryption for the given key
+		return EncryptionFactory.createEncryption(masterKey);
 	}
 
 	public static void clear(Context context) {
 		SharedPreferences prefs = getPrefs(context);
 		prefs.edit().clear().apply();
+	}
+
+	private static boolean hasEncryptionInfo(Context context) {
+		SharedPreferences prefs = getPrefs(context);
+		String keyAlias = prefs.getString(PREFS_KEY_ALIAS, null);
+		int versionCode = prefs.getInt(PREFS_SDK_VERSION_CODE, 0);
+		return !StringUtils.isNullOrEmpty(keyAlias) && versionCode > 0;
 	}
 
 	private static KeyInfo resolveKeyInfo(Context context, boolean shouldEncryptStorage) {
@@ -64,12 +85,8 @@ public final class SecurityManager {
 		int versionCode = prefs.getInt(PREFS_SDK_VERSION_CODE, 0);
 		if (StringUtils.isNullOrEmpty(keyAlias) || versionCode == 0) {
 			keyAlias = generateUniqueKeyAlias();
-			// We need to force the legacy KeyStore API on new installs since the modern 23+ API randomly
-			// fails on both devices and emulators. All the existing clients would continue using the version
-			// originally assigned on the first launch.
-			// more info: https://stackoverflow.com/questions/36488219/android-security-keystoreexception-invalid-key-blob
 			if (shouldEncryptStorage) {
-				versionCode = Math.min(LEGACY_KEY_STORE_API, Build.VERSION.SDK_INT); // we still want to keep API version less than 18 (no-op)
+				versionCode = Build.VERSION.SDK_INT;
 			} else {
 				versionCode = LEGACY_KEY_STORE_API_NO_OP; // if user opts out of encryption - use no-op API
 			}
@@ -83,24 +100,15 @@ public final class SecurityManager {
 		return new KeyInfo(keyAlias, versionCode);
 	}
 
-	private static @NonNull EncryptionKey resolveMasterKey(Context context, KeyInfo keyInfo) {
+	private static @NonNull EncryptionKey resolveMasterKey(Context context, KeyInfo keyInfo) throws EncryptionInitializationException {
 		try {
 			KeyResolver keyResolver = KeyResolverFactory.createKeyResolver(keyInfo.versionCode);
 			return keyResolver.resolveKey(context, keyInfo.alias);
 		} catch (Exception e) {
-			ApptentiveLog.e(SECURITY, e, "Exception while resolving secret key for alias '%s'. Encryption might not work correctly!", hideIfSanitized(keyInfo.alias));
-			ErrorMetrics.logException(e); // TODO: add more context info
-			return EncryptionKey.CORRUPTED;
+			throw new EncryptionInitializationException(StringUtils.format("Exception while resolving secret key for alias '%s'. Encryption might not work correctly!", hideIfSanitized(keyInfo.alias)), e);
 		}
 	}
 
-	//endregion
-
-	//region Getters/Setters
-
-	public static @NonNull EncryptionKey getMasterKey() {
-		return masterKey;
-	}
 	//endregion
 
 	//region Helpers

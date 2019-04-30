@@ -1,3 +1,10 @@
+# 2019-04-30 - v5.4.1
+
+#### Changes
+
+* Provided an API for custom device storage encryption/decryption.
+* Improved default encryption handling.
+
 # 2019-01-28 - v5.4.0
 
 #### Changes

@@ -6,8 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.encryption.Encryptor;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.ByteArrayInputStream;
@@ -18,16 +17,16 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 
 public class EncryptedFileSerializer extends FileSerializer {
-	private final EncryptionKey encryptionKey;
+	private final Encryption encryption;
 
-	public EncryptedFileSerializer(File file, EncryptionKey encryptionKey) {
+	public EncryptedFileSerializer(File file, Encryption encryption) {
 		super(file);
 
-		if (encryptionKey == null) {
-			throw new IllegalArgumentException("'encryptionKey' is null or empty");
+		if (encryption == null) {
+			throw new IllegalArgumentException("Encryption is null or empty");
 		}
 
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 	}
 
 	@Override
@@ -39,7 +38,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 			oos = new ObjectOutputStream(bos);
 			oos.writeObject(object);
 			final byte[] unencryptedBytes = bos.toByteArray();
-			final byte[] encryptedBytes = Encryptor.encrypt(encryptionKey, unencryptedBytes);
+			final byte[] encryptedBytes = encryption.encrypt(unencryptedBytes);
 			stream.write(encryptedBytes); // TODO: should we write using a buffer?
 		} finally {
 			Util.ensureClosed(bos);
@@ -51,7 +50,7 @@ public class EncryptedFileSerializer extends FileSerializer {
 	protected Object deserialize(File file) throws SerializerException {
 		try {
 			final byte[] encryptedBytes = Util.readBytes(file);
-			final byte[] unencryptedBytes = Encryptor.decrypt(encryptionKey, encryptedBytes);
+			final byte[] unencryptedBytes = encryption.decrypt(encryptedBytes);
 
 			ByteArrayInputStream bis = null;
 			ObjectInputStream ois = null;

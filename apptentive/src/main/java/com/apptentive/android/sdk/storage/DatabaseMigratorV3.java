@@ -5,21 +5,14 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.encryption.EncryptionException;
-import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.DatabaseColumn;
 import com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.PayloadEntry;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import static com.apptentive.android.sdk.ApptentiveLogTag.DATABASE;
 import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
@@ -49,18 +42,12 @@ class DatabaseMigratorV3 extends DatabaseMigrator {
 	                                                               " ORDER BY " + PayloadEntryLegacy.COLUMN_PRIMARY_KEY +
 	                                                               " ASC";
 
-	public DatabaseMigratorV3(EncryptionKey encryptionKey, File payloadDataDir) {
-		super(encryptionKey, payloadDataDir);
+	public DatabaseMigratorV3(Encryption encryption, File payloadDataDir) {
+		super(encryption, payloadDataDir);
 	}
 
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) throws IOException,
-	                                                                                NoSuchPaddingException,
-	                                                                                InvalidAlgorithmParameterException,
-	                                                                                NoSuchAlgorithmException,
-	                                                                                IllegalBlockSizeException,
-	                                                                                BadPaddingException,
-	                                                                                InvalidKeyException,
 	                                                                                EncryptionException {
 		Cursor cursor = null;
 		try {

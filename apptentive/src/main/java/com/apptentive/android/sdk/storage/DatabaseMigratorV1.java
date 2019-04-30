@@ -3,6 +3,7 @@ package com.apptentive.android.sdk.storage;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 
 import java.io.File;
@@ -12,8 +13,8 @@ import static com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.SQL_CR
 import static com.apptentive.android.sdk.storage.ApptentiveDatabaseHelper.SQL_DELETE_PAYLOAD_TABLE;
 
 class DatabaseMigratorV1 extends DatabaseMigrator {
-	public DatabaseMigratorV1(EncryptionKey encryptionKey, File payloadDataDir) {
-		super(encryptionKey, payloadDataDir);
+	public DatabaseMigratorV1(Encryption encryption, File payloadDataDir) {
+		super(encryption, payloadDataDir);
 	}
 
 	@Override

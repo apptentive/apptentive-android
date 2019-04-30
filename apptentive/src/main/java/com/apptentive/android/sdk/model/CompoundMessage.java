@@ -10,9 +10,8 @@ import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.debug.ErrorMetrics;
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageCenterUtil;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -313,14 +312,14 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 			.append(marshallForSending().toString()).append(lineEnd);
 		byte[] partBytes = part.toString().getBytes();
 
-		final EncryptionKey encryptionKey = getEncryptionKey();
+		final Encryption encryption = getEncryption();
 		if (shouldEncrypt) {
 			header
 				.append("Content-Disposition: form-data; name=\"message\"").append(lineEnd)
 				.append("Content-Type: application/octet-stream").append(lineEnd)
 				.append(lineEnd);
 			data.write(header.toString().getBytes());
-			data.write(Encryptor.encrypt(encryptionKey, partBytes));
+			data.write(encryption.encrypt(partBytes));
 			data.write("\r\n".getBytes());
 		} else {
 			data.write(header.toString().getBytes());
@@ -367,7 +366,7 @@ public class CompoundMessage extends ApptentiveMessage implements MessageCenterU
 					ApptentiveLog.v(PAYLOADS, "Writing encrypted envelope: %s", encryptionEnvelope.toString());
 					data.write(encryptionEnvelope.toString().getBytes());
 					ApptentiveLog.v(PAYLOADS, "Encrypting attachment bytes: %d", attachmentBytes.size());
-					byte[] encryptedAttachment = Encryptor.encrypt(encryptionKey, attachmentBytes.toByteArray());
+					byte[] encryptedAttachment = encryption.encrypt(attachmentBytes.toByteArray());
 					ApptentiveLog.v(PAYLOADS, "Writing encrypted attachment bytes: %d", encryptedAttachment.length);
 					data.write(encryptedAttachment);
 				} else {

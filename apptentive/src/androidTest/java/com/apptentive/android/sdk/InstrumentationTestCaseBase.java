@@ -8,10 +8,9 @@ package com.apptentive.android.sdk;
 
 import android.content.Context;
 import android.support.test.InstrumentationRegistry;
-import android.test.RenamingDelegatingContext;
 
 public class InstrumentationTestCaseBase extends TestCaseBase {
 	protected Context getContext() {
-		return new RenamingDelegatingContext(InstrumentationRegistry.getTargetContext(), "test_");
+		return InstrumentationRegistry.getTargetContext();
 	}
 }

@@ -153,30 +153,31 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		appRelease = null;
 	}
 
-	private ApptentiveInternal(Application application, String apptentiveKey, String apptentiveSignature, String serverUrl, boolean shouldEncryptStorage) {
-		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
-			throw new IllegalArgumentException("Apptentive Key is null or empty");
+	private ApptentiveInternal(Application application, ApptentiveConfiguration configuration) {
+		if (configuration == null) {
+			throw new IllegalArgumentException("Configuration is null");
 		}
 
-		if (StringUtils.isNullOrEmpty(apptentiveSignature)) {
-			throw new IllegalArgumentException("Apptentive Signature is null or empty");
-		}
+		String apptentiveKey = configuration.getApptentiveKey();
+		String apptentiveSignature = configuration.getApptentiveSignature();
+		String serverUrl = configuration.getBaseURL();
 
 		this.apptentiveKey = apptentiveKey;
 		this.apptentiveSignature = apptentiveSignature;
 		this.serverUrl = serverUrl;
 
-		SecurityManager.init(application.getApplicationContext(), shouldEncryptStorage);
+		boolean shouldEncryptStorage = configuration.shouldEncryptStorage();
+		Encryption encryption = SecurityManager.getEncryption(application.getApplicationContext(), configuration.getEncryption(), shouldEncryptStorage);
 
 		appContext = application.getApplicationContext();
 
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
 
-		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), SecurityManager.getMasterKey());
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), encryption);
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
-		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient, SecurityManager.getMasterKey());
+		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient, encryption);
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_CONVERSATION_STATE_DID_CHANGE, this)
@@ -211,8 +212,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	static void createInstance(@NonNull Application application, @NonNull ApptentiveConfiguration configuration) {
 		final String apptentiveKey = configuration.getApptentiveKey();
 		final String apptentiveSignature = configuration.getApptentiveSignature();
-		final String baseURL = configuration.getBaseURL();
-		final boolean shouldEncryptStorage = configuration.shouldEncryptStorage();
 
 		// set log message sanitizing
 		ApptentiveLog.setShouldSanitizeLogMessages(configuration.shouldSanitizeLogMessages());
@@ -233,10 +232,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 		synchronized (ApptentiveInternal.class) {
 			if (sApptentiveInternal == null) {
-				try {
 					ApptentiveLog.i("Registering Apptentive Android SDK %s", Constants.getApptentiveSdkVersion());
 					ApptentiveLog.v("ApptentiveKey=%s ApptentiveSignature=%s", apptentiveKey, apptentiveSignature);
-					sApptentiveInternal = new ApptentiveInternal(application, apptentiveKey, apptentiveSignature, baseURL, shouldEncryptStorage);
+					sApptentiveInternal = new ApptentiveInternal(application, configuration);
 					dispatchOnConversationQueue(new DispatchTask() {
 						@Override
 						protected void execute() {
@@ -245,11 +243,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 					});
 
 					ApptentiveActivityLifecycleCallbacks.register(application);
-
-				} catch (Exception e) {
-					ApptentiveLog.e(e, "Exception while initializing ApptentiveInternal instance");
-					logException(e);
-				}
 			} else {
 				ApptentiveLog.w("Apptentive instance is already initialized");
 			}
@@ -924,7 +917,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	 */
 	static boolean checkRegistered() {
 		if (!ApptentiveInternal.isApptentiveRegistered()) {
-			ApptentiveLog.e(CONVERSATION, "Error: You have failed to call Apptentive.register() in your Application.onCreate()");
+			ApptentiveLog.e(CONVERSATION, "Apptentive SDK is not initialized.");
 			return false;
 		}
 		return true;

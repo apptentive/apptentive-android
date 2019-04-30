@@ -55,4 +55,8 @@ public final class ObjectUtils {
 	public static boolean equal(@Nullable Object expected, @Nullable Object actual) {
 		return expected != null && actual != null && expected.equals(actual);
 	}
+
+	public static boolean isNullOrEmpty(byte[] array) {
+		return array == null || array.length == 0;
+	}
 }

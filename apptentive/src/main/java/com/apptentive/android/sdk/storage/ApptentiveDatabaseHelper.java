@@ -15,10 +15,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.debug.ErrorMetrics;
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.encryption.Encryptor;
+import com.apptentive.android.sdk.encryption.EncryptionHelper;
 import com.apptentive.android.sdk.model.Payload;
 import com.apptentive.android.sdk.model.PayloadData;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -30,15 +30,8 @@ import com.apptentive.android.sdk.util.Util;
 
 import java.io.File;
 import java.io.IOException;
-import java.security.InvalidAlgorithmParameterException;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.List;
-
-import javax.crypto.BadPaddingException;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 
 import static com.apptentive.android.sdk.ApptentiveLog.hideIfSanitized;
 import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
@@ -47,7 +40,6 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.Assert.assertFail;
 import static com.apptentive.android.sdk.debug.Assert.assertFalse;
 import static com.apptentive.android.sdk.debug.Assert.notNull;
-import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 import static com.apptentive.android.sdk.util.Constants.PAYLOAD_DATA_FILE_SUFFIX;
 
 /**
@@ -62,7 +54,7 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private final File fileDir; // data dir of the application
 
 	private final File payloadDataDir;
-	private final EncryptionKey encryptionKey;
+	private final Encryption encryption;
 
 	//region Payload SQL
 
@@ -205,15 +197,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 
 	// endregion
 
-	ApptentiveDatabaseHelper(Context context, EncryptionKey encryptionKey) {
+	ApptentiveDatabaseHelper(Context context, Encryption encryption) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		if (encryptionKey == null) {
+		if (encryption == null) {
 			throw new IllegalArgumentException("Encryption key is null");
 		}
 
 		this.fileDir = context.getFilesDir();
 		this.payloadDataDir = new File(fileDir, Constants.PAYLOAD_DATA_DIR);
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 	}
 
 	//region Create & Upgrade
@@ -258,11 +250,11 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 	private @Nullable DatabaseMigrator createDatabaseMigrator(int oldVersion, int newVersion) {
 		switch (oldVersion) {
 			case 1:
-				return new DatabaseMigratorV1(encryptionKey, payloadDataDir);
+				return new DatabaseMigratorV1(encryption, payloadDataDir);
 			case 2:
-				return new DatabaseMigratorV2(encryptionKey, payloadDataDir);
+				return new DatabaseMigratorV2(encryption, payloadDataDir);
 			case 3:
-				return new DatabaseMigratorV3(encryptionKey, payloadDataDir);
+				return new DatabaseMigratorV3(encryption, payloadDataDir);
 		}
 
 		assertFail("Missing database migrator version: %d", oldVersion);
@@ -585,21 +577,15 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		context.deleteDatabase(DATABASE_NAME);
 	}
 
-	private byte[] encrypt(@Nullable String value) throws NoSuchPaddingException,
-	                                                      InvalidKeyException,
-	                                                      NoSuchAlgorithmException,
-	                                                      IllegalBlockSizeException,
-	                                                      BadPaddingException,
-	                                                      InvalidAlgorithmParameterException,
-	                                                      EncryptionException {
-		return Encryptor.encrypt(encryptionKey, value);
+	private @Nullable byte[] encrypt(@Nullable String value) throws EncryptionException {
+		return EncryptionHelper.encrypt(encryption, value);
 	}
 
-	private String tryDecryptString(byte[] bytes, String defaultValue) {
+	private @Nullable String tryDecryptString(@Nullable byte[] bytes, String defaultValue) {
 		return tryDecryptString(bytes, defaultValue, true);
 	}
 
-	private String tryDecryptString(byte[] bytes, String defaultValue, boolean printError) {
+	private @Nullable String tryDecryptString(@Nullable byte[] bytes, String defaultValue, boolean printError) {
 		try {
 			return decryptString(bytes);
 		} catch (Exception e) {
@@ -610,26 +596,14 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	private String decryptString(byte[] bytes) throws NoSuchPaddingException,
-	                                                  InvalidKeyException,
-	                                                  NoSuchAlgorithmException,
-	                                                  IllegalBlockSizeException,
-	                                                  BadPaddingException,
-	                                                  InvalidAlgorithmParameterException,
-	                                                  EncryptionException {
-		return Encryptor.decryptString(encryptionKey, bytes);
+	private @Nullable String decryptString(@Nullable byte[] bytes) throws EncryptionException {
+		return EncryptionHelper.decryptString(encryption, bytes);
 	}
 
-	private void writeToFile(File file, byte[] data, boolean encrypted) throws NoSuchPaddingException,
-	                                                                           InvalidKeyException,
-	                                                                           NoSuchAlgorithmException,
-	                                                                           IOException,
-	                                                                           BadPaddingException,
-	                                                                           IllegalBlockSizeException,
-	                                                                           InvalidAlgorithmParameterException,
+	private void writeToFile(File file, byte[] data, boolean encrypted) throws IOException,
 	                                                                           EncryptionException {
 		if (encrypted) {
-			Encryptor.writeToEncryptedFile(encryptionKey, file, data);
+			EncryptionHelper.writeToEncryptedFile(encryption, file, data);
 		} else {
 			Util.writeAtomically(file, data);
 		}
@@ -645,15 +619,9 @@ public class ApptentiveDatabaseHelper extends SQLiteOpenHelper {
 		}
 	}
 
-	private byte[] readFromFile(File file, boolean encrypted) throws NoSuchPaddingException,
-	                                                                 InvalidAlgorithmParameterException,
-	                                                                 NoSuchAlgorithmException,
-	                                                                 IOException,
-	                                                                 BadPaddingException,
-	                                                                 IllegalBlockSizeException,
-	                                                                 InvalidKeyException,
+	private byte[] readFromFile(File file, boolean encrypted) throws IOException,
 	                                                                 EncryptionException {
-		return encrypted ? Encryptor.readFromEncryptedFile(encryptionKey, file) : Util.readBytes(file);
+		return encrypted ? EncryptionHelper.readFromEncryptedFile(encryption, file) : Util.readBytes(file);
 	}
 
 	//endregion

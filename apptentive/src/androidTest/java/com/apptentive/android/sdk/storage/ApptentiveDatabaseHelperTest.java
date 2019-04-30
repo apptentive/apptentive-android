@@ -83,32 +83,4 @@ public class ApptentiveDatabaseHelperTest {
 		return context.getDatabasePath("apptentive");
 	}
 
-	class ApptentiveDatabaseMockHelper extends ApptentiveDatabaseHelper {
-		private final String SQL_QUERY_PAYLOAD_LIST =
-			"SELECT * FROM " + PayloadEntry.TABLE_NAME +
-				" ORDER BY " + PayloadEntry.COLUMN_PRIMARY_KEY;
-
-		ApptentiveDatabaseMockHelper(Context context) {
-			super(context, EncryptionKey.NULL);
-		}
-
-		List<Payload> listPayloads(SQLiteDatabase db) throws JSONException {
-			Cursor cursor = null;
-			try {
-				cursor = db.rawQuery(SQL_QUERY_PAYLOAD_LIST, null);
-				List<Payload> payloads = new ArrayList<>(cursor.getCount());
-
-				Payload payload;
-				while (cursor.moveToNext()) {
-					// TODO: get data
-				}
-
-				return payloads;
-			} finally {
-				if (cursor != null) {
-					cursor.close();
-				}
-			}
-		}
-	}
 }

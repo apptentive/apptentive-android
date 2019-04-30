@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	private static final String APPTENTIVE_SDK_VERSION = "5.4.0";
+	private static final String APPTENTIVE_SDK_VERSION = "5.4.1";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -32,7 +32,11 @@ public class Constants {
 	public static final String EXAMPLE_APPTENTIVE_KEY_VALUE = "YOUR_APPTENTIVE_KEY";
 	public static final String EXAMPLE_APPTENTIVE_SIGNATURE_VALUE = "YOUR_APPTENTIVE_SIGNATURE";
 
-
+	// Encryption
+	/**
+	 * Transformation used for creating an encryption key for payloads using the hex value from the sever.
+	 */
+	public static final String PAYLOAD_ENCRYPTION_KEY_TRANSFORMATION = "AES/CBC/PKCS5Padding";
 
 	// Engagement
 	// Used to turn off Interaction polling so that contrived payloads can be manually tested.

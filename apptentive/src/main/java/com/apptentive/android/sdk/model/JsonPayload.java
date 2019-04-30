@@ -9,7 +9,6 @@ package com.apptentive.android.sdk.model;
 import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.encryption.Encryptor;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -58,7 +57,7 @@ public abstract class JsonPayload extends Payload {
 		// authenticated payloads get encrypted before sending
 		if (isAuthenticated()) {
 			byte[] bytes = jsonString.getBytes();
-			return Encryptor.encrypt(getEncryptionKey(), bytes);
+			return getEncryption().encrypt(bytes);
 		}
 
 		return jsonString.getBytes();
