@@ -3,8 +3,7 @@ package com.apptentive.android.sdk.serialization;
 import android.support.annotation.NonNull;
 import android.support.v4.util.AtomicFile;
 
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.encryption.Encryptor;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.util.Util;
 
 import java.io.ByteArrayInputStream;
@@ -42,7 +41,7 @@ public class ObjectSerialization {
 	/**
 	 * Writes an object ot an encrypted file
 	 */
-	public static void serialize(File file, SerializableObject object, @NonNull EncryptionKey encryptionKey) throws IOException {
+	public static void serialize(File file, SerializableObject object, @NonNull Encryption encryption) throws IOException {
 		ByteArrayOutputStream bos = null;
 		DataOutputStream dos = null;
 		try {
@@ -50,7 +49,7 @@ public class ObjectSerialization {
 			dos = new DataOutputStream(bos);
 			object.writeExternal(dos);
 			final byte[] unencryptedBytes = bos.toByteArray();
-			final byte[] encryptedBytes = Encryptor.encrypt(encryptionKey, unencryptedBytes);
+			final byte[] encryptedBytes = encryption.encrypt(unencryptedBytes);
 			Util.writeAtomically(file, encryptedBytes);
 		} catch (Exception e) {
 			throw new IOException(e);
@@ -81,10 +80,10 @@ public class ObjectSerialization {
 		}
 	}
 
-	public static <T extends SerializableObject> T deserialize(File file, Class<T> cls, EncryptionKey encryptionKey) throws IOException {
+	public static <T extends SerializableObject> T deserialize(File file, Class<T> cls, Encryption encryption) throws IOException {
 		try {
 			final byte[] encryptedBytes = Util.readBytes(file);
-			final byte[] unencryptedBytes = Encryptor.decrypt(encryptionKey, encryptedBytes);
+			final byte[] unencryptedBytes = encryption.decrypt(encryptedBytes);
 
 			ByteArrayInputStream stream = null;
 			try {

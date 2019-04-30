@@ -7,6 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -18,6 +19,7 @@ public class ApptentiveConfiguration {
 	private boolean shouldEncryptStorage;
 	private boolean shouldSanitizeLogMessages;
 	private boolean troubleshootingModeEnabled;
+	private Encryption encryption;
 
 	public ApptentiveConfiguration(@NonNull String apptentiveKey, @NonNull String apptentiveSignature) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -90,6 +92,20 @@ public class ApptentiveConfiguration {
 	 */
 	public void setShouldSanitizeLogMessages(boolean shouldSanitizeLogMessages) {
 		this.shouldSanitizeLogMessages = shouldSanitizeLogMessages;
+	}
+
+	/**
+	 * Overrides custom encryption object.
+	 */
+	public void setEncryption(@Nullable Encryption encryption) {
+		this.encryption = encryption;
+	}
+
+	/**
+	 * Returns custom encryption object (if any)
+	 */
+	@Nullable Encryption getEncryption() {
+		return encryption;
 	}
 
 	/**

@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.model;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.network.HttpRequestMethod;
 import com.apptentive.android.sdk.util.StringUtils;
@@ -23,7 +24,7 @@ public abstract class Payload {
 	/**
 	 * Encryption key for encrypting payload.
 	 */
-	private @NonNull EncryptionKey encryptionKey;
+	private @NonNull Encryption encryption;
 
 	/**
 	 * The Conversation ID of the payload, if known at this time.
@@ -92,15 +93,15 @@ public abstract class Payload {
 		return payloadType;
 	}
 
-	@NonNull EncryptionKey getEncryptionKey() {
-		return encryptionKey;
+	@NonNull Encryption getEncryption() {
+		return encryption;
 	}
 
-	public void setEncryptionKey(@NonNull EncryptionKey encryptionKey) {
-		if (encryptionKey == null) {
-			throw new IllegalArgumentException("Encryption key is null");
+	public void setEncryption(@NonNull Encryption encryption) {
+		if (encryption == null) {
+			throw new IllegalArgumentException("Encryption is null");
 		}
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 	}
 
 	public String getConversationId() {

@@ -9,12 +9,12 @@ package com.apptentive.android.sdk.conversation;
 import android.support.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.encryption.EncryptionException;
 import com.apptentive.android.sdk.debug.ErrorMetrics;
 
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.encryption.Encryptor;
+import com.apptentive.android.sdk.encryption.EncryptionHelper;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
 import com.apptentive.android.sdk.serialization.SerializableObject;
@@ -58,20 +58,20 @@ class FileMessageStore implements MessageStore {
 
 	private final File file;
 	private final List<MessageEntry> messageEntries;
-	private EncryptionKey encryptionKey;
+	private Encryption encryption;
 	private boolean shouldFetchFromFile;
 
-	FileMessageStore(File file, EncryptionKey encryptionKey) {
+	FileMessageStore(File file, Encryption encryption) {
 		if (file == null) {
 			throw new IllegalArgumentException("File is null");
 		}
 
-		if (encryptionKey == null) {
+		if (encryption == null) {
 			throw new IllegalArgumentException("Encryption key is null");
 		}
 
 		this.file = file;
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 		this.messageEntries = new ArrayList<>(); // we need a random access
 		this.shouldFetchFromFile = true; // we would lazily read it from a file later
 	}
@@ -228,15 +228,8 @@ class FileMessageStore implements MessageStore {
 		}
 	}
 
-	private List<MessageEntry> readFromFileGuarded() throws IOException,
-	                                                        NoSuchPaddingException,
-	                                                        InvalidAlgorithmParameterException,
-	                                                        NoSuchAlgorithmException,
-	                                                        IllegalBlockSizeException,
-	                                                        BadPaddingException,
-	                                                        InvalidKeyException,
-	                                                        EncryptionException {
-		byte[] bytes = Encryptor.readFromEncryptedFile(encryptionKey, file);
+	private List<MessageEntry> readFromFileGuarded() throws IOException, EncryptionException {
+		byte[] bytes = EncryptionHelper.readFromEncryptedFile(encryption, file);
 		ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
 
 		DataInputStream dis = new DataInputStream(bis);
@@ -262,14 +255,7 @@ class FileMessageStore implements MessageStore {
 		shouldFetchFromFile = false; // mark it as not shouldFetchFromFile to keep a memory version
 	}
 
-	private void writeToFileGuarded() throws IOException,
-	                                         NoSuchPaddingException,
-	                                         InvalidKeyException,
-	                                         NoSuchAlgorithmException,
-	                                         IllegalBlockSizeException,
-	                                         BadPaddingException,
-	                                         InvalidAlgorithmParameterException,
-	                                         EncryptionException {
+	private void writeToFileGuarded() throws IOException, EncryptionException {
 		ByteArrayOutputStream bos = new ByteArrayOutputStream();
 		DataOutputStream dos = new DataOutputStream(bos);
 		dos.writeByte(VERSION);
@@ -278,7 +264,7 @@ class FileMessageStore implements MessageStore {
 			entry.writeExternal(dos);
 		}
 		long start = System.currentTimeMillis();
-		Encryptor.writeToEncryptedFile(encryptionKey, file, bos.toByteArray());
+		EncryptionHelper.writeToEncryptedFile(encryption, file, bos.toByteArray());
 		ApptentiveLog.v(MESSAGES, "Messages saved. Took %d ms", System.currentTimeMillis() - start);
 	}
 
@@ -300,11 +286,11 @@ class FileMessageStore implements MessageStore {
 		return null;
 	}
 
-	void updateEncryptionKey(@NonNull EncryptionKey encryptionKey) {
-		if (encryptionKey == null) {
-			throw new IllegalArgumentException("Encryption key is null");
+	void updateEncryption(@NonNull Encryption encryption) {
+		if (encryption == null) {
+			throw new IllegalArgumentException("Encryption is null");
 		}
-		this.encryptionKey = encryptionKey;
+		this.encryption = encryption;
 
 		// update storage
 		writeToFile();

@@ -13,28 +13,14 @@ public class EncryptionKey {
 	/**
 	 * A no-op encryption key for API versions without key chain access (17 and below)
 	 */
-	public static final EncryptionKey NULL = new EncryptionKey(false);
-
-	/**
-	 * A special instance of the encryption key which will fail every attempt to encrypt and decrypt data.
-	 * Used for the cases when the original encryption key cannot be loaded for the key store.
-	 */
-	static final EncryptionKey CORRUPTED = new EncryptionKey(true);
-
-	static final String DEFAULT_TRANSFORMATION = "AES/CBC/PKCS5Padding";
-	private static final String ALGORITHM = "AES";
+	public static final EncryptionKey NULL = new EncryptionKey();
 
 	private final Key key;
-	private final String hexKey;
 	private final String transformation;
 
-	private boolean corrupted;
-
-	private EncryptionKey(boolean corrupted) {
-		this.corrupted = corrupted;
+	private EncryptionKey() {
 		this.key = null;
-		this.hexKey = null;
-		this.transformation = "";
+		this.transformation = null;
 	}
 
 	public EncryptionKey(@NonNull Key key, @NonNull String transformation) {
@@ -47,35 +33,59 @@ public class EncryptionKey {
 
 		this.key = key;
 		this.transformation = transformation;
-		this.hexKey = null;
 	}
 
-	public EncryptionKey(@NonNull String hexKey) {
+	public EncryptionKey(@NonNull String hexKey, @NonNull String transformation) {
 		if (StringUtils.isNullOrEmpty(hexKey)) {
 			throw new IllegalArgumentException("Hex key is null or empty");
 		}
-		this.key = new SecretKeySpec(StringUtils.hexToBytes(hexKey), ALGORITHM);
-		this.transformation = DEFAULT_TRANSFORMATION;
-		this.hexKey = hexKey;
+		String algorithm = Transformation.parse(transformation).algorithm;
+		this.key = new SecretKeySpec(StringUtils.hexToBytes(hexKey), algorithm);
+		this.transformation = transformation;
+		;
 	}
 
 	boolean isNull() {
 		return key == null;
 	}
 
-	boolean isCorrupted() {
-		return corrupted;
-	}
-
 	@Nullable Key getSecretKey() {
 		return key;
-	}
-
-	public @Nullable String getHexKey() {
-		return hexKey;
 	}
 
 	@NonNull String getTransformation() {
 		return transformation;
 	}
+
+	//region Helpers
+
+	public static final class Transformation {
+		public final String algorithm;
+		public final String mode;
+		public final String padding;
+
+		public Transformation(String algorithm, String mode, String padding) {
+			this.algorithm = algorithm;
+			this.mode = mode;
+			this.padding = padding;
+		}
+
+		public static @NonNull Transformation parse(@NonNull String transformation) {
+			if (StringUtils.isNullOrEmpty(transformation)) {
+				throw new IllegalArgumentException("Transformation is null or empty");
+			}
+
+			String[] tokens = transformation.split("/");
+			if (tokens.length != 3) {
+				throw new IllegalStateException("Invalid transformation: '" + transformation + "'");
+			}
+
+			String algorithm = tokens[0].toUpperCase();
+			String mode = tokens[1].toUpperCase();
+			String padding = tokens[2].toUpperCase();
+			return new Transformation(algorithm, mode, padding);
+		}
+	}
+
+	//endregion
 }

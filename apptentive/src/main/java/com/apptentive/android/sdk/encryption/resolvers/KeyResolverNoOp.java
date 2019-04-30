@@ -8,6 +8,6 @@ import com.apptentive.android.sdk.encryption.EncryptionKey;
 class KeyResolverNoOp implements KeyResolver {
 	@NonNull @Override
 	public EncryptionKey resolveKey(Context context, String keyAlias) {
-		return EncryptionKey.NULL; // FIXME: descriptive log message
+		return EncryptionKey.NULL;
 	}
 }

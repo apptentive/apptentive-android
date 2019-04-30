@@ -1,5 +1,10 @@
 language: android
 dist: precise
+env:
+  global:
+    - SNAPSHOT_REPOSITORY_USERNAME=travis
+    - SNAPSHOT_REPOSITORY_URL=http://54.183.158.246:8081/artifactory/apptentive-snapshots
+    - secure: pc2twMw60say0ASdXiJiRAD6tx9Qy82DIMw83qPijB2wyVHLpLbjptqBFyTYy4+JYthZ8xcB5Yretiv//AQS4wdDPsJNwOKUGXamm8IBx+1wnhG/R/ROz67Ibj4XWHIX24GaKN/MD8tCN9VPdeNEL1jysSEVxqqsvOGBsxitAyI=
 jdk:
   - oraclejdk8
 before_cache:
@@ -38,3 +43,17 @@ script:
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebug; fi
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebugAndroidTest; fi
 #  - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:connectedAutomatedDebugAndroidTest -i; fi
+
+after_script:
+  - >
+    if [ "$TRAVIS_BRANCH" = "develop" ]; then
+      ./gradlew :apptentive:uploadArchives;
+      if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:assembleQaDebug; fi
+      if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:uploadQaDebugToHockeyApp; fi;
+    fi
+
+after_failure:
+  #- echo " LOGCAT "; echo "========"; cat logcat.log; pkill -KILL -f adb
+notifications:
+  slack:
+    secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=

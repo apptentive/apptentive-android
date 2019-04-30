@@ -5,9 +5,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationDispatchTask;
-import com.apptentive.android.sdk.encryption.EncryptionKey;
 import com.apptentive.android.sdk.model.ApptentiveMessage;
 import com.apptentive.android.sdk.model.JsonPayload;
 import com.apptentive.android.sdk.model.PayloadType;
@@ -46,8 +46,8 @@ class DatabaseMigratorV2 extends DatabaseMigrator {
 	private static final String SQL_BACKUP_LEGACY_PAYLOAD_TABLE = String.format("ALTER TABLE %s RENAME TO %s;", PayloadEntry.TABLE_NAME, LegacyPayloadEntry.TABLE_NAME);
 	private static final String SQL_DELETE_LEGACY_PAYLOAD_TABLE = String.format("DROP TABLE %s;", LegacyPayloadEntry.TABLE_NAME);
 
-	public DatabaseMigratorV2(EncryptionKey encryptionKey, File payloadDataDir) {
-		super(encryptionKey, payloadDataDir);
+	public DatabaseMigratorV2(Encryption encryption, File payloadDataDir) {
+		super(encryption, payloadDataDir);
 	}
 
 	@Override
