@@ -4,6 +4,7 @@ import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
+import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -17,6 +18,10 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 	private static final byte VERSION = 1;
 
 	private final List<ConversationMetadataItem> items;
+
+	static {
+		hackR8();
+	}
 
 	public ConversationMetadata() {
 		items = new ArrayList<>();
@@ -112,6 +117,26 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 
 	//endregion
 
+	//region R8 hack
+
+	/**
+	 * This is a hack-workaround for R8 removing unused code despite
+	 * ProGuard configuration telling to keep it
+	 */
+	private static void hackR8() {
+		try {
+			// this would never be true but we have to trick the obfuscator
+			if (System.currentTimeMillis() < 10000L) {
+				DataInput stream = null;
+				// touch the constructor and "use" the reference
+				ConversationMetadata c = new ConversationMetadata(stream);
+				System.out.println(c);
+			}
+		} catch (Exception ignored) {
+		}
+	}
+
+	//endregion
 
 	@Override
 	public String toString() {

@@ -67,7 +67,7 @@ public class FileSerializer implements Serializer {
 		ObjectInputStream ois = null;
 		try {
 			fis = new FileInputStream(file);
-			ois = new ObjectInputStream(fis);
+			ois = new OverrideSerialVersionUIDObjectInputStream(fis);
 			return ois.readObject();
 		} catch (Exception e) {
 			throw new SerializerException(e);

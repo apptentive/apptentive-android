@@ -14,6 +14,7 @@ import java.util.Map;
  * Stores a record of an event occurring.
  */
 public class EventRecord implements Serializable {
+	private static final long serialVersionUID = 1485363290506105166L;
 	private double last;
 	private long total;
 	private Map<Integer, Long> versionCodes;

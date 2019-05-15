@@ -57,7 +57,7 @@ public class ConversationDataTest {
 			oos.writeObject(expected);
 
 			bais = new ByteArrayInputStream(baos.toByteArray());
-			ois = new ObjectInputStream(bais);
+			ois = new OverrideSerialVersionUIDObjectInputStream(bais);
 
 			ConversationData actual = (ConversationData) ois.readObject();
 			assertEquals(expected.getConversationId(), actual.getConversationId());

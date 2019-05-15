@@ -138,7 +138,7 @@ public class CommerceExtendedData extends ExtendedData {
 	}
 
 	public static class Item implements Serializable {
-
+		private static final long serialVersionUID = -1269601398569802633L;
 		private static final String KEY_ID = "id";
 		private static final String KEY_NAME = "name";
 		private static final String KEY_CATEGORY = "category";
