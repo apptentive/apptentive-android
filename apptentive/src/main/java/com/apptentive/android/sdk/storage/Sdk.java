@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.storage;
 import java.io.Serializable;
 
 public class Sdk implements Serializable {
+	private static final long serialVersionUID = -6227767047869055574L;
 	private String version;
 	private String programmingLanguage;
 	private String authorName;

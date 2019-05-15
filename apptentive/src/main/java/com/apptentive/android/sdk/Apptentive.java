@@ -1714,9 +1714,7 @@ public class Apptentive {
 	 * </ul>
 	 */
 	public static class Version implements Serializable, Comparable<Version> {
-
-		private static final long serialVersionUID = 1L;
-
+		private static final long serialVersionUID = 1891878408603512644L;
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "version";
 
@@ -1801,6 +1799,8 @@ public class Apptentive {
 	}
 
 	public static class DateTime implements Serializable, Comparable<DateTime> {
+		private static final long serialVersionUID = -7893194735115350118L;
+
 		public static final String KEY_TYPE = "_type";
 		public static final String TYPE = "datetime";
 		public static final String SEC = "sec";

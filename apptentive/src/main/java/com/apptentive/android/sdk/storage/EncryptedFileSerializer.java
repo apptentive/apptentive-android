@@ -56,10 +56,8 @@ public class EncryptedFileSerializer extends FileSerializer {
 			ObjectInputStream ois = null;
 			try {
 				bis = new ByteArrayInputStream(unencryptedBytes);
-				ois = new ObjectInputStream(bis);
+				ois = new OverrideSerialVersionUIDObjectInputStream(bis);
 				return ois.readObject();
-			} catch (Exception e) {
-				throw new SerializerException(e);
 			} finally {
 				Util.ensureClosed(bis);
 				Util.ensureClosed(ois);

@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.storage;
 import java.io.Serializable;
 
 public class VersionHistoryItem implements Serializable {
-
+	private static final long serialVersionUID = 1730491670319107507L;
 	private double timestamp;
 	private int versionCode;
 	private String versionName;

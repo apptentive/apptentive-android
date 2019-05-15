@@ -16,9 +16,7 @@ import java.util.Set;
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class IntegrationConfigItem implements Serializable {
-
-	private static final long serialVersionUID = 1L;
-
+	private static final long serialVersionUID = 3509802144209212980L;
 	private static final String KEY_TOKEN = "token";
 
 	private HashMap<String, String> contents = new HashMap<>();

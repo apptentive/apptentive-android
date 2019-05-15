@@ -17,7 +17,7 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.PAYLOADS;
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public abstract class ExtendedData implements Serializable {
-
+	private static final long serialVersionUID = 4070116080651157128L;
 	private static final String KEY_VERSION = "version";
 
 	private Type type = Type.unknown;

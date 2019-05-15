@@ -1,3 +1,9 @@
+# 2019-05-14 - v5.4.2
+
+#### Fixes
+
+* Fixed loading conversation data when the build if obfuscated with R8.
+
 # 2019-04-30 - v5.4.1
 
 #### Changes
