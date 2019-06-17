@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.apptentive:apptentive-android:5.3.3'
+    implementation 'com.apptentive:apptentive-android:5.4.2'
     implementation 'com.google.firebase:firebase-messaging:17.3.4'
 }
 

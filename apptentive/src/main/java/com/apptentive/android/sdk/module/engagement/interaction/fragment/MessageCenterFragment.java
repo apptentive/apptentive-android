@@ -1034,7 +1034,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	private boolean shouldOpenComposerAfterClosingWhoCard() {
-		return interaction.getWhoCard().isRequire() && (recyclerViewContainsItemOfType(MESSAGE_CONTEXT) || recyclerViewContainsItemOfType(MESSAGE_OUTGOING));
+		return interaction.getWhoCard().isRequire() && !recyclerViewContainsItemOfType(MESSAGE_OUTGOING);
 	}
 
 	public void cleanupWhoCard() {

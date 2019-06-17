@@ -20,6 +20,7 @@ public class ApptentiveConfiguration {
 	private boolean shouldSanitizeLogMessages;
 	private boolean troubleshootingModeEnabled;
 	private Encryption encryption;
+	private boolean shouldCollectAndroidIdOnPreOreoTargets;
 
 	public ApptentiveConfiguration(@NonNull String apptentiveKey, @NonNull String apptentiveSignature) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -36,6 +37,7 @@ public class ApptentiveConfiguration {
 		this.shouldEncryptStorage = false;
 		this.shouldSanitizeLogMessages = true;
 		this.troubleshootingModeEnabled = true;
+		this.shouldCollectAndroidIdOnPreOreoTargets = true;
 	}
 
 	public String getApptentiveKey() {
@@ -121,5 +123,20 @@ public class ApptentiveConfiguration {
 	public ApptentiveConfiguration setTroubleshootingModeEnabled(boolean troubleshootingModeEnabled) {
 		this.troubleshootingModeEnabled = troubleshootingModeEnabled;
 		return this;
+	}
+
+	/**
+	 * Overrides if the SDK should collect Android ID on pre Android-O targets. If set to <code>false</code>
+	 * a random value would be generated on the initial SDK launch and provided on each subsequent launch.
+	 */
+	public void setShouldCollectAndroidIdOnPreOreoTargets(boolean shouldCollectAndroidIdOnPreOreoTargets) {
+		this.shouldCollectAndroidIdOnPreOreoTargets = shouldCollectAndroidIdOnPreOreoTargets;
+	}
+
+	/**
+	 * Indicates if the SDK should collect Android ID on pre Android-O targets.
+	 */
+	public boolean shouldCollectAndroidIdOnPreOreoTargets() {
+		return shouldCollectAndroidIdOnPreOreoTargets;
 	}
 }
