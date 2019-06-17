@@ -33,6 +33,7 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.DevicePayloadDiff;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
 import com.apptentive.android.sdk.storage.SerializerException;
@@ -90,6 +91,11 @@ public class ConversationManager {
 	private final Encryption encryption;
 
 	/**
+	 * Responsible for generating device payloads.
+	 */
+	private final DeviceManager deviceManager;
+
+	/**
 	 * Current state of conversation metadata.
 	 */
 	private ConversationMetadata conversationMetadata;
@@ -103,7 +109,7 @@ public class ConversationManager {
 	 */
 	private boolean activeConversationFailedToResolve; // TODO: this is a temporary solution until we restore conversation state
 
-	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull Encryption encryption) {
+	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull Encryption encryption, @NonNull DeviceManager deviceManager) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
@@ -116,9 +122,14 @@ public class ConversationManager {
 			throw new IllegalArgumentException("Encryption is null");
 		}
 
+		if (deviceManager == null) {
+			throw new IllegalArgumentException("Device manager is null");
+		}
+
 		this.contextRef = new WeakReference<>(context.getApplicationContext());
 		this.conversationsStorageDir = conversationsStorageDir;
 		this.encryption = encryption;
+		this.deviceManager = deviceManager;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -464,11 +475,11 @@ public class ConversationManager {
 		ConversationTokenRequest conversationTokenRequest = new ConversationTokenRequest();
 
 		// Send the Device and Sdk now, so they are available on the server from the start.
-		final Device device = DeviceManager.generateNewDevice(context);
+		final Device device = deviceManager.generateNewDevice(context);
 		final Sdk sdk = SdkManager.generateCurrentSdk(context);
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 
-		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
+		conversationTokenRequest.setDevice(DevicePayloadDiff.getDiffPayload(null, device));
 		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
 
 		HttpRequest request = getHttpClient()
@@ -957,7 +968,7 @@ public class ConversationManager {
 							setActiveConversation(new Conversation(dataFile, messagesFile, conversationEncryption, payloadEncryptionKey));
 
 							// TODO: if we don't set these here - device payload would return 4xx error code
-							activeConversation.setDevice(DeviceManager.generateNewDevice(getContext()));
+							activeConversation.setDevice(deviceManager.generateNewDevice(getContext()));
 							activeConversation.setAppRelease(ApptentiveInternal.getInstance().getAppRelease());
 							activeConversation.setSdk(SdkManager.generateCurrentSdk(getContext()));
 						}
@@ -998,7 +1009,7 @@ public class ConversationManager {
 
 		final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
 		final Sdk sdk = SdkManager.generateCurrentSdk(getContext());
-		final Device device = DeviceManager.generateNewDevice(getContext());
+		final Device device = deviceManager.generateNewDevice(getContext());
 
 		HttpJsonRequest request = getHttpClient().createFirstLoginRequest(token, appRelease, sdk, device, new HttpRequest.Listener<HttpJsonRequest>() {
 			@Override

@@ -1,3 +1,10 @@
+# 2019-06-17 - v5.4.3
+
+#### Improvements
+
+* Made Android ID collection optional on pre-Oreo targets.
+* Fixed "Who" card in the Message Center.
+
 # 2019-05-14 - v5.4.2
 
 #### Fixes

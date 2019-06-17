@@ -70,10 +70,6 @@ public class WhoCard extends JSONObject implements MessageCenterListItem {
 	}
 
 	public String getNameHint() {
-		if (isRequire() && isInitial()) {
-			// The Who Card will show up right when MC is opened in this scenario. Don't ask for the name at this time.
-			return null;
-		}
 		return getApplicableConfig().optString(KEY_NAME_HINT, null);
 	}
 

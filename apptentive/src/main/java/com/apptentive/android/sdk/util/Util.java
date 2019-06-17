@@ -1118,7 +1118,7 @@ public class Util {
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
-	public static String getAndroidId(Context context) {
+	public static String getAndroidID(Context context) {
 		if (context == null) {
 			return null;
 		}

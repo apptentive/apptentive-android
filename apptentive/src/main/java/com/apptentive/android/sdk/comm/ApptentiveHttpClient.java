@@ -16,7 +16,7 @@ import com.apptentive.android.sdk.network.RawHttpRequest;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
-import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.DevicePayloadDiff;
 import com.apptentive.android.sdk.storage.PayloadRequestSender;
 import com.apptentive.android.sdk.storage.Sdk;
 import com.apptentive.android.sdk.storage.SdkManager;
@@ -168,7 +168,7 @@ public class ApptentiveHttpClient implements PayloadRequestSender {
 
 		ConversationTokenRequest conversationTokenRequest = new ConversationTokenRequest();
 		conversationTokenRequest.setSdkAndAppRelease(SdkManager.getPayload(sdk), AppReleaseManager.getPayload(appRelease));
-		conversationTokenRequest.setDevice(DeviceManager.getDiffPayload(null, device));
+		conversationTokenRequest.setDevice(DevicePayloadDiff.getDiffPayload(null, device));
 
 		try {
 			conversationTokenRequest.put("token", token);

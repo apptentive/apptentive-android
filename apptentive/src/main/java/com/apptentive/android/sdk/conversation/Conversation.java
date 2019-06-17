@@ -33,7 +33,7 @@ import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.DataChangedListener;
 import com.apptentive.android.sdk.storage.Device;
 import com.apptentive.android.sdk.storage.DeviceDataChangedListener;
-import com.apptentive.android.sdk.storage.DeviceManager;
+import com.apptentive.android.sdk.storage.DevicePayloadDiff;
 import com.apptentive.android.sdk.storage.EncryptedFileSerializer;
 import com.apptentive.android.sdk.storage.EventData;
 import com.apptentive.android.sdk.storage.FileSerializer;
@@ -507,7 +507,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 			Device lastSentDevice = getLastSentDevice();
 			Device currentDevice = getDevice();
 			assertNotNull(currentDevice, "Current device object is null");
-			DevicePayload devicePayload = DeviceManager.getDiffPayload(lastSentDevice, currentDevice);
+			DevicePayload devicePayload = DevicePayloadDiff.getDiffPayload(lastSentDevice, currentDevice);
 			if (devicePayload != null) {
 				addPayload(devicePayload);
 				setLastSentDevice(currentDevice != null ? currentDevice.clone() : null);

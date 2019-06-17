@@ -34,6 +34,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 /**
  * A collection of useful string-related functions
@@ -231,6 +233,18 @@ public final class StringUtils {
 		} catch (Exception e) {
 			return defaultValue;
 		}
+	}
+
+	//endregion
+
+	//region Device identifiers
+
+	public static String randomAndroidID() {
+		Random random = new Random();
+		long lo = ((long) random.nextInt()) & 0xffffffffL;
+		long hi = ((long) random.nextInt()) << 32L;
+		long number = hi | lo;
+		return Long.toHexString(number);
 	}
 
 	//endregion
