@@ -30,6 +30,9 @@ public final class SecurityManager {
 	 */
 	private static final int LEGACY_KEY_STORE_API_NO_OP = 17;
 
+	/** If we don't extract it into a constant - R8 would crash! */
+	private static final int SDK_INT = Build.VERSION.SDK_INT;
+
 	//region Initialization
 
 	/**
@@ -86,7 +89,7 @@ public final class SecurityManager {
 		if (StringUtils.isNullOrEmpty(keyAlias) || versionCode == 0) {
 			keyAlias = generateUniqueKeyAlias();
 			if (shouldEncryptStorage) {
-				versionCode = Build.VERSION.SDK_INT;
+				versionCode = SDK_INT;
 			} else {
 				versionCode = LEGACY_KEY_STORE_API_NO_OP; // if user opts out of encryption - use no-op API
 			}
