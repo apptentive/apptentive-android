@@ -1,3 +1,9 @@
+# 2019-07-26 - v5.4.4
+
+#### Fixes
+
+* Fixed R8 obfuscator crash.
+
 # 2019-06-17 - v5.4.3
 
 #### Improvements
