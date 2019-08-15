@@ -91,6 +91,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	{
 
 		// Prepare the reflections to manage hidden fields
+		//
+		// UPDATE: this workaround doesn't work anymore:
+		// https://stackoverflow.com/questions/56618453/after-migrating-to-androidx-application-crashes-with-attempt-to-invoke-androidx
 		try {
 			fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
 			hostField = fragmentImplClass.getDeclaredField("mHost");
@@ -213,15 +216,64 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	@Override
 	public void onDetach() {
 		super.onDetach();
-		try {
-			Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
-			childFragmentManager.setAccessible(true);
-			childFragmentManager.set(this, null);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException(e);
-		} catch (IllegalAccessException e) {
-			throw new RuntimeException(e);
+
+		/*
+		This workaround would not work anymore:
+		https://stackoverflow.com/questions/56618453/after-migrating-to-androidx-application-crashes-with-attempt-to-invoke-androidx
+
+		Originally in 'com.android.support:appcompat-v7' and 'androidx.appcompat:appcompat:1.0.+':
+		------------------------------------------------
+		Fragment.java:
+		------------------------------------------------
+		void performDetach() {
+			this.mCalled = false;
+			this.onDetach();
+			this.mLayoutInflater = null;
+			if (!this.mCalled) {
+				throw new SuperNotCalledException("Fragment " + this + " did not call through to super.onDetach()");
+			} else {
+				if (this.mChildFragmentManager != null) { <-- null-check
+					if (!this.mRetaining) {
+						throw new IllegalStateException("Child FragmentManager of " + this + " was not " + " destroyed and this fragment is not retaining instance");
+					}
+
+					this.mChildFragmentManager.dispatchDestroy();
+					this.mChildFragmentManager = null;
+				}
+			}
 		}
+
+		Changed in 'androidx.appcompat:appcompat:1.1.+':
+		------------------------------------------------
+		Fragment.java:
+		------------------------------------------------
+		void performDetach() {
+			this.mCalled = false;
+			this.onDetach();
+			this.mLayoutInflater = null;
+			if (!this.mCalled) {
+				throw new SuperNotCalledException("Fragment " + this + " did not call through to super.onDetach()");
+			} else {
+				if (!this.mChildFragmentManager.isDestroyed()) { <-- no null check any more!
+					this.mChildFragmentManager.dispatchDestroy();
+					this.mChildFragmentManager = new FragmentManagerImpl();
+				}
+			}
+		}
+
+		Previous code in the SDK (caused a NullPointerException):
+
+		//	try {
+		//		Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+		//		childFragmentManager.setAccessible(true);
+		//		childFragmentManager.set(this, null);
+		//	} catch (NoSuchFieldException e) {
+		//		throw new RuntimeException(e);
+		//	} catch (IllegalAccessException e) {
+		//		throw new RuntimeException(e);
+		//	}
+
+		*/
 	}
 
 	@Override
