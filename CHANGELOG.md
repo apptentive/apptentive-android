@@ -1,3 +1,9 @@
+# 2019-08-15 - v5.4.5
+
+#### Fixes
+
+* Fixed Fragment crash while using `androidx.appcompat:appcompat:1.1.+` dependency.
+
 # 2019-07-26 - v5.4.4
 
 #### Fixes
