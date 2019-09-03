@@ -19,7 +19,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentHostCallback;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.content.ContextCompat;
@@ -50,7 +49,6 @@ import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -64,13 +62,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	private static final String HAS_LAUNCHED = "has_launched";
 
 	private final String fragmentName = getClass().getSimpleName();
-
-	/* Nested Fragment with ChildFragmentManager lost state in rev20/rev21 of Android support library
-	 * The following are needed to work around this issue
-	 */
-	private FragmentManager retainedChildFragmentManager;
-	private Class fragmentImplClass;
-	private Field hostField;
 
 	private int toolbarLayoutId = 0;
 	private Toolbar toolbar = null;
@@ -86,37 +77,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	public interface OnFragmentTransitionListener {
 		void onFragmentTransition(ApptentiveBaseFragment currentFragment);
-	}
-
-	{
-
-		// Prepare the reflections to manage hidden fields
-		//
-		// UPDATE: this workaround doesn't work anymore:
-		// https://stackoverflow.com/questions/56618453/after-migrating-to-androidx-application-crashes-with-attempt-to-invoke-androidx
-		try {
-			fragmentImplClass = Class.forName("android.support.v4.app.FragmentManagerImpl");
-			hostField = fragmentImplClass.getDeclaredField("mHost");
-			hostField.setAccessible(true);
-		} catch (ClassNotFoundException e) {
-			throw new RuntimeException("FragmentManagerImpl is renamed due to the " +
-					"change of Android SDK, this workaround doesn't work any more. " +
-					"See the issue at " +
-					"https://code.google.com/p/android/issues/detail?id=74222", e);
-		} catch (NoSuchFieldException e) {
-			throw new RuntimeException("FragmentManagerImpl.mHost is found due to the " +
-					"change of Android SDK, this workaround doesn't work any more. " +
-					"See the issue at " +
-					"https://code.google.com/p/android/issues/detail?id=74222", e);
-		}
-	}
-
-	//use the retained childFragmentManager after the rotation.
-	public FragmentManager getRetainedChildFragmentManager() {
-		if (retainedChildFragmentManager == null) {
-			retainedChildFragmentManager = getChildFragmentManager();
-		}
-		return retainedChildFragmentManager;
 	}
 
 	public String getFragmentName() {
@@ -153,127 +113,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putBoolean(HAS_LAUNCHED, hasLaunched);
-	}
-
-	/* Guarded */
-	@Override
-	public void onAttach(Context context) {
-		super.onAttach(context);
-		try {
-			if (retainedChildFragmentManager != null) {
-				//Use the retained child fragment manager after rotation
-
-				//Set the retained ChildFragmentManager to the field
-				Field field = Fragment.class.getDeclaredField("mChildFragmentManager");
-				field.setAccessible(true);
-				field.set(this, retainedChildFragmentManager);
-
-				updateHosts(getFragmentManager(), (FragmentHostCallback) hostField.get(getFragmentManager()));
-			} else {
-				//If the child fragment manager has not been retained yet
-				retainedChildFragmentManager = getChildFragmentManager();
-			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception in %s.onAttach()", getClass().getSimpleName());
-			logException(e);
-		}
-
-	}
-
-	private void updateHosts(FragmentManager fragmentManager, FragmentHostCallback currentHost) throws IllegalAccessException {
-		if (fragmentManager != null) {
-			replaceFragmentManagerHost(fragmentManager, currentHost);
-		}
-
-		//replace host(activity) of fragments already added
-		List<Fragment> fragments = fragmentManager.getFragments();
-		if (fragments != null) {
-			for (Fragment fragment : fragments) {
-				if (fragment != null) {
-					try {
-						//Copy the mHost(Activity) to retainedChildFragmentManager
-						Field mHostField = Fragment.class.getDeclaredField("mHost");
-						mHostField.setAccessible(true);
-						mHostField.set(fragment, currentHost);
-					} catch (Exception e) {
-						ApptentiveLog.w(e, e.getMessage());
-						logException(e);
-					}
-					if (fragment.getChildFragmentManager() != null) {
-						updateHosts(fragment.getChildFragmentManager(), currentHost);
-					}
-				}
-			}
-		}
-	}
-
-	private void replaceFragmentManagerHost(FragmentManager fragmentManager, FragmentHostCallback currentHost) throws IllegalAccessException {
-		if (currentHost != null) {
-			hostField.set(fragmentManager, currentHost);
-		}
-	}
-
-	@Override
-	public void onDetach() {
-		super.onDetach();
-
-		/*
-		This workaround would not work anymore:
-		https://stackoverflow.com/questions/56618453/after-migrating-to-androidx-application-crashes-with-attempt-to-invoke-androidx
-
-		Originally in 'com.android.support:appcompat-v7' and 'androidx.appcompat:appcompat:1.0.+':
-		------------------------------------------------
-		Fragment.java:
-		------------------------------------------------
-		void performDetach() {
-			this.mCalled = false;
-			this.onDetach();
-			this.mLayoutInflater = null;
-			if (!this.mCalled) {
-				throw new SuperNotCalledException("Fragment " + this + " did not call through to super.onDetach()");
-			} else {
-				if (this.mChildFragmentManager != null) { <-- null-check
-					if (!this.mRetaining) {
-						throw new IllegalStateException("Child FragmentManager of " + this + " was not " + " destroyed and this fragment is not retaining instance");
-					}
-
-					this.mChildFragmentManager.dispatchDestroy();
-					this.mChildFragmentManager = null;
-				}
-			}
-		}
-
-		Changed in 'androidx.appcompat:appcompat:1.1.+':
-		------------------------------------------------
-		Fragment.java:
-		------------------------------------------------
-		void performDetach() {
-			this.mCalled = false;
-			this.onDetach();
-			this.mLayoutInflater = null;
-			if (!this.mCalled) {
-				throw new SuperNotCalledException("Fragment " + this + " did not call through to super.onDetach()");
-			} else {
-				if (!this.mChildFragmentManager.isDestroyed()) { <-- no null check any more!
-					this.mChildFragmentManager.dispatchDestroy();
-					this.mChildFragmentManager = new FragmentManagerImpl();
-				}
-			}
-		}
-
-		Previous code in the SDK (caused a NullPointerException):
-
-		//	try {
-		//		Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
-		//		childFragmentManager.setAccessible(true);
-		//		childFragmentManager.set(this, null);
-		//	} catch (NoSuchFieldException e) {
-		//		throw new RuntimeException(e);
-		//	} catch (IllegalAccessException e) {
-		//		throw new RuntimeException(e);
-		//	}
-
-		*/
 	}
 
 	@Override
@@ -527,7 +366,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 	 */
 	/* Guarded */
 	public boolean onFragmentExit(ApptentiveViewExitType exitType) {
-		List fragments = getRetainedChildFragmentManager().getFragments();
+		List fragments = getChildFragmentManager().getFragments();
 
 		if (fragments != null) {
 			Iterator it = fragments.iterator();

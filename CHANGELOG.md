@@ -1,3 +1,9 @@
+# 2019-09-02 - v5.4.6
+
+#### Fixes
+
+* Fixed Fragment crash while using `androidx.navigation:navigation-fragment-ktx` dependency.
+
 # 2019-08-15 - v5.4.5
 
 #### Fixes

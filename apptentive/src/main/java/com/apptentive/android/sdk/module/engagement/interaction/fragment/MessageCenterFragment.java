@@ -127,15 +127,15 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private View fab;
 
-	private ArrayList<MessageCenterListItem> listItems = new ArrayList<MessageCenterListItem>();
-	private MessageCenterRecyclerViewAdapter messageCenterRecyclerViewAdapter;
+	private ArrayList<MessageCenterListItem> listItems = new ArrayList<>();
+	private @Nullable MessageCenterRecyclerViewAdapter messageCenterRecyclerViewAdapter;
 	private MessageCenterRecyclerView messageCenterRecyclerView;
 
 	// Holder and view references
 	private MessageComposerHolder composer;
-	private EditText composerEditText;
-	private EditText whoCardNameEditText;
-	private EditText whoCardEmailEditText;
+	private @Nullable EditText composerEditText;
+	private @Nullable EditText whoCardNameEditText;
+	private @Nullable EditText whoCardEmailEditText;
 	private Parcelable composingViewSavedState;
 	/*
 	 * Set to true when user launches image picker, and set to false once an image is picked
@@ -147,8 +147,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	private boolean pendingWhoCardMode;
 	private String pendingWhoCardAvatarFile;
-	private Parcelable pendingWhoCardName;
-	private Parcelable pendingWhoCardEmail;
+	private @Nullable Parcelable pendingWhoCardName;
+	private @Nullable Parcelable pendingWhoCardEmail;
 
 	private boolean forceShowKeyboard;
 
@@ -211,6 +211,17 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	public void onViewCreated(final View view, final Bundle onSavedInstanceState) {
 		super.onViewCreated(view, onSavedInstanceState);
+
+		// setup UI before fetching messages
+		messageCenterRecyclerView = view.findViewById(R.id.message_center_recycler_view);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+			messageCenterRecyclerView.setNestedScrollingEnabled(true);
+		}
+		LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
+		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+		messageCenterRecyclerView.setLayoutManager(layoutManager);
+
+		fab = view.findViewById(R.id.composing_fab);
 
 		fetchMessages(new FetchCallback() {
 			@Override
@@ -436,15 +447,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private void setup(View rootView, boolean isInitialViewCreation, List<MessageCenterListItem> items) {
 		boolean addedAnInteractiveCard = false;
 
-		messageCenterRecyclerView = (MessageCenterRecyclerView) rootView.findViewById(R.id.message_center_recycler_view);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-			messageCenterRecyclerView.setNestedScrollingEnabled(true);
-		}
-		LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
-		layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-		messageCenterRecyclerView.setLayoutManager(layoutManager);
-
-		fab = rootView.findViewById(R.id.composing_fab);
 		fab.setOnClickListener(guarded(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
