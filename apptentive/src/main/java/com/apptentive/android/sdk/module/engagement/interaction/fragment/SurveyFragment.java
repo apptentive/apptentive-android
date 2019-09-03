@@ -19,7 +19,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.accessibility.AccessibilityEvent;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -196,11 +195,11 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					}
 					if (surveyQuestionView != null) {
 						surveyQuestionView.setOnSurveyQuestionAnsweredListener(this);
-						getRetainedChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, Integer.toString(i)).commit();
+						getChildFragmentManager().beginTransaction().add(R.id.questions, surveyQuestionView, Integer.toString(i)).commit();
 					}
 				}
 			} else {
-				List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+				List<Fragment> fragments = getChildFragmentManager().getFragments();
 				for (Fragment fragment : fragments) {
 					BaseSurveyQuestionView questionFragment = (BaseSurveyQuestionView) fragment;
 					questionFragment.setOnSurveyQuestionAnsweredListener(this);
@@ -280,7 +279,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	public boolean validateAndUpdateState() {
 		boolean validationPassed = true;
 
-		List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+		List<Fragment> fragments = getChildFragmentManager().getFragments();
 		for (Fragment fragment : fragments) {
 			SurveyQuestionView surveyQuestionView = (SurveyQuestionView) fragment;
 			answers.put(surveyQuestionView.getQuestionId(), surveyQuestionView.getAnswer());
@@ -294,7 +293,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	private Fragment getFirstRequiredQuestionPos() {
-		List<Fragment> fragments = getRetainedChildFragmentManager().getFragments();
+		List<Fragment> fragments = getChildFragmentManager().getFragments();
 		for (Fragment fragment : fragments) {
 			SurveyQuestionView surveyQuestionView = (SurveyQuestionView) fragment;
 			if (!surveyQuestionView.isValid()) {
