@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	private static final String APPTENTIVE_SDK_VERSION = "5.4.6";
+	private static final String APPTENTIVE_SDK_VERSION = "5.4.7";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
