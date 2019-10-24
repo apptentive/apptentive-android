@@ -233,8 +233,9 @@ public class ApptentiveViewActivity extends ApptentiveBaseActivity implements Ap
 			// Needed to prevent the window from being panned up when the keyboard is opened.
 			getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
 		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception in %s.onCreate()", ApptentiveViewActivity.class.getSimpleName());
+			ApptentiveLog.e(e, "Exception in %s.onCreate(). Finishing activity...", ApptentiveViewActivity.class.getSimpleName());
 			logException(e);
+			finish();
 		}
 	}
 

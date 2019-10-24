@@ -1,3 +1,9 @@
+# 2019-10-24 - v5.4.7
+
+#### Fixes
+
+* Fixed crash while configuration changes.
+
 # 2019-09-02 - v5.4.6
 
 #### Fixes
