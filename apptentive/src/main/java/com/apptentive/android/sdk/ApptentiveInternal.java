@@ -21,9 +21,9 @@ import android.content.res.Resources;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
-import android.support.v4.content.ContextCompat;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import android.text.TextUtils;
 
 import com.apptentive.android.sdk.Apptentive.LoginCallback;
@@ -295,9 +295,9 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				Resources.Theme appDefaultTheme = appContext.getResources().newTheme();
 				appDefaultTheme.applyStyle(themeResId, true);
 
-				TypedArray a = appDefaultTheme.obtainStyledAttributes(android.support.v7.appcompat.R.styleable.AppCompatTheme);
+				TypedArray a = appDefaultTheme.obtainStyledAttributes(androidx.appcompat.R.styleable.AppCompatTheme);
 				try {
-					if (a.hasValue(android.support.v7.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
+					if (a.hasValue(androidx.appcompat.R.styleable.AppCompatTheme_colorPrimaryDark)) {
 						// Only set to use if it's an AppCompat theme. See updateApptentiveInteractionTheme() for theme inheritance chain
 						appDefaultAppCompatThemeId = themeResId;
 						return true;

@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.module.engagement;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction.DisplayType;

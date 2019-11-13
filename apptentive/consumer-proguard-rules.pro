@@ -15,5 +15,5 @@
 
 -keep class android.os.Build { *; }
 -keep class android.graphics.Typeface { *; }
--keep class android.support.v4.app.Fragment { *; }
--keep class android.support.v4.app.FragmentManagerImpl { *; }
+-keep class androidx.fragment.app.Fragment { *; }
+-keep class androidx.fragment.app.FragmentManagerImpl { *; }

@@ -13,8 +13,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import android.text.TextUtils;
 import android.webkit.MimeTypeMap;
 
@@ -31,7 +31,6 @@ import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.model.TimeExtendedData;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.messagecenter.UnreadMessagesListener;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.util.Constants;
@@ -123,6 +122,11 @@ public class Apptentive {
 
 		if (configuration == null) {
 			throw new IllegalArgumentException("Apptentive configuration is null");
+		}
+
+		if (!Availability.isAndroidX()) {
+			ApptentiveLog.e("Unable to register Apptentive SDK: AndroidX support required. For more information see: https://learn.apptentive.com/knowledge-base/android-integration-reference/#migrating-from-support-library-to-androidx");
+			return;
 		}
 
 		try {
@@ -548,7 +552,7 @@ public class Apptentive {
 	/**
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
-	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * {@link androidx.core.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Intent} that did
 	 * not come from Apptentive will return a null object. If you receive a null object, your app will
 	 * need to handle this notification itself.</p>
@@ -591,7 +595,7 @@ public class Apptentive {
 	/**
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
-	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * {@link androidx.core.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>
@@ -632,7 +636,7 @@ public class Apptentive {
 	/**
 	 * <p>Use this method in your push receiver to build a pending Intent when an Apptentive push
 	 * notification is received. Pass the generated PendingIntent to
-	 * {@link android.support.v4.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
+	 * {@link androidx.core.app.NotificationCompat.Builder#setContentIntent} to allow Apptentive
 	 * to display Interactions such as Message Center. Calling this method for a push {@link Bundle} that
 	 * did not come from Apptentive will return a null object. If you receive a null object, your app
 	 * will need to handle this notification itself.</p>

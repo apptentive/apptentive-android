@@ -7,7 +7,6 @@
 package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.content.Context;
-import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -23,6 +22,7 @@ import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.AnswerDefinition;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.Question;
 
+import com.google.android.material.textfield.TextInputLayout;
 import org.json.JSONObject;
 
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;

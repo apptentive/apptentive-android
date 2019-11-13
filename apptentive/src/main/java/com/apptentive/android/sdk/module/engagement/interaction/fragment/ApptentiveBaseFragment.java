@@ -16,15 +16,6 @@ import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
-import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -53,6 +44,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
 
@@ -198,7 +199,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 						if (!parentMenuItems.contains(Integer.valueOf(menuItemId))) {
 							fragmentMenuItems.add(Integer.valueOf(menuItemId));
 							Drawable drawable = combinedMenu.getItem(i).getIcon();
-							if(drawable != null) {
+							if (drawable != null) {
 								drawable.mutate();
 								drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
 							}
@@ -281,9 +282,9 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			// Make menu icon color same as toolbar up arrow. Both use ?colorControlNormal
 			// By default colorControlNormal has same value as textColorPrimary defined in toolbar theme overlay
 			int colorControlNormal = Util.getThemeColor(ApptentiveInternal.getInstance().getApptentiveToolbarTheme(), R.attr.colorControlNormal);
-			for(int i = 0; i < menu.size(); i++){
+			for (int i = 0; i < menu.size(); i++) {
 				Drawable drawable = menu.getItem(i).getIcon();
-				if(drawable != null) {
+				if (drawable != null) {
 					drawable.mutate();
 					drawable.setColorFilter(colorControlNormal, PorterDuff.Mode.SRC_ATOP);
 				}
@@ -362,6 +363,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	/**
 	 * Delegates the hardware or software back button press to the Interaction Fragment.
+	 *
 	 * @return
 	 */
 	/* Guarded */

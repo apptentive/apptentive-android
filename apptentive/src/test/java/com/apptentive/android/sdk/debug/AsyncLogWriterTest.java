@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.debug;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.LogicTestCaseBase;
 import com.apptentive.android.sdk.TestUtils;

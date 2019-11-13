@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.tests.push;
 
 import android.app.PendingIntent;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.tests.ApptentiveTestCaseBase;

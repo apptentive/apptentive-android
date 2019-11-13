@@ -20,7 +20,7 @@
                   android:paddingRight="@dimen/apptentive_message_center_status_side_padding"
                   android:gravity="center"
                   android:orientation="@integer/apptentive_orientation_fill_length">
-        <android.support.v7.widget.AppCompatImageView android:id="@+id/icon"
+        <androidx.appcompat.widget.AppCompatImageView android:id="@+id/icon"
                                                       android:layout_width="wrap_content"
                                                       android:layout_height="wrap_content"
                                                       android:paddingTop="12dp"

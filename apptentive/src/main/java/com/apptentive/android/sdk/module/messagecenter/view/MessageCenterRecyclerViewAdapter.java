@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view;
 
 import android.os.AsyncTask;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;

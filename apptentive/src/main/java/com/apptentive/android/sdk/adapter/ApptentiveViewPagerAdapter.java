@@ -8,11 +8,11 @@ package com.apptentive.android.sdk.adapter;
 import java.util.ArrayList;
 import java.util.List;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentPagerAdapter;
+import androidx.fragment.app.Fragment;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentPagerAdapter;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.ApptentiveBaseFragment;
 
 public class ApptentiveViewPagerAdapter extends FragmentPagerAdapter {

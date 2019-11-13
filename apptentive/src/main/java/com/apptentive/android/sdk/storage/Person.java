@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.util.StringUtils;
 

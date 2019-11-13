@@ -3,34 +3,35 @@ init()
 apply plugin: 'com.android.library'
 
 dependencies {
-    implementation 'com.android.support:support-v4:28.0.0'
-    implementation 'com.android.support:appcompat-v7:28.0.0'
-    implementation 'com.android.support:cardview-v7:28.0.0'
-    implementation 'com.android.support:design:28.0.0'
+    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'com.google.android.material:material:1.0.0'
+
     testImplementation 'junit:junit:4.12'
-    testImplementation "org.powermock:powermock-module-junit4:1.6.2"
-    testImplementation "org.powermock:powermock-module-junit4-rule:1.6.2"
-    testImplementation "org.powermock:powermock-api-mockito:1.6.2"
-    testImplementation "org.powermock:powermock-classloading-xstream:1.6.2"
+    testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
+    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.6'
+    testImplementation 'org.powermock:powermock-api-mockito:1.6.6'
+    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.6'
 
     // Required for instrumented tests
-    androidTestImplementation 'com.android.support:support-annotations:28.0.0'
-    androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation 'com.android.support.test:rules:1.0.2'
+    androidTestImplementation 'androidx.annotation:annotation:1.1.0'
+    androidTestImplementation 'androidx.test:runner:1.2.0'
+    androidTestImplementation 'androidx.test:rules:1.2.0'
 }
 
 android {
-    compileSdkVersion 28
-    buildToolsVersion '28.0.3'
+    compileSdkVersion 29
+    buildToolsVersion '29.0.2'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 28
+        targetSdkVersion 29
         // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: System.getenv("TRAVIS_BUILD_NUMBER") as Integer ?: 1
         versionName project.version
         consumerProguardFiles 'consumer-proguard-rules.pro'
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         resValue "string", "apptentive_distribution_version", versionName
         vectorDrawables.useSupportLibrary = true
     }
@@ -181,6 +182,9 @@ artifacts {
 
 afterEvaluate {
     androidJavadocs.classpath += project.android.libraryVariants.toList().first().javaCompile.classpath
+}
+repositories {
+    mavenCentral()
 }
 
 def init() {

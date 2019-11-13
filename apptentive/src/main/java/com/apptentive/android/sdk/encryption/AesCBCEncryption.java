@@ -1,6 +1,6 @@
 package com.apptentive.android.sdk.encryption;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.util.StringUtils;

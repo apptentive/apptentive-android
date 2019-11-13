@@ -1,7 +1,7 @@
 package com.apptentive.android.sdk.encryption.resolvers;
 
 import android.os.Build;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 public class KeyResolverFactory {
 	public static @NonNull KeyResolver createKeyResolver(int versionCode) {

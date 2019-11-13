@@ -14,7 +14,7 @@
               android:paddingBottom="8dp"
               android:paddingLeft="@dimen/apptentive_message_center_message_list_margin_side"
               android:paddingRight="@dimen/apptentive_message_center_message_list_margin_side">
-    <android.support.v7.widget.CardView android:layout_width="match_parent"
+    <androidx.cardview.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         style="@style/Apptentive.Style.Widget.CardView.Message">
         <LinearLayout android:layout_width="match_parent"
@@ -35,5 +35,5 @@
                       android:autoLink="all"
                       android:focusable="true"/>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -22,13 +22,13 @@
               android:gravity="top|start"
               android:saveEnabled="false"
               android:text=""/>
-    <android.support.design.widget.TextInputLayout android:id="@+id/other_text_input_layout"
-                                                   android:layout_width="match_parent"
-                                                   android:layout_height="wrap_content"
-                                                   android:visibility="gone"
-                                                   app:errorEnabled="true"
-                                                   app:hintAnimationEnabled="true"
-                                                   android:animateLayoutChanges="true">
+    <com.google.android.material.textfield.TextInputLayout android:id="@+id/other_text_input_layout"
+                                                           android:layout_width="match_parent"
+                                                           android:layout_height="wrap_content"
+                                                           android:visibility="gone"
+                                                           app:errorEnabled="true"
+                                                           app:hintAnimationEnabled="true"
+                                                           android:animateLayoutChanges="true">
         <EditText android:id="@+id/other_edit_text"
                   android:layout_width="match_parent"
                   android:layout_height="wrap_content"
@@ -36,5 +36,5 @@
                   android:textAppearance="@style/Apptentive.TextAppearance.Body1"
                   android:saveEnabled="false"
                   android:inputType="textMultiLine|textCapSentences"/>
-    </android.support.design.widget.TextInputLayout>
+    </com.google.android.material.textfield.TextInputLayout>
 </LinearLayout>

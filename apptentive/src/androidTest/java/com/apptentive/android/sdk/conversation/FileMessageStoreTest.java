@@ -6,8 +6,7 @@
 
 package com.apptentive.android.sdk.conversation;
 
-import android.support.test.InstrumentationRegistry;
-
+import androidx.test.InstrumentationRegistry;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.TestCaseBase;

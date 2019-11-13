@@ -12,7 +12,7 @@
              android:layout_height="match_parent"
              android:clipToPadding="false"
              android:background="?apptentiveAttachmentItemBackground">
-    <android.support.v7.widget.AppCompatImageView android:id="@+id/image_placeholder"
+    <androidx.appcompat.widget.AppCompatImageView android:id="@+id/image_placeholder"
                                                   android:layout_width="36dp"
                                                   android:layout_height="36dp"
                                                   android:layout_gravity="center"
@@ -40,7 +40,7 @@
           android:layout_height="match_parent"
           android:visibility="gone"
           android:background="#88000000"/>
-    <android.support.v7.widget.AppCompatImageView android:id="@+id/indicator"
+    <androidx.appcompat.widget.AppCompatImageView android:id="@+id/indicator"
                                                   android:layout_width="wrap_content"
                                                   android:layout_height="wrap_content"
                                                   android:layout_gravity="top|end"

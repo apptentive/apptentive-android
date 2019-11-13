@@ -1,7 +1,7 @@
 package com.apptentive.android.sdk.encryption.resolvers;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.encryption.EncryptionKey;
 

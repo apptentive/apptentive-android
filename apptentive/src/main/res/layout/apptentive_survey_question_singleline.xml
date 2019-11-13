@@ -6,18 +6,18 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<android.support.design.widget.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                               xmlns:app="http://schemas.android.com/apk/res-auto"
-                                               android:id="@+id/answer_text_input_layout"
-                                               android:layout_width="match_parent"
-                                               android:layout_height="wrap_content"
-                                               android:animateLayoutChanges="true"
-                                               app:errorEnabled="true"
-                                               app:hintAnimationEnabled="true">
+<com.google.android.material.textfield.TextInputLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                       xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                       android:id="@+id/answer_text_input_layout"
+                                                       android:layout_width="match_parent"
+                                                       android:layout_height="wrap_content"
+                                                       android:animateLayoutChanges="true"
+                                                       app:errorEnabled="true"
+                                                       app:hintAnimationEnabled="true">
     <EditText android:id="@+id/answer_text"
               android:layout_width="match_parent"
               android:layout_height="wrap_content"
               android:minHeight="48dp"
               android:layout_marginBottom="12dp"
               android:textAppearance="@style/Apptentive.TextAppearance.Body1"/>
-</android.support.design.widget.TextInputLayout>
+</com.google.android.material.textfield.TextInputLayout>

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.model;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.AboutFragment;
 import com.apptentive.android.sdk.module.engagement.interaction.fragment.AppStoreRatingFragment;

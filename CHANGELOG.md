@@ -1,3 +1,9 @@
+# 2019-11-12 - v5.5.0
+
+#### Fixes
+
+* Added support for AndroidX.
+
 # 2019-10-24 - v5.4.7
 
 #### Fixes
