@@ -7,32 +7,15 @@
 package com.apptentive.android.sdk.storage;
 
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
-
-import com.apptentive.android.sdk.encryption.EncryptionKey;
-import com.apptentive.android.sdk.model.AppReleasePayload;
-import com.apptentive.android.sdk.model.DevicePayload;
-import com.apptentive.android.sdk.model.EventPayload;
-import com.apptentive.android.sdk.model.Payload;
-import com.apptentive.android.sdk.model.PersonPayload;
-import com.apptentive.android.sdk.model.SdkPayload;
+import androidx.test.InstrumentationRegistry;
+import androidx.test.runner.AndroidJUnit4;
+import com.apptentive.android.sdk.model.*;
 import com.apptentive.android.sdk.module.messagecenter.model.MessageFactory;
-
-import org.json.JSONException;
 import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
+import java.io.*;
 
 @RunWith(AndroidJUnit4.class)
 public class ApptentiveDatabaseHelperTest {

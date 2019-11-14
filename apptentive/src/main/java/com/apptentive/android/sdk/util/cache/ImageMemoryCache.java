@@ -7,7 +7,7 @@ package com.apptentive.android.sdk.util.cache;
 
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
-import android.support.v4.util.LruCache;
+import androidx.collection.LruCache;
 
 import java.util.ArrayList;
 import java.util.Comparator;

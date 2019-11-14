@@ -7,8 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter.view.holder;
 
 import android.os.Build;
-import android.support.design.widget.TextInputLayout;
-import android.support.v7.widget.RecyclerView;
+import androidx.recyclerview.widget.RecyclerView;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -25,6 +24,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecycle
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
+import com.google.android.material.textfield.TextInputLayout;
 
 import static android.view.View.GONE;
 import static android.view.View.VISIBLE;

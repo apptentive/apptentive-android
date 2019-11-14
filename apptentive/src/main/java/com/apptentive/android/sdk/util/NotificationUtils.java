@@ -10,8 +10,8 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.os.Build;
-import android.support.annotation.NonNull;
-import android.support.v4.app.NotificationManagerCompat;
+import androidx.annotation.NonNull;
+import androidx.core.app.NotificationManagerCompat;
 
 public class NotificationUtils {
 	public static boolean isNotificationChannelEnabled(Context context, @NonNull String channelId){

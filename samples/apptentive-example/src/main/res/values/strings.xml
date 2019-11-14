@@ -1,13 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?>
-
-<!--
-  ~ Copyright (c) 2013, Apptentive, Inc. All Rights Reserved.
-  ~ Please refer to the LICENSE file for the terms and conditions
-  ~ under which redistribution and use of this file is permitted.
-  -->
-
 <resources>
     <string name="app_name">Apptentive Example</string>
-    <string name="demo_intro_text">Apptentive Android SDK Example</string>
-    <string name="message_center_button_label">Message Center</string>
 </resources>

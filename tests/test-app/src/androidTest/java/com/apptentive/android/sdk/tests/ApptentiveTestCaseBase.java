@@ -11,7 +11,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
 import android.os.Build;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 
 import com.apptentive.android.sdk.ApptentiveInstance;
 import com.apptentive.android.sdk.ApptentiveInternal;

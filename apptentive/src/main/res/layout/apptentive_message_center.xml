@@ -6,25 +6,27 @@
   ~ under which redistribution and use of this file is permitted.
   -->
 
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                                 android:layout_width="match_parent"
-                                                 android:layout_height="match_parent" xmlns:app="http://schemas.android.com/apk/res-auto"
-                                                 android:background="?attr/apptentiveViewBackground">
-    <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView android:id="@+id/message_center_recycler_view"
-                                                                                    android:layout_width="match_parent"
-                                                                                    android:layout_height="match_parent"
-                                                                                    android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
-                                                                                    android:cacheColorHint="@android:color/transparent"
-                                                                                    android:clipToPadding="false"
-                                                                                    android:descendantFocusability="afterDescendants"
-                                                                                    android:divider="@null"
-                                                                                    android:dividerHeight="0dp"
-                                                                                    android:scrollbars="vertical"/>
-    <android.support.design.widget.FloatingActionButton android:id="@+id/composing_fab"
-                                                        android:layout_width="wrap_content"
-                                                        android:layout_height="wrap_content"
-                                                        style="?attr/apptentiveFabStyle"
-                                                        android:visibility="gone"
-                                                        app:srcCompat="@drawable/apptentive_pencil_icon"
-                                                        android:contentDescription="@string/apptentive_message_center_fab_content_description"/>
-</android.support.design.widget.CoordinatorLayout>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                                                     xmlns:app="http://schemas.android.com/apk/res-auto"
+                                                     android:layout_width="match_parent"
+                                                     android:layout_height="match_parent"
+                                                     android:background="?attr/apptentiveViewBackground">
+    <com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecyclerView
+            android:id="@+id/message_center_recycler_view"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingBottom="@dimen/apptentive_message_center_bottom_padding"
+            android:cacheColorHint="@android:color/transparent"
+            android:clipToPadding="false"
+            android:descendantFocusability="afterDescendants"
+            android:divider="@null"
+            android:dividerHeight="0dp"
+            android:scrollbars="vertical"/>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton android:id="@+id/composing_fab"
+                                                                           android:layout_width="wrap_content"
+                                                                           android:layout_height="wrap_content"
+                                                                           style="?attr/apptentiveFabStyle"
+                                                                           android:visibility="gone"
+                                                                           app:srcCompat="@drawable/apptentive_pencil_icon"
+                                                                           android:contentDescription="@string/apptentive_message_center_fab_content_description"/>
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

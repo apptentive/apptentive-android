@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.module.engagement.notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.graphics.Color;
-import android.support.annotation.RequiresApi;
+import androidx.annotation.RequiresApi;
 
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_CHANNEL_DEFAULT;
 

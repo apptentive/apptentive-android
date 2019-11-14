@@ -20,9 +20,9 @@
               android:textAppearance="@style/Apptentive.TextAppearance.Caption.Bold"
               style="@style/Apptentive.Style.TextView.Timestamp"
               android:visibility="gone"/>
-    <android.support.v7.widget.CardView android:layout_width="match_parent"
-                                        android:layout_height="wrap_content"
-                                        style="@style/Apptentive.Style.Widget.CardView.Message">
+    <androidx.cardview.widget.CardView android:layout_width="match_parent"
+                                       android:layout_height="wrap_content"
+                                       style="@style/Apptentive.Style.Widget.CardView.Message">
         <LinearLayout android:id="@+id/apptentive_message_auto_frame"
                       android:layout_width="match_parent"
                       android:layout_height="wrap_content"
@@ -41,5 +41,5 @@
                       android:textIsSelectable="true"
                       android:autoLink="all"/>
         </LinearLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </LinearLayout>

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.module.messagecenter;
 
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;

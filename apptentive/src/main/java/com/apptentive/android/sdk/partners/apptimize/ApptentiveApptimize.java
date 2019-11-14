@@ -1,6 +1,6 @@
 package com.apptentive.android.sdk.partners.apptimize;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.ApptentiveLogTag;

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk;
 
 import android.content.Context;
-import android.support.test.InstrumentationRegistry;
+import androidx.test.InstrumentationRegistry;
 
 public class InstrumentationTestCaseBase extends TestCaseBase {
 	protected Context getContext() {

@@ -1,6 +1,6 @@
 package com.apptentive.android.sdk.conversation;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.encryption.SecurityManager;
 import com.apptentive.android.sdk.serialization.SerializableObject;

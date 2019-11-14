@@ -8,8 +8,8 @@ package com.apptentive.android.sdk.tests.push;
 
 import android.app.PendingIntent;
 import android.os.Bundle;
-import android.support.test.rule.UiThreadTestRule;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.rule.UiThreadTestRule;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;

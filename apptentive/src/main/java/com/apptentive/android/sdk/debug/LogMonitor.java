@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.debug;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveLog;

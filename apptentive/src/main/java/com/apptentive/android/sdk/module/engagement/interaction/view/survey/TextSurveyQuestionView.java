@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.view.survey;
 
 import android.os.Build;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
@@ -23,6 +22,7 @@ import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.SinglelineQuestion;
 
+import com.google.android.material.textfield.TextInputLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;

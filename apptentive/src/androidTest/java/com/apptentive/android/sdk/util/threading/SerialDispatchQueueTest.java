@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.util.threading;
 
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.TestCaseBase;
 

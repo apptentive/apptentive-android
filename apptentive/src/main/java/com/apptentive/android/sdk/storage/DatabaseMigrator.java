@@ -2,7 +2,7 @@ package com.apptentive.android.sdk.storage;
 
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.Encryption;

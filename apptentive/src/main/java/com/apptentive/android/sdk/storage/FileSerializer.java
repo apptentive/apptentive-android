@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.storage;
 
-import android.support.v4.util.AtomicFile;
+import androidx.core.util.AtomicFile;
 
 import com.apptentive.android.sdk.util.Util;
 

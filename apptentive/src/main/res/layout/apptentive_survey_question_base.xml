@@ -14,7 +14,7 @@
              android:paddingLeft="@dimen/apptentive_card_view_gap_horizontal"
              android:paddingRight="@dimen/apptentive_card_view_gap_horizontal"
              android:background="@android:color/transparent">
-    <android.support.v7.widget.CardView android:layout_width="match_parent"
+    <androidx.cardview.widget.CardView android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         style="@style/Apptentive.Style.Widget.CardView.Survey">
         <FrameLayout android:layout_width="match_parent"
@@ -76,5 +76,5 @@
                          android:visibility="invisible">
             </FrameLayout>
         </FrameLayout>
-    </android.support.v7.widget.CardView>
+    </androidx.cardview.widget.CardView>
 </FrameLayout>

@@ -7,7 +7,7 @@
 package com.apptentive.android.sdk.util;
 
 import android.content.Context;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.notifications.ApptentiveNotificationCenter;

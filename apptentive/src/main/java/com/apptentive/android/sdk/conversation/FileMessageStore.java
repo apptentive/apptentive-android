@@ -6,7 +6,7 @@
 
 package com.apptentive.android.sdk.conversation;
 
-import android.support.annotation.NonNull;
+import androidx.annotation.NonNull;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.Encryption;

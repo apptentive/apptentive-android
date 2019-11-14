@@ -2,7 +2,7 @@ package com.apptentive.android.sdk.encryption;
 
 import android.security.keystore.KeyGenParameterSpec;
 import android.security.keystore.KeyProperties;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.Encryption;
 

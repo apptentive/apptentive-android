@@ -8,7 +8,7 @@ package com.apptentive.android.sdk.debug;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Jwt;

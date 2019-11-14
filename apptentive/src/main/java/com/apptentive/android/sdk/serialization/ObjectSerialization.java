@@ -1,7 +1,7 @@
 package com.apptentive.android.sdk.serialization;
 
-import android.support.annotation.NonNull;
-import android.support.v4.util.AtomicFile;
+import androidx.annotation.NonNull;
+import androidx.core.util.AtomicFile;
 
 import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.util.Util;
