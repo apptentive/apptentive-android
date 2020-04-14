@@ -18,6 +18,7 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppRelease;
@@ -207,6 +208,11 @@ class ApptentiveNullInstance implements ApptentiveInstance {
 	@Override
 	public String getDefaultAppDisplayName() {
 		failMethodCall("getDefaultAppDisplayName");
+		return null;
+	}
+
+	@Override
+	public TermsAndConditions getSurveyTermsAndConditions() {
 		return null;
 	}
 

@@ -1,3 +1,9 @@
+# 2020-04-14 - v5.5.1
+
+#### Improvements
+
+* Add a configuration property to display terms and conditions.
+
 # 2019-11-12 - v5.5.0
 
 #### Fixes

@@ -9,6 +9,7 @@ package com.apptentive.android.sdk;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.util.StringUtils;
 
 public class ApptentiveConfiguration {
@@ -21,6 +22,7 @@ public class ApptentiveConfiguration {
 	private boolean troubleshootingModeEnabled;
 	private Encryption encryption;
 	private boolean shouldCollectAndroidIdOnPreOreoTargets;
+	private TermsAndConditions surveyTermsAndConditions;
 
 	public ApptentiveConfiguration(@NonNull String apptentiveKey, @NonNull String apptentiveSignature) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -38,6 +40,7 @@ public class ApptentiveConfiguration {
 		this.shouldSanitizeLogMessages = true;
 		this.troubleshootingModeEnabled = true;
 		this.shouldCollectAndroidIdOnPreOreoTargets = true;
+		this.surveyTermsAndConditions = null;
 	}
 
 	public String getApptentiveKey() {
@@ -138,5 +141,13 @@ public class ApptentiveConfiguration {
 	 */
 	public boolean shouldCollectAndroidIdOnPreOreoTargets() {
 		return shouldCollectAndroidIdOnPreOreoTargets;
+	}
+
+	public TermsAndConditions getSurveyTermsAndConditions() {
+		return surveyTermsAndConditions;
+	}
+
+	public void setSurveyTermsAndConditions(TermsAndConditions surveyTermsAndConditions) {
+		this.surveyTermsAndConditions = surveyTermsAndConditions;
 	}
 }

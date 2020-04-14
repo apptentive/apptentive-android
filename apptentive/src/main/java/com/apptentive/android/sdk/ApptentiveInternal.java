@@ -41,6 +41,7 @@ import com.apptentive.android.sdk.model.LogoutPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
+import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.rating.impl.GooglePlayRatingProvider;
@@ -94,6 +95,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	private final String apptentiveSignature;
 	private String serverUrl;
 	private String appPackageName;
+
+	private TermsAndConditions surveyTermsAndConditions;
 
 	// toolbar theme specified in R.attr.apptentiveToolbarTheme
 	private Resources.Theme apptentiveToolbarTheme;
@@ -164,6 +167,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		this.apptentiveKey = apptentiveKey;
 		this.apptentiveSignature = apptentiveSignature;
 		this.serverUrl = serverUrl;
+		this.surveyTermsAndConditions = configuration.getSurveyTermsAndConditions();
 
 		boolean shouldEncryptStorage = configuration.shouldEncryptStorage();
 		Encryption encryption = SecurityManager.getEncryption(application.getApplicationContext(), configuration.getEncryption(), shouldEncryptStorage);
@@ -389,6 +393,10 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	public String getDefaultAppDisplayName() {
 		return defaultAppDisplayName;
+	}
+
+	public TermsAndConditions getSurveyTermsAndConditions() {
+		return surveyTermsAndConditions;
 	}
 
 	public boolean isApptentiveDebuggable() {

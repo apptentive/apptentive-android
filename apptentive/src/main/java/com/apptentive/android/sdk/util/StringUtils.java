@@ -142,6 +142,13 @@ public final class StringUtils {
 	}
 
 	/**
+	 * Checks is string is null or blank(only white spaces)
+	 */
+	public static boolean isNullOrBlank(String str) {
+		return str == null || isNullOrEmpty(str.trim());
+	}
+
+	/**
 	 * Safely trims input string
 	 */
 	public static String trim(String str) {

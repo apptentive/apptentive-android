@@ -34,6 +34,7 @@ public class SurveyInteraction extends Interaction {
 	private static final String KEY_VALIDATION_ERROR = "validation_error";
 	private static final String KEY_QUESTIONS = "questions";
 
+
 	public SurveyInteraction(String json) throws JSONException {
 		super(json);
 	}

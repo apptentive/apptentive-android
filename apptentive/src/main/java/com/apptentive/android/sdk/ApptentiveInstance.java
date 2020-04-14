@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.comm.ApptentiveHttpClient;
 import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppRelease;
@@ -70,4 +71,6 @@ public interface ApptentiveInstance extends Nullsafe {
 	boolean isAppUsingAppCompatTheme();
 
 	String getDefaultAppDisplayName();
+
+	TermsAndConditions getSurveyTermsAndConditions();
 }
