@@ -221,12 +221,14 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	private void updateTermsAndConditions(View v) {
-		updateTermsAndConditionsBody(v);
-		updateTermsAndConditionsLink(v);
+		TermsAndConditions termsAndConditions = ApptentiveInternal.getInstance().getSurveyTermsAndConditions();
+			if (termsAndConditions != null){
+			updateTermsAndConditionsBody(v, termsAndConditions);
+			updateTermsAndConditionsLink(v, termsAndConditions);
+		}
 	}
 
-	private void updateTermsAndConditionsBody(View v) {
-		TermsAndConditions termsAndConditions = ApptentiveInternal.getInstance().getSurveyTermsAndConditions();
+	private void updateTermsAndConditionsBody(View v, TermsAndConditions termsAndConditions) {
 		final TextView termsAndConditionsBodyTv = v.findViewById(R.id.terms_and_conditions_body);
 		final String termsAndConditionsBodyText = termsAndConditions.getBodyText();
 		final boolean isTermsAndConditionsBodyTextValid = !StringUtils.isNullOrBlank(termsAndConditionsBodyText);
@@ -238,8 +240,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 		}
 	}
 
-	private void updateTermsAndConditionsLink(View v) {
-		TermsAndConditions termsAndConditions = ApptentiveInternal.getInstance().getSurveyTermsAndConditions();
+	private void updateTermsAndConditionsLink(View v, TermsAndConditions termsAndConditions) {
 		final TextView termsAndConditionsLinkTv = v.findViewById(R.id.terms_and_conditions_link);
 		final String termsAndConditionsLinkUrl = termsAndConditions.getLinkURL();
 		final String termsAndConditionsLinkText = termsAndConditions.getLinkText();
