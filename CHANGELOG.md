@@ -1,3 +1,9 @@
+# 2020-04-24 - v5.5.2
+
+#### Fixes
+
+* Fix potential NPE when presenting a survey without terms and conditions.
+
 # 2020-04-14 - v5.5.1
 
 #### Improvements
