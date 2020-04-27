@@ -1,3 +1,9 @@
+# 2020-04-27 - v5.5.3
+
+#### Improvements
+
+* Improve Accessibility in Surveys for TalkBack users.
+
 # 2020-04-24 - v5.5.2
 
 #### Fixes
