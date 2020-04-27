@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.module.engagement.interaction.model.survey.RangeQuestion;
+import com.apptentive.android.sdk.util.StringUtils;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -99,6 +100,7 @@ public class RangeSurveyQuestionView extends BaseSurveyQuestionView<RangeQuestio
 				radioButton.setText(defaultNumberFormat.format(i));
 				radioButton.setTag(i);
 				radioButton.setOnCheckedChangeListener(this);
+				radioButton.setContentDescription(StringUtils.format("%s where %s is %s and %s is %s", defaultNumberFormat.format(i), min, minLabel, max, maxLabel));
 				radioGroup.addView(radioButton);
 			}
 		} catch (Exception e) {
