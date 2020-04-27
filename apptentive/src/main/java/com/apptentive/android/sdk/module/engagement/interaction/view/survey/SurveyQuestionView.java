@@ -36,4 +36,6 @@ public interface SurveyQuestionView {
 	boolean didSendMetric();
 
 	void setSentMetric(boolean sent);
+
+	void focusOnQuestionTitleView();
 }

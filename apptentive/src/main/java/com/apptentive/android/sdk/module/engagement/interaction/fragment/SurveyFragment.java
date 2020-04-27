@@ -8,7 +8,6 @@ package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 import android.app.Activity;
 import android.content.res.Resources;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Html;
@@ -53,8 +52,6 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.util.threading.DispatchQueue;
-import com.apptentive.android.sdk.util.threading.DispatchTask;
 import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
 
 import org.json.JSONException;
@@ -156,24 +153,8 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 						Assert.assertNotNull(fragment, "Expected to have a scroll pos");
 						if (fragment != null) {
 							scrollView.scrollToChild(fragment.getView());
-
 							if (fragment instanceof SurveyQuestionView) {
-								fragment.getView().requestFocus();
-
-								final String errorMessage = ((SurveyQuestionView) fragment).getErrorMessage();
-								if (!StringUtils.isNullOrEmpty(errorMessage)) {
-									DispatchQueue.mainQueue().dispatchAsync(new DispatchTask() {
-										@Override
-										protected void execute() {
-											if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
-												View fragmentView = fragment.getView();
-												if (fragmentView != null) {
-													fragmentView.announceForAccessibility(errorMessage);
-												}
-											}
-										}
-									}, 1500); // give other accessibility events a change to propagate
-								}
+								((SurveyQuestionView) fragment).focusOnQuestionTitleView();
 							}
 						}
 					}
