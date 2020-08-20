@@ -176,6 +176,7 @@ public class Constants {
 	 * A list of mobile carrier network types as Strings.
 	 * From {@link android.telephony.TelephonyManager TelephonyManager}
 	 * @see android.telephony.TelephonyManager
+	 * @see <a href="https://developer.android.com/reference/android/telephony/TelephonyManager#getDataNetworkType()">getDataNetworkType()</a>
 	 */
 	private static final String[] networkTypeLookup = {
 		"UNKNOWN", //  0
@@ -196,7 +197,9 @@ public class Constants {
 		"HSPAP",   // 15
 		"GSM",     // 16
 		"TD_SCDMA",// 17
-		"IWLAN"    // 18
+		"IWLAN",   // 18
+		"UNKNOWN", // 19, skipped by Google
+		"5G"       // 20
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {
