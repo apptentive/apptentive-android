@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 30
 
 
     defaultConfig {
@@ -14,6 +14,7 @@ android {
     lintOptions {
         abortOnError false
     }
+    buildToolsVersion '30.0.1'
 
     defaultConfig {
         testApplicationId "com.apptentive.android.sdk.tests"
