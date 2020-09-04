@@ -1,3 +1,9 @@
+# 2020-09-04 - v5.5.4
+
+#### Fixes
+
+* Android 11 support.
+
 # 2020-04-27 - v5.5.3
 
 #### Improvements
