@@ -3,12 +3,14 @@ init()
 apply plugin: 'com.android.library'
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.1.0'
+    implementation 'androidx.appcompat:appcompat:1.2.0'
     implementation 'androidx.legacy:legacy-support-v4:1.0.0'
     implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.0.0'
+    implementation 'com.google.android.material:material:1.2.0'
 
-    testImplementation 'junit:junit:4.12'
+    implementation 'com.google.android.play:core:1.8.0'
+
+    testImplementation 'junit:junit:4.13'
     testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
     testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.6'
     testImplementation 'org.powermock:powermock-api-mockito:1.6.6'
@@ -16,17 +18,17 @@ dependencies {
 
     // Required for instrumented tests
     androidTestImplementation 'androidx.annotation:annotation:1.1.0'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test:rules:1.2.0'
+    androidTestImplementation 'androidx.test:runner:1.3.0'
+    androidTestImplementation 'androidx.test:rules:1.3.0'
 }
 
 android {
-    compileSdkVersion 29
-    buildToolsVersion '29.0.2'
+    compileSdkVersion 30
+    buildToolsVersion '30.0.2'
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 30
         // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: System.getenv("TRAVIS_BUILD_NUMBER") as Integer ?: 1
         versionName project.version

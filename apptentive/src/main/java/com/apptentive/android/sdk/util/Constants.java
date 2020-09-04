@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int  API_VERSION = 9;
-	private static final String APPTENTIVE_SDK_VERSION = "5.5.3";
+	private static final String APPTENTIVE_SDK_VERSION = "5.5.4";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -176,27 +176,30 @@ public class Constants {
 	 * A list of mobile carrier network types as Strings.
 	 * From {@link android.telephony.TelephonyManager TelephonyManager}
 	 * @see android.telephony.TelephonyManager
+	 * @see <a href="https://developer.android.com/reference/android/telephony/TelephonyManager#getDataNetworkType()">getDataNetworkType()</a>
 	 */
 	private static final String[] networkTypeLookup = {
-		"UNKNOWN", //  0
-		"GPRS",    //  1
-		"EDGE",    //  2
-		"UMTS",    //  3
-		"CDMA",    //  4
-		"EVDO_0",  //  5
-		"EVDO_A",  //  6
-		"1xRTT",   //  7
-		"HSDPA",   //  8
-		"HSUPA",   //  9
-		"HSPA",    // 10
-		"IDEN",    // 11
-		"EVDO_B",  // 12
-		"LTE",     // 13
-		"EHRPD",   // 14
-		"HSPAP",   // 15
-		"GSM",     // 16
-		"TD_SCDMA",// 17
-		"IWLAN"    // 18
+			"UNKNOWN", //  0
+			"GPRS",    //  1
+			"EDGE",    //  2
+			"UMTS",    //  3
+			"CDMA",    //  4
+			"EVDO_0",  //  5
+			"EVDO_A",  //  6
+			"1xRTT",   //  7
+			"HSDPA",   //  8
+			"HSUPA",   //  9
+			"HSPA",    // 10
+			"IDEN",    // 11
+			"EVDO_B",  // 12
+			"LTE",     // 13
+			"EHRPD",   // 14
+			"HSPAP",   // 15
+			"GSM",     // 16
+			"TD_SCDMA",// 17
+			"IWLAN",   // 18
+			"UNKNOWN", // 19, skipped by Google
+			"5G"       // 20
 	};
 
 	public static String networkTypeAsString(int networkTypeAsInt) {
