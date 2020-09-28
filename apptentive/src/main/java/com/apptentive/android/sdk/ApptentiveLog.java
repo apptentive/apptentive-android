@@ -102,10 +102,11 @@ public class ApptentiveLog {
 			message = extra.append(' ').append(message).toString();
 		}
 
-		log0(level, message);
 		if (throwable != null) {
-			log0(level, StringUtils.getStackTrace(throwable));
+			message += '\n' + StringUtils.getStackTrace(throwable);
 		}
+
+		log0(level, message);
 	}
 
 	private static void log0(Level level, String message) {

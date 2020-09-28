@@ -20,7 +20,7 @@ import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_CHANNEL_DEF
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_EXTRA_INTERACTION_DEFINITION;
 import static com.apptentive.android.sdk.util.Constants.NOTIFICATION_EXTRA_INTERACTION_TYPE;
 
-class NotificationInteractionLauncher implements InteractionLauncher {
+class NotificationInteractionLauncher implements InteractionLauncher<Interaction> {
 	@Override
 	public boolean launch(Context context, Interaction interaction) {
 		if (!NotificationUtils.isNotificationChannelEnabled(context, NOTIFICATION_CHANNEL_DEFAULT)) {

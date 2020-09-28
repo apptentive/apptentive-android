@@ -15,7 +15,7 @@ import com.apptentive.android.sdk.ApptentiveViewActivity;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.util.Constants;
 
-class ActivityInteractionLauncher implements InteractionLauncher {
+class ActivityInteractionLauncher implements InteractionLauncher<Interaction> {
 	@Override
 	public boolean launch(Context context, Interaction interaction) {
 		Intent intent = new Intent();

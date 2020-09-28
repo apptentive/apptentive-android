@@ -19,7 +19,6 @@ import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
-import com.apptentive.android.sdk.module.metric.MetricModule;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -91,14 +90,18 @@ public class EngagementModule {
 
 		Interaction interaction = conversation.getApplicableInteraction(eventLabel, true);
 		if (interaction != null) {
-			String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
-			int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
-			conversation.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
-			launchInteraction(context, interaction);
-			return true;
+			return launchInteraction(context, conversation, interaction);
 		}
 		ApptentiveLog.d(INTERACTIONS, "No interaction to show for event: '%s'", eventLabel);
 		return false;
+	}
+
+	public static boolean launchInteraction(Context context, Conversation conversation, Interaction interaction) {
+		String versionName = ApptentiveInternal.getInstance().getApplicationVersionName();
+		int versionCode = ApptentiveInternal.getInstance().getApplicationVersionCode();
+		conversation.getEventData().storeInteractionForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, interaction.getId());
+		launchInteraction(context, interaction);
+		return true;
 	}
 
 	public static void launchInteraction(final Context context, final Interaction interaction) {
@@ -124,8 +127,11 @@ public class EngagementModule {
 
 		try {
 			ApptentiveLog.i(INTERACTIONS, "Launching interaction: '%s'", interaction.getType());
+
+			@SuppressWarnings("rawtypes")
 			InteractionLauncher launcher = LAUNCHER_FACTORY.launcherForInteraction(interaction);
 			if (launcher != null) {
+				@SuppressWarnings("unchecked")
 				boolean launched = launcher.launch(context, interaction);
 				ApptentiveLog.d("Interaction %slaunched", launched ? "" : "NOT ");
 			} else {

@@ -16,5 +16,6 @@ public enum ApptentiveLogTag {
 	TROUBLESHOOT,
 	ADVERTISER_ID,
 	PARTNERS,
-	SECURITY
+	SECURITY,
+	IN_APP_REVIEW
 }

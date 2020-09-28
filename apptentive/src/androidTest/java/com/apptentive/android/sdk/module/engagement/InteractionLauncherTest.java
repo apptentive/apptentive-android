@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.InstrumentationTestCaseBase;
+import com.apptentive.android.sdk.module.engagement.interaction.model.InAppRatingDialogInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction.DisplayType;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalInteraction;
@@ -43,6 +44,12 @@ public class InteractionLauncherTest extends InstrumentationTestCaseBase {
 			protected InteractionLauncher createNotificationInteractionLauncher() {
 				return new MockInteractionLauncher("Notification");
 			}
+
+			@NonNull
+			@Override
+			InteractionLauncher createInAppRatingDialogInteractionLauncher() {
+				return new MockInteractionLauncher("InAppReview");
+			}
 		});
 
 		// Everything should run immediately
@@ -63,6 +70,14 @@ public class InteractionLauncherTest extends InstrumentationTestCaseBase {
 		assertEquals(interaction.getDisplayType(), DisplayType.notification);
 		EngagementModule.launchInteraction(getContext(), interaction);
 		assertResult("Notification");
+	}
+
+	@Test
+	public void testInteractionInAppReview() throws JSONException {
+		Interaction interaction = new InAppRatingDialogInteraction("{\"type\":\"InAppRatingDialog\"}");
+		assertEquals(interaction.getType(), Interaction.Type.InAppRatingDialog);
+		EngagementModule.launchInteraction(getContext(), interaction);
+		assertResult("InAppReview");
 	}
 
 	@Test

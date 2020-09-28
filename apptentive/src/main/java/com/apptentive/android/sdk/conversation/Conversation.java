@@ -215,16 +215,24 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 				Targets targets = new Targets(getTargets());
 				String interactionId = targets.getApplicableInteraction(eventLabel, verbose);
 				if (interactionId != null) {
-					String interactionsString = getInteractions();
-					if (interactionsString != null) {
-						Interactions interactions = new Interactions(interactionsString);
-						return interactions.getInteraction(interactionId);
-					}
+					return getInteraction(interactionId);
 				}
 			} catch (JSONException e) {
 				ApptentiveLog.e(INTERACTIONS, e, "Exception while getting applicable interaction: %s", eventLabel);
 				logException(e);
 			}
+		}
+		return null;
+	}
+
+	/**
+	 * Returns an Interaction for <code>interactionId</code> if there is one.
+	 */
+	public @Nullable Interaction getInteraction(@NonNull String interactionId) throws JSONException {
+		String interactionsString = getInteractions();
+		if (interactionsString != null) {
+			Interactions interactions = new Interactions(interactionsString);
+			return interactions.getInteraction(interactionId);
 		}
 		return null;
 	}

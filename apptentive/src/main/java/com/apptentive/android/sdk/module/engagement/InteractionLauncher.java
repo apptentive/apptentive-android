@@ -10,9 +10,9 @@ import android.content.Context;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 
-public interface InteractionLauncher {
+public interface InteractionLauncher<T extends Interaction> {
 	/**
 	 * Returns <code>true</code> if interaction was successfully launched
 	 */
-	boolean launch(Context context, Interaction interaction);
+	boolean launch(Context context, T interaction);
 }
