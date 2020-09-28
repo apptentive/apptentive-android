@@ -1,3 +1,9 @@
+# 2020-09-28 - v5.6.0
+
+#### Improvements
+
+* Google Play In-App Review support.
+
 # 2020-09-04 - v5.5.4
 
 #### Fixes

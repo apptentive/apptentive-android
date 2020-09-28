@@ -119,6 +119,7 @@ public abstract class Interaction extends JSONObject {
 		Survey,
 		TextModal,
 		NavigateToLink,
+		InAppRatingDialog,
 		unknown;
 
 		public static Type parse(String type) {
@@ -175,6 +176,8 @@ public abstract class Interaction extends JSONObject {
 						return new TextModalInteraction(interactionString);
 					case NavigateToLink:
 						return new NavigateToLinkInteraction(interactionString);
+					case InAppRatingDialog:
+						return new InAppRatingDialogInteraction(interactionString);
 					case unknown:
 						break;
 				}

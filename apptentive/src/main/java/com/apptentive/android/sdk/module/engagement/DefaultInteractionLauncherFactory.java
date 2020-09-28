@@ -11,27 +11,24 @@ import androidx.annotation.NonNull;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction.DisplayType;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class DefaultInteractionLauncherFactory implements InteractionLauncherFactory {
-	private final Map<DisplayType, InteractionLauncher> launcherLookup;
-
 	DefaultInteractionLauncherFactory() {
-		launcherLookup = createLauncherLookup();
-	}
-
-	private Map<DisplayType, InteractionLauncher> createLauncherLookup() {
-		Map<DisplayType, InteractionLauncher> lookup = new HashMap<>();
-		lookup.put(DisplayType.notification, createNotificationInteractionLauncher());
-		// This is for maintaining existing behavior
-		lookup.put(DisplayType.unknown, createActivityInteractionLauncher());
-		return lookup;
 	}
 
 	@Override
 	public InteractionLauncher launcherForInteraction(Interaction interaction) {
-		return launcherLookup.get(interaction.getDisplayType());
+		final Interaction.Type type = interaction.getType();
+		if (Interaction.Type.TextModal.equals(type)) {
+			return DisplayType.notification.equals(interaction.getDisplayType())
+					? createNotificationInteractionLauncher()
+					: createActivityInteractionLauncher();
+		}
+
+		if (Interaction.Type.InAppRatingDialog.equals(type)) {
+			return createInAppRatingDialogInteractionLauncher();
+		}
+
+		return createActivityInteractionLauncher();
 	}
 
 	// for Unit-tests
@@ -44,5 +41,10 @@ public class DefaultInteractionLauncherFactory implements InteractionLauncherFac
 	@NonNull
 	InteractionLauncher createNotificationInteractionLauncher() {
 		return new NotificationInteractionLauncher();
+	}
+
+	@NonNull
+	InteractionLauncher createInAppRatingDialogInteractionLauncher() {
+		return new InAppRatingDialogInteractionLauncher();
 	}
 }
