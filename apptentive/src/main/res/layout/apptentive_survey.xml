@@ -12,7 +12,7 @@
     android:background="?attr/apptentiveViewBackground"
     android:orientation="vertical">
 
-    <com.apptentive.android.sdk.view.ApptentiveNestedScrollView
+    <androidx.core.widget.NestedScrollView
         android:id="@+id/survey_scrollview"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
@@ -105,5 +105,5 @@
 
             </LinearLayout>
         </LinearLayout>
-    </com.apptentive.android.sdk.view.ApptentiveNestedScrollView>
+    </androidx.core.widget.NestedScrollView>
 </LinearLayout>

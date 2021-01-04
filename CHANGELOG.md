@@ -1,3 +1,9 @@
+# 2021-01-04 - v5.6.1
+
+#### Improvements
+
+* Accessibility improvements.
+
 # 2020-09-28 - v5.6.0
 
 #### Improvements

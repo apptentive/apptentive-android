@@ -28,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.core.widget.NestedScrollView;
 import androidx.fragment.app.Fragment;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -52,7 +53,7 @@ import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.module.survey.OnSurveyQuestionAnsweredListener;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
-import com.apptentive.android.sdk.view.ApptentiveNestedScrollView;
+import com.apptentive.android.sdk.view.NestedScrollViewHelper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -66,14 +67,14 @@ import static com.apptentive.android.sdk.util.Util.guarded;
 
 
 public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> implements OnSurveyQuestionAnsweredListener,
-		ApptentiveNestedScrollView.OnScrollChangeListener {
+		NestedScrollView.OnScrollChangeListener {
 
 	private static final String EVENT_CANCEL = "cancel";
 	private static final String EVENT_CLOSE = "close";
 	private static final String EVENT_SUBMIT = "submit";
 	private static final String EVENT_QUESTION_RESPONSE = "question_response";
 
-	private ApptentiveNestedScrollView scrollView;
+	private NestedScrollView scrollView;
 	private LinearLayout questionsContainer;
 
 	private Map<String, Object> answers;
@@ -152,7 +153,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 						final Fragment fragment = getFirstRequiredQuestionPos();
 						Assert.assertNotNull(fragment, "Expected to have a scroll pos");
 						if (fragment != null) {
-							scrollView.scrollToChild(fragment.getView());
+							NestedScrollViewHelper.scrollToChild(scrollView, fragment.getView());
 							if (fragment instanceof SurveyQuestionView) {
 								((SurveyQuestionView) fragment).focusOnQuestionTitleView();
 							}
@@ -264,7 +265,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 					ApptentiveInternal.getInstance().showAboutInternal(getActivity(), false);
 				}
 			}));
-			scrollView = (ApptentiveNestedScrollView) view.findViewById(R.id.survey_scrollview);
+			scrollView = (NestedScrollView) view.findViewById(R.id.survey_scrollview);
 			scrollView.setOnScrollChangeListener(this);
 
 			/* Android's ScrollView (when scrolled or fling'd) by default always set the focus to an EditText when
@@ -292,7 +293,7 @@ public class SurveyFragment extends ApptentiveBaseFragment<SurveyInteraction> im
 	}
 
 	@Override
-	public void onScrollChange(ApptentiveNestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
+	public void onScrollChange(NestedScrollView v, int scrollX, int scrollY, int oldScrollX, int oldScrollY) {
 		showToolbarElevation(v.getTop() != scrollY);
 	}
 
