@@ -65,6 +65,7 @@ abstract public class BaseSurveyQuestionView<Q extends Question> extends Fragmen
 			root.setTag(Integer.parseInt(getTag()));
 
             setQuestion(question.getValue());
+			questionView.setContentDescription(getTitleContentDescription(true));
 
 			setInstructions(question.getRequiredText(), question.getInstructions());
 
