@@ -12,8 +12,9 @@
 -keep class * implements com.apptentive.android.sdk.serialization.SerializableObject { *; }
 -keep class com.apptentive.android.sdk.** implements java.io.Serializable { *; }
 
-
 -keep class android.os.Build { *; }
 -keep class android.graphics.Typeface { *; }
 -keep class androidx.fragment.app.Fragment { *; }
 -keep class androidx.fragment.app.FragmentManagerImpl { *; }
+
+-keep class com.google.android.play.core.review.** { *; }

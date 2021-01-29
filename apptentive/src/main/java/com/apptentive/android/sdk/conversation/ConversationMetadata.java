@@ -4,7 +4,6 @@ import com.apptentive.android.sdk.serialization.SerializableObject;
 import com.apptentive.android.sdk.util.StringUtils;
 
 import java.io.DataInput;
-import java.io.DataInputStream;
 import java.io.DataOutput;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -131,6 +130,10 @@ public class ConversationMetadata implements SerializableObject, Iterable<Conver
 				// touch the constructor and "use" the reference
 				ConversationMetadata c = new ConversationMetadata(stream);
 				System.out.println(c);
+
+				// some R8 configurations also remove google in-app review library classes
+				com.google.android.play.core.review.ReviewManager factory = com.google.android.play.core.review.ReviewManagerFactory.create(null);
+				System.out.println(factory);
 			}
 		} catch (Exception ignored) {
 		}

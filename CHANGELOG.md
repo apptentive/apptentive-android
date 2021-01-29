@@ -1,3 +1,9 @@
+# 2021-01-28 - v5.6.2
+
+#### Fixes
+
+* Google Play Core library ProGuard fixes.
+
 # 2021-01-04 - v5.6.1
 
 #### Improvements
