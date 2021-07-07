@@ -400,6 +400,10 @@ public class Device implements Saveable, DataChangedListener {
 		notifyDataChanged();
 	}
 
-	//endregion
+	public boolean isDeviceInitialized() {
+		return osApiLevel != 0;
+	}
+
+    //endregion
 
 }

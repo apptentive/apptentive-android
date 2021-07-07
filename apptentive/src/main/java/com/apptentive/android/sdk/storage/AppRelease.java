@@ -94,5 +94,9 @@ public class AppRelease implements Serializable {
 		this.versionName = versionName;
 	}
 
-	//endregion
+	public boolean isAppReleaseInitialized() {
+		return versionName != null;
+	}
+
+    //endregion
 }
