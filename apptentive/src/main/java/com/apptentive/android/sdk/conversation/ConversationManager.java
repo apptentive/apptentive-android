@@ -216,7 +216,9 @@ public class ConversationManager {
 		// try to load an active conversation from metadata first
 		try {
 			if (conversationMetadata.hasItems()) {
-				return loadConversationFromMetadata(conversationMetadata);
+				Conversation conversation = loadConversationFromMetadata(conversationMetadata);
+				setDeviceSDKAppRelease(conversation);
+				return conversation;
 			}
 
 			// try to load legacy conversation
@@ -237,8 +239,39 @@ public class ConversationManager {
 		File messagesFile = generateMessagesFilename();
 		Conversation conversation = new Conversation(dataFile, messagesFile, encryption, null);
 		conversation.setState(ANONYMOUS_PENDING);
+		setDeviceSDKAppRelease(conversation);
 		fetchConversationToken(conversation);
 		return conversation;
+	}
+
+	private void setDeviceSDKAppRelease(Conversation conversation) {
+		// check if context is lost
+		final Context context = getContext();
+		if (context == null) {
+			ApptentiveLog.w(CONVERSATION, "Unable to update Conversation data: context reference is lost");
+		} else {
+			// Set the Device, Sdk and AppRelease now, so they are available on the server from the start.
+			final Device device = deviceManager.generateNewDevice(context);
+			final Sdk sdk = SdkManager.generateCurrentSdk(context);
+			final AppRelease appRelease = ApptentiveInternal.getInstance().getAppRelease();
+			if (conversation.getDevice() == null || !conversation.getDevice().isDeviceInitialized()) {
+				conversation.setDevice(device);
+				conversation.setLastSentDevice(device.clone());
+			}
+
+			if (conversation.getSdk() == null || !conversation.getSdk().isSDKInitialized()) {
+				conversation.setSdk(sdk);
+			}
+
+			if (conversation.getAppRelease() == null || !conversation.getAppRelease().isAppReleaseInitialized()) {
+				conversation.setAppRelease(appRelease);
+			}
+
+			if (conversation.getLastSeenSdkVersion() == null) {
+				conversation.setLastSeenSdkVersion(sdk.getVersion());
+			}
+		}
+
 	}
 
 	/**
@@ -511,11 +544,6 @@ public class ConversationManager {
 						                      conversation.setState(ANONYMOUS);
 						                      conversation.setConversationToken(conversationToken);
 						                      conversation.setConversationId(conversationId);
-						                      conversation.setDevice(device);
-						                      conversation.setLastSentDevice(device.clone());
-						                      conversation.setAppRelease(appRelease);
-						                      conversation.setSdk(sdk);
-						                      conversation.setLastSeenSdkVersion(sdk.getVersion());
 
 						                      String personId = root.getString("person_id");
 						                      ApptentiveLog.d(CONVERSATION, "PersonId: " + personId);

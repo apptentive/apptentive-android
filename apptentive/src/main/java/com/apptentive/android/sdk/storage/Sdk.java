@@ -76,5 +76,9 @@ public class Sdk implements Serializable {
 		this.distributionVersion = distributionVersion;
 	}
 
-	//endregion
+	public boolean isSDKInitialized() {
+		return version != null;
+	}
+
+    //endregion
 }

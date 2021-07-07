@@ -1,3 +1,9 @@
+# 2021-07-07 - v5.6.3
+
+#### Fixes
+
+* Fixes a race condition where information about the SDK and app was failing to be recorded. 
+
 # 2021-01-28 - v5.6.2
 
 #### Fixes
