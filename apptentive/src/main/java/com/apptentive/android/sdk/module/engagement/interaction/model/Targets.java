@@ -6,10 +6,14 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.model;
 
+import android.content.Context;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.conversation.Conversation;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
+import com.apptentive.android.sdk.module.engagement.logic.RandomPercentProvider;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -38,7 +42,9 @@ public class Targets extends JSONObject {
 					try {
 						Invocation invocation = new Invocation(invocationObject.toString());
 						Conversation conversation = ApptentiveInternal.getInstance().getConversation();
-						FieldManager fieldManager = new FieldManager(ApptentiveInternal.getInstance().getApplicationContext(), conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease());
+						final Context context = ApptentiveInternal.getInstance().getApplicationContext();
+						//final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
+						FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease()/*,percentProvider*/);
 
 						if (invocation.isCriteriaMet(fieldManager, verbose)) {
 							return invocation.getInteractionId();

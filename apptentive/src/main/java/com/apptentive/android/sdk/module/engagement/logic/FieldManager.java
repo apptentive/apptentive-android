@@ -10,7 +10,6 @@ import android.content.Context;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.CustomData;
@@ -29,26 +28,28 @@ import static com.apptentive.android.sdk.ApptentiveLogTag.INTERACTIONS;
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
 public class FieldManager {
-
 	Context context;
 	VersionHistory versionHistory;
 	EventData eventData;
 	Person person;
 	Device device;
 	AppRelease appRelease;
+	//private final RandomPercentProvider randomPercentProvider;
 
-	public FieldManager(Context context, VersionHistory versionHistory, EventData eventData, Person person, Device device, AppRelease appRelease) {
+	public FieldManager(Context context, VersionHistory versionHistory, EventData eventData, Person person, Device device, AppRelease appRelease/*,RandomPercentProvider randomPercentProvider*/) {
 		Assert.notNull(context);
 		Assert.notNull(versionHistory);
 		Assert.notNull(eventData);
 		Assert.notNull(person);
 		Assert.notNull(device);
+		//Assert.notNull(randomPercentProvider);
 		this.context = context;
 		this.versionHistory = versionHistory;
 		this.eventData = eventData;
 		this.person = person;
 		this.device = device;
 		this.appRelease = appRelease;
+		//this.randomPercentProvider = randomPercentProvider;
 	}
 
 	public boolean exists(String query) {
@@ -61,7 +62,6 @@ public class FieldManager {
 	}
 
 	private Object doGetValue(String query) {
-
 		query = query.trim();
 		String[] tokens = query.split("/");
 		QueryPart topLevelQuery = QueryPart.parse(tokens[0]);
@@ -289,6 +289,22 @@ public class FieldManager {
 						return null;
 				}
 			}
+//			case random: {
+//				if (tokens.length == 3) { // random/<key>/percent
+//					final String randomNumberKey = tokens[1];
+//					QueryPart subQuery = QueryPart.valueOf(tokens[2]);
+//					switch (subQuery) {
+//						case percent:
+//							return randomPercentProvider.getPercent(randomNumberKey);
+//					}
+//				} else if (tokens.length == 2) { // random/percent
+//					QueryPart subQuery = QueryPart.valueOf(tokens[1]);
+//					switch (subQuery) {
+//						case percent:
+//							return randomPercentProvider.getPercent(null);
+//					}
+//				}
+//			}
 			default:
 				break;
 		}
@@ -490,6 +506,22 @@ public class FieldManager {
 						return null;
 				}
 			}
+//			case random: {
+//				if (tokens.length == 3) { // random/<key>/percent
+//					final String randomNumberKey = tokens[1];
+//					QueryPart subQuery = QueryPart.valueOf(tokens[2]);
+//					switch (subQuery) {
+//						case percent:
+//							return StringUtils.format("random percent for key '%s'", randomNumberKey);
+//					}
+//				} else if (tokens.length == 2) { // random/percent
+//					QueryPart subQuery = QueryPart.valueOf(tokens[1]);
+//					switch (subQuery) {
+//						case percent:
+//							return StringUtils.format("random percent");
+//					}
+//				}
+//			}
 			default:
 				break;
 		}
@@ -544,6 +576,10 @@ public class FieldManager {
 		debug,
 		build,
 		time_ago,
+
+//		random,
+//		percent,
+
 		other;
 
 		public static QueryPart parse(String name) {
