@@ -1,8 +1,18 @@
+# 2021-07-27 - v5.6.4
+
+#### Fixes
+
+* Prevent Clipboard Notifications for Release builds in Android 12.
+
+#### Improvements
+
+* Replace JCenter with Maven Central.
+
 # 2021-07-07 - v5.6.3
 
 #### Fixes
 
-* Fixes a race condition where information about the SDK and app was failing to be recorded. 
+* Fixes a race condition where information about the SDK and app was failing to be recorded.
 
 # 2021-01-28 - v5.6.2
 

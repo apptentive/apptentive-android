@@ -54,6 +54,7 @@ import android.widget.Toast;
 
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
+import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
@@ -84,6 +85,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
 import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
 import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 
@@ -219,14 +221,6 @@ public class Util {
 
 	public static boolean isEmailValid(String email) {
 		return !StringUtils.isNullOrEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email).matches();
-	}
-
-	public static boolean getPackageMetaDataBoolean(Context context, String key) {
-		try {
-			return context.getPackageManager().getApplicationInfo(context.getPackageName(), PackageManager.GET_META_DATA).metaData.getBoolean(key, false);
-		} catch (PackageManager.NameNotFoundException e) {
-			return false;
-		}
 	}
 
 	public static Object getPackageMetaData(Context appContext, String key) {
@@ -1167,6 +1161,20 @@ public class Util {
 		}
 
 		return null;
+	}
+
+	/*
+	* On Android 12 and up the user would see a toast notification when the app tries to access the
+	* pasteboard. We need to prevent this from happening and only check pasteboard in earlier
+	* versions or debug configurations.
+	*/
+	public static boolean canAccessClipboard(Context context) {
+		try {
+			return Build.VERSION.SDK_INT <= Build.VERSION_CODES.R || RuntimeUtils.getApplicationInfo(context).isDebuggable();
+		} catch (Exception e) {
+			ApptentiveLog.e(UTIL, e, "Unable to determine if the clipboard can be accessed");
+			return false;
+		}
 	}
 
 	public static String getClipboardText(Context context) {

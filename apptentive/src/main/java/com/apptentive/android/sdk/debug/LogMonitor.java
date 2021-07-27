@@ -88,6 +88,12 @@ public final class LogMonitor {
 			return;
 		}
 
+		// don't try to read the the pasteboard if the system forbids it
+		if (!Util.canAccessClipboard(context)) {
+			ApptentiveLog.w(TROUBLESHOOT, "Unable to access device pasteboard");
+			return;
+		}
+
 		// attempt to create a new session based on the clipboard content
 		final String accessToken = readAccessTokenFromClipboard(context);
 

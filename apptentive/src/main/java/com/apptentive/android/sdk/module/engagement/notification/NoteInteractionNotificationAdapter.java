@@ -29,7 +29,9 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.TextModalI
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Action;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.Actions;
 import com.apptentive.android.sdk.module.engagement.interaction.model.common.LaunchInteractionAction;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
+import com.apptentive.android.sdk.module.engagement.logic.RandomPercentProvider;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
@@ -205,8 +207,9 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 						String interactionIdToLaunch = null;
 
 						// Need to check each Invocation object's criteria to find the right one.
+						//final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
 						for (Invocation invocation : invocations) {
-							FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease());
+							FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease()/*,percentProvider*/);
 							if (invocation.isCriteriaMet(fieldManager, true)) {
 								interactionIdToLaunch = invocation.getInteractionId();
 								ApptentiveLog.v(NOTIFICATION_INTERACTIONS, "Found an Interaction to launch with id %s", interactionIdToLaunch);
