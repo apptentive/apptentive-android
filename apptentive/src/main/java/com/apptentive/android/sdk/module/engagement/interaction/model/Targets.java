@@ -43,8 +43,8 @@ public class Targets extends JSONObject {
 						Invocation invocation = new Invocation(invocationObject.toString());
 						Conversation conversation = ApptentiveInternal.getInstance().getConversation();
 						final Context context = ApptentiveInternal.getInstance().getApplicationContext();
-						//final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
-						FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease()/*,percentProvider*/);
+						final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
+						FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease(), percentProvider);
 
 						if (invocation.isCriteriaMet(fieldManager, verbose)) {
 							return invocation.getInteractionId();

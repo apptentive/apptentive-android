@@ -207,9 +207,9 @@ public class NoteInteractionNotificationAdapter implements InteractionNotificati
 						String interactionIdToLaunch = null;
 
 						// Need to check each Invocation object's criteria to find the right one.
-						//final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
+						final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(context, conversation.getLocalIdentifier());
 						for (Invocation invocation : invocations) {
-							FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease()/*,percentProvider*/);
+							FieldManager fieldManager = new FieldManager(context, conversation.getVersionHistory(), conversation.getEventData(), conversation.getPerson(), conversation.getDevice(), conversation.getAppRelease(), percentProvider);
 							if (invocation.isCriteriaMet(fieldManager, true)) {
 								interactionIdToLaunch = invocation.getInteractionId();
 								ApptentiveLog.v(NOTIFICATION_INTERACTIONS, "Found an Interaction to launch with id %s", interactionIdToLaunch);

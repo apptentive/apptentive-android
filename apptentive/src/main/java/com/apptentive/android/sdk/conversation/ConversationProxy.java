@@ -202,9 +202,9 @@ public class ConversationProxy implements ApptentiveNotificationObserver {
 		return conversation.getConversationToken();
 	}
 
-//	public String getLocalIdentifier() {
-//		return conversation.getLocalIdentifier();
-//	}
+	public String getLocalIdentifier() {
+		return conversation.getLocalIdentifier();
+	}
 
     //endregion
 }

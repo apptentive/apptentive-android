@@ -1,3 +1,9 @@
+# 2021-08-04 - v5.7.0
+
+#### Improvements
+
+* Add the ability to randomly target a percentage of customers.
+
 # 2021-07-27 - v5.6.4
 
 #### Fixes
