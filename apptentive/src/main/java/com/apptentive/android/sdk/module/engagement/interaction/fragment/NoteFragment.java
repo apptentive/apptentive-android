@@ -129,9 +129,9 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 									LaunchInteractionAction launchInteractionButton = (LaunchInteractionAction) buttonAction;
 									List<Invocation> invocations = launchInteractionButton.getInvocations();
 									String interactionIdToLaunch = null;
-									//final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(getContext(), getConversation().getLocalIdentifier());
+									final RandomPercentProvider percentProvider = new DefaultRandomPercentProvider(getContext(), getConversation().getLocalIdentifier());
 									for (Invocation invocation : invocations) {
-										FieldManager fieldManager = new FieldManager(getContext(), getConversation().getVersionHistory(), getConversation().getEventData(), getConversation().getPerson(), getConversation().getDevice(), getConversation().getAppRelease()/*,percentProvider*/);
+										FieldManager fieldManager = new FieldManager(getContext(), getConversation().getVersionHistory(), getConversation().getEventData(), getConversation().getPerson(), getConversation().getDevice(), getConversation().getAppRelease(), percentProvider);
 										if (invocation.isCriteriaMet(fieldManager, false)) { // TODO: should we print details here as well?
 											interactionIdToLaunch = invocation.getInteractionId();
 											break;
