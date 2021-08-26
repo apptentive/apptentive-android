@@ -10,6 +10,7 @@ import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
@@ -43,7 +44,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
 			EventData eventData = new EventData();
-			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 			// 0 - $gt
 			ApptentiveLog.e("Test $gt");
@@ -158,7 +159,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
 			EventData eventData = new EventData();
-			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 			// 0 - $gt
 			eventData.clear();
@@ -283,7 +284,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
 			EventData eventData = new EventData();
-			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 			// 0 - $gt
 			eventData.clear();
@@ -408,7 +409,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 			InteractionCriteria criteria = new InteractionCriteria(json);
 
 			EventData eventData = new EventData();
-			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease());
+			FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 			// 0 - $after
 			eventData.clear();
@@ -490,7 +491,7 @@ public class CodePointAndInteractionStoreTest extends ApptentiveTestCaseBase {
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), appRelease);
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 
 		// 0 - $gt
 		eventData.clear();

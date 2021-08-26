@@ -28,7 +28,6 @@ import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
 // TODO: get rid of JSONObject
 public class Configuration extends JSONObject {
 	private static final String KEY_METRICS_ENABLED = "metrics_enabled";
-	private static final String KEY_COLLECT_AD_ID = "collect_ad_id";
 	private static final String KEY_APP_DISPLAY_NAME = "app_display_name";
 	private static final String KEY_MESSAGE_CENTER = "message_center";
 	private static final String KEY_MESSAGE_CENTER_FG_POLL = "fg_poll";
@@ -84,10 +83,6 @@ public class Configuration extends JSONObject {
 
 	public boolean isMetricsEnabled() {
 		return getBoolean(KEY_METRICS_ENABLED, true);
-	}
-
-	public boolean isCollectingAdID() {
-		return getBoolean(KEY_COLLECT_AD_ID, false);
 	}
 
 	public String getAppDisplayName() {

@@ -136,11 +136,6 @@ public final class DevicePayloadDiff {
 			changed = true;
 		}
 
-		if (oldDevice == null || !equal(oldDevice.getAdvertiserId(), newDevice.getAdvertiserId())) {
-			ret.setAdvertiserId(newDevice.getAdvertiserId());
-			changed = true;
-		}
-
 		if (oldDevice == null || !equal(oldDevice.getIntegrationConfig(), newDevice.getIntegrationConfig())) {
 			IntegrationConfig integrationConfig = newDevice.getIntegrationConfig();
 			ret.setIntegrationConfig(integrationConfig != null ? integrationConfig.toJson() : null);

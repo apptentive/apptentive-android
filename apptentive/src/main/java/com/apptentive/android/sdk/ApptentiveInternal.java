@@ -53,7 +53,6 @@ import com.apptentive.android.sdk.partners.apptimize.ApptentiveApptimize;
 import com.apptentive.android.sdk.partners.apptimize.ApptentiveApptimizeTestInfo;
 import com.apptentive.android.sdk.storage.*;
 import com.apptentive.android.sdk.util.*;
-import com.apptentive.android.sdk.util.AdvertiserManager.AdvertisingIdClientInfo;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -1101,7 +1100,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				}
 
 				checkSendVersionChanges(conversation);
-				updateConversationAdvertiserIdentifier(conversation);
 			}
 		} else if (notification.hasName(NOTIFICATION_CONVERSATION_WILL_LOGOUT)) {
 			Conversation conversation = notification.getRequiredUserInfo(NOTIFICATION_KEY_CONVERSATION, Conversation.class);
@@ -1115,34 +1113,12 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			storeManifestResponse(appContext, manifest);
 		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_FOREGROUND)) {
 			onAppEnterForeground();
-
-			if (Configuration.load().isCollectingAdID()) {
-				// update advertiser id every time we come back from the background
-				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
-					// update active conversation's device info
-					Conversation conversation = getConversation();
-					if (conversation != null) {
-						updateConversationAdvertiserIdentifier(conversation);
-					}
-				}
-			}
 		} else if (notification.hasName(NOTIFICATION_APP_ENTERED_BACKGROUND)) {
 			onAppEnterBackground();
 		} else if (notification.hasName(NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH)) {
 			Configuration configuration = notification.getUserInfo(NOTIFICATION_KEY_CONFIGURATION, Configuration.class);
 			if (configuration == null) {
 				return;
-			}
-
-			if (configuration.isCollectingAdID()) {
-				// update advertiser id since the current customer needs it
-				if (AdvertiserManager.updateAdvertisingIdClientInfo(appContext)) {
-					// update active conversation's device info
-					Conversation conversation = getConversation();
-					if (conversation != null) {
-						updateConversationAdvertiserIdentifier(conversation);
-					}
-				}
 			}
 
 			if (configuration.isCollectingApptimizeData()) {
@@ -1169,26 +1145,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			Util.writeText(file, manifest);
 		} catch (Exception e) {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while trying to save engagement manifest data");
-			logException(e);
-		}
-	}
-
-	//endregion
-
-	//region Advertiser Identifier
-
-	private void updateConversationAdvertiserIdentifier(Conversation conversation) {
-		checkConversationQueue();
-
-		try {
-			Configuration config = Configuration.load();
-			if (config.isCollectingAdID()) {
-				AdvertisingIdClientInfo info = AdvertiserManager.getAdvertisingIdClientInfo();
-				String advertiserId = info != null && !info.isLimitAdTrackingEnabled() ? info.getId() : null;
-				conversation.getDevice().setAdvertiserId(advertiserId);
-			}
-		} catch (Exception e) {
-			ApptentiveLog.e(ADVERTISER_ID, e, "Exception while updating conversation advertiser id");
 			logException(e);
 		}
 	}

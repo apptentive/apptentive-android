@@ -147,5 +147,4 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_KEY_MANIFEST = "manifest";
 	public static final String NOTIFICATION_KEY_MESSAGE_STORE = "messageStore";
 	public static final String NOTIFICATION_KEY_INTERVAL = "interval";
-	public static final String NOTIFICATION_KEY_ADVERTISER_CLIENT_INFO = "clientInfo";
 }

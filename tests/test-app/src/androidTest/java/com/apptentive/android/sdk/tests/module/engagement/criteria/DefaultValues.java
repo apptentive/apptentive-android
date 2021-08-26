@@ -9,6 +9,7 @@ package com.apptentive.android.sdk.tests.module.engagement.criteria;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.Device;
@@ -35,7 +36,7 @@ public class DefaultValues extends ApptentiveTestCaseBase {
 		String json = loadTextAssetAsString(TEST_DATA_DIR + "testDefaultValues.json");
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		assertNotNull("Criteria was null, but it shouldn't be.", criteria);
 		assertTrue(criteria.isMet(fieldManager));

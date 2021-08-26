@@ -1,3 +1,10 @@
+# 2021-08-26 - v5.7.1
+
+#### Fixes
+
+* Fix a couple of issues related to Android 12
+* Fix Navigate to Link interaction for API 30+
+
 # 2021-08-04 - v5.7.0
 
 #### Improvements
