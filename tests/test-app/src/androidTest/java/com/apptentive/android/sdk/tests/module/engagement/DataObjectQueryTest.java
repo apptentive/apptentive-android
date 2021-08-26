@@ -10,6 +10,7 @@ import android.os.Build;
 import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.Device;
@@ -42,7 +43,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 		person.setEmail("example@example.com");
 		person.getCustomData().put("foo", "bar");
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, person, new Device(), new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, person, new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		// 0
 		assertTrue(criteria.isMet(fieldManager));
@@ -79,7 +80,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 		device.getCustomData().put("foo", "bar");
 
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		// 0
 		assertTrue(criteria.isMet(fieldManager));
@@ -109,7 +110,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 		Device device = new Device();
 		device.getCustomData().put("foo", "bar");
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		// 0
 		assertTrue(criteria.isMet(fieldManager));

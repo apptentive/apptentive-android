@@ -16,8 +16,6 @@ import android.telephony.TelephonyManager;
 import androidx.core.content.ContextCompat;
 
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.model.Configuration;
-import com.apptentive.android.sdk.util.AdvertiserManager;
 import com.apptentive.android.sdk.util.Constants;
 import com.apptentive.android.sdk.util.StringUtils;
 
@@ -54,22 +52,6 @@ public class DeviceManager {
 		device.setUuid(androidID);
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
-
-		// advertiser id
-		try {
-			Configuration configuration = Configuration.load();
-			if (configuration.isCollectingAdID()) {
-				AdvertiserManager.AdvertisingIdClientInfo info = AdvertiserManager.getAdvertisingIdClientInfo();
-				if (info != null && !info.isLimitAdTrackingEnabled()) {
-					device.setAdvertiserId(info.getId());
-				} else {
-					ApptentiveLog.w("Advertising ID tracking is not available or limited");
-				}
-			}
-		} catch (Exception e) {
-			ApptentiveLog.e(e, "Exception while collecting advertising ID");
-			logException(e);
-		}
 
 		// Second, set the stuff that requires querying system services.
 		try {

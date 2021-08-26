@@ -28,4 +28,13 @@
         <receiver android:name=".module.engagement.notification.ApptentiveNotificationInteractionBroadcastReceiver"
                   android:exported="false"/>
     </application>
+
+    <queries>
+    <!-- Browser -->
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <category android:name="android.intent.category.BROWSABLE" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
 </manifest>

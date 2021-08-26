@@ -214,6 +214,7 @@ public class FieldManager {
 					case other:
 						return null;
 				}
+				break;
 			}
 			case device: {
 				QueryPart subQuery = QueryPart.parse(tokens[1]);
@@ -288,6 +289,7 @@ public class FieldManager {
 					case other:
 						return null;
 				}
+				break;
 			}
 			case random: {
 				if (tokens.length == 3) { // random/<key>/percent

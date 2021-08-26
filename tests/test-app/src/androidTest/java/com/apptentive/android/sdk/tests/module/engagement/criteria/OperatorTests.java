@@ -10,6 +10,7 @@ import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.Device;
@@ -102,7 +103,7 @@ public class OperatorTests extends ApptentiveTestCaseBase {
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
 		Device device = new Device();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), device, new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), device, new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		Apptentive.DateTime dateTime = new Apptentive.DateTime(1000d);
 		Apptentive.Version version = new Apptentive.Version();

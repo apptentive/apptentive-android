@@ -10,6 +10,7 @@ import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
+import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.Device;
@@ -39,7 +40,7 @@ public class CornerCases extends ApptentiveTestCaseBase {
 		EventData eventData = new EventData();
 		Device device = new Device();
 		device.getCustomData().put("key_with_null_value", null);
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		assertNotNull("Criteria was null, but it shouldn't be.", criteria);
 		assertTrue(criteria.isMet(fieldManager));
@@ -56,7 +57,7 @@ public class CornerCases extends ApptentiveTestCaseBase {
 		EventData eventData = new EventData();
 		Device device = new Device();
 		device.getCustomData().put("key_with_null_value", null);
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease());
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), device, new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 
 		assertNotNull("Criteria was null, but it shouldn't be.", criteria);
 		assertTrue(criteria.isMet(fieldManager));

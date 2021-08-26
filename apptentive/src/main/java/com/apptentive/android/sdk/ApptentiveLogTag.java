@@ -14,7 +14,6 @@ public enum ApptentiveLogTag {
 	PUSH,
 	UTIL,
 	TROUBLESHOOT,
-	ADVERTISER_ID,
 	PARTNERS,
 	SECURITY,
 	IN_APP_REVIEW
