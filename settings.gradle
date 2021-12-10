@@ -13,3 +13,5 @@ project(':apptentive-example').projectDir = new File('samples/apptentive-example
 if (file('apptentive-internal-app/build.gradle').exists()) {
     include ':apptentive-internal-app'
 }
+
+rootProject.name = 'apptentive-sdk'

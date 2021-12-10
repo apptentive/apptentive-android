@@ -134,6 +134,11 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		@Override
 		protected void execute() {
 			try {
+				if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
+					ApptentiveLog.v(CONVERSATION, "Saving conversation data...");
+					ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString());
+					ApptentiveLog.v(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
+				}
 				saveConversationData();
 			} catch (Exception e) {
 				ApptentiveLog.e(CONVERSATION, e, "Exception while saving conversation data");
@@ -401,11 +406,6 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 	 * if succeed.
 	 */
 	private synchronized void saveConversationData() throws SerializerException {
-		if (ApptentiveLog.canLog(ApptentiveLog.Level.VERBOSE)) {
-			ApptentiveLog.v(CONVERSATION, "Saving conversation data...");
-			ApptentiveLog.v(CONVERSATION, "EventData: %s", getEventData().toString());
-			ApptentiveLog.v(CONVERSATION, "Messages: %s", messageManager.getMessageStore().toString());
-		}
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer = new EncryptedFileSerializer(conversationDataFile, encryption);
@@ -438,7 +438,7 @@ public class Conversation implements DataChangedListener, Destroyable, DeviceDat
 		return false;
 	}
 
-	void loadConversationData() throws SerializerException {
+	synchronized void loadConversationData() throws SerializerException {
 		long start = System.currentTimeMillis();
 
 		FileSerializer serializer = new EncryptedFileSerializer(conversationDataFile, encryption);

@@ -320,7 +320,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	}
 
 	public void onStop() {
-		super.onStop();
 		try {
 			ConversationProxy conversation = getConversation();
 			if (conversation != null) {
@@ -330,6 +329,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 			ApptentiveLog.e("Exception in %s.onStop()", MessageCenterFragment.class.getSimpleName());
 			logException(e);
 		}
+		super.onStop();
 	}
 
 	@Override
@@ -390,7 +390,6 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 	@Override
 	public void onPause() {
-		super.onPause();
 		dispatchConversationTask(new ConversationDispatchTask() {
 			@Override
 			protected boolean execute(Conversation conversation) {
@@ -398,6 +397,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 				return true;
 			}
 		}, "pause message center fragment");
+		super.onPause();
 	}
 
 	@Override
