@@ -12,6 +12,8 @@ import androidx.annotation.Nullable;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.util.StringUtils;
 
+import java.util.concurrent.TimeUnit;
+
 public class ApptentiveConfiguration {
 	private final String apptentiveKey;
 	private final String apptentiveSignature;
@@ -23,6 +25,7 @@ public class ApptentiveConfiguration {
 	private Encryption encryption;
 	private boolean shouldCollectAndroidIdOnPreOreoTargets;
 	private TermsAndConditions surveyTermsAndConditions;
+	private Long interactionThrottle;
 
 	public ApptentiveConfiguration(@NonNull String apptentiveKey, @NonNull String apptentiveSignature) {
 		if (StringUtils.isNullOrEmpty(apptentiveKey)) {
@@ -149,5 +152,23 @@ public class ApptentiveConfiguration {
 
 	public void setSurveyTermsAndConditions(TermsAndConditions surveyTermsAndConditions) {
 		this.surveyTermsAndConditions = surveyTermsAndConditions;
+	}
+
+	public Long getInteractionThrottle() {
+		return interactionThrottle != null ? interactionThrottle : TimeUnit.DAYS.toMillis(7);
+	}
+
+	/**
+	 * Sets a time limit throttle which determines when a rating interaction can be shown again.
+	 * Default is 7 days.
+	 *
+	 * @see TimeUnit for conversion utils
+	 * e.g. TimeUnit.MINUTES.toMillis(10); or TimeUnit.DAYS.toMillis(30);
+	 *
+	 * @param interactionThrottle The length of time (in milliseconds) to wait before showing
+	 *                            the same interaction again.
+	 */
+	public void setRatingInteractionThrottle(Long interactionThrottle) {
+		this.interactionThrottle = interactionThrottle;
 	}
 }

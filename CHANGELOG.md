@@ -1,9 +1,24 @@
+# 2022-01-06 - v5.8.0
+
+#### Major changes
+
+* Add safeguard parameter for interaction frequency of Rating Dialog.
+
+#### Fixes
+
+* Fix a couple of possible ANR issues.
+
+#### Improvements
+
+* Update License & README files.
+
 # 2021-08-26 - v5.7.1
 
 #### Fixes
 
-* Fix a couple of issues related to Android 12
-* Fix Navigate to Link interaction for API 30+
+* Fix a couple of issues related to Android 12.
+* Fix Navigate to Link interaction for API 30+.
+* Remove all references to AdvertiserId.
 
 # 2021-08-04 - v5.7.0
 

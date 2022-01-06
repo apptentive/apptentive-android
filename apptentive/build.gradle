@@ -3,36 +3,30 @@ init()
 apply plugin: 'com.android.library'
 
 dependencies {
-    implementation 'androidx.appcompat:appcompat:1.2.0'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-    implementation 'androidx.cardview:cardview:1.0.0'
-    implementation 'com.google.android.material:material:1.2.0'
+    implementation "androidx.appcompat:appcompat:$appcompat_library_version"
+    implementation "androidx.legacy:legacy-support-v4:$legacy_support_v4_version"
+    implementation "com.google.android.material:material:$material_design_version"
+    implementation "com.google.android.play:core:$play_core_version"
+    implementation "com.google.android.gms:play-services-base:$play_services_base_version"
 
-    // Play Core library required for in-app review flow
-    implementation 'com.google.android.play:core:1.8.0'
+    testImplementation "junit:junit:$junit_version"
+    testImplementation "org.powermock:powermock-module-junit4:$powermock_version"
+    testImplementation "org.powermock:powermock-module-junit4-rule:$powermock_version"
+    testImplementation "org.powermock:powermock-api-mockito2:$powermock_version"
+    testImplementation "org.powermock:powermock-classloading-xstream:$powermock_version"
 
-    // Play Services library required to check for GPS availability before showing in-app review
-    implementation 'com.google.android.gms:play-services-base:17.4.0'
-
-    testImplementation 'junit:junit:4.13'
-    testImplementation 'org.powermock:powermock-module-junit4:1.6.6'
-    testImplementation 'org.powermock:powermock-module-junit4-rule:1.6.6'
-    testImplementation 'org.powermock:powermock-api-mockito:1.6.6'
-    testImplementation 'org.powermock:powermock-classloading-xstream:1.6.6'
-
-    // Required for instrumented tests
-    androidTestImplementation 'androidx.annotation:annotation:1.1.0'
-    androidTestImplementation 'androidx.test:runner:1.3.0'
-    androidTestImplementation 'androidx.test:rules:1.3.0'
+    androidTestImplementation "androidx.annotation:annotation:$annotation_version"
+    androidTestImplementation "androidx.test:runner:$androidx_test_version"
+    androidTestImplementation "androidx.test:rules:$androidx_test_version"
 }
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion '30.0.2'
+    compileSdkVersion rootProject.compileSdkVersion
+    buildToolsVersion rootProject.buildToolsVersion
 
     defaultConfig {
-        minSdkVersion 14
-        targetSdkVersion 30
+        minSdkVersion rootProject.minSdkVersion
+        targetSdkVersion rootProject.targetSdkVersion
         // BUILD_NUMBER is provided by Jenkins. Default to 1 in dev builds.
         versionCode System.getenv("BUILD_NUMBER") as Integer ?: System.getenv("TRAVIS_BUILD_NUMBER") as Integer ?: 1
         versionName project.version
@@ -56,8 +50,8 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     testOptions {

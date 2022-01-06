@@ -242,7 +242,6 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 
 	@Override
 	public void onStop() {
-		super.onStop();
 		try {
 			if (Build.VERSION.SDK_INT >= 11 && getActivity() != null) {
 				isChangingConfigurations = getActivity().isChangingConfigurations();
@@ -251,12 +250,11 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			ApptentiveLog.e(e, "Exception in %s.onStop()", ApptentiveBaseFragment.class.getSimpleName());
 			logException(e);
 		}
+		super.onStop();
 	}
 
 	@Override
 	public void onDestroyView() {
-		super.onDestroyView();
-
 		try {
 			if (toolbar != null && fragmentMenuItems != null) {
 				Menu toolbarMenu = toolbar.getMenu();
@@ -273,6 +271,7 @@ public abstract class ApptentiveBaseFragment<T extends Interaction> extends Dial
 			logException(e);
 		}
 
+		super.onDestroyView();
 	}
 
 	@Override

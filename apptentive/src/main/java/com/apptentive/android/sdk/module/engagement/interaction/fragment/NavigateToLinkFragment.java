@@ -83,8 +83,8 @@ public class NavigateToLinkFragment extends ApptentiveBaseFragment<NavigateToLin
 
 	@Override
 	public void onPause() {
-		super.onPause();
 		transit();
+		super.onPause();
 	}
 
 

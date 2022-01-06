@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.storage;
 
+import static com.apptentive.android.sdk.util.ObjectUtils.isNullOrEmpty;
+
 import com.apptentive.android.sdk.Encryption;
 import com.apptentive.android.sdk.util.Util;
 
@@ -39,7 +41,11 @@ public class EncryptedFileSerializer extends FileSerializer {
 			oos.writeObject(object);
 			final byte[] unencryptedBytes = bos.toByteArray();
 			final byte[] encryptedBytes = encryption.encrypt(unencryptedBytes);
-			stream.write(encryptedBytes); // TODO: should we write using a buffer?
+			if (!isNullOrEmpty(encryptedBytes)) {
+				stream.write(encryptedBytes); // TODO: should we write using a buffer?
+			} else {
+				throw new SerializerException(new IllegalStateException("Encrypted bytes should not be null or 0"));
+			}
 		} finally {
 			Util.ensureClosed(bos);
 			Util.ensureClosed(oos);

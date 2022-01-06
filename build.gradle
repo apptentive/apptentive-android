@@ -1,14 +1,62 @@
 buildscript {
-    ext.kotlin_version = '1.3.50'
+    ext {
+        // ----- SDK Compile and Build Versions ----- //
+
+        compileSdkVersion = 30
+        buildToolsVersion = '30.0.3'
+        minSdkVersion = 14
+        targetSdkVersion = 30
+
+        // ----- App dependencies ----- //
+
+        // AndroidX
+        // https://developer.android.com/jetpack/androidx/explorer
+        appcompat_library_version = '1.3.1'
+        legacy_support_v4_version = '1.0.0'
+
+        // Material Design
+        // https://github.com/material-components/material-components-android/releases
+        material_design_version='1.4.0'
+
+        // Google Play (For Google In-App Review)
+        // https://developer.android.com/guide/playcore
+        // https://developers.google.com/android/guides/setup
+        play_core_version = '1.10.2'
+        play_services_base_version = '17.6.0'
+
+
+        // ------- Testing ------- //
+
+        // Junit
+        // https://mvnrepository.com/artifact/junit/junit
+        junit_version = '4.13.2'
+
+        // PowerMock
+        // https://github.com/powermock/powermock
+        powermock_version = '2.0.9'
+
+        // AndroidX
+        // https://developer.android.com/jetpack/androidx/explorer
+        // https://developer.android.com/jetpack/androidx/releases/test
+        annotation_version = '1.2.0'
+        androidx_test_version = '1.4.0'
+    }
 
     repositories {
         google() // "https://maven.google.com"
         mavenCentral()
     }
     dependencies {
+        // Android Gradle
+        // https://developer.android.com/studio/releases/gradle-plugin
         classpath 'com.android.tools.build:gradle:4.2.2'
+
+        // Kotlin
+        // https://kotlinlang.org/docs/gradle.html
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.5.30"
+
+        // HockeyApp
         classpath 'com.github.3mph4515:gradle-hockeyapp-plugin:3.7.6'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 

@@ -18,11 +18,13 @@ import com.apptentive.android.sdk.conversation.Conversation;
 import com.apptentive.android.sdk.conversation.ConversationProxy;
 import com.apptentive.android.sdk.debug.Assert;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.module.rating.IRatingProvider;
 import com.apptentive.android.sdk.module.survey.OnSurveyFinishedListener;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.ApptentiveTaskManager;
+import com.apptentive.android.sdk.util.ThrottleUtils;
 
 import java.util.Map;
 
@@ -214,6 +216,11 @@ class ApptentiveNullInstance implements ApptentiveInstance {
 	@Override
 	public TermsAndConditions getSurveyTermsAndConditions() {
 		return null;
+	}
+
+	@Override
+	public boolean shouldThrottleInteraction(Interaction.Type interactionType) {
+		return false;
 	}
 
 	private void failMethodCall(String method) {
