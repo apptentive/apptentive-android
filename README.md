@@ -7,13 +7,13 @@ use your app, to talk to them at the right time, and in the right way.
 
 #### [Android Interface Customization](https://learn.apptentive.com/knowledge-base/android-interface-customization/)
 
-#### [Apptentive SDK API Javadoc](http://www.apptentive.com/docs/android/api)
+#### [Apptentive SDK API Javadoc](https://learn.apptentive.com/docs/android/api/index.html)
 
 ##### [API Changes here](docs/APIChanges.md)
 
 ##### [Release Notes](https://learn.apptentive.com/knowledge-base/android-sdk-release-notes/)
 
-##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|5.7.1|aar)
+##### Binary releases are hosted for Maven [here](http://search.maven.org/#artifactdetails|com.apptentive|apptentive-android|5.8.0|aar)
 
 #### Reporting Bugs
 

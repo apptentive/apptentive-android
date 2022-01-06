@@ -19,6 +19,7 @@ import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.ExtendedData;
 import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
+import com.apptentive.android.sdk.util.ThrottleUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.threading.DispatchTask;
 
@@ -90,7 +91,11 @@ public class EngagementModule {
 
 		Interaction interaction = conversation.getApplicableInteraction(eventLabel, true);
 		if (interaction != null) {
-			return launchInteraction(context, conversation, interaction);
+			if (!ApptentiveInternal.getInstance().shouldThrottleInteraction(interaction.getType())) {
+				return launchInteraction(context, conversation, interaction);
+			} else {
+				return false;
+			}
 		}
 		ApptentiveLog.d(INTERACTIONS, "No interaction to show for event: '%s'", eventLabel);
 		return false;

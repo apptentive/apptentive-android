@@ -86,8 +86,8 @@ public class AppStoreRatingFragment extends ApptentiveBaseFragment<AppStoreRatin
 
 	@Override
 	public void onPause() {
-		super.onPause();
 		transit();
+		super.onPause();
 	}
 
 	@Override

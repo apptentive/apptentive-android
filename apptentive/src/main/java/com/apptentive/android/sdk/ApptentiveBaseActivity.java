@@ -29,8 +29,8 @@ public abstract class ApptentiveBaseActivity extends AppCompatActivity implement
 
 	@Override
 	protected void onDestroy() {
-		super.onDestroy();
 		unregisterNotification();
+		super.onDestroy();
 	}
 
 	//endregion

@@ -40,6 +40,7 @@ import com.apptentive.android.sdk.model.EventPayload;
 import com.apptentive.android.sdk.model.LogoutPayload;
 import com.apptentive.android.sdk.module.engagement.EngagementModule;
 import com.apptentive.android.sdk.module.engagement.interaction.InteractionManager;
+import com.apptentive.android.sdk.module.engagement.interaction.model.Interaction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.MessageCenterInteraction;
 import com.apptentive.android.sdk.module.engagement.interaction.model.TermsAndConditions;
 import com.apptentive.android.sdk.module.messagecenter.MessageManager;
@@ -118,6 +119,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 	// Used for temporarily holding customData that needs to be sent on the next message the consumer sends.
 	private Map<String, Object> customData;
 
+	private ThrottleUtils throttleUtils;
+
 	private static final String PUSH_ACTION = "action";
 	private static final String PUSH_CONVERSATION_ID = "conversation_id";
 	private static final int LOG_HISTORY_SIZE = 2;
@@ -176,6 +179,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		globalSharedPrefs = application.getSharedPreferences(Constants.PREF_NAME, Context.MODE_PRIVATE);
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
 
+		this.throttleUtils = new ThrottleUtils(configuration.getInteractionThrottle(), getGlobalSharedPrefs());
 		DeviceManager deviceManager = new DeviceManager(androidID);
 		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), encryption, deviceManager);
 
@@ -222,17 +226,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		// set log level before we initialize log monitor since log monitor can override it as well
 		ApptentiveLog.overrideLogLevel(configuration.getLogLevel());
 
-		// troubleshooting mode
-		if (configuration.isTroubleshootingModeEnabled()) {
-			// initialize log writer
-			ApptentiveLog.initializeLogWriter(application.getApplicationContext(), LOG_HISTORY_SIZE);
-
-			// try initializing log monitor
-			LogMonitor.startSession(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
-		} else {
-			ApptentiveLog.i(TROUBLESHOOT, "Troubleshooting is disabled in the app configuration");
-		}
-
 		synchronized (ApptentiveInternal.class) {
 			if (sApptentiveInternal == null) {
 				ApptentiveLog.i("Registering Apptentive Android SDK %s", Constants.getApptentiveSdkVersion());
@@ -240,10 +233,21 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 				// resolve Android ID
 				boolean shouldGenerateRandomAndroidID = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !configuration.shouldCollectAndroidIdOnPreOreoTargets();
 				String androidID = resolveAndroidID(application.getApplicationContext(), shouldGenerateRandomAndroidID);
-				sApptentiveInternal = new ApptentiveInternal(application, configuration, androidID);
 				dispatchOnConversationQueue(new DispatchTask() {
 					@Override
 					protected void execute() {
+						// troubleshooting mode
+						if (configuration.isTroubleshootingModeEnabled()) {
+							// initialize log writer
+							ApptentiveLog.initializeLogWriter(application.getApplicationContext(), LOG_HISTORY_SIZE);
+
+							// try initializing log monitor
+							LogMonitor.startSession(application.getApplicationContext(), apptentiveKey, apptentiveSignature);
+						} else {
+							ApptentiveLog.i(TROUBLESHOOT, "Troubleshooting is disabled in the app configuration");
+						}
+
+						sApptentiveInternal = new ApptentiveInternal(application, configuration, androidID);
 						sApptentiveInternal.start();
 					}
 				});
@@ -396,6 +400,11 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	public TermsAndConditions getSurveyTermsAndConditions() {
 		return surveyTermsAndConditions;
+	}
+
+	@Override
+	public boolean shouldThrottleInteraction(Interaction.Type interactionType) {
+		return throttleUtils.shouldThrottleInteraction(interactionType);
 	}
 
 	public boolean isApptentiveDebuggable() {

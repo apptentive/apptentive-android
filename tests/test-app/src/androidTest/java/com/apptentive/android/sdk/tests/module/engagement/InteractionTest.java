@@ -6,13 +6,16 @@
 
 package com.apptentive.android.sdk.tests.module.engagement;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import androidx.test.runner.AndroidJUnit4;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.module.engagement.interaction.model.InteractionCriteria;
 import com.apptentive.android.sdk.module.engagement.logic.DefaultRandomPercentProvider;
 import com.apptentive.android.sdk.module.engagement.logic.FieldManager;
-import com.apptentive.android.sdk.module.engagement.logic.RandomPercentProvider;
 import com.apptentive.android.sdk.storage.AppRelease;
 import com.apptentive.android.sdk.storage.AppReleaseManager;
 import com.apptentive.android.sdk.storage.Device;
@@ -27,10 +30,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.io.File;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 /**
  * Note: Right now, these tests need versionName and versionCode in the manifest to be "2.0" and 4", respectively.
@@ -160,7 +159,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionCode.json");
 		json = json.replace("\"APPLICATION_VERSION_CODE\"", String.valueOf(appRelease.getVersionCode()));
 		InteractionCriteria criteria = new InteractionCriteria(json);
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 
 		assertTrue(criteria.isMet(fieldManager));
 	}
@@ -171,7 +170,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationVersionName.json");
 		json = json.replace("APPLICATION_VERSION_NAME", appRelease.getVersionName());
 		InteractionCriteria criteria = new InteractionCriteria(json);
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 		assertTrue(criteria.isMet(fieldManager));
 	}
 
@@ -181,7 +180,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		String json = loadTextAssetAsString(TEST_DATA_DIR + "criteria/testCriteriaApplicationDebug.json");
 		json = json.replace("APPLICATION_DEBUG", Boolean.toString(appRelease.isDebug()));
 		InteractionCriteria criteria = new InteractionCriteria(json);
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), new EventData(), new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 
 		assertTrue(criteria.isMet(fieldManager));
 	}
@@ -199,7 +198,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 
 		VersionHistory versionHistory = new VersionHistory();
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, eventData, new Person(), new Device(), new AppRelease() , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 		versionHistory.updateVersionHistory(Util.currentTimeSeconds(), versionCode, versionName);
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "app.launch");
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "app.launch");
@@ -232,7 +231,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease() , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, new VersionHistory(), eventData, new Person(), new Device(), new AppRelease(), new DefaultRandomPercentProvider(targetContext, "id"));
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "app.launch");
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "app.launch");
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "big.win");
@@ -308,7 +307,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
 		VersionHistory versionHistory = new VersionHistory();
-		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, new EventData(), new Person(), new Device(), appRelease , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, new EventData(), new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 		versionHistory.updateVersionHistory(Util.currentTimeSeconds(), versionCode, versionName);
 
 		// Test version targeted UpgradeMessage
@@ -344,7 +343,7 @@ public class InteractionTest extends ApptentiveTestCaseBase {
 
 		VersionHistory versionHistory = new VersionHistory();
 		EventData eventData = new EventData();
-		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, eventData, new Person(), new Device(), appRelease , new DefaultRandomPercentProvider(targetContext, "id"));
+		FieldManager fieldManager = new FieldManager(targetContext, versionHistory, eventData, new Person(), new Device(), appRelease, new DefaultRandomPercentProvider(targetContext, "id"));
 		versionHistory.updateVersionHistory(Util.currentTimeSeconds(), versionCode, versionName);
 		eventData.storeEventForCurrentAppVersion(Util.currentTimeSeconds(), versionCode, versionName, "app.launch");
 
