@@ -6,6 +6,8 @@
 
 package com.apptentive.android.sdk.storage;
 
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -17,22 +19,25 @@ import androidx.core.content.ContextCompat;
 
 import com.apptentive.android.sdk.ApptentiveLog;
 import com.apptentive.android.sdk.util.Constants;
-import com.apptentive.android.sdk.util.StringUtils;
 
 import java.util.Locale;
 import java.util.TimeZone;
-
-import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+import java.util.UUID;
 
 public class DeviceManager {
-	private final String androidID;
 
-	public DeviceManager(String androidID) {
-		if (StringUtils.isNullOrEmpty(androidID)) {
-			throw new IllegalArgumentException("Android ID is null or empty");
-		}
-		this.androidID = androidID;
+	public DeviceManager() {
 	}
+
+    /**
+     * AndroidID is no longer collected
+     *
+     * @since Apptentive Android SDK version 5.8.3
+     * @deprecated Use DeviceManager(); instead
+     */
+    @Deprecated
+    public DeviceManager(String androidID) {
+    }
 
 	public Device generateNewDevice(Context context) {
 		Device device = new Device();
@@ -49,9 +54,10 @@ public class DeviceManager {
 		device.setBrand(Build.BRAND);
 		device.setCpu(Build.CPU_ABI);
 		device.setDevice(Build.DEVICE);
-		device.setUuid(androidID);
 		device.setBuildType(Build.TYPE);
 		device.setBuildId(Build.ID);
+
+		device.setUuid(UUID.randomUUID().toString());
 
 		// Second, set the stuff that requires querying system services.
 		try {
@@ -67,7 +73,6 @@ public class DeviceManager {
 			logException(e);
 		}
 		device.setRadioVersion(Build.getRadioVersion());
-
 
 		device.setLocaleCountryCode(Locale.getDefault().getCountry());
 		device.setLocaleLanguageCode(Locale.getDefault().getLanguage());

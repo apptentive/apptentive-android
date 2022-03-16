@@ -10,6 +10,8 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
+
 import androidx.core.app.NotificationManagerCompat;
 
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -32,8 +34,10 @@ public class LogBroadcastReceiver extends BroadcastReceiver {
 		notificationManager.cancel(notificationId);
 
 		// Close the notification drawer
-		Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
-		context.sendBroadcast(it);
+		if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.R) {
+			Intent it = new Intent(Intent.ACTION_CLOSE_SYSTEM_DIALOGS);
+			context.sendBroadcast(it);
+		}
 
 		// Stop log monitor
 		LogMonitor.stopSession(context);

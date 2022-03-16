@@ -23,7 +23,6 @@ public class ApptentiveConfiguration {
 	private boolean shouldSanitizeLogMessages;
 	private boolean troubleshootingModeEnabled;
 	private Encryption encryption;
-	private boolean shouldCollectAndroidIdOnPreOreoTargets;
 	private TermsAndConditions surveyTermsAndConditions;
 	private Long interactionThrottle;
 
@@ -42,7 +41,6 @@ public class ApptentiveConfiguration {
 		this.shouldEncryptStorage = false;
 		this.shouldSanitizeLogMessages = true;
 		this.troubleshootingModeEnabled = true;
-		this.shouldCollectAndroidIdOnPreOreoTargets = true;
 		this.surveyTermsAndConditions = null;
 	}
 
@@ -132,18 +130,22 @@ public class ApptentiveConfiguration {
 	}
 
 	/**
-	 * Overrides if the SDK should collect Android ID on pre Android-O targets. If set to <code>false</code>
-	 * a random value would be generated on the initial SDK launch and provided on each subsequent launch.
+	 * AndroidID is no longer collected
+	 *
+	 * @since Apptentive Android SDK version 5.8.3
 	 */
+	@Deprecated
 	public void setShouldCollectAndroidIdOnPreOreoTargets(boolean shouldCollectAndroidIdOnPreOreoTargets) {
-		this.shouldCollectAndroidIdOnPreOreoTargets = shouldCollectAndroidIdOnPreOreoTargets;
 	}
 
 	/**
-	 * Indicates if the SDK should collect Android ID on pre Android-O targets.
+	 * AndroidID is no longer collected
+	 *
+	 * @since Apptentive Android SDK version 5.8.3
 	 */
+	@Deprecated
 	public boolean shouldCollectAndroidIdOnPreOreoTargets() {
-		return shouldCollectAndroidIdOnPreOreoTargets;
+		return false;
 	}
 
 	public TermsAndConditions getSurveyTermsAndConditions() {

@@ -1,66 +1,102 @@
-language: android
-dist: precise
+dist: focal
+
+language: java
+
+jdk: openjdk11
+
 env:
   global:
-    - SNAPSHOT_REPOSITORY_USERNAME=travis
-    - SNAPSHOT_REPOSITORY_URL=http://54.183.158.246:8081/artifactory/apptentive-snapshots
-    - secure: pc2twMw60say0ASdXiJiRAD6tx9Qy82DIMw83qPijB2wyVHLpLbjptqBFyTYy4+JYthZ8xcB5Yretiv//AQS4wdDPsJNwOKUGXamm8IBx+1wnhG/R/ROz67Ibj4XWHIX24GaKN/MD8tCN9VPdeNEL1jysSEVxqqsvOGBsxitAyI=
-jdk:
-  - oraclejdk8
+    # Android command line tools, check for updates here https://developer.android.com/studio/#command-tools
+    - COMMAND_LINE_TOOLS_VERSION=7583922
+    - ANDROID_HOME=$HOME/android-sdk
+    - TARGET_SDK_VERSION=31
+    - BUILD_TOOLS_VERSION=30.0.2
+
+branches:
+  except:
+    - /^v\..*$/ # Exclude version tags
+
+notifications:
+  slack:
+    secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=
+
 before_cache:
-  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
-  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+  # Only cache the latest version used by the Gradle wrapper
+  # List content in wrapper/dist sorted by modification time and remove entries starting by the second entry
+  - ls -d $HOME/.gradle/wrapper/dists/* -1t | tail -n +2 | xargs rm -rf
+  # Do not cache a few Gradle files/directories (see https://docs.travis-ci.com/user/languages/java/#caching)
+  - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
+  - rm -f $HOME/.gradle/caches/*/executionHistory/executionHistory.bin
+  - rm -f $HOME/.gradle/caches/*/executionHistory/executionHistory.lock
+  - rm -f $HOME/.gradle/caches/*/fileContent/fileContent.lock
+  - rm -f $HOME/.gradle/caches/*/fileContent/java-modules.bin
+  - rm -f $HOME/.gradle/caches/*/fileHashes/fileHashes.bin
+  - rm -f $HOME/.gradle/caches/*/fileHashes/fileHashes.lock
+  - rm -f $HOME/.gradle/caches/*/fileHashes/resourceHashesCache.bin
+  - rm -f $HOME/.gradle/caches/*/generated-gradle-jars/generated-gradle-jars.lock
+  - rm -f $HOME/.gradle/caches/*/javaCompile/jarAnalysis.bin
+  - rm -f $HOME/.gradle/caches/*/javaCompile/javaCompile.lock
+  - rm -f $HOME/.gradle/caches/*/kotlin-dsl/kotlin-dsl.lock
+  - rm -f $HOME/.gradle/caches/jars-9/*/buildSrc.jar
+  - rm -f $HOME/.gradle/caches/jars-9/*/buildSrc.jar.lock.lock
+  - rm -f $HOME/.gradle/caches/jars-9/*/buildSrc.jar.receipt
+  - rm -f $HOME/.gradle/caches/jars-9/jars-*.lock
+  - rm -f $HOME/.gradle/caches/journal-1/file-access.bin
+  - rm -f $HOME/.gradle/caches/journal-1/journal-1.lock
+  - rm -f $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -f $HOME/.gradle/caches/transforms-*/*/results.bin
+  - rm -f $HOME/.gradle/caches/transforms-*/*/transformed/android.jar
+  - rm -f $HOME/.gradle/caches/transforms-*/*/transformed/output.bin
+  - rm -f $HOME/.gradle/caches/transforms-*/transforms-*.lock
+  - rm -f $HOME/.gradle/caches/user-id.txt.lock
+
 cache:
   directories:
+    # Android SDK
+    - $HOME/android-cmdline-tools
+    - $HOME/android-sdk
+
+    # Gradle dependencies
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-    - $HOME/.android/build-cache
-android:
-  components:
-    - tools # to get the new `repository-11.xml`
-    - tools # see https://github.com/travis-ci/travis-ci/issues/6040#issuecomment-219367943)
-    - platform-tools
-    - build-tools-29.0.2
-    # - android-25
-    - android-29
-    - extra-android-m2repository
-    - extra-google-m2repository
-    - extra-google-google_play_services
-    - addon-google_apis-google-29
-    # - sys-img-armeabi-v7a-google_apis-25
-    # - sys-img-armeabi-v7a-android-25
-  licenses:
-    - 'android-sdk-preview-license-52d11cd2'
-    - 'android-sdk-license-.+'
-    - 'google-gdk-license-.+'
-before_install:
-  - yes | sdkmanager "platforms;android-29"
-install: true
+
+install:
+  - mkdir -p $HOME/android-cmdline-tools
+  # Download and unzip the Android command line tools (if not already there thanks to the cache mechanism)
+  - if test ! -e $HOME/android-cmdline-tools/cmdline-tools.zip ; then curl "https://dl.google.com/android/repository/commandlinetools-linux-${COMMAND_LINE_TOOLS_VERSION}_latest.zip" > $HOME/android-cmdline-tools/cmdline-tools.zip ; fi
+  - unzip -qq -n $HOME/android-cmdline-tools/cmdline-tools.zip -d $HOME/android-cmdline-tools
+  - echo y | $HOME/android-cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk "platform-tools"
+  - echo y | $HOME/android-cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk "build-tools;${BUILD_TOOLS_VERSION}"
+  - echo y | $HOME/android-cmdline-tools/cmdline-tools/bin/sdkmanager --sdk_root=$HOME/android-sdk "platforms;android-${TARGET_SDK_VERSION}"
+
 before_script:
-# - echo "y" | android update sdk -a --no-ui --filter android-25
-# - echo "y" | android update sdk -a --no-ui --filter sys-img-armeabi-v7a-android-25
-# - android list targets | grep -E '^id:' | awk -F '"' '{$1=""; print $2}' # list all targets
-# - echo no | android create avd --force -n test -t android-25 --abi google_apis/armeabi-v7a
-# - emulator -avd test -no-window &
-# - android-wait-for-emulator
-# - adb shell input keyevent 82 &
+  # To see if the correct values have been extracted.
+  - echo TARGET_SDK_VERSION=$TARGET_SDK_VERSION
+  - echo BUILD_TOOLS_VERSION=$BUILD_TOOLS_VERSION
+
+  # Ensure Gradle wrapper is executable
+  - chmod +x gradlew
+
+  # Create directory for user Gradle settings
+  - mkdir -p $HOME/.gradle
+
+  # Reduce memory usage / avoid OutOfMemoryError with Gradle 4.10.3
+  - echo "org.gradle.jvmargs=-Xmx2048m -Xms512m -XX:MaxPermSize=768m" >> gradle.properties
+
+  # Enable Gradle's build cache. To be disabled for an Android RELEASE build.
+  - echo "org.gradle.caching=true" >> $HOME/.gradle/gradle.properties
+
 script:
   - ./gradlew :apptentive:test -i
-  # - ./gradlew :test-app:connectedAndroidTest
-  # - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebug; fi
-  # - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:installAutomatedDebugAndroidTest; fi
-  # - if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:connectedAutomatedDebugAndroidTest -i; fi
 
 after_script:
   - >
     if [ "$TRAVIS_BRANCH" = "develop" ]; then
       ./gradlew :apptentive:uploadArchives;
       if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:assembleQaDebug; fi
-      if [ -d "apptentive-internal-app" ]; then ./gradlew :apptentive-internal-app:uploadQaDebugToHockeyApp; fi;
     fi
 
-after_failure:
-#- echo " LOGCAT "; echo "========"; cat logcat.log; pkill -KILL -f adb
-notifications:
-  slack:
-    secure: HejMl0EUociwGu+5djx95snbS+m/Yw8DseQKCSqeyWvMQLrAy8bi9oa89mZvXnvjqSVY3kKRZgJncEkQdIe9c7xwgNA9QYLkc7UVbXqga291HMoNnWaIMewD2ervbzM4aBQAHnkDr+GsXgb7+1YdOktIn8dA7jdIuB90ar4So9U=
+addons:
+  # Fix OpenJDK builds
+  # https://github.com/travis-ci/travis-ci/issues/5227
+  hostname: short-hostname

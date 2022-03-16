@@ -6,6 +6,10 @@
 
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
+import static android.view.View.TEXT_ALIGNMENT_CENTER;
+import static android.view.View.TEXT_ALIGNMENT_VIEW_END;
+import static com.apptentive.android.sdk.util.Util.guarded;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -34,8 +38,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.List;
-
-import static com.apptentive.android.sdk.util.Util.guarded;
 
 public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 
@@ -102,6 +104,9 @@ public class NoteFragment extends ApptentiveBaseFragment<TextModalInteraction> {
 					final int position = i;
 					Button button = (Button) inflater.inflate(R.layout.apptentive_textmodal_interaction_button, bottomArea, false);
 					button.setText(buttonAction.getLabel());
+					if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.JELLY_BEAN_MR1) {
+						button.setTextAlignment(vertical ? TEXT_ALIGNMENT_VIEW_END : TEXT_ALIGNMENT_CENTER);
+					}
 					switch (buttonAction.getType()) {
 						case dismiss:
 							button.setOnClickListener(guarded(new View.OnClickListener() {

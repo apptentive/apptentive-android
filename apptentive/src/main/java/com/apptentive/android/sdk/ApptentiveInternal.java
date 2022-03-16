@@ -157,7 +157,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		appRelease = null;
 	}
 
-	private ApptentiveInternal(Application application, ApptentiveConfiguration configuration, @NonNull String androidID) {
+	private ApptentiveInternal(Application application, ApptentiveConfiguration configuration) {
 		if (configuration == null) {
 			throw new IllegalArgumentException("Configuration is null");
 		}
@@ -180,8 +180,8 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		apptentiveHttpClient = new ApptentiveHttpClient(apptentiveKey, apptentiveSignature, getEndpointBase(globalSharedPrefs));
 
 		this.throttleUtils = new ThrottleUtils(configuration.getInteractionThrottle(), getGlobalSharedPrefs());
-		DeviceManager deviceManager = new DeviceManager(androidID);
-		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), encryption, deviceManager);
+		DeviceManager deviceManager = new DeviceManager();
+		conversationManager = new ConversationManager(appContext, Util.getInternalDir(appContext, CONVERSATIONS_DIR, true), encryption, deviceManager, throttleUtils);
 
 		appRelease = AppReleaseManager.generateCurrentAppRelease(application, this);
 		taskManager = new ApptentiveTaskManager(appContext, apptentiveHttpClient, encryption);
@@ -230,9 +230,7 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 			if (sApptentiveInternal == null) {
 				ApptentiveLog.i("Registering Apptentive Android SDK %s", Constants.getApptentiveSdkVersion());
 				ApptentiveLog.v("ApptentiveKey=%s ApptentiveSignature=%s", apptentiveKey, apptentiveSignature);
-				// resolve Android ID
-				boolean shouldGenerateRandomAndroidID = Build.VERSION.SDK_INT < Build.VERSION_CODES.O && !configuration.shouldCollectAndroidIdOnPreOreoTargets();
-				String androidID = resolveAndroidID(application.getApplicationContext(), shouldGenerateRandomAndroidID);
+				sApptentiveInternal = new ApptentiveInternal(application, configuration);
 				dispatchOnConversationQueue(new DispatchTask() {
 					@Override
 					protected void execute() {
@@ -246,8 +244,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 						} else {
 							ApptentiveLog.i(TROUBLESHOOT, "Troubleshooting is disabled in the app configuration");
 						}
-
-						sApptentiveInternal = new ApptentiveInternal(application, configuration, androidID);
 						sApptentiveInternal.start();
 					}
 				});
@@ -1164,38 +1160,6 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 
 	private static void logException(Exception e) {
 		ErrorMetrics.logException(e); // TODO: add more context info
-	}
-
-	//endregion
-
-	//region Android ID
-
-	private static final String PREFS_NAME_ANDROID_ID = "com.apptentive.sdk.androidID";
-	private static final String PREFS_KEY_NAME_ANDROID_ID = "androidID";
-
-	private static String resolveAndroidID(Context context, boolean shouldGenerateRandomAndroidID) {
-		if (shouldGenerateRandomAndroidID) {
-			String existingAndroidID = loadAndroidID(context);
-			if (existingAndroidID != null) {
-				return existingAndroidID;
-			}
-
-			String androidID = StringUtils.randomAndroidID();
-			saveAndroidID(context, androidID);
-			return androidID;
-		}
-
-		return Util.getAndroidID(context);
-	}
-
-	private static String loadAndroidID(Context context) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME_ANDROID_ID, Context.MODE_PRIVATE);
-		return sharedPreferences.getString(PREFS_KEY_NAME_ANDROID_ID, null);
-	}
-
-	private static void saveAndroidID(Context context, String androidID) {
-		SharedPreferences sharedPreferences = context.getSharedPreferences(PREFS_NAME_ANDROID_ID, Context.MODE_PRIVATE);
-		sharedPreferences.edit().putString(PREFS_KEY_NAME_ANDROID_ID, androidID).apply();
 	}
 
 	//endregion

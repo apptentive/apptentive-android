@@ -6,6 +6,9 @@
 
 package com.apptentive.android.sdk.util;
 
+import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
+import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+
 import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
@@ -36,11 +39,6 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
 import android.provider.Settings;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
-import androidx.core.content.IntentCompat;
-import androidx.core.util.AtomicFile;
 import android.text.TextUtils;
 import android.util.Patterns;
 import android.util.TypedValue;
@@ -52,9 +50,14 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.URLUtil;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.IntentCompat;
+import androidx.core.util.AtomicFile;
+
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
-import com.apptentive.android.sdk.ApptentiveLogTag;
 import com.apptentive.android.sdk.R;
 import com.apptentive.android.sdk.model.StoredFile;
 import com.apptentive.android.sdk.util.threading.DispatchQueue;
@@ -79,15 +82,20 @@ import java.io.PrintWriter;
 import java.io.Reader;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
+import java.security.KeyStore;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
-
-import static com.apptentive.android.sdk.ApptentiveLogTag.CONVERSATION;
-import static com.apptentive.android.sdk.ApptentiveLogTag.UTIL;
-import static com.apptentive.android.sdk.debug.ErrorMetrics.logException;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
+import java.util.UUID;
 
 // TODO: this class does too much - split into smaller classes and clean up
 public class Util {
@@ -353,7 +361,7 @@ public class Util {
 	 * @param d
 	 */
 	public static void setBackground(View v, Drawable d) {
-		if (android.os.Build.VERSION.SDK_INT < android.os.Build.VERSION_CODES.JELLY_BEAN) {
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.JELLY_BEAN) {
 			v.setBackgroundDrawable(d);
 		} else {
 			v.setBackground(d);
@@ -1112,12 +1120,16 @@ public class Util {
 		return String.format("%.1f %sB", bytes / Math.pow(unit, exp), pre);
 	}
 
+	/**
+	 * AndroidID is no longer collected
+	 *
+	 * @since Apptentive Android SDK version 5.8.3
+	 */
+	@Deprecated
 	public static String getAndroidID(Context context) {
-		if (context == null) {
-			return null;
-		}
-		return Settings.Secure.getString(context.getContentResolver(), android.provider.Settings.Secure.ANDROID_ID);
+		return null;
 	}
+
 	/**
 	 * Returns and internal storage directory
 	 */
@@ -1170,7 +1182,26 @@ public class Util {
 	*/
 	public static boolean canAccessClipboard(Context context) {
 		try {
-			return Build.VERSION.SDK_INT <= Build.VERSION_CODES.R || RuntimeUtils.getApplicationInfo(context).isDebuggable();
+			boolean hasApptentiveCertInstalled = false;
+
+			KeyStore ks = KeyStore.getInstance("AndroidCAStore");
+			if (ks != null) {
+				ks.load(null, null);
+				Enumeration<String> aliases = ks.aliases();
+				while (aliases.hasMoreElements()) {
+					String alias = aliases.nextElement();
+					X509Certificate cert = (X509Certificate) ks.getCertificate(alias);
+
+					if (cert.getIssuerDN().getName().contains("Apptentive")) {
+						hasApptentiveCertInstalled = true;
+						break;
+					}
+				}
+			}
+
+			return Build.VERSION.SDK_INT <= Build.VERSION_CODES.R
+					|| hasApptentiveCertInstalled
+					|| RuntimeUtils.getApplicationInfo(context).isDebuggable();
 		} catch (Exception e) {
 			ApptentiveLog.e(UTIL, e, "Unable to determine if the clipboard can be accessed");
 			return false;

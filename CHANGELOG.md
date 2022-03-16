@@ -1,3 +1,16 @@
+# 2022-03-16 - v5.8.3
+
+#### Fixes
+
+* Fix conversation deserialization issue with conversation reset & throttle once per SDK version
+* Register lifecycle callback on the main thread
+* Remove all references of AndroidID
+
+#### Improvements
+
+* Add troubleshooting mode for Android 12+ with a Apptentive certificate
+* Support long texts for alert dialog buttons
+
 # 2022-01-06 - v5.8.0
 
 #### Major changes

@@ -194,7 +194,6 @@ public class ConversationDataTest {
 		assertTrue(listenerFired);
 		listenerFired = false;
 
-
 		data.setPerson(new Person());
 		assertTrue(listenerFired);
 		listenerFired = false;
