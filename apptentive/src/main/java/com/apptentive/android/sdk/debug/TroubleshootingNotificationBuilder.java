@@ -51,7 +51,7 @@ final class TroubleshootingNotificationBuilder {
 		Intent abortIntent = new Intent(context, LogBroadcastReceiver.class);
 		abortIntent.setAction(ACTION_ABORT);
 		abortIntent.putExtra(NOTIFICATION_ID_KEY, APPTENTIVE_NOTIFICATION_ID);
-		PendingIntent abortPendingIntent = PendingIntent.getBroadcast(context, 0, abortIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent abortPendingIntent = PendingIntent.getBroadcast(context, 0, abortIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		NotificationCompat.Action abortAction = new NotificationCompat.Action.Builder(0, "Discard", abortPendingIntent).build();
 
 		Intent sendLogsIntent = new Intent(context, LogBroadcastReceiver.class);
@@ -62,7 +62,7 @@ final class TroubleshootingNotificationBuilder {
 		sendLogsIntent.putExtra(EXTRA_INFO, systemInfo);
 		sendLogsIntent.putExtra(EXTRA_ATTACHMENTS, attachments);
 
-		PendingIntent sendLogsPendingIntent = PendingIntent.getBroadcast(context, 0, sendLogsIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+		PendingIntent sendLogsPendingIntent = PendingIntent.getBroadcast(context, 0, sendLogsIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 		NotificationCompat.Action sendLogsAction = new NotificationCompat.Action.Builder(0, "Send Report", sendLogsPendingIntent).build();
 
 		// Build notification

@@ -8,6 +8,7 @@ import com.apptentive.android.sdk.module.engagement.interaction.model.Interactio
 
 import java.util.concurrent.TimeUnit;
 
+
 public class ThrottleUtils {
 
     public ThrottleUtils(Long ratingThrottle, SharedPreferences globalSharedPrefs) {
@@ -37,6 +38,20 @@ public class ThrottleUtils {
         } else {
             sharedPrefs.edit().putLong(interactionName, currentTime).commit();
             return false;
+        }
+    }
+
+    public boolean shouldThrottleResetConversation() {
+        String sdkVersion = sharedPrefs.getString(Constants.PREF_KEY_THROTTLE_VERSION, "");
+        String apptentiveSDKVersion = Constants.getApptentiveSdkVersion();
+
+        if (sdkVersion.isEmpty() || !sdkVersion.equals(apptentiveSDKVersion)) {
+            ApptentiveLog.d("Conversation reset not throttled");
+            sharedPrefs.edit().putString(Constants.PREF_KEY_THROTTLE_VERSION, Constants.getApptentiveSdkVersion()).apply();
+            return false;
+        } else {
+            ApptentiveLog.d("Conversation reset throttled");
+            return true;
         }
     }
 

@@ -31,7 +31,6 @@ import static org.junit.Assert.assertTrue;
 @RunWith(AndroidJUnit4.class)
 public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 
-	private static final String ANDROID_ID = "a3d5f16b-e64c-4ebf-bd1a-8a17b92115b9";
 	private static final String TEST_DATA_DIR = "engagement/payloads/";
 
 	@Test
@@ -76,7 +75,7 @@ public class DataObjectQueryTest extends ApptentiveTestCaseBase {
 		json = json.replace("\"OS_API_LEVEL\"", String.valueOf(Build.VERSION.SDK_INT));
 		InteractionCriteria criteria = new InteractionCriteria(json);
 
-		Device device = new DeviceManager(ANDROID_ID).generateNewDevice(targetContext);
+		Device device = new DeviceManager().generateNewDevice(targetContext);
 		device.getCustomData().put("foo", "bar");
 
 		EventData eventData = new EventData();

@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int API_VERSION = 10;
-	private static final String APPTENTIVE_SDK_VERSION = "5.8.0";
+	private static final String APPTENTIVE_SDK_VERSION = "5.8.3";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -73,6 +73,9 @@ public class Constants {
 	public static final String PAYLOAD_DATA_DIR = "payloads";
 	public static final String PAYLOAD_DATA_FILE_SUFFIX = ".data";
 	//endregion
+
+	// region Keys used for conversation reset
+	public static final String PREF_KEY_THROTTLE_VERSION = "conversation_reset_version";
 
 	// region Keys used to access old data for migration
 	public static final String PREF_KEY_CONVERSATION_TOKEN = "conversationToken";

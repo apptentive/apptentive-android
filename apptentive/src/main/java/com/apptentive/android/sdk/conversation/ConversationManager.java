@@ -42,6 +42,7 @@ import com.apptentive.android.sdk.util.Jwt;
 import com.apptentive.android.sdk.util.ObjectUtils;
 import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
+import com.apptentive.android.sdk.util.ThrottleUtils;
 import com.apptentive.android.sdk.util.Util;
 
 import org.json.JSONObject;
@@ -49,6 +50,7 @@ import org.json.JSONObject;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.util.List;
+import java.util.Objects;
 
 import static com.apptentive.android.sdk.ApptentiveHelper.checkConversationQueue;
 import static com.apptentive.android.sdk.ApptentiveHelper.conversationQueue;
@@ -103,13 +105,15 @@ public class ConversationManager {
 	private Conversation activeConversation;
 	private ConversationProxy activeConversationProxy;
 
+	private ThrottleUtils throttleUtils;
+
 	/**
 	 * Indicate a failure in resolving active conversation (there was an exception while loading
 	 * metadata or conversation). Used to disable conversation-related SDK functionality (like login)
 	 */
 	private boolean activeConversationFailedToResolve; // TODO: this is a temporary solution until we restore conversation state
 
-	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull Encryption encryption, @NonNull DeviceManager deviceManager) {
+	public ConversationManager(@NonNull Context context, @NonNull File conversationsStorageDir, @NonNull Encryption encryption, @NonNull DeviceManager deviceManager, @NonNull ThrottleUtils throttleUtils) {
 		if (context == null) {
 			throw new IllegalArgumentException("Context is null");
 		}
@@ -130,6 +134,7 @@ public class ConversationManager {
 		this.conversationsStorageDir = conversationsStorageDir;
 		this.encryption = encryption;
 		this.deviceManager = deviceManager;
+		this.throttleUtils = throttleUtils;
 
 		ApptentiveNotificationCenter.defaultCenter()
 			.addObserver(NOTIFICATION_APP_ENTERED_FOREGROUND, new ApptentiveNotificationObserver() {
@@ -187,9 +192,9 @@ public class ConversationManager {
 
 			if (activeConversation != null) {
 				ApptentiveNotificationCenter.defaultCenter()
-					.postNotification(NOTIFICATION_CONVERSATION_LOAD_DID_FINISH,
-						NOTIFICATION_KEY_CONVERSATION, activeConversation,
-						NOTIFICATION_KEY_SUCCESSFUL, true);
+						.postNotification(NOTIFICATION_CONVERSATION_LOAD_DID_FINISH,
+								NOTIFICATION_KEY_CONVERSATION, activeConversation,
+								NOTIFICATION_KEY_SUCCESSFUL, true);
 
 				activeConversation.startListeningForChanges();
 				activeConversation.scheduleSaveConversationData();
@@ -202,14 +207,38 @@ public class ConversationManager {
 			ApptentiveLog.e(CONVERSATION, e, "Exception while loading active conversation");
 			logException(e);
 
+			//This fix is to recover the accounts that are stuck with serialization issue.
+			// It is not recommended to reset the conversation state.
+			if (!throttleUtils.shouldThrottleResetConversation()) {
+				ApptentiveLog.d(CONVERSATION, "Deserialization failure, deleting the conversation files");
+				deleteUnrecoverableStorageFiles(conversationsStorageDir);
+			}
+			//What to do with this??
 			activeConversationFailedToResolve = true;
+			ApptentiveNotificationCenter.defaultCenter()
+					.postNotification(NOTIFICATION_CONVERSATION_LOAD_DID_FINISH,
+							NOTIFICATION_KEY_SUCCESSFUL, false);
+
+			return false;
+
 		}
 
-		ApptentiveNotificationCenter.defaultCenter()
-			.postNotification(NOTIFICATION_CONVERSATION_LOAD_DID_FINISH,
-				NOTIFICATION_KEY_SUCCESSFUL, false);
-
 		return false;
+	}
+
+	public void deleteUnrecoverableStorageFiles(File fileOrDirectory) {
+		try {
+			if (fileOrDirectory.isDirectory()) {
+				for (File child : Objects.requireNonNull(fileOrDirectory.listFiles())) {
+					deleteUnrecoverableStorageFiles(child);
+				}
+			}
+			ApptentiveLog.d(CONVERSATION, "File/directory to be deleted " + fileOrDirectory.getName());
+			fileOrDirectory.delete();
+		} catch (Exception e) {
+			ApptentiveLog.e(CONVERSATION, "Exception while trying to delete unrecoverable Conversation data files");
+			logException(e);
+		}
 	}
 
 	private @Nullable Conversation loadActiveConversationGuarded() throws ConversationLoadException {
@@ -234,6 +263,10 @@ public class ConversationManager {
 		}
 
 		// no active conversations: create a new one
+		return createNewActiveConversation();
+	}
+
+	private Conversation createNewActiveConversation() {
 		ApptentiveLog.i(CONVERSATION, "Creating 'anonymous' conversation...");
 		File dataFile = generateConversationDataFilename();
 		File messagesFile = generateMessagesFilename();

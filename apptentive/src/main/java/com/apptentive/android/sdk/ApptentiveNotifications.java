@@ -114,12 +114,13 @@ public class ApptentiveNotifications {
 	public static final String NOTIFICATION_MESSAGE_STORE_DID_CHANGE = "MESSAGE_STORE_DID_CHANGE"; // { messageStore: MessageStore }
 
 	/**
-	 * Sent when advertiser id was resolved.
+	 * AdvertiserID is not collected
 	 */
-	public static final String NOTIFICATION_ADVERTISER_ID_DID_RESOLVE = "ADVERTISER_ID_DID_RESOLVE"; // { successful: Boolean, clientInfo: AdvertisingIdClientInfo }
+	@Deprecated
+	public static final String NOTIFICATION_ADVERTISER_ID_DID_RESOLVE = "ADVERTISER_ID_DID_RESOLVE";
 
 	/**
-	 * Sent when advertiser id was resolved.
+	 * Sent when Configuration fetch finishes.
 	 */
 	public static final String NOTIFICATION_CONFIGURATION_FETCH_DID_FINISH = "CONFIGURATION_FETCH_DID_FINISH"; // { configuration: Configuration, conversation: Conversation }
 
