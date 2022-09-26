@@ -9,7 +9,7 @@ package com.apptentive.android.sdk.util;
 public class Constants {
 
 	public static final int API_VERSION = 10;
-	private static final String APPTENTIVE_SDK_VERSION = "5.8.3";
+	private static final String APPTENTIVE_SDK_VERSION = "5.8.4";
 
 	public static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 45000;
 	public static final int DEFAULT_READ_TIMEOUT_MILLIS = 45000;
@@ -18,6 +18,7 @@ public class Constants {
 	public static final int REQUEST_CODE_CLOSE_COMPOSING_CONFIRMATION = 20;
 
 	public final static int REQUEST_READ_STORAGE_PERMISSION = 1;
+	public final static int REQUEST_POST_NOTIFICATION_PERMISSION = 2;
 
 	public static final String PREF_NAME = "APPTENTIVE";
 
