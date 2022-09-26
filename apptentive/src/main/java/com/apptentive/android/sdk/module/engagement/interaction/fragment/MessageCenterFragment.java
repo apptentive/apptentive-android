@@ -7,6 +7,18 @@
 package com.apptentive.android.sdk.module.engagement.interaction.fragment;
 
 
+import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
+import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
+import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
+import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.STATUS;
+import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.WHO_CARD;
+import static com.apptentive.android.sdk.util.Util.guarded;
+import static com.apptentive.android.sdk.util.Util.hasPermission;
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -19,8 +31,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Parcelable;
-import androidx.annotation.Nullable;
-import androidx.core.view.ViewCompat;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -33,10 +43,13 @@ import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.EditText;
 
+import androidx.annotation.Nullable;
+import androidx.core.view.ViewCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
+
 import com.apptentive.android.sdk.Apptentive;
 import com.apptentive.android.sdk.ApptentiveInternal;
 import com.apptentive.android.sdk.ApptentiveLog;
@@ -62,6 +75,7 @@ import com.apptentive.android.sdk.module.messagecenter.view.MessageCenterRecycle
 import com.apptentive.android.sdk.module.messagecenter.view.holder.MessageComposerHolder;
 import com.apptentive.android.sdk.util.AnimationUtil;
 import com.apptentive.android.sdk.util.Constants;
+import com.apptentive.android.sdk.util.RuntimeUtils;
 import com.apptentive.android.sdk.util.StringUtils;
 import com.apptentive.android.sdk.util.Util;
 import com.apptentive.android.sdk.util.image.ApptentiveAttachmentLoader;
@@ -83,17 +97,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
-
-import static com.apptentive.android.sdk.ApptentiveHelper.dispatchConversationTask;
-import static com.apptentive.android.sdk.debug.Assert.assertMainThread;
-import static com.apptentive.android.sdk.debug.Assert.assertNotNull;
-import static com.apptentive.android.sdk.ApptentiveLogTag.MESSAGES;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_COMPOSER;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_CONTEXT;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.MESSAGE_OUTGOING;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.STATUS;
-import static com.apptentive.android.sdk.module.messagecenter.model.MessageCenterListItem.WHO_CARD;
-import static com.apptentive.android.sdk.util.Util.guarded;
 
 public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterInteraction> implements
 	OnListviewItemActionListener,
@@ -255,6 +258,8 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 
 		// Needed to prevent the window from being pushed up when a text input area is focused.
 		getActivity().getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_UNCHANGED | WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+
+		getPushNotificationPermission();
 	}
 
 	private void fetchMessages(final FetchCallback callback) {
@@ -380,6 +385,9 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 						addAttachmentsToComposer(new ImageItem(uri.toString(), cachedFileName, Util.getMimeTypeFromUri(hostingActivity, uri), 0));
 					}
 
+					break;
+				}
+				case Constants.REQUEST_POST_NOTIFICATION_PERMISSION: {
 					break;
 				}
 				default:
@@ -1067,7 +1075,7 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	@Override
 	public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
 		boolean bCanScrollUp;
-		if (android.os.Build.VERSION.SDK_INT < 14) {
+		if (Build.VERSION.SDK_INT < 14) {
 			bCanScrollUp = view.getChildCount() > 0
 				&& (view.getFirstVisiblePosition() > 0 ||
 				view.getChildAt(0).getTop() < view.getPaddingTop());
@@ -1669,4 +1677,22 @@ public class MessageCenterFragment extends ApptentiveBaseFragment<MessageCenterI
 	private interface FetchCallback {
 		void onFetchFinish(@Nullable List<MessageCenterListItem> items);
 	}
+
+	//region push notifications
+	private void getPushNotificationPermission() {
+		String POST_NOTIFICATIONS = "android.permission.POST_NOTIFICATIONS";
+
+		SharedPreferences prefs = ApptentiveInternal.getInstance().getGlobalSharedPrefs();
+
+		boolean hasPushSetUp = prefs != null && prefs.getInt(Constants.PREF_KEY_PUSH_PROVIDER, -1) != -1 &&
+				prefs.getString(Constants.PREF_KEY_PUSH_TOKEN, null) != null;
+
+		if (hasPushSetUp &&
+				Build.VERSION.SDK_INT >= 33 &&
+				!hasPermission(requireContext(), POST_NOTIFICATIONS) &&
+				RuntimeUtils.getApplicationInfo(requireContext()).getTargetSdkVersion() >= 33) {
+			requestPermissions(new String[]{POST_NOTIFICATIONS}, Constants.REQUEST_POST_NOTIFICATION_PERMISSION);
+		}
+	}
+	//endregion
 }

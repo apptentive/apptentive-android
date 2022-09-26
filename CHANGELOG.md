@@ -1,3 +1,9 @@
+# 2022-09-26 - v5.8.4
+
+#### Fixes
+
+* Support Message Center Push Notifications for Android 13
+
 # 2022-03-16 - v5.8.3
 
 #### Fixes

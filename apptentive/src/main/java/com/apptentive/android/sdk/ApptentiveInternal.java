@@ -921,8 +921,13 @@ public class ApptentiveInternal implements ApptentiveInstance, ApptentiveNotific
 		} else {
 			intent = MessageCenterInteraction.generateMessageCenterErrorIntent(context);
 		}
-		return (intent != null) ? PendingIntent.getActivity(context, 0, intent,
-			PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT) : null;
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+			return PendingIntent.getActivity(context, 0, intent,
+					PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+		} else {
+			return PendingIntent.getActivity(context, 0, intent,
+					PendingIntent.FLAG_ONE_SHOT | PendingIntent.FLAG_UPDATE_CURRENT);
+		}
 	}
 
 	/**
